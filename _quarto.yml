@@ -20,5 +20,3 @@ format:
   html:
     theme: flatly
     css: styles.css
-    link-external-icon: true
-    link-external-newwindow: true
