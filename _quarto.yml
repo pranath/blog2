@@ -4,7 +4,7 @@ project:
 
 website:
   title: "LivingDataLab"
-  description: 'Professional Blog of Pranath Fernando, Data Scientist'
+  description: ''
   site-url: 'http://livingdatalab.com'
   twitter-card: true
   open-graph: true
@@ -20,5 +20,4 @@ format:
   html:
     theme: flatly
     css: styles.css
-    link-external-icon: true
     link-external-newwindow: true

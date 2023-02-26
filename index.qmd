@@ -1,5 +1,5 @@
 ---
-title: ""
+title: "Blog of Pranath Fernando - Data Scientist"
 listing:
   contents: posts
   sort: "date desc"
