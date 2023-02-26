@@ -71,7 +71,7 @@ ul.task-list li input[type="checkbox"] {
 
     const options = {
       valueNames: ['listing-image','listing-date','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      page: 10,
+      page: 5,
     pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
       searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
@@ -312,7 +312,7 @@ Feb 8, 2023
 </div>
 <div class="quarto-post image-right" data-index="5" data-categories="aws,cloud-data-science,natural-language-processing,deep-learning" data-listing-date-sort="1675641600000" data-listing-file-modified-sort="1677436766035" data-listing-reading-time-sort="5.025">
 <div class="thumbnail">
-<p><a href="./posts/2023-02-06-creating-text-classifier-using-aws-sagemaker-blazingtext.html"> <img src="https://github.com/pranath/blog/raw/master/images/aws4.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2023-02-06-creating-text-classifier-using-aws-sagemaker-blazingtext.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/aws4.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2023-02-06-creating-text-classifier-using-aws-sagemaker-blazingtext.html">
@@ -337,7 +337,7 @@ Feb 6, 2023
 </div>
 <div class="quarto-post image-right" data-index="6" data-categories="aws,cloud-data-science,natural-language-processing" data-listing-date-sort="1675555200000" data-listing-file-modified-sort="1677432332361" data-listing-reading-time-sort="8.845">
 <div class="thumbnail">
-<p><a href="./posts/2023-02-05-train-model-aws-sagemaker-autopilot.html"> <img src="https://github.com/pranath/blog/raw/master/images/aws3.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/2023-02-05-train-model-aws-sagemaker-autopilot.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/aws3.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2023-02-05-train-model-aws-sagemaker-autopilot.html">
@@ -362,7 +362,7 @@ Feb 5, 2023
 </div>
 <div class="quarto-post image-right" data-index="7" data-categories="aws,cloud-data-science,natural-language-processing" data-listing-date-sort="1675468800000" data-listing-file-modified-sort="1677432169998" data-listing-reading-time-sort="5.11">
 <div class="thumbnail">
-<p><a href="./posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify.html"> <img src="https://github.com/pranath/blog/raw/master/images/aws2.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/aws2.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify.html">
@@ -387,7 +387,7 @@ Feb 4, 2023
 </div>
 <div class="quarto-post image-right" data-index="8" data-categories="aws,cloud-data-science,natural-language-processing" data-listing-date-sort="1675382400000" data-listing-file-modified-sort="1677431855091" data-listing-reading-time-sort="7.765">
 <div class="thumbnail">
-<p><a href="./posts/2023-02-03-loading-transforming-clothes-reviews-text-aws.html"> <img src="https://github.com/pranath/blog/raw/master/images/aws.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/2023-02-03-loading-transforming-clothes-reviews-text-aws.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/aws.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2023-02-03-loading-transforming-clothes-reviews-text-aws.html">
@@ -412,7 +412,7 @@ Feb 3, 2023
 </div>
 <div class="quarto-post image-right" data-index="9" data-categories="fastai,deep-learning" data-listing-date-sort="1673740800000" data-listing-file-modified-sort="1677431805431" data-listing-reading-time-sort="7.87">
 <div class="thumbnail">
-<p><a href="./posts/2023-01-15-using-satellite-images-and-deep-learning-to-track-deforestation-in-the-amazon.html"> <img src="https://github.com/pranath/blog/raw/master/images/amazon_deforrest.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2023-01-15-using-satellite-images-and-deep-learning-to-track-deforestation-in-the-amazon.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/amazon_deforrest.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2023-01-15-using-satellite-images-and-deep-learning-to-track-deforestation-in-the-amazon.html">
@@ -1486,6 +1486,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (!isInternal(link.href)) {
           // target, if specified
           link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
       }
     }
 });
