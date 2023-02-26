@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2021-06-12">
+<meta name="description" content="In this article we will build a ResNet type convolutional image networks from scratch using PyTorch, and see why they are key to building deeper neural networks.">
+
+<title>LivingDataLab - Resnets - The Key to Training Deeper Neural Networks</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Resnets - The Key to Training Deeper Neural Networks</h1>
+                  <div>
+        <div class="description">
+          In this article we will build a ResNet type convolutional image networks from scratch using PyTorch, and see why they are key to building deeper neural networks.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">fastai</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 12, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#improving-convolutional-networks---average-pooling" id="toc-improving-convolutional-networks---average-pooling" class="nav-link" data-scroll-target="#improving-convolutional-networks---average-pooling"><span class="toc-section-number">2</span>  Improving Convolutional Networks - Average pooling</a></li>
+  <li><a href="#modern-cnns---resnet" id="toc-modern-cnns---resnet" class="nav-link" data-scroll-target="#modern-cnns---resnet"><span class="toc-section-number">3</span>  Modern CNN’s - ResNet</a>
+  <ul class="collapse">
+  <li><a href="#skip-connections" id="toc-skip-connections" class="nav-link" data-scroll-target="#skip-connections"><span class="toc-section-number">3.1</span>  Skip connections</a></li>
+  <li><a href="#state-of-the-art-resnets" id="toc-state-of-the-art-resnets" class="nav-link" data-scroll-target="#state-of-the-art-resnets"><span class="toc-section-number">3.2</span>  State of the art ResNet’s</a></li>
+  <li><a href="#bottleneck-layers" id="toc-bottleneck-layers" class="nav-link" data-scroll-target="#bottleneck-layers"><span class="toc-section-number">3.3</span>  Bottleneck Layers</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">4</span>  Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In this article we will build a ResNet type convolutional image networks from scratch using PyTorch. We will see why these type of networks are key to enabling the building much deeper networks that can be easily trained and perform well.</p>
+<p>This article and it’s content is based on the <a href="https://github.com/fastai/fastbook/blob/master/14_resnet.ipynb">fast ai deep learning course, chapter 14</a>.</p>
+</section>
+<section id="improving-convolutional-networks---average-pooling" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="improving-convolutional-networks---average-pooling"><span class="header-section-number">2</span> Improving Convolutional Networks - Average pooling</h2>
+<p>In an <a href="2021-06-11-convolutional-image-model-from-scratch.html">earlier article about convolutional networks</a> in the models we used we ended up with a single vector of activations for each image by using enough stride-2 convolutions to down-sample each layer of activations so that we would end up with a grid size of 1.</p>
+<p>If we tried this approach with other, bigger images we would face 2 issues:</p>
+<ul>
+<li>We would need many more layers</li>
+<li>The model would not be able to work on images of a different size to which it was trained on</li>
+</ul>
+<p>By using this type of architecture, we are in essence <em>hard coding</em> the architecture and making it difficult to reuse. We could for example flatten the final layer regardless of the grid size it was beyond 1x1, which was indeed an earlier approach followed, but this would still not work on images of a different size, and takes a lot of memory.</p>
+<p>The problem was better solved by using <em>fully convolutional networks</em> which take the average of activations accross a final grid e.g.&nbsp;over the x and y axis.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> avg_pool(x): <span class="cf">return</span> x.mean((<span class="dv">2</span>,<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This will always convert a grid of activations into a single activation per image.</p>
+<p><strong>A full convolutional network then has a number of convolutional layers some of stride 2, at the end of which is an adaptive average pooling layer - to a layer to flatten and remove the unit axis, and a final linear layer.</strong></p>
+<p>We can define a fully convoltional network in the following way.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> block(ni, nf): <span class="cf">return</span> ConvLayer(ni, nf, stride<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_model():</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">3</span>, <span class="dv">16</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">16</span>, <span class="dv">32</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">32</span>, <span class="dv">64</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">64</span>, <span class="dv">128</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">128</span>, <span class="dv">256</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        nn.AdaptiveAvgPool2d(<span class="dv">1</span>),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        Flatten(),</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        nn.Linear(<span class="dv">256</span>, dls.c))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Because of the nature fo average pooling, this may not be suitable for some vision tasks, as you’re loosing certain types of information. For example if you were trying to recognise digits of 6 and 9, the orientation and relational aspect of groups of pixels matters - so fully convoltuonal may not be good here. However for other images like animals, the orientation does’nt really matter - a cat is a cat even if its upside down! So the fully convolutional networks which loose this relational information would be fine here.</p>
+<p>When we come out of the convolutional layers, we have activations of dimensions bs x ch x h x w (batch size, a certain number of channels, height, and width). We want to end up with a tensor of bs x ch, so we can take the average over the last two dimensions and flatten the trailing 1×1 dimension like we did in our previous model.</p>
+<p>There are other types of pooling we could use for example max pooling. For instance, max pooling layers of size 2, which were very popular in older CNNs, reduce the size of our image by half on each dimension by taking the maximum of each 2×2 window (with a stride of 2).</p>
+<p>We are going to use a new dataset <em>Imagenette</em> which is a smaller version of the famous ImageNet dataset, this smaller one being with just 10 classes of image.</p>
+<p>Lets get the data and train our new model.</p>
+<div class="cell" data-outputid="900d955d-883e-42eb-a8d0-2c28c6dc989b" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_data(url, presize, resize):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> untar_data(url)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> DataBlock(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        blocks<span class="op">=</span>(ImageBlock, CategoryBlock), get_items<span class="op">=</span>get_image_files, </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        splitter<span class="op">=</span>GrandparentSplitter(valid_name<span class="op">=</span><span class="st">'val'</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        get_y<span class="op">=</span>parent_label, item_tfms<span class="op">=</span>Resize(presize),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        batch_tfms<span class="op">=</span>[<span class="op">*</span>aug_transforms(min_scale<span class="op">=</span><span class="fl">0.5</span>, size<span class="op">=</span>resize),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                    Normalize.from_stats(<span class="op">*</span>imagenet_stats)],</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    ).dataloaders(path, bs<span class="op">=</span><span class="dv">128</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>dls <span class="op">=</span> get_data(URLs.IMAGENETTE_160, <span class="dv">160</span>, <span class="dv">128</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>dls.show_batch(max_n<span class="op">=</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>File downloaded is broken. Remove /root/.fastai/archive/imagenette2-160.tgz and try again.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-06-12-resnets-the-key-to-training-deep-neural-networks_files/figure-html/cell-5-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-outputid="d17fd10a-87c5-4bba-9080-e26d602081a4" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_learner(m):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Learner(dls, m, loss_func<span class="op">=</span>nn.CrossEntropyLoss(), metrics<span class="op">=</span>accuracy</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                  ).to_fp16()</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(get_model())</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>learn.lr_find()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>SuggestedLRs(lr_min=0.002290867641568184, lr_steep=0.007585775572806597)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-06-12-resnets-the-key-to-training-deep-neural-networks_files/figure-html/cell-6-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-outputid="4feee49d-41e8-4bd2-d1a6-cc8d5eefe374" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 3e-3 often a good learning rate for CNN's</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">5</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>accuracy</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>1.882259</td>
+      <td>1.813273</td>
+      <td>0.404076</td>
+      <td>00:30</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>1.522370</td>
+      <td>1.521868</td>
+      <td>0.504459</td>
+      <td>00:30</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>1.276501</td>
+      <td>1.225626</td>
+      <td>0.606624</td>
+      <td>00:30</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1.135786</td>
+      <td>1.183137</td>
+      <td>0.623185</td>
+      <td>00:30</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>1.042103</td>
+      <td>1.048710</td>
+      <td>0.665733</td>
+      <td>00:30</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<p>This is quite a good result, considering this is not a pre-trained model trying and to predict 10 image categories from scratch. But to improve this, we will need to do more than just add more layers.</p>
+</section>
+<section id="modern-cnns---resnet" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="modern-cnns---resnet"><span class="header-section-number">3</span> Modern CNN’s - ResNet</h2>
+<section id="skip-connections" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="skip-connections"><span class="header-section-number">3.1</span> Skip connections</h3>
+<p>The authors of the original ResNet paper noticed when training deeper models, even when using BatchNorm, that a network with more layers often did worse than a network with less layers.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/resnet2.png" title="How deeper networks do worse than shallower networks" class="img-fluid"></p>
+<p>It seems that a bigger network has a lot of trouble discovering the parameters of even the smaller better network when left by itself to just train this bigger network.</p>
+<p>While this had been noticed before, what the authors of the paper did that was new was to realise it <strong>should be possible to create a deeper network that should do at least as well as a more shallow network, by essentially turning off the extra layers i.e.&nbsp;using an identity mapping</strong>.</p>
+<p>An identity mapping is where you are passing through the signal from earlier layers directly, skipping over the current layer. Remember from Batch norm layers we have the transformative factors of gamma and beta - if we set gamma to zero for the extra layers - this would essentially turn off the actions of the extra layers - and allow the signal from the earlier layers to come through unaltered. This is called the <strong>skip connection</strong>.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/resnet.png" title="The ResNet skip connection" class="img-fluid"></p>
+<p>This can allow the model to only change the later layers gradually. The original ResNet paper actually defined the skip connection as jumping over 2 layers, as seen in the diagram above.</p>
+<p>Another way to think about ResNet’s and these skip connections is to consider the function here i.e.</p>
+<p>Y = X + block(X)</p>
+<p>So we are not asking this block layer to directly predict the output Y, we are asking the block to learn to predict the difference between X and Y to minimise the error i.e.&nbsp;block(X) wants to help X get closer to Y. <strong>So a ResNet is good at learning about slight differences between doing nothing and adding a little something to the previous signal to make it better.</strong> This is how ResNet’s got their name, as they are predicting ‘residuals’ i.e.&nbsp;a residual is the prediction - target.</p>
+<p>Also what is key here is the idea of making learning more gradual and easier. Even though the Universal Approximation Theorem states that a sufficiently large network can learn any function, in practice there is a difference between how different architectures can make it easy and difficult to learn.</p>
+<p>Let’s define a ResNet block with a skip connection, here <strong>norm_type=NormType.BatchZero</strong> causes fastai to init the gamma weights of the last batchnorm layer to zero).</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResBlock(Module):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, ni, nf):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.convs <span class="op">=</span> nn.Sequential(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>            ConvLayer(ni,nf),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>            ConvLayer(nf,nf, norm_type<span class="op">=</span>NormType.BatchZero))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x): <span class="cf">return</span> x <span class="op">+</span> <span class="va">self</span>.convs(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are 2 problems with this though, it can’t handle strides of more than 1, and it needs ni=nf. If we recall, convolutional operations change the dimensions of the output based on the output channels, as do strides of more than 1. This would prevent us from adding X to conv(X) as they would be of different dimensions.</p>
+<p>To remedy this, we need a way to change the dimensions of x to match conv(x). So we can halve the grid size using and average pooling layer with stride 2, and we can change the number of channels using a convolution. We need to make the convolution as simple as possible, and that would be one with a kernal size of 1.</p>
+<p>So we can now define a better ResBlock that uses these tricks to handle the changing shape of the skip connection.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _conv_block(ni,nf,stride):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        ConvLayer(ni, nf, stride<span class="op">=</span>stride),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        ConvLayer(nf, nf, act_cls<span class="op">=</span><span class="va">None</span>, norm_type<span class="op">=</span>NormType.BatchZero))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResBlock(Module):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, ni, nf, stride<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.convs <span class="op">=</span> _conv_block(ni,nf,stride)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.idconv <span class="op">=</span> noop <span class="cf">if</span> ni<span class="op">==</span>nf <span class="cf">else</span> ConvLayer(ni, nf, <span class="dv">1</span>, act_cls<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pool <span class="op">=</span> noop <span class="cf">if</span> stride<span class="op">==</span><span class="dv">1</span> <span class="cf">else</span> nn.AvgPool2d(<span class="dv">2</span>, ceil_mode<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> F.relu(<span class="va">self</span>.convs(x) <span class="op">+</span> <span class="va">self</span>.idconv(<span class="va">self</span>.pool(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We are using the <strong>noop</strong> function here which just returns the input unchanged, so idconv does nothing if ni==nf, and pool does nothing if stride=1 - which is what we want in our skip connection.</p>
+<p>Also we moved the Relu after both layers, treating as the whole ResNet block like one layer.</p>
+<p>Lets try this model.</p>
+<div class="cell" data-outputid="ebf53620-d9a7-4f60-e664-87396057bc05" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> block(ni,nf): <span class="cf">return</span> ResBlock(ni, nf, stride<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(get_model())</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">5</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>accuracy</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>1.947870</td>
+      <td>1.877467</td>
+      <td>0.335796</td>
+      <td>00:32</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>1.671832</td>
+      <td>1.602260</td>
+      <td>0.456561</td>
+      <td>00:32</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>1.379121</td>
+      <td>1.492799</td>
+      <td>0.533503</td>
+      <td>00:32</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1.170203</td>
+      <td>1.069924</td>
+      <td>0.662166</td>
+      <td>00:33</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>1.032529</td>
+      <td>1.050656</td>
+      <td>0.672357</td>
+      <td>00:33</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<p>While this is not spectacularly better, the point is this allows us to now train deeper models more easily. For example we can make a model with twice as many layers in the following way.</p>
+<div class="cell" data-outputid="bbde0fdf-74ec-4fc8-af87-ea6d0d1125ed" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> block(ni, nf):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(ResBlock(ni, nf, stride<span class="op">=</span><span class="dv">2</span>), ResBlock(nf, nf))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(get_model())</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">5</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>accuracy</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>1.945738</td>
+      <td>1.871942</td>
+      <td>0.353631</td>
+      <td>00:36</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>1.632775</td>
+      <td>1.519365</td>
+      <td>0.492484</td>
+      <td>00:36</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>1.331637</td>
+      <td>1.168114</td>
+      <td>0.622930</td>
+      <td>00:36</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1.081849</td>
+      <td>1.036962</td>
+      <td>0.665733</td>
+      <td>00:35</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.944774</td>
+      <td>0.946332</td>
+      <td>0.695287</td>
+      <td>00:36</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<p>This deeper model is now doing better with the same number of epochs.</p>
+<p>For the ResNet breakthrough and many others a key note might be that <strong>many of these breakthroughs have come through experimental observations of odd things, and then trying to figure out why these occour.</strong> So deep learning is a very experimental field where many breakthroughs come through experiments.</p>
+<p>Further work exploring ResNet’s showed how the skip connections actually helped smooth the loss landscape making training easier, more gradual, and easier to avoid getting stuck in a local minima.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/resnet3.png" title="Smoothed loss landscape using ResNets" class="img-fluid"></p>
+</section>
+<section id="state-of-the-art-resnets" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="state-of-the-art-resnets"><span class="header-section-number">3.2</span> State of the art ResNet’s</h3>
+<p>Current ResNet’s used have a few further tweaks that improve their performance. This include the earlier layers being just convolutional layers followed by a max pooling layer, without a full ResNet block and skip connections. These earlier layers are called the <em>stem</em> of the network.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _resnet_stem(<span class="op">*</span>sizes):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        ConvLayer(sizes[i], sizes[i<span class="op">+</span><span class="dv">1</span>], <span class="dv">3</span>, stride <span class="op">=</span> <span class="dv">2</span> <span class="cf">if</span> i<span class="op">==</span><span class="dv">0</span> <span class="cf">else</span> <span class="dv">1</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(sizes)<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    ] <span class="op">+</span> [nn.MaxPool2d(kernel_size<span class="op">=</span><span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">1</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="00ebec1d-f944-4019-9e0a-1bc157bbc895" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>_resnet_stem(<span class="dv">3</span>,<span class="dv">32</span>,<span class="dv">32</span>,<span class="dv">64</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Why this approach? <strong>with deep convolutional networks, most of the computation occours in the earlier layers of the network. Therefore it helps to keep the earlier layers as simple as possible.</strong>. ResNet blocks take far more computation than a plain convolutional block.</p>
+<p>Lets now try this approach with improving out ResNet architecture with these improvements in mind.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResNet(nn.Sequential):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_out, layers, expansion<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        stem <span class="op">=</span> _resnet_stem(<span class="dv">3</span>,<span class="dv">32</span>,<span class="dv">32</span>,<span class="dv">64</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.block_szs <span class="op">=</span> [<span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>]</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">5</span>): <span class="va">self</span>.block_szs[i] <span class="op">*=</span> expansion</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        blocks <span class="op">=</span> [<span class="va">self</span>._make_layer(<span class="op">*</span>o) <span class="cf">for</span> o <span class="kw">in</span> <span class="bu">enumerate</span>(layers)]</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="op">*</span>stem, <span class="op">*</span>blocks,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>                         nn.AdaptiveAvgPool2d(<span class="dv">1</span>), Flatten(),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                         nn.Linear(<span class="va">self</span>.block_szs[<span class="op">-</span><span class="dv">1</span>], n_out))</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _make_layer(<span class="va">self</span>, idx, n_layers):</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        stride <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> idx<span class="op">==</span><span class="dv">0</span> <span class="cf">else</span> <span class="dv">2</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        ch_in,ch_out <span class="op">=</span> <span class="va">self</span>.block_szs[idx:idx<span class="op">+</span><span class="dv">2</span>]</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> nn.Sequential(<span class="op">*</span>[</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>            ResBlock(ch_in <span class="cf">if</span> i<span class="op">==</span><span class="dv">0</span> <span class="cf">else</span> ch_out, ch_out, stride <span class="cf">if</span> i<span class="op">==</span><span class="dv">0</span> <span class="cf">else</span> <span class="dv">1</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_layers)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>        ])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The various versions of the models (ResNet-18, -34, -50, etc.) just change the number of blocks in each of those groups. This is the definition of a ResNet-18:</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>rn <span class="op">=</span> ResNet(dls.c, [<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s try training this new Resnet-18 architecture.</p>
+<div class="cell" data-outputid="8de9c5aa-66ee-4c61-8864-16d2f7b740b6" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(rn)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">5</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>accuracy</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>1.625527</td>
+      <td>2.041075</td>
+      <td>0.396688</td>
+      <td>00:55</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>1.329917</td>
+      <td>1.507927</td>
+      <td>0.541147</td>
+      <td>00:54</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>1.065707</td>
+      <td>1.900392</td>
+      <td>0.499618</td>
+      <td>00:54</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.870085</td>
+      <td>0.987169</td>
+      <td>0.682293</td>
+      <td>00:54</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.765841</td>
+      <td>0.779386</td>
+      <td>0.753631</td>
+      <td>00:54</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="bottleneck-layers" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="bottleneck-layers"><span class="header-section-number">3.3</span> Bottleneck Layers</h3>
+<p>We can use another method when making even deeper models to try and reduce the amount of memory used to make it faster, this might be fore ResNet’s of depth 50 or more.</p>
+<p>Rather than stacking 2 convolutions with a kernal size of 3, we can use 3 different convolutions two 1x1 at the start and end, and one 3x3. This is called a <em>bottleneck layer</em>.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/resnet4.png" title="A ResNet bottleneck layer" class="img-fluid"></p>
+<p>How does this help? 1x1 convolutions are much faster, so this type of block runs much faster than the ones with only 3x3 kernals. This then allows us to use more channels, 4 times more in fact (we end up with 256 channels out instead of just 64) which reduce then restore the number of channels (ie the name bottleneck).</p>
+<p>So we end up using more channels in the same amout of time with this type of block architecture. Lets try improving our model with a bottleneck block and use it to build a bigger model ResNet-50.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _conv_block(ni,nf,stride):</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>        ConvLayer(ni, nf<span class="op">//</span><span class="dv">4</span>, <span class="dv">1</span>),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        ConvLayer(nf<span class="op">//</span><span class="dv">4</span>, nf<span class="op">//</span><span class="dv">4</span>, stride<span class="op">=</span>stride), </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        ConvLayer(nf<span class="op">//</span><span class="dv">4</span>, nf, <span class="dv">1</span>, act_cls<span class="op">=</span><span class="va">None</span>, norm_type<span class="op">=</span>NormType.BatchZero))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To get better results from this bigger model we will need to train it longer and we can use bigger images as well.</p>
+<div class="cell" data-outputid="dea2294f-c2ab-4cc0-d5e8-4eb705b2be93" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dls <span class="op">=</span> get_data(URLs.IMAGENETTE_320, presize<span class="op">=</span><span class="dv">320</span>, resize<span class="op">=</span><span class="dv">224</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>rn <span class="op">=</span> ResNet(dls.c, [<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">3</span>], <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>File downloaded is broken. Remove /root/.fastai/archive/imagenette2-320.tgz and try again.</code></pre>
+</div>
+</div>
+<p>Bear in mind even though we are using bigger images, we don’t need to really change our network due to this because its fully convolutional it works just fine (remember the use of pooling layers). This also allows us to use the fastai technique of <em>progressive resizing</em>.</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">4</span> Conclusion</h2>
+<p>In this article we have built a ResNet convolutional deep learning image model from scratch, using many iterations and variations - including some of the most recent state of the art techniques.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

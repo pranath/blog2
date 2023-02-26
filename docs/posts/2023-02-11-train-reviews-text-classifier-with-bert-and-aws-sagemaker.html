@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-02-11">
+<meta name="description" content="We train a text classifier using a variant of the BERT deep learning model architecture called RoBERTa - a Robustly Optimized BERT Pretraining Approach, within a PyTorch model ran as a SageMaker Training Job.">
+
+<title>blogtest1 - Train a Review Classifier with BERT and Amazon SageMaker</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">blogtest1</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Train a Review Classifier with BERT and Amazon SageMaker</h1>
+                  <div>
+        <div class="description">
+          We train a text classifier using a variant of the BERT deep learning model architecture called RoBERTa - a Robustly Optimized BERT Pretraining Approach, within a PyTorch model ran as a SageMaker Training Job.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">aws</div>
+                <div class="quarto-category">cloud-data-science</div>
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">February 11, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">0.1</span>  Introduction</a></li>
+  <li><a href="#aws-built-in-algorithms-vs-pre-trained-models" id="toc-aws-built-in-algorithms-vs-pre-trained-models" class="nav-link" data-scroll-target="#aws-built-in-algorithms-vs-pre-trained-models"><span class="toc-section-number">1</span>  AWS Built-in algorithms vs Pre-Trained Models</a></li>
+  <li><a href="#pre-trained-bert-and-roberta-models" id="toc-pre-trained-bert-and-roberta-models" class="nav-link" data-scroll-target="#pre-trained-bert-and-roberta-models"><span class="toc-section-number">2</span>  Pre-Trained BERT and Roberta Models</a></li>
+  <li><a href="#configure-dataset-hyper-parameters-and-evaluation-metrics" id="toc-configure-dataset-hyper-parameters-and-evaluation-metrics" class="nav-link" data-scroll-target="#configure-dataset-hyper-parameters-and-evaluation-metrics"><span class="toc-section-number">3</span>  Configure dataset, hyper-parameters and evaluation metrics</a>
+  <ul class="collapse">
+  <li><a href="#configure-dataset" id="toc-configure-dataset" class="nav-link" data-scroll-target="#configure-dataset"><span class="toc-section-number">3.1</span>  Configure dataset</a></li>
+  <li><a href="#configure-model-hyper-parameters" id="toc-configure-model-hyper-parameters" class="nav-link" data-scroll-target="#configure-model-hyper-parameters"><span class="toc-section-number">3.2</span>  Configure model hyper-parameters</a></li>
+  <li><a href="#setup-evaluation-metrics" id="toc-setup-evaluation-metrics" class="nav-link" data-scroll-target="#setup-evaluation-metrics"><span class="toc-section-number">3.3</span>  Setup evaluation metrics</a></li>
+  <li><a href="#setup-debugger-and-profiler" id="toc-setup-debugger-and-profiler" class="nav-link" data-scroll-target="#setup-debugger-and-profiler"><span class="toc-section-number">3.4</span>  Setup Debugger and Profiler</a></li>
+  </ul></li>
+  <li><a href="#train-model" id="toc-train-model" class="nav-link" data-scroll-target="#train-model"><span class="toc-section-number">4</span>  Train model</a>
+  <ul class="collapse">
+  <li><a href="#setup-the-roberta-and-pytorch-script-to-run-on-sagemaker" id="toc-setup-the-roberta-and-pytorch-script-to-run-on-sagemaker" class="nav-link" data-scroll-target="#setup-the-roberta-and-pytorch-script-to-run-on-sagemaker"><span class="toc-section-number">4.1</span>  Setup the RoBERTa and PyTorch script to run on SageMaker</a></li>
+  <li><a href="#download-sagemaker-debugger-profiling-report" id="toc-download-sagemaker-debugger-profiling-report" class="nav-link" data-scroll-target="#download-sagemaker-debugger-profiling-report"><span class="toc-section-number">4.2</span>  Download SageMaker debugger profiling report</a></li>
+  </ul></li>
+  <li><a href="#deploy-the-model" id="toc-deploy-the-model" class="nav-link" data-scroll-target="#deploy-the-model"><span class="toc-section-number">5</span>  Deploy the model</a></li>
+  <li><a href="#test-model" id="toc-test-model" class="nav-link" data-scroll-target="#test-model"><span class="toc-section-number">6</span>  Test model</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">7</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level3" data-number="0.1">
+<h3 data-number="0.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">0.1</span> Introduction</h3>
+<p>In the previous article we performed <a href="2023-02-08-feature-transformation-aws-sagemaker-processing-job-feature-store.html">Feature Engineering on a raw dataset of product text reviews</a> using AWS Sagemaker, preparing it for training the model. Now we will train a text classifier using a variant of BERT called <a href="https://arxiv.org/abs/1907.11692">RoBERTa</a> - a Robustly Optimized BERT Pretraining Approach - within a PyTorch model ran as a SageMaker Training Job.</p>
+<p>Let’s review the Amazon SageMaker “Bring Your Own Script” scheme:</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/sagemaker_scriptmode.png" title="AWS Bring your own script scheme" class="img-fluid"></p>
+<p>In this project we will cover each part of this scheme. First, we need to install and import the required modules:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> boto3</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sagemaker</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> botocore</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> botocore.config.Config(user_agent_extra<span class="op">=</span><span class="st">'dlai-pds/c2/w2'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># low-level service client of the boto3 session</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> boto3.client(service_name<span class="op">=</span><span class="st">'sagemaker'</span>, </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                  config<span class="op">=</span>config)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>sm_runtime <span class="op">=</span> boto3.client(<span class="st">'sagemaker-runtime'</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                          config<span class="op">=</span>config)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>sess <span class="op">=</span> sagemaker.Session(sagemaker_client<span class="op">=</span>sm,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                         sagemaker_runtime_client<span class="op">=</span>sm_runtime)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>bucket <span class="op">=</span> sess.default_bucket()</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>role <span class="op">=</span> sagemaker.get_execution_role()</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> sess.boto_region_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>config InlineBackend.figure_format<span class="op">=</span><span class="st">'retina'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="aws-built-in-algorithms-vs-pre-trained-models" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="aws-built-in-algorithms-vs-pre-trained-models"><span class="header-section-number">1</span> AWS Built-in algorithms vs Pre-Trained Models</h2>
+<p>Training an NLP model from scratch can be a very time-consuming and expensive. For example, training the BERT models 110 or 340 million parameters from scratch could take multiple days, depending on the CPU or GPU resources you have available. Luckily, there are many pretrained models available, which you can use to simply adapt them to your use case and your data set.</p>
+<p>Lets also highlight the differences between AWS built-in algorithms and pretrained models. In <a href="https://livingdatalab.com/categories/#aws">earlier articles</a>, we looked at how to use built-in AWS algorithms, for example, the blazing text algorithm, to quickly train a model.</p>
+<p>The built-in algorithm all required code to train the text classifier. We just pointed the algorithm to the prepared training data. In this project, we will work with pretrained models. <strong>The main difference here is that the model has already been trained on large collections of text data.</strong> For example, wikipedia text data.</p>
+<p>We looked at <a href="https://livingdatalab.com/categories/#fastai">pre-trained deep learning models previously as the Fastai deep learning library provides these by default</a>.</p>
+<p>With pre-trained models there are usually 2 steps:</p>
+<ul>
+<li><strong>Model pre-training</strong>: a task to help the model understand language better e.g.&nbsp;to predict the next word in a sequence</li>
+<li><strong>Model fine-tuning</strong>: the main task at hand, where we use the pre-trained model that already understands language well and then customise that for a task e.g.&nbsp;classify text for sentiment</li>
+</ul>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_model_pretrain_finetune.png" title="Pre-training and fine tuning models" class="img-fluid"></p>
+<p>This helps improve the speed and performance of training a deep learning model by using a pre-training step, as opposed to say training a deep learning text classifier from scratch. This concept is also known as <em>transfer learning</em>.</p>
+<p>Here using AWS we will provide specific text data, the product reviews data, to adapt a pre-trained model to our text domain and also provide the task and model training code. We wll be telling the pretrained model to perform a text classification task, with the three sentiment classes supplied.</p>
+</section>
+<section id="pre-trained-bert-and-roberta-models" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="pre-trained-bert-and-roberta-models"><span class="header-section-number">2</span> Pre-Trained BERT and Roberta Models</h2>
+<p>While you can use BERT as is without training from scratch, it’s useful to understand how BERT uses word masking and next sentence prediction in parallel to learn and understand language. As BERT sees new text, the model masks 15 percent of the words in each sentence. BERT then predicts the masked words and corrects itself, meaning it updates the model weights when it predicts incorrectly.</p>
+<p>This step is called <em>masked language model or masked LM</em>. Masking forces the model to learn the surrounding words for each sentence. At the same time, BERT is masking and predicting words, or to be more precise, input tokens. It is also performing next sentence prediction, or NSP, on pairs of input sequences.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_bert_pretrain.png" title="Pretraining a BERT Model" class="img-fluid"></p>
+<p>To perform NSP, BERT randomly chooses 50 percent of the sentence pairs and replaces one of the two sentences with a random sentence from another part of the document. BERT then predicts if the two sentences are a valid sentence pair or not. BERT again will correct itself when it predicts incorrectly. Both of those training tasks are performed in parallel to create a single accuracy score for the combined training efforts.</p>
+<p>This results in a more robust model capable of performing word and sentence level predictive tasks. The input data is large collections of unlabeled text.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_bert_finetune.png" title="Finetuning a BERT Model" class="img-fluid"></p>
+<p>Since BERT has already been pre-trained on millions of public documents from Wikipedia and the Google Books corpus, the vocabulary and learned representations are indeed transferable to a large number of NLP and NLU tasks across a wide variety of domains.</p>
+<p>In the fine-tuning step, you also configure the model for the actual NLP task, such as question and answer, text classification, or a named entity recognition. Fine-tuning is implemented as supervised learning and no masking or next sentence prediction happens. As a result, fine-tuning is very fast and requires a relatively small number of samples or product reviews, in our case.</p>
+<p>The RoBERTa model architecture builds on BERT’s language masking strategy, but removes the next sentence pre-training objective. It also trains with much larger mini-batches and learning rates and with a 160 gigabyte of text, RoBERTa also uses much more training data compared to BERT, which is pre-trained with 16 gigabytes of text data.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_roberta.png" title="AWS Pretrain &amp; Finetune a Roberta Model" class="img-fluid"></p>
+<p>These model architecture changes focus on building an even better performing masked language model for the NLP downstream tasks, such as text classification.</p>
+</section>
+<section id="configure-dataset-hyper-parameters-and-evaluation-metrics" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="configure-dataset-hyper-parameters-and-evaluation-metrics"><span class="header-section-number">3</span> Configure dataset, hyper-parameters and evaluation metrics</h2>
+<section id="configure-dataset" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="configure-dataset"><span class="header-section-number">3.1</span> Configure dataset</h3>
+<p>We have already transformed and balanced the data into a format that the model expects. Let’s copy this data to S3. We will be using training and validation datasets to train the model. The test dataset will be used for tuning later.</p>
+<p>Let’s setup the paths:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>processed_train_data_s3_uri <span class="op">=</span> <span class="st">'s3://</span><span class="sc">{}</span><span class="st">/data/sentiment-train/'</span>.<span class="bu">format</span>(bucket)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>processed_validation_data_s3_uri <span class="op">=</span> <span class="st">'s3://</span><span class="sc">{}</span><span class="st">/data/sentiment-validation/'</span>.<span class="bu">format</span>(bucket)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Upload the data to S3 bucket:</p>
+<div class="cell" data-outputid="48c9d0c2-2eb4-4c7b-a335-b5dd46a30dbb">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp <span class="op">--</span>recursive .<span class="op">/</span>data<span class="op">/</span>sentiment<span class="op">-</span>train $processed_train_data_s3_uri</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp <span class="op">--</span>recursive .<span class="op">/</span>data<span class="op">/</span>sentiment<span class="op">-</span>validation $processed_validation_data_s3_uri</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>upload: data/sentiment-train/part-algo-1-womens_clothing_ecommerce_reviews.tsv to s3://sagemaker-us-east-1-215290792315/data/sentiment-train/part-algo-1-womens_clothing_ecommerce_reviews.tsv
+upload: data/sentiment-validation/part-algo-1-womens_clothing_ecommerce_reviews.tsv to s3://sagemaker-us-east-1-215290792315/data/sentiment-validation/part-algo-1-womens_clothing_ecommerce_reviews.tsv</code></pre>
+</div>
+</div>
+<p>Check the existence of those files in the S3 bucket:</p>
+<div class="cell" data-outputid="ef3a5da4-a37e-4137-94f9-e3cce56b85b2">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls <span class="op">--</span>recursive $processed_train_data_s3_uri</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2023-02-11 11:21:43    4894416 data/sentiment-train/part-algo-1-womens_clothing_ecommerce_reviews.tsv</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="46dd16e0-7745-4a9f-dc96-e3cc57e84bed">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls <span class="op">--</span>recursive $processed_validation_data_s3_uri</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2023-02-11 11:21:44     276522 data/sentiment-validation/part-algo-1-womens_clothing_ecommerce_reviews.tsv</code></pre>
+</div>
+</div>
+<p>We need to setup the input data channels, wrapping the S3 locations in a <code>TrainingInput</code> object to use with the SageMaker Training Job. This can be organized as a dictionary where training and validation data are the Amazon SageMaker channels for S3 input data sources.</p>
+<p>Let’s create a train data channel.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>s3_input_train_data <span class="op">=</span> sagemaker.inputs.TrainingInput(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    s3_data<span class="op">=</span>processed_train_data_s3_uri </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now create a validation data channel.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>s3_input_validation_data <span class="op">=</span> sagemaker.inputs.TrainingInput(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    s3_data<span class="op">=</span>processed_validation_data_s3_uri </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Organize the data channels defined above as a dictionary.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data_channels <span class="op">=</span> {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'train'</span>: s3_input_train_data, </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'validation'</span>: s3_input_validation_data </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="configure-model-hyper-parameters" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="configure-model-hyper-parameters"><span class="header-section-number">3.2</span> Configure model hyper-parameters</h3>
+<p>Now we need to set the Training Job parameters including the instance type, instance count, learning rate, batch size etc. For the purposes of this project, we will use a relatively small instance type. Please refer to <a href="https://aws.amazon.com/sagemaker/pricing/">this link</a> for additional instance types that may work for your use cases.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>max_seq_length<span class="op">=</span><span class="dv">128</span> <span class="co"># maximum number of input tokens passed to BERT model</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>freeze_bert_layer<span class="op">=</span><span class="va">False</span> <span class="co"># specifies the depth of training within the network</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>epochs<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>learning_rate<span class="op">=</span><span class="fl">2e-5</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>train_batch_size<span class="op">=</span><span class="dv">256</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>train_steps_per_epoch<span class="op">=</span><span class="dv">50</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>validation_batch_size<span class="op">=</span><span class="dv">256</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>validation_steps_per_epoch<span class="op">=</span><span class="dv">50</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>seed<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>run_validation<span class="op">=</span><span class="va">True</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>train_instance_count<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>train_instance_type<span class="op">=</span><span class="st">'ml.c5.9xlarge'</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>train_volume_size<span class="op">=</span><span class="dv">256</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>input_mode<span class="op">=</span><span class="st">'File'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Some of them will be passed into the PyTorch estimator in the hyperparameters argument. Let’s setup the dictionary for that:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>hyperparameters<span class="op">=</span>{</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'max_seq_length'</span>: max_seq_length,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'freeze_bert_layer'</span>: freeze_bert_layer,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'epochs'</span>: epochs,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'learning_rate'</span>: learning_rate,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'train_batch_size'</span>: train_batch_size,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'train_steps_per_epoch'</span>: train_steps_per_epoch,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'validation_batch_size'</span>: validation_batch_size,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'validation_steps_per_epoch'</span>: validation_steps_per_epoch,    </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'seed'</span>: seed,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'run_validation'</span>: run_validation</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="setup-evaluation-metrics" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="setup-evaluation-metrics"><span class="header-section-number">3.3</span> Setup evaluation metrics</h3>
+<p>We will choose loss and accuracy as the evaluation metrics. The regular expressions <code>Regex</code> will capture the values of metrics that the algorithm will emit.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>metric_definitions <span class="op">=</span> [</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>     {<span class="st">'Name'</span>: <span class="st">'validation:loss'</span>, <span class="st">'Regex'</span>: <span class="st">'val_loss: ([0-9.]+)'</span>},</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>     {<span class="st">'Name'</span>: <span class="st">'validation:accuracy'</span>, <span class="st">'Regex'</span>: <span class="st">'val_acc: ([0-9.]+)'</span>},</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For example, these sample log lines…</p>
+<pre><code>[step: 100] val_loss: 0.76 - val_acc: 70.92%</code></pre>
+<p>…will produce the following metrics in CloudWatch:</p>
+<p><code>validation:loss</code> = 0.76</p>
+<p><code>validation:accuracy</code> = 70.92</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/cloudwatch_validation_metrics.png" title="Evaluation metrics" class="img-fluid"></p>
+</section>
+<section id="setup-debugger-and-profiler" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="setup-debugger-and-profiler"><span class="header-section-number">3.4</span> Setup Debugger and Profiler</h3>
+<p>Amazon SageMaker Debugger can be used to profile machine learning models, helping to identify and fix training issues caused by hardware resource usage. Setting some parameters in the SageMaker estimator, without any change to the training code, can enable the collection of infrastructure and model metrics such as: CPU and GPU, RAM and GPU RAM, data loading time, time spent in ML operators running on CPU and GPU, distributed training metrics and many more.</p>
+<p>In addition, we can visualize how much time is spent in different phases, such as preprocessing, training loop, and postprocessing. If needed, you can drill down on each training epoch, and even on each function in your training script.</p>
+<p>You can define Debugger Rules as are described here: https://docs.aws.amazon.com/sagemaker/latest/dg/debugger-built-in-rules.html</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.debugger <span class="im">import</span> Rule, ProfilerRule, rule_configs</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.debugger <span class="im">import</span> DebuggerHookConfig</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.debugger <span class="im">import</span> ProfilerConfig, FrameworkProfile</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>DebuggerHookConfig</code> provides options to customize how debugging information is emitted and saved. <code>s3_output_path</code> argument value defines the location in Amazon S3 to store the output.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>debugger_hook_config <span class="op">=</span> DebuggerHookConfig(</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    s3_output_path<span class="op">=</span><span class="st">'s3://</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(bucket),</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>ProfilerConfig</code> sets the configuration for collecting system and framework metrics of SageMaker Training Jobs. Parameter <code>system_monitor_interval_millis</code> sets the time interval to collect system metrics (in milliseconds). Parameter <code>framework_profile_params</code> is the object for framework metrics profiling. Here we will set its local path, the step at which to start profiling, <code>start_step</code>, and the number of steps to profile, <code>num_steps</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.debugger <span class="im">import</span> ProfilerConfig, FrameworkProfile</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>profiler_config <span class="op">=</span> ProfilerConfig(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    system_monitor_interval_millis<span class="op">=</span><span class="dv">500</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    framework_profile_params<span class="op">=</span>FrameworkProfile(local_path<span class="op">=</span><span class="st">"/opt/ml/output/profiler/"</span>, start_step<span class="op">=</span><span class="dv">5</span>, num_steps<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For monitoring and profiling the built-in rules we can use the <code>ProfilerReport</code>. It creates a profiling report and updates when the individual rules are triggered. If you trigger this <code>ProfilerReport</code> rule without any customized parameter as in the cell below, then the <code>ProfilerReport</code> rule triggers all of the built-in rules for monitoring and profiling with their default parameter values.</p>
+<p>The profiling report can be downloaded while the Training Job is running or after the job has finished.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>rules<span class="op">=</span>[ProfilerRule.sagemaker(rule_configs.ProfilerReport())]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="train-model" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="train-model"><span class="header-section-number">4</span> Train model</h2>
+<section id="setup-the-roberta-and-pytorch-script-to-run-on-sagemaker" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="setup-the-roberta-and-pytorch-script-to-run-on-sagemaker"><span class="header-section-number">4.1</span> Setup the RoBERTa and PyTorch script to run on SageMaker</h3>
+<p>We will prepare the PyTorch model to run as a SageMaker Training Job in a separate Python file, which will be called during the training.</p>
+<p>Here we will be using the pre-trained model <code>roberta-base</code>. The information about the available models can be found in the <a href="https://huggingface.co/models">Hugging Face website</a>.</p>
+<div class="cell" data-outputid="c2e3988f-0967-4dd0-8353-d13e7f71b752">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys, importlib</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">'src/'</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> train</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># reload the module if it has been previously loaded</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">'train'</span> <span class="kw">in</span> sys.modules:</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    importlib.<span class="bu">reload</span>(train)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Ignore warnings below</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> train.configure_model()</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>label_0 <span class="op">=</span> config.id2label[<span class="dv">0</span>]</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>label_1 <span class="op">=</span> config.id2label[<span class="dv">1</span>]</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>label_2 <span class="op">=</span> config.id2label[<span class="dv">2</span>]</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>updated_correctly <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> label_0 <span class="op">!=</span> <span class="op">-</span><span class="dv">1</span> <span class="kw">or</span> label_1 <span class="op">!=</span> <span class="dv">0</span> <span class="kw">or</span> label_2 <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'#######################################################################################'</span>)</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Check that the function </span><span class="ch">\'</span><span class="st">configure_model</span><span class="ch">\'</span><span class="st"> in the file src/train.py is complete.'</span>)</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'########################################################################################'</span>)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">'Check that the function </span><span class="ch">\'</span><span class="st">configure_model</span><span class="ch">\'</span><span class="st"> in the file src/train.py is complete.'</span>)</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'##################'</span>)    </span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Updated correctly!'</span>)        </span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'##################'</span>)        </span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    updated_correctly <span class="op">=</span> <span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"3913195754df496ab1e9b41497fc6739","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+##################
+Updated correctly!
+##################</code></pre>
+</div>
+</div>
+<p>Setup the PyTorch estimator to train our model. For more information on the PyTorch estimator, see the documentation <a href="https://sagemaker.readthedocs.io/en/stable/frameworks/pytorch/sagemaker.pytorch.html">here</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.pytorch <span class="im">import</span> PyTorch <span class="im">as</span> PyTorchEstimator</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> updated_correctly:</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    estimator <span class="op">=</span> PyTorchEstimator(</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>        entry_point<span class="op">=</span><span class="st">'train.py'</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        source_dir<span class="op">=</span><span class="st">'src'</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>        role<span class="op">=</span>role,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>        instance_count<span class="op">=</span>train_instance_count,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>        instance_type<span class="op">=</span>train_instance_type,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>        volume_size<span class="op">=</span>train_volume_size,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>        py_version<span class="op">=</span><span class="st">'py3'</span>, <span class="co"># dynamically retrieves the correct training image (Python 3)</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>        framework_version<span class="op">=</span><span class="st">'1.6.0'</span>, <span class="co"># dynamically retrieves the correct training image (PyTorch)</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>        hyperparameters<span class="op">=</span>hyperparameters,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>        metric_definitions<span class="op">=</span>metric_definitions,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>        input_mode<span class="op">=</span>input_mode,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>        debugger_hook_config<span class="op">=</span>debugger_hook_config,</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>        profiler_config<span class="op">=</span>profiler_config,</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>        rules<span class="op">=</span>rules</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Lets now launch the SageMaker Training Job which will be fitting the model to the dataset. We can use the <code>estimator.fit</code> function, passing the configured train and validation inputs (data channels).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>estimator.fit(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    inputs<span class="op">=</span>data_channels, </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    wait<span class="op">=</span><span class="va">False</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can refer to the last Training Job using the estimator function <code>latest_training_job</code>. Then the Training Job name can be found with the <code>name</code> function:</p>
+<div class="cell" data-outputid="985f7efd-a155-4784-b1bd-5e2c9a5a2ec5">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>training_job_name <span class="op">=</span> estimator.latest_training_job.name</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Training Job name: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(training_job_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Training Job name: pytorch-training-2023-02-11-11-22-02-024</code></pre>
+</div>
+</div>
+<p>We can also load the information about the Training Job using the function <code>describe()</code>. The result is in dictionary format. Let’s check that it has the same Training Job name:</p>
+<div class="cell" data-outputid="83c51a67-93dc-436a-9b22-b682c806c683">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>training_job_name <span class="op">=</span> estimator.latest_training_job.describe()[<span class="st">'TrainingJobName'</span>]</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Training Job name: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(training_job_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Training Job name: pytorch-training-2023-02-11-11-22-02-024</code></pre>
+</div>
+</div>
+<p>Let’s pull the Training Job status from the Training Job description.</p>
+<div class="cell" data-outputid="17e1fd2c-3db0-458f-ead5-bc7391134802">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(estimator.latest_training_job.describe().keys())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>dict_keys(['TrainingJobName', 'TrainingJobArn', 'TrainingJobStatus', 'SecondaryStatus', 'HyperParameters', 'AlgorithmSpecification', 'RoleArn', 'InputDataConfig', 'OutputDataConfig', 'ResourceConfig', 'StoppingCondition', 'CreationTime', 'LastModifiedTime', 'SecondaryStatusTransitions', 'EnableNetworkIsolation', 'EnableInterContainerTrafficEncryption', 'EnableManagedSpotTraining', 'DebugHookConfig', 'ProfilerConfig', 'ProfilerRuleConfigurations', 'ProfilerRuleEvaluationStatuses', 'ProfilingStatus', 'ResponseMetadata'])</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="8f57ce0a-fa4c-48ba-b246-db24734663c5">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>training_job_status_primary <span class="op">=</span> estimator.latest_training_job.describe()[<span class="st">'TrainingJobStatus'</span>] </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Training Job status: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(training_job_status_primary))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Training Job status: InProgress</code></pre>
+</div>
+</div>
+<p>Wait for the Training Job to complete.</p>
+<div class="cell" data-outputid="752461d7-2cf6-4cd7-d043-1a143e0f5281">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>estimator.latest_training_job.wait(logs<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+2023-02-11 11:44:39 Starting - Preparing the instances for training
+2023-02-11 11:44:39 Downloading - Downloading input data
+2023-02-11 11:44:39 Training - Training image download completed. Training in progress.....................................................................................................................................................................................................................
+2023-02-11 12:02:56 Uploading - Uploading generated training model....................................
+2023-02-11 12:06:06 Completed - Training job completed
+CPU times: user 1.19 s, sys: 131 ms, total: 1.32 s
+Wall time: 21min 9s</code></pre>
+</div>
+</div>
+<p>Review the training metrics.</p>
+<div class="cell" data-outputid="a8344d15-8a6f-498c-9457-da067937674c">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>df_metrics <span class="op">=</span> estimator.training_job_analytics.dataframe()</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>df_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>timestamp</th>
+      <th>metric_name</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>validation:loss</td>
+      <td>1.10</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1320.0</td>
+      <td>validation:loss</td>
+      <td>1.02</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1800.0</td>
+      <td>validation:loss</td>
+      <td>0.66</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.0</td>
+      <td>validation:accuracy</td>
+      <td>34.77</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1320.0</td>
+      <td>validation:accuracy</td>
+      <td>50.39</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1800.0</td>
+      <td>validation:accuracy</td>
+      <td>69.14</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>We can query and plot the training metrics:</p>
+<div class="cell" data-outputid="6a84ab14-11fb-40ce-d96d-0e29e4dd3ae5">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>df_metrics.query(<span class="st">"metric_name=='validation:accuracy'"</span>).plot(x<span class="op">=</span><span class="st">'timestamp'</span>, y<span class="op">=</span><span class="st">'value'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f40865b1a90&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2023-02-11-train-reviews-text-classifier-with-bert-and-aws-sagemaker_files/figure-html/cell-28-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="download-sagemaker-debugger-profiling-report" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="download-sagemaker-debugger-profiling-report"><span class="header-section-number">4.2</span> Download SageMaker debugger profiling report</h3>
+<p>We can download and review the debugger profiling report.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>profiler_report_s3_uri <span class="op">=</span> <span class="st">"s3://</span><span class="sc">{}</span><span class="st">/</span><span class="sc">{}</span><span class="st">/rule-output/ProfilerReport/profiler-output"</span>.<span class="bu">format</span>(bucket, training_job_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then we can list the report files:</p>
+<div class="cell" data-outputid="89304a1b-e467-4bcc-b7c8-03d89d655527">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls $profiler_report_s3_uri<span class="op">/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                           PRE profiler-reports/
+2023-02-11 12:03:09     364394 profiler-report.html
+2023-02-11 12:03:08     211444 profiler-report.ipynb</code></pre>
+</div>
+</div>
+<p>The folder <code>profiler-reports</code> contains the built-in rule analysis components, stored in JSON and a Jupyter notebook. They are aggregated into the report.</p>
+<div class="cell" data-outputid="f391389f-c01c-4fa4-9687-9711abd67366">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp <span class="op">--</span>recursive $profiler_report_s3_uri .<span class="op">/</span>profiler_report<span class="op">/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/CPUBottleneck.json to profiler_report/profiler-reports/CPUBottleneck.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/MaxInitializationTime.json to profiler_report/profiler-reports/MaxInitializationTime.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/Dataloader.json to profiler_report/profiler-reports/Dataloader.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/OverallFrameworkMetrics.json to profiler_report/profiler-reports/OverallFrameworkMetrics.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/BatchSize.json to profiler_report/profiler-reports/BatchSize.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/OverallSystemUsage.json to profiler_report/profiler-reports/OverallSystemUsage.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/GPUMemoryIncrease.json to profiler_report/profiler-reports/GPUMemoryIncrease.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/IOBottleneck.json to profiler_report/profiler-reports/IOBottleneck.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/LoadBalancing.json to profiler_report/profiler-reports/LoadBalancing.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-report.ipynb to profiler_report/profiler-report.ipynb
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/LowGPUUtilization.json to profiler_report/profiler-reports/LowGPUUtilization.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-reports/StepOutlier.json to profiler_report/profiler-reports/StepOutlier.json
+download: s3://sagemaker-us-east-1-215290792315/pytorch-training-2023-02-11-11-22-02-024/rule-output/ProfilerReport/profiler-output/profiler-report.html to profiler_report/profiler-report.html</code></pre>
+</div>
+</div>
+<p>You can review the profiler report <a href="https://pranath.github.io/pds/profiler-report.html">here</a>.</p>
+</section>
+</section>
+<section id="deploy-the-model" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="deploy-the-model"><span class="header-section-number">5</span> Deploy the model</h2>
+<p>Now we will create a custom <code>SentimentPredictor</code> that encapsulates a JSONLines serializer and deserializer. To be passed into the <code>PyTorchModel</code> it needs to be wrapped as a class.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.predictor <span class="im">import</span> Predictor</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.serializers <span class="im">import</span> JSONLinesSerializer</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.deserializers <span class="im">import</span> JSONLinesDeserializer</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SentimentPredictor(Predictor):</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, endpoint_name, sagemaker_session):</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(endpoint_name, </span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>                         sagemaker_session<span class="op">=</span>sagemaker_session, </span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>                         serializer<span class="op">=</span>JSONLinesSerializer(),</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>                         deserializer<span class="op">=</span>JSONLinesDeserializer())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.pytorch.model <span class="im">import</span> PyTorchModel</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>timestamp <span class="op">=</span> <span class="bu">int</span>(time.time())</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>pytorch_model_name <span class="op">=</span> <span class="st">'</span><span class="sc">{}</span><span class="st">-</span><span class="sc">{}</span><span class="st">-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(training_job_name, <span class="st">'pt'</span>, timestamp)</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> PyTorchModel(name<span class="op">=</span>pytorch_model_name,</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>                     model_data<span class="op">=</span>estimator.model_data,</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>                     predictor_cls<span class="op">=</span>SentimentPredictor,</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>                     entry_point<span class="op">=</span><span class="st">'inference.py'</span>,</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>                     source_dir<span class="op">=</span><span class="st">'src'</span>,</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>                     framework_version<span class="op">=</span><span class="st">'1.6.0'</span>,</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>                     py_version<span class="op">=</span><span class="st">'py3'</span>,</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>                     role<span class="op">=</span>role)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="4922a522-8c15-428f-a648-02597f213c11">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>pytorch_endpoint_name <span class="op">=</span> <span class="st">'</span><span class="sc">{}</span><span class="st">-</span><span class="sc">{}</span><span class="st">-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(training_job_name, <span class="st">'pt'</span>, timestamp)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pytorch_endpoint_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>pytorch-training-2023-02-11-11-22-02-024-pt-1676117278</code></pre>
+</div>
+</div>
+<p>Now we deploy the model as an endpoint.</p>
+<div class="cell" data-outputid="72355abe-ebf0-4fa7-8079-7ee6c2bdba90">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>predictor <span class="op">=</span> model.deploy(initial_instance_count<span class="op">=</span><span class="dv">1</span>, </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                         instance_type<span class="op">=</span><span class="st">'ml.m5.large'</span>, </span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                         endpoint_name<span class="op">=</span>pytorch_endpoint_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>----------!CPU times: user 2min 15s, sys: 9.35 s, total: 2min 25s
+Wall time: 7min 23s</code></pre>
+</div>
+</div>
+</section>
+<section id="test-model" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="test-model"><span class="header-section-number">6</span> Test model</h2>
+<p>Here, we will pass sample strings of text to the endpoint in order to see the sentiment. We will try one example of each sentiment.</p>
+<div class="cell" data-outputid="47d672de-b9cb-48f6-b13e-2c3a277ebb99">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> [</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"I love this product!"</span>]},</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"OK, but not great."</span>]},</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"This is not the right product."</span>]},</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>predictor <span class="op">=</span> SentimentPredictor(endpoint_name<span class="op">=</span>pytorch_endpoint_name,</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>                               sagemaker_session<span class="op">=</span>sess)</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>predicted_classes <span class="op">=</span> predictor.predict(inputs)</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> predicted_class <span class="kw">in</span> predicted_classes:</span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Predicted class </span><span class="sc">{}</span><span class="st"> with probability </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(predicted_class[<span class="st">'predicted_label'</span>], predicted_class[<span class="st">'probability'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Predicted class 1 with probability 0.9605445861816406
+Predicted class 0 with probability 0.5798221230506897
+Predicted class -1 with probability 0.7667604684829712</code></pre>
+</div>
+</div>
+</section>
+<section id="acknowledgements" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the great <a href="https://www.deeplearning.ai/courses/practical-data-science-specialization/">Deep Learning AI Practical Data Science on AWS Specialisation Course</a> which i completed, and acknowledge the use of some images and other materials from the training course in this article.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

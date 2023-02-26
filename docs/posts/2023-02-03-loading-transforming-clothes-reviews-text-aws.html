@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-02-03">
+<meta name="description" content="In this project we will explore text reviews for clothing products using tools from the cloud data science service AWS Sagemaker to load and visualise the data and to gain key insights from it.">
+
+<title>blogtest1 - Loading &amp; Transforming Clothing Reviews Text Data with AWS</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">blogtest1</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Loading &amp; Transforming Clothing Reviews Text Data with AWS</h1>
+                  <div>
+        <div class="description">
+          In this project we will explore text reviews for clothing products using tools from the cloud data science service AWS Sagemaker to load and visualise the data and to gain key insights from it.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">aws</div>
+                <div class="quarto-category">cloud-data-science</div>
+                <div class="quarto-category">natural-language-processing</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">February 3, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#aws-cloud-services-for-data-science" id="toc-aws-cloud-services-for-data-science" class="nav-link" data-scroll-target="#aws-cloud-services-for-data-science"><span class="toc-section-number">2</span>  AWS &amp; Cloud Services for Data Science</a>
+  <ul class="collapse">
+  <li><a href="#why-use-the-cloud-for-data-science" id="toc-why-use-the-cloud-for-data-science" class="nav-link" data-scroll-target="#why-use-the-cloud-for-data-science"><span class="toc-section-number">2.1</span>  Why use the Cloud for Data Science ?</a></li>
+  <li><a href="#using-aws-for-cloud-data-science" id="toc-using-aws-for-cloud-data-science" class="nav-link" data-scroll-target="#using-aws-for-cloud-data-science"><span class="toc-section-number">2.2</span>  Using AWS for Cloud Data Science</a></li>
+  </ul></li>
+  <li><a href="#ingest-and-transform-dataset" id="toc-ingest-and-transform-dataset" class="nav-link" data-scroll-target="#ingest-and-transform-dataset"><span class="toc-section-number">3</span>  Ingest and transform Dataset</a>
+  <ul class="collapse">
+  <li><a href="#list-the-dataset-files-in-the-public-s3-bucket" id="toc-list-the-dataset-files-in-the-public-s3-bucket" class="nav-link" data-scroll-target="#list-the-dataset-files-in-the-public-s3-bucket"><span class="toc-section-number">3.1</span>  List the dataset files in the public S3 bucket</a></li>
+  <li><a href="#copy-the-data-locally-to-the-notebook" id="toc-copy-the-data-locally-to-the-notebook" class="nav-link" data-scroll-target="#copy-the-data-locally-to-the-notebook"><span class="toc-section-number">3.2</span>  Copy the data locally to the notebook</a></li>
+  <li><a href="#transform-the-data" id="toc-transform-the-data" class="nav-link" data-scroll-target="#transform-the-data"><span class="toc-section-number">3.3</span>  Transform the data</a></li>
+  <li><a href="#write-the-data-to-a-csv-file" id="toc-write-the-data-to-a-csv-file" class="nav-link" data-scroll-target="#write-the-data-to-a-csv-file"><span class="toc-section-number">3.4</span>  Write the data to a CSV file</a></li>
+  </ul></li>
+  <li><a href="#register-the-public-dataset-for-querying-and-visualizing" id="toc-register-the-public-dataset-for-querying-and-visualizing" class="nav-link" data-scroll-target="#register-the-public-dataset-for-querying-and-visualizing"><span class="toc-section-number">4</span>  Register the public dataset for querying and visualizing</a>
+  <ul class="collapse">
+  <li><a href="#register-s3-dataset-files-as-a-table-for-querying" id="toc-register-s3-dataset-files-as-a-table-for-querying" class="nav-link" data-scroll-target="#register-s3-dataset-files-as-a-table-for-querying"><span class="toc-section-number">4.1</span>  Register S3 dataset files as a table for querying</a></li>
+  <li><a href="#create-aws-glue-catalog-database" id="toc-create-aws-glue-catalog-database" class="nav-link" data-scroll-target="#create-aws-glue-catalog-database"><span class="toc-section-number">4.2</span>  Create AWS Glue Catalog database</a></li>
+  <li><a href="#register-csv-data-with-aws-glue-catalog" id="toc-register-csv-data-with-aws-glue-catalog" class="nav-link" data-scroll-target="#register-csv-data-with-aws-glue-catalog"><span class="toc-section-number">4.3</span>  Register CSV data with AWS Glue Catalog</a></li>
+  <li><a href="#create-default-s3-bucket-for-amazon-athena" id="toc-create-default-s3-bucket-for-amazon-athena" class="nav-link" data-scroll-target="#create-default-s3-bucket-for-amazon-athena"><span class="toc-section-number">4.4</span>  Create default S3 bucket for Amazon Athena</a></li>
+  </ul></li>
+  <li><a href="#visualising-the-data-and-answering-questions" id="toc-visualising-the-data-and-answering-questions" class="nav-link" data-scroll-target="#visualising-the-data-and-answering-questions"><span class="toc-section-number">5</span>  Visualising the Data and Answering Questions</a>
+  <ul class="collapse">
+  <li><a href="#preparation-for-data-visualization" id="toc-preparation-for-data-visualization" class="nav-link" data-scroll-target="#preparation-for-data-visualization"><span class="toc-section-number">5.1</span>  Preparation for data visualization</a></li>
+  <li><a href="#plotting-key-stats-using-bar-charts" id="toc-plotting-key-stats-using-bar-charts" class="nav-link" data-scroll-target="#plotting-key-stats-using-bar-charts"><span class="toc-section-number">5.2</span>  Plotting key stats using bar charts</a></li>
+  <li><a href="#how-many-reviews-per-sentiment" id="toc-how-many-reviews-per-sentiment" class="nav-link" data-scroll-target="#how-many-reviews-per-sentiment"><span class="toc-section-number">5.3</span>  How many reviews per sentiment?</a></li>
+  <li><a href="#calculate-total-number-of-reviews-per-product-category" id="toc-calculate-total-number-of-reviews-per-product-category" class="nav-link" data-scroll-target="#calculate-total-number-of-reviews-per-product-category"><span class="toc-section-number">5.4</span>  Calculate total number of reviews per product category</a></li>
+  <li><a href="#which-product-categories-are-highest-rated-by-average-sentiment" id="toc-which-product-categories-are-highest-rated-by-average-sentiment" class="nav-link" data-scroll-target="#which-product-categories-are-highest-rated-by-average-sentiment"><span class="toc-section-number">5.5</span>  Which product categories are highest rated by average sentiment?</a></li>
+  <li><a href="#which-product-categories-have-the-most-reviews" id="toc-which-product-categories-have-the-most-reviews" class="nav-link" data-scroll-target="#which-product-categories-have-the-most-reviews"><span class="toc-section-number">5.6</span>  Which product categories have the most reviews?</a></li>
+  <li><a href="#what-is-the-breakdown-of-sentiments-per-product-category" id="toc-what-is-the-breakdown-of-sentiments-per-product-category" class="nav-link" data-scroll-target="#what-is-the-breakdown-of-sentiments-per-product-category"><span class="toc-section-number">5.7</span>  What is the breakdown of sentiments per product category?</a></li>
+  <li><a href="#analyze-the-distribution-of-review-word-counts" id="toc-analyze-the-distribution-of-review-word-counts" class="nav-link" data-scroll-target="#analyze-the-distribution-of-review-word-counts"><span class="toc-section-number">5.8</span>  Analyze the distribution of review word counts</a></li>
+  </ul></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">6</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In this project we will ingest and transform a customer product reviews dataset using AWS (Amazon Web Services) cloud services. We will then use AWS data stack services such as AWS Glue and Amazon Athena for ingesting and querying the dataset. Finally we will use AWS Data Wrangler to analyze the dataset and plot some visuals extracting insights.</p>
+<p>This exploration could be useful for a range of tasks, including creating a sentiment analysis text classification model - which is something we will explore in future articles.</p>
+</section>
+<section id="aws-cloud-services-for-data-science" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="aws-cloud-services-for-data-science"><span class="header-section-number">2</span> AWS &amp; Cloud Services for Data Science</h2>
+<section id="why-use-the-cloud-for-data-science" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="why-use-the-cloud-for-data-science"><span class="header-section-number">2.1</span> Why use the Cloud for Data Science ?</h3>
+<p>Data Science can be performed in a range of devices and environments, from local machines and laptops, to dedicated server centers, to cloud services such as <a href="https://livingdatalab.com/categories/#aws">AWS</a> or <a href="https://livingdatalab.com/categories/#azure-databricks">Azure Databricks</a>.</p>
+<p>Why would you want to use cloud services for Data Science?</p>
+<ul>
+<li>Local machines or server centers have limited resources as they are specific machines and the only ones you have, which have limited computing power, disk space and memory which could make certain tasks and problems unfeasible to solve</li>
+<li>Cloud services allow the storage of any amount of data</li>
+<li>Cloud services allow you to <em>scale up</em> e.g.&nbsp;increase the processing or memory capacity of the machines you use in minutes</li>
+<li>Cloud services allow you to <em>scale out</em> e.g.&nbsp;increase the number of machines you are able to use for a task</li>
+<li>Cloud services provide a large range of data science tools already installed and maintained</li>
+<li>Cloud services provide a flexible deployment platform for any products you develop, with a capacity able to scale with demand</li>
+<li>Cloud services provide a more cost efficient and flexible solution for many tasks, you generally only pay for what you use and can increase or decrease options and capacity easily either by choice or even automatically based on need or demand</li>
+</ul>
+<p><img src="https://github.com/pranath/blog/raw/master/images/practical_ds.png" title="Why use the cloud for Data Science" class="img-fluid"></p>
+</section>
+<section id="using-aws-for-cloud-data-science" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="using-aws-for-cloud-data-science"><span class="header-section-number">2.2</span> Using AWS for Cloud Data Science</h3>
+<p>AWS offers a range of different services that can help at different stages of the machine learning development cycle.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_ds_workflow.png" title="The AWS Data Science Workflow" class="img-fluid"></p>
+<p>In this article we will be demonstrating how we can use AWS for the <strong>Ingesting and Analysing stage</strong>, so we will be using the following services:</p>
+<ul>
+<li>Amazon S3: A simple storage service</li>
+<li>AWS Glue: An ETL service that helps prepare, extract and load data</li>
+<li>Amazon Athena: An interactive query service that uses SQL</li>
+<li>Amazon Sagemaker: A cloud machine learning service</li>
+</ul>
+</section>
+</section>
+<section id="ingest-and-transform-dataset" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="ingest-and-transform-dataset"><span class="header-section-number">3</span> Ingest and transform Dataset</h2>
+<p>The dataset we will use is the <a href="https://www.kaggle.com/nicapotato/womens-ecommerce-clothing-reviews">Women’s Clothing Reviews</a> a public dataset available on kaggle.</p>
+<p>It is shared in a public Amazon S3 bucket, and is available as a comma-separated value (CSV) text format:</p>
+<p><code>s3://dlai-practical-data-science/data/raw/womens_clothing_ecommerce_reviews.csv</code></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_s3.png" title="Amazon S3" class="img-fluid"></p>
+<section id="list-the-dataset-files-in-the-public-s3-bucket" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="list-the-dataset-files-in-the-public-s3-bucket"><span class="header-section-number">3.1</span> List the dataset files in the public S3 bucket</h3>
+<p>The <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/index.html">AWS Command Line Interface (CLI)</a> is a unified tool to manage AWS services. With just one tool, you can control multiple AWS services from the command line and automate them through scripts. We will use it to list the dataset files.</p>
+<p><code>aws s3 ls [bucket_name]</code> is a function lists all objects in the S3 bucket. Let’s use it to view the reviews data files in CSV format.</p>
+<div class="cell" data-outputid="7cc4b5c0-4e8d-4eab-a671-34f5faf79f5d">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls s3:<span class="op">//</span>dlai<span class="op">-</span>practical<span class="op">-</span>data<span class="op">-</span>science<span class="op">/</span>data<span class="op">/</span>raw<span class="op">/</span>womens_clothing_ecommerce_reviews.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2021-04-30 02:21:06    8457214 womens_clothing_ecommerce_reviews.csv</code></pre>
+</div>
+</div>
+</section>
+<section id="copy-the-data-locally-to-the-notebook" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="copy-the-data-locally-to-the-notebook"><span class="header-section-number">3.2</span> Copy the data locally to the notebook</h3>
+<p><code>aws s3 cp [bucket_name/file_name] [file_name]</code> is a function that copies the file from the S3 bucket into the local environment or into another S3 bucket. Let’s use it to copy the file with the dataset locally.</p>
+<div class="cell" data-outputid="862d14a1-53d7-43a5-b453-a36375749318">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp s3:<span class="op">//</span>dlai<span class="op">-</span>practical<span class="op">-</span>data<span class="op">-</span>science<span class="op">/</span>data<span class="op">/</span>raw<span class="op">/</span>womens_clothing_ecommerce_reviews.csv .<span class="op">/</span>womens_clothing_ecommerce_reviews.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>download: s3://dlai-practical-data-science/data/raw/womens_clothing_ecommerce_reviews.csv to ./womens_clothing_ecommerce_reviews.csv</code></pre>
+</div>
+</div>
+<p>Now we will use Pandas to load and preview the data.</p>
+<div class="cell" data-outputid="c631958c-d885-455d-a09e-fa73d9ca8a44">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> csv</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'./womens_clothing_ecommerce_reviews.csv'</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                 index_col<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>df.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>(23486, 10)</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="1b21b49f-2b92-4ea0-c812-b982550de7fe">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Clothing ID</th>
+      <th>Age</th>
+      <th>Title</th>
+      <th>Review Text</th>
+      <th>Rating</th>
+      <th>Recommended IND</th>
+      <th>Positive Feedback Count</th>
+      <th>Division Name</th>
+      <th>Department Name</th>
+      <th>Class Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>847</td>
+      <td>33</td>
+      <td>Cute, crisp shirt</td>
+      <td>If this product was in petite  i would get the...</td>
+      <td>4</td>
+      <td>1</td>
+      <td>2</td>
+      <td>General</td>
+      <td>Tops</td>
+      <td>Blouses</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1080</td>
+      <td>34</td>
+      <td>NaN</td>
+      <td>Love this dress!  it's sooo pretty.  i happene...</td>
+      <td>5</td>
+      <td>1</td>
+      <td>4</td>
+      <td>General</td>
+      <td>Dresses</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1077</td>
+      <td>60</td>
+      <td>Some major design flaws</td>
+      <td>I had such high hopes for this dress and reall...</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>General</td>
+      <td>Dresses</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1049</td>
+      <td>50</td>
+      <td>My favorite buy!</td>
+      <td>I love  love  love this jumpsuit. it's fun  fl...</td>
+      <td>5</td>
+      <td>1</td>
+      <td>0</td>
+      <td>General Petite</td>
+      <td>Bottoms</td>
+      <td>Pants</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>847</td>
+      <td>47</td>
+      <td>Flattering shirt</td>
+      <td>This shirt is very flattering to all due to th...</td>
+      <td>5</td>
+      <td>1</td>
+      <td>6</td>
+      <td>General</td>
+      <td>Tops</td>
+      <td>Blouses</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>23481</th>
+      <td>1104</td>
+      <td>34</td>
+      <td>Great dress for many occasions</td>
+      <td>I was very happy to snag this dress at such a ...</td>
+      <td>5</td>
+      <td>1</td>
+      <td>0</td>
+      <td>General Petite</td>
+      <td>Dresses</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>23482</th>
+      <td>862</td>
+      <td>48</td>
+      <td>Wish it was made of cotton</td>
+      <td>It reminds me of maternity clothes. soft  stre...</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>General Petite</td>
+      <td>Tops</td>
+      <td>Knits</td>
+    </tr>
+    <tr>
+      <th>23483</th>
+      <td>1104</td>
+      <td>31</td>
+      <td>Cute, but see through</td>
+      <td>This fit well  but the top was very see throug...</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1</td>
+      <td>General Petite</td>
+      <td>Dresses</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>23484</th>
+      <td>1084</td>
+      <td>28</td>
+      <td>Very cute dress, perfect for summer parties an...</td>
+      <td>I bought this dress for a wedding i have this ...</td>
+      <td>3</td>
+      <td>1</td>
+      <td>2</td>
+      <td>General</td>
+      <td>Dresses</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>23485</th>
+      <td>1104</td>
+      <td>52</td>
+      <td>Please make more like this one!</td>
+      <td>This dress in a lovely platinum is feminine an...</td>
+      <td>5</td>
+      <td>1</td>
+      <td>22</td>
+      <td>General Petite</td>
+      <td>Dresses</td>
+      <td>Dresses</td>
+    </tr>
+  </tbody>
+</table>
+<p>23486 rows × 10 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="transform-the-data" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="transform-the-data"><span class="header-section-number">3.3</span> Transform the data</h3>
+<p>To simplify the task, we will transform the data into a comma-separated value (CSV) file that contains only a <code>review_body</code>, <code>product_category</code>, and <code>sentiment</code> derived from the original data.</p>
+<div class="cell" data-outputid="3345c2d3-4ab3-4b26-98b0-cdff61f2992f">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_transformed <span class="op">=</span> df.rename(columns<span class="op">=</span>{<span class="st">'Review Text'</span>: <span class="st">'review_body'</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">'Rating'</span>: <span class="st">'star_rating'</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">'Class Name'</span>: <span class="st">'product_category'</span>})</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>df_transformed.drop(columns<span class="op">=</span>[<span class="st">'Clothing ID'</span>, <span class="st">'Age'</span>, <span class="st">'Title'</span>, <span class="st">'Recommended IND'</span>, <span class="st">'Positive Feedback Count'</span>, <span class="st">'Division Name'</span>, <span class="st">'Department Name'</span>],</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                    inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>df_transformed.dropna(inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>df_transformed.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>(22628, 3)</code></pre>
+</div>
+</div>
+<p>Now lets convert the <code>star_rating</code> into the <code>sentiment</code> (positive, neutral, negative), which later on we could use for a text classification model.</p>
+<div class="cell" data-outputid="8f8db857-dc81-4e5e-c4df-907268dc1f7f">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> to_sentiment(star_rating):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> star_rating <span class="kw">in</span> {<span class="dv">1</span>, <span class="dv">2</span>}: <span class="co"># negative</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span><span class="dv">1</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> star_rating <span class="op">==</span> <span class="dv">3</span>:      <span class="co"># neutral</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> star_rating <span class="kw">in</span> {<span class="dv">4</span>, <span class="dv">5</span>}: <span class="co"># positive</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># transform star_rating into the sentiment</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>df_transformed[<span class="st">'sentiment'</span>] <span class="op">=</span> df_transformed[<span class="st">'star_rating'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> star_rating: </span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    to_sentiment(star_rating<span class="op">=</span>star_rating) </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co"># drop the star rating column</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>df_transformed.drop(columns<span class="op">=</span>[<span class="st">'star_rating'</span>],</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                    inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co"># remove reviews for product_categories with &lt; 10 reviews</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>df_transformed <span class="op">=</span> df_transformed.groupby(<span class="st">'product_category'</span>).<span class="bu">filter</span>(<span class="kw">lambda</span> reviews : <span class="bu">len</span>(reviews) <span class="op">&gt;</span> <span class="dv">10</span>)[[<span class="st">'sentiment'</span>, <span class="st">'review_body'</span>, <span class="st">'product_category'</span>]]</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>df_transformed.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>(22626, 3)</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="0462fa50-7798-4440-daad-c4d615070f63">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># preview the results</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_transformed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>sentiment</th>
+      <th>review_body</th>
+      <th>product_category</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>If this product was in petite  i would get the...</td>
+      <td>Blouses</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>Love this dress!  it's sooo pretty.  i happene...</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>I had such high hopes for this dress and reall...</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>I love  love  love this jumpsuit. it's fun  fl...</td>
+      <td>Pants</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>This shirt is very flattering to all due to th...</td>
+      <td>Blouses</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>23481</th>
+      <td>1</td>
+      <td>I was very happy to snag this dress at such a ...</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>23482</th>
+      <td>0</td>
+      <td>It reminds me of maternity clothes. soft  stre...</td>
+      <td>Knits</td>
+    </tr>
+    <tr>
+      <th>23483</th>
+      <td>0</td>
+      <td>This fit well  but the top was very see throug...</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>23484</th>
+      <td>0</td>
+      <td>I bought this dress for a wedding i have this ...</td>
+      <td>Dresses</td>
+    </tr>
+    <tr>
+      <th>23485</th>
+      <td>1</td>
+      <td>This dress in a lovely platinum is feminine an...</td>
+      <td>Dresses</td>
+    </tr>
+  </tbody>
+</table>
+<p>22626 rows × 3 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="write-the-data-to-a-csv-file" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="write-the-data-to-a-csv-file"><span class="header-section-number">3.4</span> Write the data to a CSV file</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df_transformed.to_csv(<span class="st">'./womens_clothing_ecommerce_reviews_transformed.csv'</span>, </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                      index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="fc0c8905-6380-4488-8915-546f55752f23">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>head <span class="op">-</span>n <span class="dv">5</span> .<span class="op">/</span>womens_clothing_ecommerce_reviews_transformed.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>sentiment,review_body,product_category
+1,If this product was in petite  i would get the petite. the regular is a little long on me but a tailor can do a simple fix on that.     fits nicely! i'm 5'4  130lb and pregnant so i bough t medium to grow into.     the tie can be front or back so provides for some nice flexibility on form fitting.,Blouses
+1,"Love this dress!  it's sooo pretty.  i happened to find it in a store  and i'm glad i did bc i never would have ordered it online bc it's petite.  i bought a petite and am 5'8"".  i love the length on me- hits just a little below the knee.  would definitely be a true midi on someone who is truly petite.",Dresses
+0,I had such high hopes for this dress and really wanted it to work for me. i initially ordered the petite small (my usual size) but i found this to be outrageously small. so small in fact that i could not zip it up! i reordered it in petite medium  which was just ok. overall  the top half was comfortable and fit nicely  but the bottom half had a very tight under layer and several somewhat cheap (net) over layers. imo  a major design flaw was the net over layer sewn directly into the zipper - it c,Dresses
+1,I love  love  love this jumpsuit. it's fun  flirty  and fabulous! every time i wear it  i get nothing but great compliments!,Pants</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="register-the-public-dataset-for-querying-and-visualizing" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="register-the-public-dataset-for-querying-and-visualizing"><span class="header-section-number">4</span> Register the public dataset for querying and visualizing</h2>
+<p>We will now register the public dataset into an S3-backed database table so we can query and visualize our dataset at scale.</p>
+<section id="register-s3-dataset-files-as-a-table-for-querying" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="register-s3-dataset-files-as-a-table-for-querying"><span class="header-section-number">4.1</span> Register S3 dataset files as a table for querying</h3>
+<p>Before we can use Amazon Athena to query our data, we first need to get our data ‘registered’ so we can do this.</p>
+<p>Let’s import some key modules.</p>
+<p><code>boto3</code> is the AWS SDK for Python to create, configure, and manage AWS services, such as Amazon Elastic Compute Cloud (Amazon EC2) and Amazon Simple Storage Service (Amazon S3). The SDK provides an object-oriented API as well as low-level access to AWS services.</p>
+<p><code>sagemaker</code> is the SageMaker Python SDK which provides several high-level abstractions for working with the Amazon SageMaker.</p>
+<div class="cell" data-outputid="fa4f4313-0f69-426b-f22d-22291540a77b">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> boto3</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sagemaker</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> botocore</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> botocore.config.Config(user_agent_extra<span class="op">=</span><span class="st">'dlai-pds/c1/w1'</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># low-level service client of the boto3 session</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> boto3.client(service_name<span class="op">=</span><span class="st">'sagemaker'</span>, </span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                  config<span class="op">=</span>config)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>sess <span class="op">=</span> sagemaker.Session(sagemaker_client<span class="op">=</span>sm)                         </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>bucket <span class="op">=</span> sess.default_bucket()</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>role <span class="op">=</span> sagemaker.get_execution_role()</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> sess.boto_region_name</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>account_id <span class="op">=</span> sess.account_id</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'S3 Bucket: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(bucket))</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Region: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(region))</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Account ID: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(account_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>S3 Bucket: sagemaker-us-east-1-634231958143
+Region: us-east-1
+Account ID: &lt;bound method Session.account_id of &lt;sagemaker.session.Session object at 0x7f987cf24490&gt;&gt;</code></pre>
+</div>
+</div>
+<p>Lets now copy the file into the S3 bucket.</p>
+<div class="cell" data-outputid="25af66a5-66be-4cd9-b656-224dafc92c4d">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp .<span class="op">/</span>womens_clothing_ecommerce_reviews_transformed.csv s3:<span class="op">//</span>$bucket<span class="op">/</span>data<span class="op">/</span>transformed<span class="op">/</span>womens_clothing_ecommerce_reviews_transformed.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>upload: ./womens_clothing_ecommerce_reviews_transformed.csv to s3://sagemaker-us-east-1-634231958143/data/transformed/womens_clothing_ecommerce_reviews_transformed.csv</code></pre>
+</div>
+</div>
+<p><strong>Import AWS Data Wrangler</strong></p>
+<p><a href="https://github.com/awslabs/aws-data-wrangler">AWS Data Wrangler</a> is an AWS Professional Service open source python initiative part of Amazon Sagemaker - that extends the power of Pandas library to AWS connecting dataframes and AWS data related services (Amazon Redshift, AWS Glue, Amazon Athena, Amazon EMR, Amazon QuickSight, etc).</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_data_wrangler.png" title="AWS Data Wrangler" class="img-fluid"></p>
+<p>Built on top of other open-source projects like Pandas, Apache Arrow, Boto3, SQLAlchemy, Psycopg2 and PyMySQL, it offers abstracted functions to execute usual ETL tasks like load/unload data from data lakes, data warehouses and databases.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> awswrangler <span class="im">as</span> wr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-aws-glue-catalog-database" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="create-aws-glue-catalog-database"><span class="header-section-number">4.2</span> Create AWS Glue Catalog database</h3>
+<p>The data catalog features of <strong>AWS Glue</strong> and the inbuilt integration to Amazon S3 simplify the process of identifying data and deriving the schema definition out of the discovered data. Using AWS Glue crawlers within our data catalog, we can traverse the data stored in Amazon S3 and build out the metadata tables that are defined in our data catalog.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_glue.png" title="AWS Glue" class="img-fluid"></p>
+<p>Here we will use the <code>wr.catalog.create_database</code> function to create a database with the name <code>dsoaws_deep_learning</code> (“dsoaws” stands for “Data Science on AWS”).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>wr.catalog.create_database(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'dsoaws_deep_learning'</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    exist_ok<span class="op">=</span><span class="va">True</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="7e5143b1-a925-4177-d6bd-347f256665a7">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>dbs <span class="op">=</span> wr.catalog.get_databases()</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> db <span class="kw">in</span> dbs:</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Database name: "</span> <span class="op">+</span> db[<span class="st">'Name'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Database name: dsoaws_deep_learning</code></pre>
+</div>
+</div>
+</section>
+<section id="register-csv-data-with-aws-glue-catalog" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="register-csv-data-with-aws-glue-catalog"><span class="header-section-number">4.3</span> Register CSV data with AWS Glue Catalog</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>wr.catalog.create_csv_table(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    database<span class="op">=</span><span class="st">'dsoaws_deep_learning'</span>, </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    path<span class="op">=</span><span class="st">'s3://</span><span class="sc">{}</span><span class="st">/data/transformed/'</span>.<span class="bu">format</span>(bucket), </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    table<span class="op">=</span><span class="st">"reviews"</span>,    </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    columns_types<span class="op">=</span>{</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'sentiment'</span>: <span class="st">'int'</span>,        </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'review_body'</span>: <span class="st">'string'</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'product_category'</span>: <span class="st">'string'</span>      </span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">'overwrite'</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    skip_header_line_count<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    sep<span class="op">=</span><span class="st">','</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Review the table shape:</p>
+<div class="cell" data-outputid="120953c8-d8e6-49c3-e142-33fe75274bca">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> wr.catalog.table(database<span class="op">=</span><span class="st">'dsoaws_deep_learning'</span>,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                         table<span class="op">=</span><span class="st">'reviews'</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Column Name</th>
+      <th>Type</th>
+      <th>Partition</th>
+      <th>Comment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>sentiment</td>
+      <td>int</td>
+      <td>False</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>review_body</td>
+      <td>string</td>
+      <td>False</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>product_category</td>
+      <td>string</td>
+      <td>False</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="create-default-s3-bucket-for-amazon-athena" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="create-default-s3-bucket-for-amazon-athena"><span class="header-section-number">4.4</span> Create default S3 bucket for Amazon Athena</h3>
+<p>We can use Amazon Athena to query our results. Amazon Athena requires this S3 bucket to store temporary query results and improve performance of subsequent queries.</p>
+<p>The contents of this bucket are mostly binary and human-unreadable.</p>
+<div class="cell" data-outputid="7d9ec90b-876b-45cd-e8cb-af0c4a755682">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 bucket name</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>wr.athena.create_athena_bucket()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<pre><code>'s3://aws-athena-query-results-634231958143-us-east-1/'</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="visualising-the-data-and-answering-questions" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="visualising-the-data-and-answering-questions"><span class="header-section-number">5</span> Visualising the Data and Answering Questions</h2>
+<p>Let’s review the columns we have selected from our reviews dataset.</p>
+<ul>
+<li><code>sentiment</code>: The review’s sentiment (-1, 0, 1).</li>
+<li><code>product_category</code>: Broad product category that can be used to group reviews (in this case digital videos).</li>
+<li><code>review_body</code>: The text of the review.</li>
+</ul>
+<section id="preparation-for-data-visualization" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="preparation-for-data-visualization"><span class="header-section-number">5.1</span> Preparation for data visualization</h3>
+<p><strong>Imports</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>config InlineBackend.figure_format<span class="op">=</span><span class="st">'retina'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Settings</strong></p>
+<p>We need to set an AWS Glue database and a table name.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>database_name <span class="op">=</span> <span class="st">'dsoaws_deep_learning'</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>table_name <span class="op">=</span> <span class="st">'reviews'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s also define some seaborn config for our visualisations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>sns.set_style <span class="op">=</span> <span class="st">'seaborn-whitegrid'</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(rc<span class="op">=</span>{<span class="st">"font.style"</span>:<span class="st">"normal"</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">"axes.facecolor"</span>:<span class="st">"white"</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">'grid.color'</span>: <span class="st">'.8'</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">'grid.linestyle'</span>: <span class="st">'-'</span>,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"figure.facecolor"</span>:<span class="st">"white"</span>,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"figure.titlesize"</span>:<span class="dv">20</span>,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"text.color"</span>:<span class="st">"black"</span>,</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"xtick.color"</span>:<span class="st">"black"</span>,</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"ytick.color"</span>:<span class="st">"black"</span>,</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"axes.labelcolor"</span>:<span class="st">"black"</span>,</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"axes.grid"</span>:<span class="va">True</span>,</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">'axes.labelsize'</span>:<span class="dv">10</span>,</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">'xtick.labelsize'</span>:<span class="dv">10</span>,</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">'font.size'</span>:<span class="dv">10</span>,</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">'ytick.labelsize'</span>:<span class="dv">10</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plotting-key-stats-using-bar-charts" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="plotting-key-stats-using-bar-charts"><span class="header-section-number">5.2</span> Plotting key stats using bar charts</h3>
+<p><strong>Amazon Athena</strong> lets you query data in Amazon S3 using a standard SQL interface. It reflects the databases and tables in the AWS Glue Catalog.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_athena2.png" title="AWS Athena - Overview" class="img-fluid"></p>
+<p>You can create interactive queries and perform any data manipulations required for further downstream processing.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_athena1.png" title="AWS Athena - Overview" class="img-fluid"></p>
+<p>A Standard SQL query can be saved as a string and then passed as a parameter into the Athena query. For example to count the total number of reviews by sentiment, the SQL query here will take the following form:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> column_name, <span class="fu">COUNT</span>(column_name) <span class="kw">as</span> new_column_name</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> table_name</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> column_name</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> column_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="how-many-reviews-per-sentiment" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="how-many-reviews-per-sentiment"><span class="header-section-number">5.3</span> How many reviews per sentiment?</h3>
+<div class="cell" data-outputid="6a908564-8c2e-43c0-eb0c-70ec4a19d4e7">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>statement_count_by_sentiment <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT sentiment, COUNT(sentiment) AS count_sentiment</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM reviews</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY sentiment</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY sentiment</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(statement_count_by_sentiment)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+SELECT sentiment, COUNT(sentiment) AS count_sentiment
+FROM reviews
+GROUP BY sentiment
+ORDER BY sentiment
+</code></pre>
+</div>
+</div>
+<p>Query data in Amazon Athena database cluster using the prepared SQL statement:</p>
+<div class="cell" data-outputid="223abb7e-6ff3-4d27-e79d-3bdcddc61d42">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>df_count_by_sentiment <span class="op">=</span> wr.athena.read_sql_query(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    sql<span class="op">=</span>statement_count_by_sentiment,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    database<span class="op">=</span>database_name</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_count_by_sentiment)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sentiment  count_sentiment
+0         -1             2370
+1          0             2823
+2          1            17433</code></pre>
+</div>
+</div>
+<p>Preview the results of the query:</p>
+<div class="cell" data-outputid="8c1baeae-65d9-488f-b6ae-b1141cd32dc1">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>df_count_by_sentiment.plot(kind<span class="op">=</span><span class="st">'bar'</span>, x<span class="op">=</span><span class="st">'sentiment'</span>, y<span class="op">=</span><span class="st">'count_sentiment'</span>, rot<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>&lt;AxesSubplot:xlabel='sentiment'&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2023-02-03-loading-transforming-clothes-reviews-text-aws_files/figure-html/cell-25-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>So we can see the positive sentiment (1) category has by far the most reviews.</p>
+</section>
+<section id="calculate-total-number-of-reviews-per-product-category" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="calculate-total-number-of-reviews-per-product-category"><span class="header-section-number">5.4</span> Calculate total number of reviews per product category</h3>
+<p>Using an Amazon Athena query with the standard SQL statement passed as a parameter, we can calculate the total number of reviews per <code>product_category</code> in the table <code>reviews</code>.</p>
+<p>We can create an SQL statement of the form</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> category_column, <span class="fu">COUNT</span>(column_name) <span class="kw">AS</span> new_column_name</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> table_name</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> category_column</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> new_column_name <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>as a triple quote string into the variable <code>statement_count_by_category</code>. We will also use the column <code>sentiment</code> in the <code>COUNT</code> function and give it a new name <code>count_sentiment</code>.</p>
+<div class="cell" data-outputid="2dca4de6-d34f-4602-c37e-53966cc1c3d7">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>statement_count_by_category <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT product_category, COUNT(sentiment) AS count_sentiment</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM reviews</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY product_category </span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY count_sentiment DESC</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(statement_count_by_category)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+SELECT product_category, COUNT(sentiment) AS count_sentiment
+FROM reviews
+GROUP BY product_category 
+ORDER BY count_sentiment DESC
+</code></pre>
+</div>
+</div>
+<p>Let’s query data in Amazon Athena database passing the prepared SQL statement:</p>
+<div class="cell" data-outputid="bbb496c2-f765-4b59-f67b-c692b2bed41b">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>df_count_by_category <span class="op">=</span> wr.athena.read_sql_query(</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    sql<span class="op">=</span>statement_count_by_category,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    database<span class="op">=</span>database_name</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>df_count_by_category</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 320 ms, sys: 24.5 ms, total: 345 ms
+Wall time: 3.27 s</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>product_category</th>
+      <th>count_sentiment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Dresses</td>
+      <td>6145</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Knits</td>
+      <td>4626</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Blouses</td>
+      <td>2983</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sweaters</td>
+      <td>1380</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Pants</td>
+      <td>1350</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Jeans</td>
+      <td>1104</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Fine gauge</td>
+      <td>1059</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Skirts</td>
+      <td>903</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Jackets</td>
+      <td>683</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Lounge</td>
+      <td>669</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Swim</td>
+      <td>332</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Outerwear</td>
+      <td>319</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Shorts</td>
+      <td>304</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Sleep</td>
+      <td>214</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Legwear</td>
+      <td>158</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Intimates</td>
+      <td>147</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Layering</td>
+      <td>132</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Trend</td>
+      <td>118</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="which-product-categories-are-highest-rated-by-average-sentiment" class="level3" data-number="5.5">
+<h3 data-number="5.5" class="anchored" data-anchor-id="which-product-categories-are-highest-rated-by-average-sentiment"><span class="header-section-number">5.5</span> Which product categories are highest rated by average sentiment?</h3>
+<p>We will set the SQL statement to find the average sentiment per product category, showing the results in the descending order.</p>
+<div class="cell" data-outputid="3a8832c5-0db9-4b7a-beef-a617c2c94560">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>statement_avg_by_category <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT product_category, AVG(sentiment) AS avg_sentiment</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM </span><span class="sc">{}</span><span class="st"> </span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY product_category </span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY avg_sentiment DESC</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>.<span class="bu">format</span>(table_name)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(statement_avg_by_category)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+SELECT product_category, AVG(sentiment) AS avg_sentiment
+FROM reviews 
+GROUP BY product_category 
+ORDER BY avg_sentiment DESC
+</code></pre>
+</div>
+</div>
+<p>Lets query data in Amazon Athena database passing the prepared SQL statement:</p>
+<div class="cell" data-outputid="32a30401-6472-4e46-d6ae-a8447213ae53">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>df_avg_by_category <span class="op">=</span> wr.athena.read_sql_query(</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    sql<span class="op">=</span>statement_avg_by_category,</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    database<span class="op">=</span>database_name</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 462 ms, sys: 16.5 ms, total: 478 ms
+Wall time: 3.74 s</code></pre>
+</div>
+</div>
+<p>Let’s now preview the query results in the temporary S3 bucket: <code>s3://aws-athena-query-results-ACCOUNT-REGION/</code></p>
+<div class="cell" data-outputid="8b91eb80-2228-4cdb-9cb4-f49430d5665c">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>df_avg_by_category</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="38">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>product_category</th>
+      <th>avg_sentiment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Layering</td>
+      <td>0.780303</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Jeans</td>
+      <td>0.746377</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Lounge</td>
+      <td>0.745889</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sleep</td>
+      <td>0.710280</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Shorts</td>
+      <td>0.707237</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Pants</td>
+      <td>0.705185</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Intimates</td>
+      <td>0.700680</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Jackets</td>
+      <td>0.699854</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Skirts</td>
+      <td>0.696567</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Legwear</td>
+      <td>0.696203</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Fine gauge</td>
+      <td>0.692162</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Outerwear</td>
+      <td>0.683386</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Knits</td>
+      <td>0.653913</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Swim</td>
+      <td>0.644578</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Dresses</td>
+      <td>0.643287</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Sweaters</td>
+      <td>0.641304</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Blouses</td>
+      <td>0.641301</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Trend</td>
+      <td>0.483051</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p><strong>Visualization</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_values_barplot(axs, space):</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _show_on_plot(ax):</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> p <span class="kw">in</span> ax.patches:</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>            _x <span class="op">=</span> p.get_x() <span class="op">+</span> p.get_width() <span class="op">+</span> <span class="bu">float</span>(space)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>            _y <span class="op">=</span> p.get_y() <span class="op">+</span> p.get_height()</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>            value <span class="op">=</span> <span class="bu">round</span>(<span class="bu">float</span>(p.get_width()),<span class="dv">2</span>)</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>            ax.text(_x, _y, value, ha<span class="op">=</span><span class="st">"left"</span>)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(axs, np.ndarray):</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> idx, ax <span class="kw">in</span> np.ndenumerate(axs):</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>            _show_on_plot(ax)</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>        _show_on_plot(axs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="499a9209-b8ea-4fbc-e1a2-3216e241cbaf">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create plot</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>barplot <span class="op">=</span> sns.barplot(</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> df_avg_by_category, </span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'product_category'</span>,</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">'avg_sentiment'</span>, </span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"b"</span>, </span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>    saturation<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the size of the figure</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(rc<span class="op">=</span>{<span class="st">'figure.figsize'</span>:(<span class="fl">15.0</span>, <span class="fl">10.0</span>)})</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Set title and x-axis ticks </span></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Average sentiment by product category'</span>)</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a><span class="co">#plt.xticks([-1, 0, 1], ['Negative', 'Neutral', 'Positive'])</span></span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper code to show actual values afters bars </span></span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>show_values_barplot(barplot, <span class="fl">0.1</span>)</span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Average sentiment"</span>)</span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Product category"</span>)</span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Show graphic</span></span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true" tabindex="-1"></a>plt.show(barplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2023-02-03-loading-transforming-clothes-reviews-text-aws_files/figure-html/cell-32-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="which-product-categories-have-the-most-reviews" class="level3" data-number="5.6">
+<h3 data-number="5.6" class="anchored" data-anchor-id="which-product-categories-have-the-most-reviews"><span class="header-section-number">5.6</span> Which product categories have the most reviews?</h3>
+<p>Let’s create an SQL statement to find the count of sentiment per product category, showing the results in the descending order.</p>
+<div class="cell" data-outputid="f2568c3d-d2e9-46a4-c837-9e36d6ffe6ea">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>statement_count_by_category_desc <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT product_category, COUNT(*) AS count_reviews </span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM </span><span class="sc">{}</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY product_category </span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY count_reviews DESC</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>.<span class="bu">format</span>(table_name)</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(statement_count_by_category_desc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+SELECT product_category, COUNT(*) AS count_reviews 
+FROM reviews
+GROUP BY product_category 
+ORDER BY count_reviews DESC
+</code></pre>
+</div>
+</div>
+<p>Now lets query data in Amazon Athena database passing the prepared SQL statement.</p>
+<div class="cell" data-outputid="607b59d9-f9d8-4671-a27f-45422d2dc9ee">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>df_count_by_category_desc <span class="op">=</span> wr.athena.read_sql_query(</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>    sql<span class="op">=</span>statement_count_by_category_desc,</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    database<span class="op">=</span>database_name</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 360 ms, sys: 22.6 ms, total: 382 ms
+Wall time: 4.38 s</code></pre>
+</div>
+</div>
+<p>Let’s store maximum number of sentiment for the visualization plot.</p>
+<div class="cell" data-outputid="58d816a8-053f-4a0e-8254-78e71ee6bde7">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>max_sentiment <span class="op">=</span> df_count_by_category_desc[<span class="st">'count_reviews'</span>].<span class="bu">max</span>()</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Highest number of reviews (in a single category): </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(max_sentiment))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Highest number of reviews (in a single category): 6145</code></pre>
+</div>
+</div>
+<p>Let’s now plot this as a bar chart.</p>
+<div class="cell" data-outputid="49aa5fc4-9c2f-4f65-dbbf-68eb18d4a4c0">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create seaborn barplot</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>barplot <span class="op">=</span> sns.barplot(</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_count_by_category_desc, </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'product_category'</span>, </span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">'count_reviews'</span>, </span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"b"</span>,</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    saturation<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the size of the figure</span></span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(rc<span class="op">=</span>{<span class="st">'figure.figsize'</span>:(<span class="fl">15.0</span>, <span class="fl">10.0</span>)})</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Set title</span></span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Number of reviews per product category"</span>)</span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Number of reviews"</span>)</span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Product category"</span>)</span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-20"><a href="#cb56-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the barplot</span></span>
+<span id="cb56-21"><a href="#cb56-21" aria-hidden="true" tabindex="-1"></a>plt.show(barplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2023-02-03-loading-transforming-clothes-reviews-text-aws_files/figure-html/cell-36-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="what-is-the-breakdown-of-sentiments-per-product-category" class="level3" data-number="5.7">
+<h3 data-number="5.7" class="anchored" data-anchor-id="what-is-the-breakdown-of-sentiments-per-product-category"><span class="header-section-number">5.7</span> What is the breakdown of sentiments per product category?</h3>
+<p>Let’s set the SQL statement to find the count of sentiment per product category and sentiment.</p>
+<div class="cell" data-outputid="5dbd22ae-0041-4fdb-93d0-41253e311611">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>statement_count_by_category_and_sentiment <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT product_category,</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="st">         sentiment,</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="st">         COUNT(*) AS count_reviews</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM </span><span class="sc">{}</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY  product_category, sentiment</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY  product_category ASC, sentiment DESC, count_reviews</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>.<span class="bu">format</span>(table_name)</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(statement_count_by_category_and_sentiment)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+SELECT product_category,
+         sentiment,
+         COUNT(*) AS count_reviews
+FROM reviews
+GROUP BY  product_category, sentiment
+ORDER BY  product_category ASC, sentiment DESC, count_reviews
+</code></pre>
+</div>
+</div>
+<p>Now we query the data in Amazon Athena database passing the prepared SQL statement.</p>
+<div class="cell" data-outputid="9a244d23-07ba-477a-8dbc-bcf48863b824">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>df_count_by_category_and_sentiment <span class="op">=</span> wr.athena.read_sql_query(</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    sql<span class="op">=</span>statement_count_by_category_and_sentiment,</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>    database<span class="op">=</span>database_name</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 482 ms, sys: 22 ms, total: 504 ms
+Wall time: 3.56 s</code></pre>
+</div>
+</div>
+<p>Let’s prepare for a stacked percentage horizontal bar plot showing proportion of sentiments per product category.</p>
+<div class="cell" data-outputid="9443387b-b7a8-4e3f-987c-00b852468be5">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create grouped dataframes by category and by sentiment</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>grouped_category <span class="op">=</span> df_count_by_category_and_sentiment.groupby(<span class="st">'product_category'</span>)</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>grouped_star <span class="op">=</span> df_count_by_category_and_sentiment.groupby(<span class="st">'sentiment'</span>)</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sum of sentiments per star sentiment</span></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>df_sum <span class="op">=</span> df_count_by_category_and_sentiment.groupby([<span class="st">'sentiment'</span>]).<span class="bu">sum</span>()</span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate total number of sentiments</span></span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>total <span class="op">=</span> df_sum[<span class="st">'count_reviews'</span>].<span class="bu">sum</span>()</span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Total number of reviews: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(total))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total number of reviews: 22626</code></pre>
+</div>
+</div>
+<p>And create a dictionary of product categories and array of star rating distribution per category.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>distribution <span class="op">=</span> {}</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>count_reviews_per_star <span class="op">=</span> []</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>i<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> category, sentiments <span class="kw">in</span> grouped_category:</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>    count_reviews_per_star <span class="op">=</span> []</span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> star <span class="kw">in</span> sentiments[<span class="st">'sentiment'</span>]:</span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>        count_reviews_per_star.append(sentiments.at[i, <span class="st">'count_reviews'</span>])</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>        i<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>    distribution[category] <span class="op">=</span> count_reviews_per_star</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s build an array per star across all categories.</p>
+<div class="cell" data-outputid="1fb0704b-3db6-4f2d-d697-fe1b5fe47972">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>distribution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="53">
+<pre><code>{'Blouses': [2256, 384, 343],
+ 'Dresses': [4634, 830, 681],
+ 'Fine gauge': [837, 118, 104],
+ 'Intimates': [117, 16, 14],
+ 'Jackets': [550, 61, 72],
+ 'Jeans': [909, 110, 85],
+ 'Knits': [3523, 605, 498],
+ 'Layering': [113, 9, 10],
+ 'Legwear': [126, 16, 16],
+ 'Lounge': [545, 78, 46],
+ 'Outerwear': [254, 29, 36],
+ 'Pants': [1074, 154, 122],
+ 'Shorts': [240, 39, 25],
+ 'Skirts': [714, 104, 85],
+ 'Sleep': [175, 16, 23],
+ 'Sweaters': [1036, 193, 151],
+ 'Swim': [252, 42, 38],
+ 'Trend': [78, 19, 21]}</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="bd11465c-101d-42ea-809b-636d1804ec92">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>df_distribution_pct <span class="op">=</span> pd.DataFrame(distribution).transpose().<span class="bu">apply</span>(</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> num_sentiments: num_sentiments<span class="op">/</span><span class="bu">sum</span>(num_sentiments)<span class="op">*</span><span class="dv">100</span>, axis<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>df_distribution_pct.columns<span class="op">=</span>[<span class="st">'1'</span>, <span class="st">'0'</span>, <span class="st">'-1'</span>]</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>df_distribution_pct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="54">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>1</th>
+      <th>0</th>
+      <th>-1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Blouses</th>
+      <td>75.628562</td>
+      <td>12.872947</td>
+      <td>11.498491</td>
+    </tr>
+    <tr>
+      <th>Dresses</th>
+      <td>75.410903</td>
+      <td>13.506916</td>
+      <td>11.082181</td>
+    </tr>
+    <tr>
+      <th>Fine gauge</th>
+      <td>79.036827</td>
+      <td>11.142587</td>
+      <td>9.820585</td>
+    </tr>
+    <tr>
+      <th>Intimates</th>
+      <td>79.591837</td>
+      <td>10.884354</td>
+      <td>9.523810</td>
+    </tr>
+    <tr>
+      <th>Jackets</th>
+      <td>80.527086</td>
+      <td>8.931186</td>
+      <td>10.541728</td>
+    </tr>
+    <tr>
+      <th>Jeans</th>
+      <td>82.336957</td>
+      <td>9.963768</td>
+      <td>7.699275</td>
+    </tr>
+    <tr>
+      <th>Knits</th>
+      <td>76.156507</td>
+      <td>13.078253</td>
+      <td>10.765240</td>
+    </tr>
+    <tr>
+      <th>Layering</th>
+      <td>85.606061</td>
+      <td>6.818182</td>
+      <td>7.575758</td>
+    </tr>
+    <tr>
+      <th>Legwear</th>
+      <td>79.746835</td>
+      <td>10.126582</td>
+      <td>10.126582</td>
+    </tr>
+    <tr>
+      <th>Lounge</th>
+      <td>81.464873</td>
+      <td>11.659193</td>
+      <td>6.875934</td>
+    </tr>
+    <tr>
+      <th>Outerwear</th>
+      <td>79.623824</td>
+      <td>9.090909</td>
+      <td>11.285266</td>
+    </tr>
+    <tr>
+      <th>Pants</th>
+      <td>79.555556</td>
+      <td>11.407407</td>
+      <td>9.037037</td>
+    </tr>
+    <tr>
+      <th>Shorts</th>
+      <td>78.947368</td>
+      <td>12.828947</td>
+      <td>8.223684</td>
+    </tr>
+    <tr>
+      <th>Skirts</th>
+      <td>79.069767</td>
+      <td>11.517165</td>
+      <td>9.413068</td>
+    </tr>
+    <tr>
+      <th>Sleep</th>
+      <td>81.775701</td>
+      <td>7.476636</td>
+      <td>10.747664</td>
+    </tr>
+    <tr>
+      <th>Sweaters</th>
+      <td>75.072464</td>
+      <td>13.985507</td>
+      <td>10.942029</td>
+    </tr>
+    <tr>
+      <th>Swim</th>
+      <td>75.903614</td>
+      <td>12.650602</td>
+      <td>11.445783</td>
+    </tr>
+    <tr>
+      <th>Trend</th>
+      <td>66.101695</td>
+      <td>16.101695</td>
+      <td>17.796610</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Let’s plot the distributions of sentiments per product category.</p>
+<div class="cell" data-outputid="25bec75a-75df-4fc6-9d67-67c6953b4431">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>categories <span class="op">=</span> df_distribution_pct.index</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot bars</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>))</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>df_distribution_pct.plot(kind<span class="op">=</span><span class="st">"barh"</span>, </span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>                         stacked<span class="op">=</span><span class="va">True</span>, </span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>                         edgecolor<span class="op">=</span><span class="st">'white'</span>,</span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>                         width<span class="op">=</span><span class="fl">1.0</span>,</span>
+<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>                         color<span class="op">=</span>[<span class="st">'green'</span>, </span>
+<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>                                <span class="st">'orange'</span>, </span>
+<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>                                <span class="st">'blue'</span>])</span>
+<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Distribution of reviews per sentiment per category"</span>, </span>
+<span id="cb67-15"><a href="#cb67-15" aria-hidden="true" tabindex="-1"></a>          fontsize<span class="op">=</span><span class="st">'16'</span>)</span>
+<span id="cb67-16"><a href="#cb67-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-17"><a href="#cb67-17" aria-hidden="true" tabindex="-1"></a>plt.legend(bbox_to_anchor<span class="op">=</span>(<span class="fl">1.04</span>,<span class="dv">1</span>), </span>
+<span id="cb67-18"><a href="#cb67-18" aria-hidden="true" tabindex="-1"></a>           loc<span class="op">=</span><span class="st">"upper left"</span>,</span>
+<span id="cb67-19"><a href="#cb67-19" aria-hidden="true" tabindex="-1"></a>           labels<span class="op">=</span>[<span class="st">'Positive'</span>, </span>
+<span id="cb67-20"><a href="#cb67-20" aria-hidden="true" tabindex="-1"></a>                   <span class="st">'Neutral'</span>, </span>
+<span id="cb67-21"><a href="#cb67-21" aria-hidden="true" tabindex="-1"></a>                   <span class="st">'Negative'</span>])</span>
+<span id="cb67-22"><a href="#cb67-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-23"><a href="#cb67-23" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"% Breakdown of sentiments"</span>, fontsize<span class="op">=</span><span class="st">'14'</span>)</span>
+<span id="cb67-24"><a href="#cb67-24" aria-hidden="true" tabindex="-1"></a>plt.gca().invert_yaxis()</span>
+<span id="cb67-25"><a href="#cb67-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb67-26"><a href="#cb67-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-27"><a href="#cb67-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 1000x500 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2023-02-03-loading-transforming-clothes-reviews-text-aws_files/figure-html/cell-43-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="analyze-the-distribution-of-review-word-counts" class="level3" data-number="5.8">
+<h3 data-number="5.8" class="anchored" data-anchor-id="analyze-the-distribution-of-review-word-counts"><span class="header-section-number">5.8</span> Analyze the distribution of review word counts</h3>
+<p>Let’s now set the SQL statement to count the number of the words in each of the reviews.</p>
+<div class="cell" data-outputid="dd6a2a1d-78e0-40cb-8095-6bd32edb4d31">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>statement_num_words <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT CARDINALITY(SPLIT(review_body, ' ')) as num_words</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM </span><span class="sc">{}</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>.<span class="bu">format</span>(table_name)</span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(statement_num_words)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    SELECT CARDINALITY(SPLIT(review_body, ' ')) as num_words
+    FROM reviews
+</code></pre>
+</div>
+</div>
+<p>Now query the data in Amazon Athena database passing the SQL statement.</p>
+<div class="cell" data-outputid="452e8a65-c21a-4bbb-de47-f4bdeff4f3a7">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>df_num_words <span class="op">=</span> wr.athena.read_sql_query(</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>    sql<span class="op">=</span>statement_num_words,</span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>    database<span class="op">=</span>database_name</span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 286 ms, sys: 20.9 ms, total: 307 ms
+Wall time: 3.25 s</code></pre>
+</div>
+</div>
+<p>Let’s print out and analyse some descriptive statistics.</p>
+<div class="cell" data-outputid="ae09e3c3-d0b4-41b6-e836-ceeda57eb6c1">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> df_num_words[<span class="st">"num_words"</span>].describe(percentiles<span class="op">=</span>[<span class="fl">0.10</span>, <span class="fl">0.20</span>, <span class="fl">0.30</span>, <span class="fl">0.40</span>, <span class="fl">0.50</span>, <span class="fl">0.60</span>, <span class="fl">0.70</span>, <span class="fl">0.80</span>, <span class="fl">0.90</span>, <span class="fl">1.00</span>])</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="59">
+<pre><code>count    22626.000000
+mean        62.709847
+std         29.993735
+min          2.000000
+10%         22.000000
+20%         33.000000
+30%         42.000000
+40%         51.000000
+50%         61.000000
+60%         72.000000
+70%         86.000000
+80%         97.000000
+90%        103.000000
+100%       122.000000
+max        122.000000
+Name: num_words, dtype: float64</code></pre>
+</div>
+</div>
+<p>Now we will plot the distribution of the words number per review.</p>
+<div class="cell" data-outputid="70a460d3-cf2d-4e89-fb74-0ca2b43ef362">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>df_num_words[<span class="st">"num_words"</span>].plot.hist(xticks<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">256</span>], bins<span class="op">=</span><span class="dv">100</span>, <span class="bu">range</span><span class="op">=</span>[<span class="dv">0</span>, <span class="dv">256</span>]).axvline(</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>summary[<span class="st">"100%"</span>], c<span class="op">=</span><span class="st">"red"</span></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Words number"</span>, fontsize<span class="op">=</span><span class="st">'14'</span>)</span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Frequency"</span>, fontsize<span class="op">=</span><span class="st">'14'</span>)</span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'distribution_num_words_per_review.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2023-02-03-loading-transforming-clothes-reviews-text-aws_files/figure-html/cell-47-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="acknowledgements" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">6</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the great <a href="https://www.deeplearning.ai/courses/practical-data-science-specialization/">Deep Learning AI Practical Data Science on AWS Specialisation Course</a> which i completed, and acknowledge the use of some images and other materials from the training course in this article.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

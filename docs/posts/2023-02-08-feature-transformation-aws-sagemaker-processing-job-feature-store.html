@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-02-08">
+<meta name="description" content="We will prepare to train a BERT-based natural language processing (NLP) model converting review text into machine-readable features used by BERT. With the required feature transformation we will configure an Amazon SageMaker processing job to perform the task.">
+
+<title>blogtest1 - Feature Transformation with Amazon SageMaker Processing Job and Feature Store</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">blogtest1</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Feature Transformation with Amazon SageMaker Processing Job and Feature Store</h1>
+                  <div>
+        <div class="description">
+          We will prepare to train a BERT-based natural language processing (NLP) model converting review text into machine-readable features used by BERT. With the required feature transformation we will configure an Amazon SageMaker processing job to perform the task.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">aws</div>
+                <div class="quarto-category">cloud-data-science</div>
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">February 8, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#the-bert-language-model" id="toc-the-bert-language-model" class="nav-link" data-scroll-target="#the-bert-language-model"><span class="toc-section-number">2</span>  The Bert language model</a></li>
+  <li><a href="#feature-engineering-at-scale" id="toc-feature-engineering-at-scale" class="nav-link" data-scroll-target="#feature-engineering-at-scale"><span class="toc-section-number">3</span>  Feature Engineering at Scale</a></li>
+  <li><a href="#import-libraries-initialise" id="toc-import-libraries-initialise" class="nav-link" data-scroll-target="#import-libraries-initialise"><span class="toc-section-number">4</span>  Import Libraries &amp; Initialise</a></li>
+  <li><a href="#configure-the-sagemaker-feature-store" id="toc-configure-the-sagemaker-feature-store" class="nav-link" data-scroll-target="#configure-the-sagemaker-feature-store"><span class="toc-section-number">5</span>  Configure the SageMaker Feature Store</a>
+  <ul class="collapse">
+  <li><a href="#configure-dataset" id="toc-configure-dataset" class="nav-link" data-scroll-target="#configure-dataset"><span class="toc-section-number">5.1</span>  Configure dataset</a></li>
+  <li><a href="#configure-the-sagemaker-feature-store-1" id="toc-configure-the-sagemaker-feature-store-1" class="nav-link" data-scroll-target="#configure-the-sagemaker-feature-store-1"><span class="toc-section-number">5.2</span>  Configure the SageMaker feature store</a></li>
+  </ul></li>
+  <li><a href="#transform-the-dataset" id="toc-transform-the-dataset" class="nav-link" data-scroll-target="#transform-the-dataset"><span class="toc-section-number">6</span>  Transform the dataset</a></li>
+  <li><a href="#query-the-feature-store" id="toc-query-the-feature-store" class="nav-link" data-scroll-target="#query-the-feature-store"><span class="toc-section-number">7</span>  Query the Feature Store</a>
+  <ul class="collapse">
+  <li><a href="#export-training-validation-and-test-datasets-from-the-feature-store" id="toc-export-training-validation-and-test-datasets-from-the-feature-store" class="nav-link" data-scroll-target="#export-training-validation-and-test-datasets-from-the-feature-store"><span class="toc-section-number">7.1</span>  Export training, validation, and test datasets from the Feature Store</a></li>
+  <li><a href="#export-tsv-from-feature-store" id="toc-export-tsv-from-feature-store" class="nav-link" data-scroll-target="#export-tsv-from-feature-store"><span class="toc-section-number">7.2</span>  Export TSV from Feature Store</a></li>
+  <li><a href="#check-that-the-dataset-in-the-feature-store-is-balanced-by-sentiment" id="toc-check-that-the-dataset-in-the-feature-store-is-balanced-by-sentiment" class="nav-link" data-scroll-target="#check-that-the-dataset-in-the-feature-store-is-balanced-by-sentiment"><span class="toc-section-number">7.3</span>  Check that the dataset in the Feature Store is balanced by sentiment</a></li>
+  </ul></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">8</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In <a href="https://livingdatalab.com/categories/#aws">earlier articles we introduced AWS cloud services for data science</a>, and showed how it can help with different stages of the data science &amp; machine learning workflow.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_ds_workflow.png" title="The AWS Data Science Workflow" class="img-fluid"></p>
+<p>In this article we will look at the <strong>Prepare &amp; Transform</strong> stage using AWS including:</p>
+<ul>
+<li>Feature engineering</li>
+<li>Feature store</li>
+</ul>
+<p>Using the raw <a href="https://www.kaggle.com/nicapotato/womens-ecommerce-clothing-reviews">Women’s Clothing Reviews</a> dataset - we will prepare it to train a BERT-based natural language processing (NLP) model. The model will be used to classify customer reviews into positive (1), neutral (0) and negative (-1) sentiment.</p>
+<p>We will convert the original review text into machine-readable features used by BERT. To perform the required feature transformation we will configure an Amazon SageMaker processing job, which will be running a custom Python script.</p>
+</section>
+<section id="the-bert-language-model" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-bert-language-model"><span class="header-section-number">2</span> The Bert language model</h2>
+<p>BERT stands for ‘Bidirectional Encoder Representations from Transformers’. So Bert language models are based on the transformer type models first created in 2017.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_bert_history.png" title="The History of Language Models" class="img-fluid"></p>
+<p>In a <a href="https://livingdatalab.com/aws/cloud-data-science/natural-language-processing/deep-learning/2023/02/06/creating-text-classifier-using-aws-sagemaker-blazingtext.html">previous article we used a Blazing Text Language Model</a> to create a text classifier. Blazing Text language models are in turn based on Word2Vec type language models. But how do word2vec/Blazing text language models work? essentially these models convert individual words into a series of numbers or a <em>vector</em>.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_blazingtext_embed.png" title="Blazing Text Embeddings" class="img-fluid"></p>
+<p>I used word2vec in one of my first data science/deep learning projects back in 2019 <a href="https://docs.google.com/presentation/d/164oDiuEZFR35X9QEJN1R-rOb4sp5r32DxR4Xm6z-Qgs/edit#slide=id.p">classifying disaster text messages</a>.</p>
+<p>This means with word2vec similar meaning words will have similar numbers and vector positions, this is what this language model learns. The downside of this approach though is it allows only for one sense of what a word might mean - but we know in practice the meaning of a word can be effected by the context.</p>
+<p>For example, if we were trying to decide if these two phrases were positive or negative:</p>
+<ul>
+<li>I love the dress</li>
+<li>I love the dress, but not the price</li>
+</ul>
+<p>A word2vec model might end up giving quite positive sentiment to both of these phrases when summing up the meaning of these words individually, yet we can see that the second phrase might have more neutral if not negative sentiment, because here ‘love’, usually positive, has been modified by the context of the words its within.</p>
+<p>This is one key thing that transformer models such as BERT or GPT can do, <strong>they can take into account the context of a word, and indeed process an entire phrase in one go to give a vector for that group of words, rather than for one word at a time.</strong></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_bert_embed.png" title="The Bert Embeddings" class="img-fluid"></p>
+<p>In particular transformers use <em>attention</em> to capture the relationship and meaning between words used together. You can find out more about the differences between word2vec and transformer models <a href="https://towardsdatascience.com/word2vec-to-transformers-caf5a3daa08a">here</a>.</p>
+</section>
+<section id="feature-engineering-at-scale" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="feature-engineering-at-scale"><span class="header-section-number">3</span> Feature Engineering at Scale</h2>
+<p>Amazon SageMaker processing allows you to perform data related tasks such as, preprocessing, postprocessing, and model evaluation at scale. SageMaker processing provides this capability by using a distributed cluster. By specifying some parameters, you can control how many notes and the type of the notes that make up the distributed cluster.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_processing.png" title="Amazon SageMaker Processing" class="img-fluid"></p>
+<p>Sagemaker Feature Store is a fully managed service that provides purpose-built feature store. SageMaker Feature Store provides you with a centralized repository to securely save and serve features from.</p>
+<p>Next, SageMaker Feature Store provides you with the capabilities to reuse the features, not just across a single machine learning project, but across multiple projects. A typical challenge that data scientist sees is training an inference skew that could result from discrepancies in the data used for training and the data used for inferencing. Sagemaker Feature Store helps reduce the skew by reusing the features across training and inference traces and by keeping the features consistent.</p>
+<p>Finally, SageMaker Feature Store provides the capabilities to create it for the features both in real time and batch. The ability to creating for features in real time suppose use cases such as near real time ML predictions. Similarly, the ability to look up features in batch mode can be used to support use cases, such as model training.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_feature_store.png" title="AWS Feature Store" class="img-fluid"></p>
+</section>
+<section id="import-libraries-initialise" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="import-libraries-initialise"><span class="header-section-number">4</span> Import Libraries &amp; Initialise</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> boto3</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sagemaker</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> botocore</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> botocore.config.Config(user_agent_extra<span class="op">=</span><span class="st">'dlai-pds/c2/w1'</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># low-level service client of the boto3 session</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> boto3.client(service_name<span class="op">=</span><span class="st">'sagemaker'</span>, </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                  config<span class="op">=</span>config)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>featurestore_runtime <span class="op">=</span> boto3.client(service_name<span class="op">=</span><span class="st">'sagemaker-featurestore-runtime'</span>, </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                                    config<span class="op">=</span>config)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>sess <span class="op">=</span> sagemaker.Session(sagemaker_client<span class="op">=</span>sm,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                         sagemaker_featurestore_runtime_client<span class="op">=</span>featurestore_runtime)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>bucket <span class="op">=</span> sess.default_bucket()</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>role <span class="op">=</span> sagemaker.get_execution_role()</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> sess.boto_region_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="configure-the-sagemaker-feature-store" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="configure-the-sagemaker-feature-store"><span class="header-section-number">5</span> Configure the SageMaker Feature Store</h2>
+<section id="configure-dataset" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="configure-dataset"><span class="header-section-number">5.1</span> Configure dataset</h3>
+<p>The raw dataset is in the public S3 bucket. Let’s start by specifying the S3 location of it:</p>
+<div class="cell" data-outputid="b4ddde35-0d6b-4320-a9be-f29a22f1be3c">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>raw_input_data_s3_uri <span class="op">=</span> <span class="st">'s3://dlai-practical-data-science/data/raw/'</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(raw_input_data_s3_uri)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>s3://dlai-practical-data-science/data/raw/</code></pre>
+</div>
+</div>
+<p>List the files in the S3 bucket (in this case it will be just one file):</p>
+<div class="cell" data-outputid="5712b73b-7dd8-47d6-b0a9-f2b69298a913">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls $raw_input_data_s3_uri</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2021-04-30 02:21:06    8457214 womens_clothing_ecommerce_reviews.csv</code></pre>
+</div>
+</div>
+</section>
+<section id="configure-the-sagemaker-feature-store-1" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="configure-the-sagemaker-feature-store-1"><span class="header-section-number">5.2</span> Configure the SageMaker feature store</h3>
+<p>As the result of the transformation, in addition to generating files in S3 bucket, we will also save the transformed data in the <strong>Amazon SageMaker Feature Store</strong> to be used by others in our organization, for example.</p>
+<p>To configure a Feature Store we need to setup a <strong>Feature Group</strong>. This is the main resource containing all of the metadata related to the data stored in the Feature Store.</p>
+<p>A Feature Group should contain a list of <strong>Feature Definitions</strong>. A Feature Definition consists of a name and the data type. The Feature Group also contains an online store configuration and an offline store configuration controlling where the data is stored. Enabling the online store allows quick access to the latest value for a record via the <a href="https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_feature_store_GetRecord.html">GetRecord API</a>. The offline store allows storage of the data in your S3 bucket. We will be using the offline store here.</p>
+<p>Let’s setup the Feature Group name and the Feature Store offline prefix in S3 bucket.</p>
+<div class="cell" data-outputid="fc9ed9db-1b5f-4575-f4f9-516bcb663856">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>timestamp <span class="op">=</span> <span class="bu">int</span>(time.time())</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>feature_group_name <span class="op">=</span> <span class="st">'reviews-feature-group-'</span> <span class="op">+</span> <span class="bu">str</span>(timestamp)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>feature_store_offline_prefix <span class="op">=</span> <span class="st">'reviews-feature-store-'</span> <span class="op">+</span> <span class="bu">str</span>(timestamp)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Feature group name: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(feature_group_name))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Feature store offline prefix in S3: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(feature_store_offline_prefix))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Feature group name: reviews-feature-group-1675799708
+Feature store offline prefix in S3: reviews-feature-store-1675799708</code></pre>
+</div>
+</div>
+<p>Taking two features from the original raw dataset (<code>Review Text</code> and <code>Rating</code>), we will transform it preparing to be used for the model training and then to be saved in the Feature Store. Here we will define the related features to be stored as a list of <code>FeatureDefinition</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.feature_store.feature_definition <span class="im">import</span> (</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    FeatureDefinition,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    FeatureTypeEnum,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>feature_definitions<span class="op">=</span> [</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># unique ID of the review</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    FeatureDefinition(feature_name<span class="op">=</span><span class="st">'review_id'</span>, feature_type<span class="op">=</span>FeatureTypeEnum.STRING), </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ingestion timestamp</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    FeatureDefinition(feature_name<span class="op">=</span><span class="st">'date'</span>, feature_type<span class="op">=</span>FeatureTypeEnum.STRING),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sentiment: -1 (negative), 0 (neutral) or 1 (positive). It will be found the Rating values (1, 2, 3, 4, 5)</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    FeatureDefinition(feature_name<span class="op">=</span><span class="st">'sentiment'</span>, feature_type<span class="op">=</span>FeatureTypeEnum.STRING), </span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># label ID of the target class (sentiment)</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    FeatureDefinition(feature_name<span class="op">=</span><span class="st">'label_id'</span>, feature_type<span class="op">=</span>FeatureTypeEnum.STRING),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># reviews encoded with the BERT tokenizer</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    FeatureDefinition(feature_name<span class="op">=</span><span class="st">'input_ids'</span>, feature_type<span class="op">=</span>FeatureTypeEnum.STRING),</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># original Review Text</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    FeatureDefinition(feature_name<span class="op">=</span><span class="st">'review_body'</span>, feature_type<span class="op">=</span>FeatureTypeEnum.STRING),</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># train/validation/test label</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    FeatureDefinition(feature_name<span class="op">=</span><span class="st">'split_type'</span>, feature_type<span class="op">=</span>FeatureTypeEnum.STRING)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s create the feature group using the feature definitions defined above.</p>
+<div class="cell" data-outputid="1bb637b8-7887-46dd-8634-575fc8095b69">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.feature_store.feature_group <span class="im">import</span> FeatureGroup</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>feature_group <span class="op">=</span> FeatureGroup(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>feature_group_name, </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    feature_definitions<span class="op">=</span>feature_definitions, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    sagemaker_session<span class="op">=</span>sess</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(feature_group)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>FeatureGroup(name='reviews-feature-group-1675799708', sagemaker_session=&lt;sagemaker.session.Session object at 0x7f9cb912c350&gt;, feature_definitions=[FeatureDefinition(feature_name='review_id', feature_type=&lt;FeatureTypeEnum.STRING: 'String'&gt;), FeatureDefinition(feature_name='date', feature_type=&lt;FeatureTypeEnum.STRING: 'String'&gt;), FeatureDefinition(feature_name='sentiment', feature_type=&lt;FeatureTypeEnum.STRING: 'String'&gt;), FeatureDefinition(feature_name='label_id', feature_type=&lt;FeatureTypeEnum.STRING: 'String'&gt;), FeatureDefinition(feature_name='input_ids', feature_type=&lt;FeatureTypeEnum.STRING: 'String'&gt;), FeatureDefinition(feature_name='review_body', feature_type=&lt;FeatureTypeEnum.STRING: 'String'&gt;), FeatureDefinition(feature_name='split_type', feature_type=&lt;FeatureTypeEnum.STRING: 'String'&gt;)])</code></pre>
+</div>
+</div>
+<p>We will use the defined Feature Group later in this project, the actual creation of the Feature Group will take place in the processing job. Now let’s move into the setup of the processing job to transform the dataset.</p>
+</section>
+</section>
+<section id="transform-the-dataset" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="transform-the-dataset"><span class="header-section-number">6</span> Transform the dataset</h2>
+<p>We will configure a SageMaker processing job to run a custom Python script to balance and transform the raw data into a format used by BERT model.</p>
+<p>Let’s set the transformation parameters including the instance type, instance count, and train/validation/test split percentages. We will use a relatively small instance type for this project. Please refer to <a href="https://aws.amazon.com/sagemaker/pricing/">this</a> link for additional instance types that may work for your use case.</p>
+<p>We can also choose whether you want to balance the dataset or not. In this case, we will balance the dataset to avoid class imbalance in the target variable, <code>sentiment</code>.</p>
+<p>Another important parameter of the model is the <code>max_seq_length</code>, which specifies the maximum length of the classified reviews for the RoBERTa model. If the sentence is shorter than the maximum length parameter, it will be padded. In another case, when the sentence is longer, it will be truncated from the right side.</p>
+<p>Since a smaller <code>max_seq_length</code> leads to faster training and lower resource utilization, you want to find the smallest power-of-2 that captures <code>100%</code> of our reviews. For this dataset, the <code>100th</code> percentile is <code>115</code>. However, it’s best to stick with powers-of-2 when using BERT. So let’s choose <code>128</code> as this is the smallest power-of-2 greater than <code>115</code>. We will see below how the shorter sentences will be padded to a maximum length.</p>
+<pre><code>mean        52.512374
+std         31.387048
+min          1.000000
+10%         10.000000
+20%         22.000000
+30%         32.000000
+40%         41.000000
+50%         51.000000
+60%         61.000000
+70%         73.000000
+80%         88.000000
+90%         97.000000
+100%       115.000000
+max        115.000000</code></pre>
+<p><img src="https://github.com/pranath/blog/raw/master/images/distribution_num_words_per_review.png" title="Histogram of text sequence lengths" class="img-fluid"></p>
+<div class="cell" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>processing_instance_type<span class="op">=</span><span class="st">'ml.c5.xlarge'</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>processing_instance_count<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>train_split_percentage<span class="op">=</span><span class="fl">0.90</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>validation_split_percentage<span class="op">=</span><span class="fl">0.05</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>test_split_percentage<span class="op">=</span><span class="fl">0.05</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>balance_dataset<span class="op">=</span><span class="va">True</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>max_seq_length<span class="op">=</span><span class="dv">128</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To balance and transform our data, we will use a scikit-learn-based processing job. This is essentially a generic Python processing job with scikit-learn pre-installed. We can specify the version of scikit-learn we wish to use. Also we will pass the SageMaker execution role, processing instance type and instance count.</p>
+<div class="cell" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.sklearn.processing <span class="im">import</span> SKLearnProcessor</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>processor <span class="op">=</span> SKLearnProcessor(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    framework_version<span class="op">=</span><span class="st">'0.23-1'</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    role<span class="op">=</span>role,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    instance_type<span class="op">=</span>processing_instance_type,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    instance_count<span class="op">=</span>processing_instance_count,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    env<span class="op">=</span>{<span class="st">'AWS_DEFAULT_REGION'</span>: region},                             </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    max_runtime_in_seconds<span class="op">=</span><span class="dv">7200</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The processing job will be running the Python code from the file <a href="https://github.com/pranath/pds/blob/main/prepare_data.py"><code>src/prepare_data.py</code></a>.</p>
+<div class="cell" data-outputid="36d16e53-c76f-4665-9a17-5cbaa581c55c">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys, importlib</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">'src/'</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># import the `prepare_data.py` module</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> prepare_data</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># reload the module if it has been previously loaded </span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">'prepare_data'</span> <span class="kw">in</span> sys.modules:</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    importlib.<span class="bu">reload</span>(prepare_data)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>input_ids <span class="op">=</span> prepare_data.convert_to_bert_input_ids(<span class="st">"this product is great!"</span>, max_seq_length)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>updated_correctly <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(input_ids) <span class="op">!=</span> max_seq_length:</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">'Please check that the function </span><span class="ch">\'</span><span class="st">convert_to_bert_input_ids</span><span class="ch">\'</span><span class="st"> in the file src/prepare_data.py is complete.'</span>)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'##################'</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Updated correctly!'</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'##################'</span>)</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    updated_correctly <span class="op">=</span> <span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>##################
+Updated correctly!
+##################</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="1d816a68-2ca9-4893-c5d9-b942dfe893e7">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>input_ids <span class="op">=</span> prepare_data.convert_to_bert_input_ids(<span class="st">"this product is great!"</span>, max_seq_length)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(input_ids)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Length of the sequence: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(<span class="bu">len</span>(input_ids)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0, 9226, 1152, 16, 372, 328, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+Length of the sequence: 128</code></pre>
+</div>
+</div>
+<p>Now we launch the processing job with the custom script passing defined above parameters.</p>
+<div class="cell" data-outputid="bcbfb17d-a9cf-4bc3-f0b6-c3ffd4bb542b">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.processing <span class="im">import</span> ProcessingInput, ProcessingOutput</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (updated_correctly):</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    processor.run(code<span class="op">=</span><span class="st">'src/prepare_data.py'</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>              inputs<span class="op">=</span>[</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                    ProcessingInput(source<span class="op">=</span>raw_input_data_s3_uri,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>                                    destination<span class="op">=</span><span class="st">'/opt/ml/processing/input/data/'</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>                                    s3_data_distribution_type<span class="op">=</span><span class="st">'ShardedByS3Key'</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>              ],</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>              outputs<span class="op">=</span>[</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                    ProcessingOutput(output_name<span class="op">=</span><span class="st">'sentiment-train'</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                                     source<span class="op">=</span><span class="st">'/opt/ml/processing/output/sentiment/train'</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>                                     s3_upload_mode<span class="op">=</span><span class="st">'EndOfJob'</span>),</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                    ProcessingOutput(output_name<span class="op">=</span><span class="st">'sentiment-validation'</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>                                     source<span class="op">=</span><span class="st">'/opt/ml/processing/output/sentiment/validation'</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>                                     s3_upload_mode<span class="op">=</span><span class="st">'EndOfJob'</span>),</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>                    ProcessingOutput(output_name<span class="op">=</span><span class="st">'sentiment-test'</span>,</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>                                     source<span class="op">=</span><span class="st">'/opt/ml/processing/output/sentiment/test'</span>,</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>                                     s3_upload_mode<span class="op">=</span><span class="st">'EndOfJob'</span>)</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>              ],</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>              arguments<span class="op">=</span>[<span class="st">'--train-split-percentage'</span>, <span class="bu">str</span>(train_split_percentage),</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>                         <span class="st">'--validation-split-percentage'</span>, <span class="bu">str</span>(validation_split_percentage),</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>                         <span class="st">'--test-split-percentage'</span>, <span class="bu">str</span>(test_split_percentage),</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>                         <span class="st">'--balance-dataset'</span>, <span class="bu">str</span>(balance_dataset),</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>                         <span class="st">'--max-seq-length'</span>, <span class="bu">str</span>(max_seq_length),                         </span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>                         <span class="st">'--feature-store-offline-prefix'</span>, <span class="bu">str</span>(feature_store_offline_prefix),</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>                         <span class="st">'--feature-group-name'</span>, <span class="bu">str</span>(feature_group_name)                         </span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>              ],</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>              logs<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>              wait<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Job Name:  sagemaker-scikit-learn-2023-02-07-19-57-59-405
+Inputs:  [{'InputName': 'input-1', 'AppManaged': False, 'S3Input': {'S3Uri': 's3://dlai-practical-data-science/data/raw/', 'LocalPath': '/opt/ml/processing/input/data/', 'S3DataType': 'S3Prefix', 'S3InputMode': 'File', 'S3DataDistributionType': 'ShardedByS3Key', 'S3CompressionType': 'None'}}, {'InputName': 'code', 'AppManaged': False, 'S3Input': {'S3Uri': 's3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/input/code/prepare_data.py', 'LocalPath': '/opt/ml/processing/input/code', 'S3DataType': 'S3Prefix', 'S3InputMode': 'File', 'S3DataDistributionType': 'FullyReplicated', 'S3CompressionType': 'None'}}]
+Outputs:  [{'OutputName': 'sentiment-train', 'AppManaged': False, 'S3Output': {'S3Uri': 's3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-train', 'LocalPath': '/opt/ml/processing/output/sentiment/train', 'S3UploadMode': 'EndOfJob'}}, {'OutputName': 'sentiment-validation', 'AppManaged': False, 'S3Output': {'S3Uri': 's3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-validation', 'LocalPath': '/opt/ml/processing/output/sentiment/validation', 'S3UploadMode': 'EndOfJob'}}, {'OutputName': 'sentiment-test', 'AppManaged': False, 'S3Output': {'S3Uri': 's3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-test', 'LocalPath': '/opt/ml/processing/output/sentiment/test', 'S3UploadMode': 'EndOfJob'}}]</code></pre>
+</div>
+</div>
+<p>You can see the information about the processing jobs using the <code>describe</code> function. The result is in dictionary format. Let’s pull the processing job name:</p>
+<div class="cell" data-outputid="30efa06b-9280-4261-e383-cfdb58d55f4d" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>scikit_processing_job_name <span class="op">=</span> processor.jobs[<span class="op">-</span><span class="dv">1</span>].describe()[<span class="st">'ProcessingJobName'</span>]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Processing job name: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(scikit_processing_job_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Processing job name: sagemaker-scikit-learn-2023-02-07-19-57-59-405</code></pre>
+</div>
+</div>
+<p>Let’s pull the processing job status from the processing job description.</p>
+<div class="cell" data-outputid="bbb0d2fb-094a-4cbb-ad88-fc1dc5c6a48f" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(processor.jobs[<span class="op">-</span><span class="dv">1</span>].describe().keys())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>dict_keys(['ProcessingInputs', 'ProcessingOutputConfig', 'ProcessingJobName', 'ProcessingResources', 'StoppingCondition', 'AppSpecification', 'Environment', 'RoleArn', 'ProcessingJobArn', 'ProcessingJobStatus', 'LastModifiedTime', 'CreationTime', 'ResponseMetadata'])</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="f88ffba6-dd55-4c57-ff3e-60f28e7819ea" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>scikit_processing_job_status <span class="op">=</span> processor.jobs[<span class="op">-</span><span class="dv">1</span>].describe()[<span class="st">'ProcessingJobStatus'</span>]</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Processing job status: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(scikit_processing_job_status))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Processing job status: InProgress</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="d7e17737-e44f-439d-e860-9ad9045b906b">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>running_processor <span class="op">=</span> sagemaker.processing.ProcessingJob.from_processing_name(</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    processing_job_name<span class="op">=</span>scikit_processing_job_name,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    sagemaker_session<span class="op">=</span>sess</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>running_processor.wait(logs<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>....................................................................................................................................!CPU times: user 647 ms, sys: 44.3 ms, total: 691 ms
+Wall time: 11min 13s</code></pre>
+</div>
+</div>
+<p>Let’s inspect the transformed and balanced data in the S3 bucket.</p>
+<div class="cell" data-outputid="5bd636b5-220b-4d92-e570-f61ef08ceaef">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>processing_job_description <span class="op">=</span> running_processor.describe()</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>output_config <span class="op">=</span> processing_job_description[<span class="st">'ProcessingOutputConfig'</span>]</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> output <span class="kw">in</span> output_config[<span class="st">'Outputs'</span>]:</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> output[<span class="st">'OutputName'</span>] <span class="op">==</span> <span class="st">'sentiment-train'</span>:</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>        processed_train_data_s3_uri <span class="op">=</span> output[<span class="st">'S3Output'</span>][<span class="st">'S3Uri'</span>]</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> output[<span class="st">'OutputName'</span>] <span class="op">==</span> <span class="st">'sentiment-validation'</span>:</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>        processed_validation_data_s3_uri <span class="op">=</span> output[<span class="st">'S3Output'</span>][<span class="st">'S3Uri'</span>]</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> output[<span class="st">'OutputName'</span>] <span class="op">==</span> <span class="st">'sentiment-test'</span>:</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>        processed_test_data_s3_uri <span class="op">=</span> output[<span class="st">'S3Output'</span>][<span class="st">'S3Uri'</span>]</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(processed_train_data_s3_uri)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(processed_validation_data_s3_uri)</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(processed_test_data_s3_uri)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>s3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-train
+s3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-validation
+s3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-test</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="f11a5fe8-12f7-4997-ff23-bf263ad744f7" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls $processed_train_data_s3_uri<span class="op">/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2023-02-07 20:10:54    4896333 part-algo-1-womens_clothing_ecommerce_reviews.tsv</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="0e77df43-82cf-4331-fca4-260076006e8d" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls $processed_validation_data_s3_uri<span class="op">/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2023-02-07 20:10:54     269735 part-algo-1-womens_clothing_ecommerce_reviews.tsv</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="963692e4-adde-4975-e2a3-03af2ac7934c" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls $processed_test_data_s3_uri<span class="op">/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2023-02-07 20:10:55     269933 part-algo-1-womens_clothing_ecommerce_reviews.tsv</code></pre>
+</div>
+</div>
+<p>Now we copy the data into the folder <code>balanced</code>.</p>
+<div class="cell" data-outputid="96f547ff-ca9e-4d69-b853-c28e53a957f1">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp $processed_train_data_s3_uri<span class="op">/</span>part<span class="op">-</span>algo<span class="op">-</span><span class="dv">1</span><span class="op">-</span>womens_clothing_ecommerce_reviews.tsv .<span class="op">/</span>balanced<span class="op">/</span>sentiment<span class="op">-</span>train<span class="op">/</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp $processed_validation_data_s3_uri<span class="op">/</span>part<span class="op">-</span>algo<span class="op">-</span><span class="dv">1</span><span class="op">-</span>womens_clothing_ecommerce_reviews.tsv .<span class="op">/</span>balanced<span class="op">/</span>sentiment<span class="op">-</span>validation<span class="op">/</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp $processed_test_data_s3_uri<span class="op">/</span>part<span class="op">-</span>algo<span class="op">-</span><span class="dv">1</span><span class="op">-</span>womens_clothing_ecommerce_reviews.tsv .<span class="op">/</span>balanced<span class="op">/</span>sentiment<span class="op">-</span>test<span class="op">/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>download: s3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-train/part-algo-1-womens_clothing_ecommerce_reviews.tsv to balanced/sentiment-train/part-algo-1-womens_clothing_ecommerce_reviews.tsv
+download: s3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-validation/part-algo-1-womens_clothing_ecommerce_reviews.tsv to balanced/sentiment-validation/part-algo-1-womens_clothing_ecommerce_reviews.tsv
+download: s3://sagemaker-us-east-1-951182689916/sagemaker-scikit-learn-2023-02-07-19-57-59-405/output/sentiment-test/part-algo-1-womens_clothing_ecommerce_reviews.tsv to balanced/sentiment-test/part-algo-1-womens_clothing_ecommerce_reviews.tsv</code></pre>
+</div>
+</div>
+<p>Let’s review the training, validation and test data outputs:</p>
+<div class="cell" data-outputid="627eb440-3ec3-4ecd-e7c0-e88c2920a4ce">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>head <span class="op">-</span>n <span class="dv">5</span> .<span class="op">/</span>balanced<span class="op">/</span>sentiment<span class="op">-</span>train<span class="op">/</span>part<span class="op">-</span>algo<span class="op">-</span><span class="dv">1</span><span class="op">-</span>womens_clothing_ecommerce_reviews.tsv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>review_id   sentiment   label_id    input_ids   review_body date
+15231   -1  0   [0, 100, 657, 13855, 27734, 111, 4682, 13, 42, 65, 4, 5, 10199, 16, 38596, 4, 24, 18, 227, 4136, 8, 5, 1468, 14, 51, 146, 9287, 66, 9, 4, 5, 5780, 16, 15652, 8, 5, 14893, 62, 5, 760, 32, 2422, 11962, 4, 5, 3318, 631, 14, 18, 95, 7209, 89, 116, 1437, 24, 18, 10, 3318, 631, 14, 95, 23835, 89, 4, 24, 630, 75, 1437, 356, 205, 7209, 1437, 8, 24, 630, 75, 356, 205, 3016, 4, 1437, 42, 13855, 6439, 56, 98, 203, 801, 4, 939, 437, 2299, 5779, 4, 1437, 13, 39328, 5135, 1437, 939, 524, 195, 108, 245, 113, 1437, 16157, 1437, 2631, 438, 8, 10, 650, 21, 1969, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]   "I love jumpsuits - except for this one. the fabric is blah. it's between plastic and the material that they make flags out of. the print is adorable and the buttons up the front are super cute. the tie thing that's just hanging there?  it's a tie thing that just hangs there. it doesn't  look good hanging  and it doesn't look good tied.  this jumpsuit had so much potential. i'm definitely disappointed.  for sizing reference  i am 5'5""  135  34c and a small was perfect." 2023-02-07T20:04:40Z
+8389    -1  0   [0, 100, 269, 770, 7, 101, 209, 1437, 53, 51, 95, 399, 75, 356, 235, 15, 127, 195, 108, 246, 2345, 102, 35156, 5120, 4, 939, 33, 380, 35841, 8, 460, 619, 66, 9, 317, 2498, 2084, 6149, 1033, 1437, 98, 2085, 939, 437, 95, 45, 5, 235, 1002, 13, 209, 1437, 53, 51, 1415, 98, 11962, 8, 939, 770, 7, 492, 106, 10, 860, 4, 5, 13977, 21, 350, 239, 13, 127, 25896, 1437, 8, 5, 2985, 18459, 58, 350, 380, 8, 851, 162, 10, 33062, 3786, 356, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  I really wanted to like these  but they just didn't look right on my 5'3 sorta bulky frame. i have big thighs and always feel out of place wearing leggings  so maybe i'm just not the right target for these  but they looked so cute and i wanted to give them a try. the waist was too high for my liking  and the leg openings were too big and gave me a stumpified look.  2023-02-07T20:04:40Z
+17752   1   2   [0, 713, 16, 10, 1528, 5262, 299, 42514, 571, 26875, 1827, 8, 1237, 650, 4, 939, 2333, 3568, 10, 650, 50, 4761, 11, 6215, 13657, 1437, 53, 15679, 219, 939, 460, 1836, 62, 4, 939, 437, 10, 2491, 438, 1437, 8, 10, 739, 10698, 1969, 4, 5, 760, 16, 10, 828, 11708, 1437, 53, 45, 98, 203, 47, 240, 10, 740, 5602, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]   This is a true tiny top........gorgeous and runs small. i usually wear a small or medium in retailer tops  but timy i always size up. i'm a 36c  and a large fits perfect. the front is a bit sheer  but not so much you need a cami.   2023-02-07T20:04:40Z
+65  1   2   [0, 100, 3584, 42, 299, 11, 41, 9876, 1001, 1400, 94, 186, 4, 5, 1318, 16, 4613, 8, 5, 2272, 1173, 2440, 3195, 16, 182, 2216, 4, 5, 3089, 11556, 34, 10, 2721, 4140, 219, 740, 7042, 1020, 459, 14, 16, 7391, 23, 5, 10762, 1437, 53, 64, 28, 2928, 30, 11803, 4, 939, 362, 29, 372, 77, 10610, 80, 430, 1319, 4, 939, 5328, 24, 19, 5, 2205, 4104, 66, 1437, 8, 24, 3723, 15390, 149, 5, 3089, 11556, 23, 5, 2576, 4, 24, 67, 1326, 372, 77, 5, 11021, 354, 4104, 16, 10610, 11, 4, 127, 129, 2813, 16, 14, 24, 74, 283, 11, 10, 4716, 1459, 1836, 25, 24, 18, 10, 2842, 380, 23, 5, 10762, 8, 5397, 3572, 2, 1, 1, 1, 1, 1]   I purchased this top in an antro store last week. the quality is wonderful and the greenish blue color is very unique. the blouse has a beautiful stretchy camsiole that is attached at the shoulders  but can be removed by snaps. i tooks great when worn two different ways. i wore it with the campole out  and it peeks through the blouse at the bottom. it also looks great when the camisole is worn in. my only wish is that it would come in a petite size as it's a touch big at the shoulders and neckli    2023-02-07T20:04:40Z</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="fce03655-4455-476d-aeca-5e4b6e378f7a">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>head <span class="op">-</span>n <span class="dv">5</span> .<span class="op">/</span>balanced<span class="op">/</span>sentiment<span class="op">-</span>validation<span class="op">/</span>part<span class="op">-</span>algo<span class="op">-</span><span class="dv">1</span><span class="op">-</span>womens_clothing_ecommerce_reviews.tsv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>review_id   sentiment   label_id    input_ids   review_body date
+5506    1   2   [0, 19065, 3588, 11, 1110, 9, 1468, 1437, 1318, 1437, 5780, 734, 18891, 59, 5, 2408, 19, 5, 14187, 156, 24, 45, 173, 13, 162, 4, 939, 2740, 65, 1836, 159, 25, 5131, 30, 97, 34910, 1437, 53, 14, 399, 75, 173, 131, 89, 21, 350, 203, 10199, 13, 5, 5933, 8, 5, 14187, 156, 24, 356, 19351, 4, 939, 2740, 10, 4761, 8, 939, 113, 119, 195, 108, 245, 113, 15, 5, 5350, 11454, 526, 4, 14223, 157, 4, 939, 348, 56, 98, 203, 6620, 19, 97, 6215, 3365, 98, 939, 437, 45, 350, 5779, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] "Great dress in terms of material  quality  print...something about the weight with the lining made it not work for me. i ordered one size down as recommended by other reviewers  but that didn't work; there was too much fabric for the length and the lining made it look heavier. i ordered a medium and i""m 5'5"" on the curvy side. oh well. i've had so much luck with other retailer orders so i'm not too disappointed." 2023-02-07T20:04:40Z
+8480    0   1   [0, 713, 2170, 473, 45, 109, 42, 16576, 2427, 4, 24, 16, 12058, 4, 959, 1437, 5, 13977, 21, 98, 650, 14, 5, 16721, 1344, 11532, 88, 127, 13977, 442, 162, 206, 9, 10, 25818, 11809, 2187, 4, 9574, 1437, 24, 21, 5, 1154, 1836, 98, 939, 64, 75, 1836, 62, 4, 939, 437, 204, 108, 1225, 113, 98, 5, 5933, 21, 1969, 111, 24, 376, 7, 235, 1065, 127, 15145, 4, 939, 657, 5, 16576, 98, 203, 14, 939, 437, 2811, 11356, 366, 27345, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] "This picture does not do this skirt justice. it is gorgeous. however  the waist was so small that the sequins dug into my waist making me think of a medieval torture device. unfortunately  it was the largest size so i can't size up. i'm 4'11"" so the length was perfect - it came to right above my knees. i love the skirt so much that i'm considering liposuction."   2023-02-07T20:04:40Z
+66  0   1   [0, 100, 829, 42, 6399, 11, 127, 6097, 3023, 29, 8, 24, 10698, 6683, 4, 939, 116, 119, 45, 5373, 11, 657, 19, 24, 53, 939, 67, 218, 116, 90, 28101, 4, 5, 6399, 16, 15, 5, 7174, 526, 4, 109, 939, 240, 7, 3568, 10, 740, 5602, 12213, 24, 1437, 117, 4, 127, 2212, 16, 6538, 4, 24, 473, 8736, 162, 9, 10, 1468, 14, 115, 2179, 103, 6538, 71, 103, 3568, 8, 21, 5065, 4, 19, 14, 145, 26, 939, 116, 890, 10397, 42, 6399, 11, 2569, 514, 8, 6713, 3841, 8, 5952, 14, 40, 2097, 6538, 31, 2623, 4, 5, 5933, 16, 2051, 8, 939, 109, 101, 5, 3369, 2629, 11, 760, 116, 405, 3639, 10, 410, 14548, 2, 1, 1, 1, 1, 1, 1]   I received this shirt in my typical xs and it fits perfectly. i?m not crazy in love with it but i also don?t dislike. the shirt is on the thin side. do i need to wear a cami underneath it  no. my concern is holes. it does remind me of a material that could develop some holes after some wear and washes. with that being said i?ll wash this shirt in cold water and hang dry and hopefully that will prevent holes from developing. the length is fine and i do like the slits in front?it adds a little dim    2023-02-07T20:04:40Z
+10411   -1  0   [0, 100, 33, 57, 546, 23, 42, 23204, 804, 187, 24, 78, 376, 66, 8, 939, 1747, 2740, 24, 77, 24, 21, 843, 207, 160, 4, 939, 2740, 10, 1836, 475, 4716, 1459, 1437, 16748, 77, 24, 2035, 8, 939, 1381, 24, 15, 1437, 24, 21, 182, 2233, 219, 1437, 13116, 101, 1437, 8, 222, 45, 3041, 101, 24, 1415, 15, 5, 1421, 804, 98, 939, 1051, 24, 124, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  I have been looking at this sweater online since it first came out and i finally ordered it when it was 40% off. i ordered a size m petite  sadly when it arrived and i tried it on  it was very boxy  stiff like  and did not flow like it looked on the model online so i sent it back.   2023-02-07T20:04:40Z</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="dfa07e96-7f91-4be6-afdc-e98a520bce67">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>head <span class="op">-</span>n <span class="dv">5</span> .<span class="op">/</span>balanced<span class="op">/</span>sentiment<span class="op">-</span>test<span class="op">/</span>part<span class="op">-</span>algo<span class="op">-</span><span class="dv">1</span><span class="op">-</span>womens_clothing_ecommerce_reviews.tsv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>review_id   sentiment   label_id    input_ids   review_body date
+4815    0   1   [0, 100, 300, 5, 1275, 1437, 61, 21, 765, 30145, 5202, 4, 5, 6399, 1495, 21, 98, 11962, 1437, 53, 5, 2564, 16, 182, 2233, 219, 4, 939, 300, 10, 650, 8, 24, 21, 169, 350, 1810, 4, 444, 6012, 8, 10941, 11, 5, 13977, 87, 5, 2170, 924, 4, 939, 524, 5074, 7, 671, 1437, 53, 24, 817, 162, 356, 101, 10, 3925, 4, 36, 43882, 14, 16, 43, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  I got the red  which was short sleeved. the shirt itself was so cute  but the fit is very boxy. i got a small and it was way too wide. far wider and shorter in the waist than the picture shows. i am sad to return  but it makes me look like a square. (shape that is)   2023-02-07T20:04:40Z
+1933    1   2   [0, 1708, 5, 124, 9, 24, 1437, 30, 5, 13977, 1437, 15713, 5559, 95, 10, 5262, 828, 4, 114, 939, 120, 2671, 1437, 24, 40, 28, 350, 251, 4, 53, 939, 657, 5, 16576, 1437, 24, 16, 34203, 8, 11962, 4, 45, 24, 17414, 13, 162, 190, 114, 5, 1270, 161, 24787, 4, 939, 2740, 5, 16273, 642, 8, 5, 5933, 16, 1256, 203, 25, 7092, 1437, 95, 874, 5, 4117, 11, 760, 4, 5, 13977, 16, 41783, 1437, 2671, 24, 74, 1136, 55, 15, 127, 28097, 36, 2457, 1755, 5, 350, 251, 1129, 656, 4, 36, 15314, 23246, 1437, 973, 12, 2518, 11, 13977, 1437, 765, 5856, 41137, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]   But the back of it  by the waist  bunches just a tiny bit. if i get bigger  it will be too long. but i love the skirt  it is flattering and cute. not itchy for me even if the title says wool. i ordered the 00p and the length is pretty much as pictured  just below the knee in front. the waist is snug  bigger it would fall more on my hips (hence the too long comment earlier. (115 lbs  26-27 in waist  short legs...)    2023-02-07T20:04:40Z
+14029   -1  0   [0, 100, 269, 657, 5, 6184, 8, 5, 356, 15, 5, 1421, 1437, 8, 939, 802, 939, 74, 657, 24, 4, 939, 2740, 804, 1437, 98, 939, 222, 45, 860, 15, 11, 1400, 4, 77, 939, 1381, 24, 15, 1437, 24, 34, 169, 350, 203, 10199, 198, 5, 13977, 8, 16576, 4, 24, 16, 7992, 10199, 25, 157, 1437, 8, 34, 10, 14187, 1437, 8, 5, 13977, 34, 1823, 10199, 13, 5, 1521, 1437, 8, 24, 34, 12189, 1437, 98, 24, 70, 3639, 62, 7, 28, 169, 350, 35156, 4, 24, 16, 45, 34203, 23, 70, 8, 156, 162, 356, 158, 2697, 19351, 4, 939, 524, 3357, 42, 3588, 4, 5074, 1437, 142, 24, 1326, 98, 9869, 15, 5, 1421, 4, 939, 524, 2, 1, 1, 1, 1] I really love the pattern and the look on the model  and i thought i would love it. i ordered online  so i did not try on in store. when i tried it on  it has way too much fabric around the waist and skirt. it is thick fabric as well  and has a lining  and the waist has extra fabric for the design  and it has pockets  so it all adds up to be way too bulky. it is not flattering at all and made me look 10 pounds heavier. i am returning this dress. sad  because it looks so lovely on the model. i am    2023-02-07T20:04:40Z
+10468   0   1   [0, 713, 6966, 18605, 16, 182, 157, 156, 8, 190, 39083, 906, 11, 621, 4, 939, 437, 195, 108, 398, 113, 8, 59, 17445, 2697, 4, 939, 2333, 3568, 10, 1836, 231, 4, 939, 3568, 10, 2631, 417, 11689, 4, 939, 303, 5, 3235, 7, 422, 10, 828, 650, 4, 939, 1835, 24, 142, 1437, 1135, 141, 203, 939, 6640, 5, 2496, 1437, 24, 95, 938, 75, 34203, 15, 127, 809, 1907, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]    "This swimsuit is very well made and even prettier in person. i'm 5'8"" and about 145 pounds. i usually wear a size 6. i wear a 34d bra. i found the suit to run a bit small. i returned it because  despite how much i liked the style  it just wasn't flattering on my body type."    2023-02-07T20:04:40Z</code></pre>
+</div>
+</div>
+</section>
+<section id="query-the-feature-store" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="query-the-feature-store"><span class="header-section-number">7</span> Query the Feature Store</h2>
+<p>In addition to transforming the data and saving in S3 bucket, the processing job populates the feature store with the transformed and balanced data. Let’s query this data using Amazon Athena.</p>
+<section id="export-training-validation-and-test-datasets-from-the-feature-store" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="export-training-validation-and-test-datasets-from-the-feature-store"><span class="header-section-number">7.1</span> Export training, validation, and test datasets from the Feature Store</h3>
+<p>Here we will do the export only for the training dataset, as an example.</p>
+<p>We will use the <code>athena_query()</code> function to create an Athena query for the defined above Feature Group. Then we can pull the table name of the Amazon Glue Data Catalog table which is auto-generated by Feature Store.</p>
+<div class="cell" data-outputid="5d8077d0-a8b9-4e3a-920c-643ba37e4265">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>feature_store_query <span class="op">=</span> feature_group.athena_query()</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>feature_store_table <span class="op">=</span> feature_store_query.table_name</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>query_string <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT date,</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="st">        review_id,</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="st">        sentiment, </span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="st">        label_id,</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="st">        input_ids,</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="st">        review_body</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM "</span><span class="sc">{}</span><span class="st">" </span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE split_type='train' </span></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="st">    LIMIT 5</span></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>.<span class="bu">format</span>(feature_store_table)</span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Glue Catalog table name: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(feature_store_table))</span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Running query: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(query_string))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Glue Catalog table name: reviews-feature-group-1675799708-1675800251
+Running query: 
+    SELECT date,
+        review_id,
+        sentiment, 
+        label_id,
+        input_ids,
+        review_body
+    FROM "reviews-feature-group-1675799708-1675800251" 
+    WHERE split_type='train' 
+    LIMIT 5
+</code></pre>
+</div>
+</div>
+<p>Now we configure the S3 location for the query results. This allows us to re-use the query results for future queries if the data has not changed. We can even share this S3 location between team members to improve query performance for common queries on data that does not change often.</p>
+<div class="cell" data-outputid="16e5dec6-907f-4617-c5b1-77c508a60490">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>output_s3_uri <span class="op">=</span> <span class="st">'s3://</span><span class="sc">{}</span><span class="st">/query_results/</span><span class="sc">{}</span><span class="st">/'</span>.<span class="bu">format</span>(bucket, feature_store_offline_prefix)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(output_s3_uri)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>s3://sagemaker-us-east-1-951182689916/query_results/reviews-feature-store-1675799708/</code></pre>
+</div>
+</div>
+<p>Let’s query the feature store.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>feature_store_query.run(</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    query_string<span class="op">=</span>query_string,</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    output_location<span class="op">=</span>output_s3_uri </span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>feature_store_query.wait()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="94020c99-585a-4aff-dd74-d988b35e3177">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"max_colwidth"</span>, <span class="dv">100</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>df_feature_store <span class="op">=</span> feature_store_query.as_dataframe()</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>df_feature_store</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>date</th>
+      <th>review_id</th>
+      <th>sentiment</th>
+      <th>label_id</th>
+      <th>input_ids</th>
+      <th>review_body</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2023-02-07T20:04:40Z</td>
+      <td>3151</td>
+      <td>0</td>
+      <td>1</td>
+      <td>[0, 17425, 27941, 181, 267, 1318, 4, 939, 33, 10, 5342, 7174, 5120, 8, 42, 10601, 15, 162, 101, ...</td>
+      <td>Definitely pj quality. i have a fairly thin frame and this hung on me like a tent. and it's very...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2023-02-07T20:04:40Z</td>
+      <td>2313</td>
+      <td>0</td>
+      <td>1</td>
+      <td>[0, 713, 16, 10, 182, 11962, 3588, 4, 24, 21, 1969, 137, 939, 15158, 24, 4, 5, 1272, 939, 56, 71...</td>
+      <td>This is a very cute dress. it was perfect before i washed it. the problems i had after washing i...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2023-02-07T20:04:40Z</td>
+      <td>10378</td>
+      <td>1</td>
+      <td>2</td>
+      <td>[0, 100, 2162, 5, 10521, 1437, 61, 16, 10, 12058, 3195, 4, 939, 101, 5, 251, 5933, 11, 5, 3701, ...</td>
+      <td>I bought the grey  which is a gorgeous color. i like the long length in the arms (though i tried...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2023-02-07T20:04:40Z</td>
+      <td>13251</td>
+      <td>0</td>
+      <td>1</td>
+      <td>[0, 37396, 299, 804, 111, 8578, 11, 621, 4, 1237, 650, 1437, 941, 15, 2576, 23385, 1902, 4, 802,...</td>
+      <td>Pretty top online - okay in person. runs small  especially on bottom hemline. thought it would h...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2023-02-07T20:04:40Z</td>
+      <td>9286</td>
+      <td>-1</td>
+      <td>0</td>
+      <td>[0, 713, 299, 16, 2721, 804, 8, 11, 621, 4, 939, 524, 11, 117, 169, 10, 739, 455, 11464, 22101, ...</td>
+      <td>This top is beautiful online and in person. i am in no way a large full figured gal  but i did o...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="export-tsv-from-feature-store" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="export-tsv-from-feature-store"><span class="header-section-number">7.2</span> Export TSV from Feature Store</h3>
+<p>Save the output as a TSV file:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>df_feature_store.to_csv(<span class="st">'./feature_store_export.tsv'</span>,</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>                        sep<span class="op">=</span><span class="st">'</span><span class="ch">\t</span><span class="st">'</span>,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>                        index<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>                        header<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="16035dde-6294-4b65-dbf0-bd405e1f1645">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>head <span class="op">-</span>n <span class="dv">5</span> .<span class="op">/</span>feature_store_export.tsv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>date    review_id   sentiment   label_id    input_ids   review_body
+2023-02-07T20:04:40Z    3151    0   1   [0, 17425, 27941, 181, 267, 1318, 4, 939, 33, 10, 5342, 7174, 5120, 8, 42, 10601, 15, 162, 101, 10, 10178, 4, 8, 24, 18, 182, 7174, 1437, 98, 24, 1364, 25, 10, 6966, 1719, 1437, 53, 2299, 45, 10, 3588, 13, 932, 1493, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]    Definitely pj quality. i have a fairly thin frame and this hung on me like a tent. and it's very thin  so it works as a swim cover  but definitely not a dress for anything else.
+2023-02-07T20:04:40Z    2313    0   1   [0, 713, 16, 10, 182, 11962, 3588, 4, 24, 21, 1969, 137, 939, 15158, 24, 4, 5, 1272, 939, 56, 71, 14784, 24, 21, 5, 15705, 13178, 10490, 9, 5, 3588, 28704, 5933, 11036, 150, 5, 1025, 909, 14187, 222, 45, 1437, 98, 5, 909, 14187, 3723, 15390, 66, 10, 205, 10468, 50, 80, 4, 8, 187, 5, 3588, 16, 10941, 939, 64, 75, 269, 3568, 24, 396, 634, 741, 17625, 13344, 1437, 941, 13, 5, 124, 9, 5, 3588, 187, 24, 18, 10941, 89, 8, 114, 939, 18822, 81, 47, 115, 192, 960, 4, 939, 437, 98, 5779, 11, 5, 1318, 142, 24, 16, 10, 182, 11962, 1437, 4342, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  This is a very cute dress. it was perfect before i washed it. the problems i had after washing it was the outer cotton layer of the dress shrunk length wise while the inside black lining did not  so the black lining peeks out a good inch or two. and since the dress is shorter i can't really wear it without using biker shorts  especially for the back of the dress since it's shorter there and if i bent over you could see everything. i'm so disappointed in the quality because it is a very cute  ver
+2023-02-07T20:04:40Z    10378   1   2   [0, 100, 2162, 5, 10521, 1437, 61, 16, 10, 12058, 3195, 4, 939, 101, 5, 251, 5933, 11, 5, 3701, 36, 18401, 939, 1381, 24, 15, 11, 430, 8089, 8, 5, 3124, 5933, 222, 182, 322, 3793, 8, 1256, 4, 939, 101, 5, 5933, 4, 5, 124, 473, 14902, 15673, 1437, 53, 939, 202, 101, 5, 6399, 4, 24, 18, 7082, 1437, 9881, 8, 34203, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  I bought the grey  which is a gorgeous color. i like the long length in the arms (though i tried it on in different colors and the arm length did very). soft and pretty. i like the length. the back does wrinkle  but i still like the shirt. it's loose  casual and flattering.
+2023-02-07T20:04:40Z    13251   0   1   [0, 37396, 299, 804, 111, 8578, 11, 621, 4, 1237, 650, 1437, 941, 15, 2576, 23385, 1902, 4, 802, 24, 74, 33, 10, 7021, 7, 24, 4, 24, 473, 45, 4, 55, 11708, 11, 621, 87, 939, 802, 24, 74, 28, 4, 14, 1979, 75, 912, 162, 31, 2396, 24, 600, 4, 24, 21, 5, 169, 24, 4976, 15, 127, 7050, 14, 21, 29747, 24203, 4, 1415, 101, 939, 21, 2498, 10, 741, 1452, 4, 939, 218, 75, 33, 10, 739, 7050, 1437, 95, 7735, 356, 15, 162, 4, 9327, 1437, 142, 24, 16, 41, 15652, 5780, 4, 299, 156, 13, 29284, 50, 10, 4716, 1459, 6429, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  Pretty top online - okay in person. runs small  especially on bottom hemline. thought it would have a swing to it. it does not. more sheer in person than i thought it would be. that wouldn't stop me from keeping it though. it was the way it laid on my chest that was unflattering. looked like i was wearing a bib. i don't have a large chest  just weird look on me. unfortunate  because it is an adorable print. top made for thinner or a petite lady.</code></pre>
+</div>
+</div>
+<p>Upload TSV to the S3 bucket:</p>
+<div class="cell" data-outputid="57290246-f471-4e48-b0e5-1b2a681773b8">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp .<span class="op">/</span>feature_store_export.tsv s3:<span class="op">//</span>$bucket<span class="op">/</span>feature_store<span class="op">/</span>feature_store_export.tsv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>upload: ./feature_store_export.tsv to s3://sagemaker-us-east-1-951182689916/feature_store/feature_store_export.tsv</code></pre>
+</div>
+</div>
+<p>Check the file in the S3 bucket:</p>
+<div class="cell" data-outputid="5640ed9c-5bee-410e-c22b-c1097ba6fb6b">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 ls <span class="op">--</span>recursive s3:<span class="op">//</span>$bucket<span class="op">/</span>feature_store<span class="op">/</span>feature_store_export.tsv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2023-02-07 20:11:18       4714 feature_store/feature_store_export.tsv</code></pre>
+</div>
+</div>
+</section>
+<section id="check-that-the-dataset-in-the-feature-store-is-balanced-by-sentiment" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="check-that-the-dataset-in-the-feature-store-is-balanced-by-sentiment"><span class="header-section-number">7.3</span> Check that the dataset in the Feature Store is balanced by sentiment</h3>
+<p>Now we can setup an Athena query to check that the stored dataset is balanced by the target class <code>sentiment</code>.</p>
+<p>We will rrite an SQL query to count the total number of the reviews per <code>sentiment</code> stored in the Feature Group.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>feature_store_query_2 <span class="op">=</span> feature_group.athena_query()</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>query_string_count_by_sentiment <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT sentiment, COUNT(*) AS count_reviews</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM "</span><span class="sc">{}</span><span class="st">"</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY sentiment</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>.<span class="bu">format</span>(feature_store_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we query the feature store.</p>
+<div class="cell" data-outputid="d812a8f3-720c-401a-9cd5-553a467cf07f">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>feature_store_query_2.run(</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>    query_string<span class="op">=</span>query_string_count_by_sentiment, </span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    output_location<span class="op">=</span>output_s3_uri </span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>feature_store_query_2.wait()</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>df_count_by_sentiment <span class="op">=</span> feature_store_query_2.as_dataframe()</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>df_count_by_sentiment</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="40">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>sentiment</th>
+      <th>count_reviews</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>2051</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-1</td>
+      <td>2051</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>2051</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Let’s visualize the result of the query in the bar plot, showing the count of the reviews by sentiment value.</p>
+<div class="cell" data-outputid="e4ec7bc7-058d-4ec5-be1c-d4cac2bc3728">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>sns.barplot(</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_count_by_sentiment, </span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">'sentiment'</span>, </span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'count_reviews'</span>, </span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"blue"</span></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="43">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f9c4f4c9710&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2023-02-08-feature-transformation-aws-sagemaker-processing-job-feature-store_files/figure-html/cell-36-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="acknowledgements" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">8</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the great <a href="https://www.deeplearning.ai/courses/practical-data-science-specialization/">Deep Learning AI Practical Data Science on AWS Specialisation Course</a> which i completed, and acknowledge the use of some images and other materials from the training course in this article.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

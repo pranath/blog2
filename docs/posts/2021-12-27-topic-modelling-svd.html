@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2021-12-27">
+<meta name="description" content="Singular Value Decomposition (SVD) is a method from Linear Algebra widley used accross science and engineering. In this article we will introduce the concept and show how it can be used for Topic Modelling in Natural Language Processing (NLP).">
+
+<title>blogtest1 - Topic Modelling using Singular Value Decomposition (SVD)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">blogtest1</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Topic Modelling using Singular Value Decomposition (SVD)</h1>
+                  <div>
+        <div class="description">
+          Singular Value Decomposition (SVD) is a method from Linear Algebra widley used accross science and engineering. In this article we will introduce the concept and show how it can be used for Topic Modelling in Natural Language Processing (NLP).
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">mathematics</div>
+                <div class="quarto-category">linear-algebra</div>
+                <div class="quarto-category">natural-language-processing</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 27, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="toc-section-number">2</span>  Dataset</a></li>
+  <li><a href="#singular-value-decomposition-svd" id="toc-singular-value-decomposition-svd" class="nav-link" data-scroll-target="#singular-value-decomposition-svd"><span class="toc-section-number">3</span>  Singular Value Decomposition (SVD)</a></li>
+  <li><a href="#truncated-svd" id="toc-truncated-svd" class="nav-link" data-scroll-target="#truncated-svd"><span class="toc-section-number">4</span>  Truncated SVD</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">5</span>  Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p><strong>Singular Value Decomposition (SVD)</strong> is a method from Linear Algebra that is used in a wide range of applications in science and engineering. It can be used for tasks such as dimensionality reduction, image compression, and even <a href="https://www.math3ma.com/blog/understanding-entanglement-with-svd">understanding entanglement in quantum theory</a>.</p>
+<p><strong>Topic modeling</strong> is an unsupervised machine learning technique used in Natural Language Processing (NLP) that’s capable of scanning a set of texts, detecting word and phrase patterns within them, and automatically clustering word groups and similar expressions that best characterize a set of documents.</p>
+<p>In this article we will will use SVD to perform topic modelling.</p>
+<p>This article is based in large part on the material from the <a href="https://github.com/fastai/numerical-linear-algebra/blob/master/README.md">fastai linear algebra course</a>.</p>
+</section>
+<section id="dataset" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="dataset"><span class="header-section-number">2</span> Dataset</h2>
+<p>We will use the <a href="https://archive.ics.uci.edu/ml/datasets/Twenty+Newsgroups">20 Newsgroups</a> dataset which consists of 20,000 messages taken from 20 different newsgroups from the Usenet bulletin board service, which pre-dates the world-wide-web and websites. We will look at a subset of 4 of these newsgroup categories:</p>
+<ul>
+<li>rec.motorcycles</li>
+<li>talk.politics.mideast</li>
+<li>sci.med</li>
+<li>sci.crypt</li>
+</ul>
+<p>We will now get this data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>categories <span class="op">=</span> [<span class="st">'rec.motorcycles'</span>, <span class="st">'talk.politics.mideast'</span>, <span class="st">'sci.med'</span>, <span class="st">'sci.crypt'</span>]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>remove <span class="op">=</span> (<span class="st">'headers'</span>, <span class="st">'footers'</span>, <span class="st">'quotes'</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>newsgroups_train <span class="op">=</span> fetch_20newsgroups(subset<span class="op">=</span><span class="st">'train'</span>, categories<span class="op">=</span>categories, remove<span class="op">=</span>remove)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>newsgroups_test <span class="op">=</span> fetch_20newsgroups(subset<span class="op">=</span><span class="st">'test'</span>, categories<span class="op">=</span>categories, remove<span class="op">=</span>remove)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s check how many posts this gives us in total</p>
+<div class="cell" data-outputid="ca2efdf6-15f9-4c2f-cb39-02461ebbf5fc">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>newsgroups_train.filenames.shape, newsgroups_train.target.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>((2351,), (2351,))</code></pre>
+</div>
+</div>
+<p>Let’s print the first few lines of 3 of the posts to see what the text looks like</p>
+<div class="cell" data-outputid="d791175f-2939-4747-b8a9-5dd27038286d">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(newsgroups_train.data[<span class="dv">0</span>].split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)[:<span class="dv">3</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+I am not an expert in the cryptography science, but some basic things
+seem evident to me, things which this Clinton Clipper do not address.</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="ba78c59c-76df-4b61-9ade-dc1393784f96">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(newsgroups_train.data[<span class="dv">2</span>].split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)[:<span class="dv">3</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Does the Bates method work?  I first heard about it in this newsgroup 
+several years ago, and I have just got hold of a book, "How to improve your
+sight - simple daily drills in relaxation", by Margaret D. Corbett, </code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="ead5c006-8ce0-4ca0-f12a-9b3b127ef3b8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(newsgroups_train.data[<span class="dv">5</span>].split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)[:<span class="dv">3</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Suggest McQuires #1 plastic polish.  It will help somewhat but nothing 
+will remove deep scratches without making it worse than it already is.</code></pre>
+</div>
+</div>
+<p>We can also get the newsgroup category for each from the ‘target_names’ attribute</p>
+<div class="cell" data-outputid="1bcbd2d0-98e7-40f8-d452-a83d4892cfcb">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>np.array(newsgroups_train.target_names)[newsgroups_train.target[:<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>array(['sci.crypt', 'sci.med', 'sci.med'], dtype='&lt;U21')</code></pre>
+</div>
+</div>
+<p>To use this text dataset for topic modelling we will need to convert this into a <strong>document-term</strong> matrix. This is a matrix where the rows will correspond to to each of the newsgroup posts (a ‘document’ conceptually) and the columns will be for each of the words that exists in all posts (a ‘term’ conceptually). The values of the matrix will be the count of the number of words that exists for a particular post for each post/word combination in the matrix.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/document-term-matrix.png" title="An example Document-Term matrix" class="img-fluid"></p>
+<p>This method of converting text into a count of the words in the text matrix, without regard for anything else (such as order, context etc) is called a <strong>bag of words</strong> model. We can create this matrix using a <em>CountVectoriser()</em> function.</p>
+<div class="cell" data-outputid="4d598487-2683-4fb5-ff3a-040b4002f9a4">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>vectorizer <span class="op">=</span> CountVectorizer(stop_words<span class="op">=</span><span class="st">'english'</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>vectors <span class="op">=</span> vectorizer.fit_transform(newsgroups_train.data).todense() <span class="co"># (documents, vocab)</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>vectors.shape </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>(2351, 32291)</code></pre>
+</div>
+</div>
+<p>We can see this matrix has the same number of rows as we have posts (2351) and we must have 32,291 unique words accross all posts which is the number of columns we have.</p>
+<div class="cell" data-outputid="135d54c2-4c5e-4a3a-af49-956d3b419b70">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(newsgroups_train.data), vectors.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2351 (2351, 32291)</code></pre>
+</div>
+</div>
+<p>If we print the matrix, its just an array of counts for each of the words in each post</p>
+<div class="cell" data-outputid="90429429-33f0-43f5-c573-c39e9338a4a4">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>vectors</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>matrix([[0, 0, 0, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0],
+        ...,
+        [0, 0, 0, ..., 0, 0, 0],
+        [0, 2, 0, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0]])</code></pre>
+</div>
+</div>
+<p>This matrix does not actually contain the names of the words, so it will be helpful for us to extract these as well to create a vocabulary of terms used in the matrix. We can extract these using <em>get_feature_names()</em></p>
+<div class="cell" data-outputid="e1aa69b1-c54a-48fa-fd1f-9427eecbee6e">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>vocab <span class="op">=</span> np.array(vectorizer.get_feature_names())</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>vocab.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>(32291,)</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="331a0856-53d9-4bd5-ea36-08ecf2e176b0">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>vocab[:<span class="dv">32000</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>array(['00', '000', '0000', ..., 'yarn', 'yarvin', 'yashir'], dtype='&lt;U79')</code></pre>
+</div>
+</div>
+<p>While we have the newsgroup categories here, we will not actually use them for our topic modelling exercise, where we want to create topics independantly based on the posts alone, but we would hope these will correspond to the newsgroup categories in some way, indeed this would be a good check that the topic modelling is working.</p>
+<p>Now we have our Document-Term matrix and the vocabulary, we are now ready to use Singular Value Decompostion.</p>
+</section>
+<section id="singular-value-decomposition-svd" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="singular-value-decomposition-svd"><span class="header-section-number">3</span> Singular Value Decomposition (SVD)</h2>
+<p>SVD is a method of matrix decomposition, so for a given matrix A we can convert it into 3 other matrices: U, <span class="math inline">\(\sum_{}\)</span>, and <span class="math inline">\(V^{T}\)</span></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/svd.png" title="Singular Value Decompositon" class="img-fluid"></p>
+<p>R is a value we choose in advance, in the case of our intention here R will repesent the number of topics we want to create for our topic model of the newsgroup posts.</p>
+<p>Each of these matricies represents the following</p>
+<ul>
+<li>U: <strong>Left singular vectors</strong> this has the same number of rows as our original matrix A (m rows/posts) and a column for each of our chosen number of topics (r columns). This matrix has <em>orthogonal (or orthonormal) columns</em> i.e.&nbsp;vectors along the r topics column axis.</li>
+<li><span class="math inline">\(\sum_{}\)</span>: <strong>Singular values</strong> has r rows by r columns, in our case this means topics by topics. This represents the ranked relative importance of each topic so the most important topic is topic 1 which is in row 1, column 1 - and the value at this index will be a measure of the importance, and so on for topic 2 etc. This is a matrix of diagonal singular values (all other values off the diagonal are zero).</li>
+<li><span class="math inline">\(V^{T}\)</span>: <strong>Right singular vectors</strong> this has the same number of columns as our original matrix A (n columns) and a row for each of our chosen number of topics (r rows)</li>
+</ul>
+<p>If we were to choose a R value equal to N this would be an <strong>exact decompostion</strong> of the matrix A, which would mean if we were to multiply U, <span class="math inline">\(\sum_{}\)</span>, and <span class="math inline">\(V^{T}\)</span> we would get back exactly the same matrix A.</p>
+<p>However there are many reasons why in practice we may not want to do a full decompostion, including in the case of large matricies this can be extermely time consuming, and often we may not require all potential topics, just the most important. So in practice we are likely to choose a value for R that is far smaller than N.</p>
+<p><strong>Latent Semantic Analysis (LSA) or Latent Semantic Index (LSI)</strong> is a common name given to applying SVD to topic modelling in NLP in this way i.e.&nbsp;using a Document-Term matrix.</p>
+<p>Another way to think about SVD more generally is that whatever is represented by a matrix A by columns M and N, is mapped into a ‘latent space’ defined by the R dimension. Futhermore, this mapping is done in such a way that co-occuring values of N are projected into the same R dimensions with higher values, and conversley non-couccuring values on N are projected into different R dimensions.</p>
+<p>In other words, the latent space R dimensions allow us to show which M are similar or different based on their values of N.</p>
+<p>So we can peform full SVD on our Document-Term matrix using the scipy <em>linalg</em> module.</p>
+<div class="cell" data-outputid="cd4ac640-e5b8-476b-bd86-d45119f481db">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>time U, s, Vh <span class="op">=</span> linalg.svd(vectors, full_matrices<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 1min 55s, sys: 5.34 s, total: 2min
+Wall time: 1min 2s</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="cbd89bfe-da06-44e0-e0ef-58dcfd2a229f">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(U.shape, s.shape, Vh.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(2351, 2351) (2351,) (2351, 32291)</code></pre>
+</div>
+</div>
+<p>This has performed a full SVD, and took around 2 mins.</p>
+<p>We can test that this is a decomposition by multipling these matrices and checking if they are close to equal to the original matrix using the <em>allclose()</em> function from numpy.</p>
+<div class="cell" data-outputid="34ba3b33-218b-453d-e124-88504ec724ca">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Confirm that U, s, Vh is a decomposition of the var Vectors</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiply matrices</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>reconstructed_vectors <span class="op">=</span> U <span class="op">@</span> np.diag(s) <span class="op">@</span> Vh</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the Frobenius norm between the original matrix A and this reconstructed one - which is a measure of the distance/differences between these matrices</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>np.linalg.norm(reconstructed_vectors <span class="op">-</span> vectors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>4.063801905115974e-12</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="2084fecc-c7f6-4ea3-c3bb-b2745bfcf9ef">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if two matrices are approximately equal within a small difference</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>np.allclose(reconstructed_vectors, vectors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>True</code></pre>
+</div>
+</div>
+<p>We can also check that U and Vh are orthonormal matrices. <a href="https://en.wikipedia.org/wiki/Orthogonal_matrix">If we multiply these by their transpose this should be close to equal to the identity matrix for each of these (by definition).</a>.</p>
+<div class="cell" data-outputid="d54a8e6c-b411-450d-9bb2-61246e360244">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Confirm that U, Vh are orthonormal</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>np.allclose(U.T <span class="op">@</span> U, np.eye(U.shape[<span class="dv">0</span>]))</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>np.allclose(Vh <span class="op">@</span> Vh.T, np.eye(Vh.shape[<span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>True</code></pre>
+</div>
+</div>
+<p>If we look at the singular values matrix, we can get an idea of the relative importance of each of the topics (topics on x axis)</p>
+<div class="cell" data-outputid="f1bab807-24d8-448e-8a6e-640608c10f96">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>plt.plot(s)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Topic number'</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Importance'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>Text(0, 0.5, 'Importance')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-27-topic-modelling-svd_files/figure-html/cell-19-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Let’s have a look at the topics discovered by SVD, we will do this by looking at the top 8 words that score most highly for each topic. This will be orderded by most important topic first.</p>
+<div class="cell" data-outputid="2c356aae-858e-4a49-f6cf-b3daa003d74b">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>num_top_words<span class="op">=</span><span class="dv">8</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_topics(a):</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    top_words <span class="op">=</span> <span class="kw">lambda</span> t: [vocab[i] <span class="cf">for</span> i <span class="kw">in</span> np.argsort(t)[:<span class="op">-</span>num_top_words<span class="op">-</span><span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]]</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    topic_words <span class="op">=</span> ([top_words(t) <span class="cf">for</span> t <span class="kw">in</span> a])</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="st">' '</span>.join(t) <span class="cf">for</span> t <span class="kw">in</span> topic_words]</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Top 10 topics, described by top words in each topic'</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>show_topics(Vh[:<span class="dv">10</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Top 10 topics, described by top words in each topic</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>['melittin wimp disgruntled rebelling toxin sorta bikeless litte',
+ 'db mov bh si bl di maxbyte cx',
+ 'said didn people know don went apartment came',
+ 'health 1993 hiv medical use 10 number 20',
+ 'edu com anonymous health posting anon service cs',
+ 'key privacy eff pub encryption use law health',
+ 'internet email privacy anonymous anonymity health eff hiv',
+ 'anonymous posting anonymity use anon key users postings',
+ 'com edu encryption privacy government said chip technology',
+ 'version machines contact type pc comments ftp keyboard']</code></pre>
+</div>
+</div>
+<p>So if you recall our original news group categories were:</p>
+<ul>
+<li>rec.motorcycles</li>
+<li>talk.politics.mideast</li>
+<li>sci.med</li>
+<li>sci.crypt</li>
+</ul>
+<p>We can see that the topics discovered correspond fairly well to these, bar a few anomalies.</p>
+</section>
+<section id="truncated-svd" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="truncated-svd"><span class="header-section-number">4</span> Truncated SVD</h2>
+<p>So we saw from our attempt at full SVD was quite slow to calculate (approx 2 mins) we can imagine this is likely to get far worse with bigger matrices. We also know that perhaps we don’t need to calculate a full set of topics, especially given for most practical applications we are most likely interested in using the strongest topics that distinguish posts, rather than topics that are not very useful. The approaches to calculate full SVD use particular algorithms to create the decomposition, and <a href="https://arxiv.org/abs/0909.4061">Halko et al</a> highlighted some of the key disadvantages of this approach:</p>
+<ul>
+<li>Matrices are “stupendously big”</li>
+<li>Data are often missing or inaccurate. Why spend extra computational resources when imprecision of input limits precision of the output?</li>
+<li>Data transfer now plays a major role in time of algorithms. Techniques the require fewer passes over the data may be substantially faster, even if they require more flops (flops = floating point operations).</li>
+<li>Important to take advantage of GPUs.</li>
+</ul>
+<p>In the same paper, Halko et al argued for the advantages of using randomised approaches which include:</p>
+<ul>
+<li>They are inherently stable</li>
+<li>Performance guarantees do not depend on subtle spectral properties</li>
+<li>Needed matrix-vector products can be done in parallel i.e.&nbsp;on a GPU</li>
+</ul>
+<p>So <strong>Truncated SVD</strong> using a randomised approach, allows us to calculate just the largest singular values and the corresponding matrices, which should be much quicker to calculate.</p>
+<p>We can use sklearn’s <em>decomposition</em> module to calculated randomised SVD, we will specify the top 10 topics only.</p>
+<div class="cell" data-outputid="5931738e-f483-4500-aaed-b4072eb06ad3">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>time u, s, v <span class="op">=</span> decomposition.randomized_svd(vectors, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 18.7 s, sys: 2.09 s, total: 20.8 s
+Wall time: 15.2 s</code></pre>
+</div>
+</div>
+<p>Lets see the top 10 topics its discovered.</p>
+<div class="cell" data-outputid="e8d88e90-7c66-4559-c20b-0c659e19fa3f">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>show_topics(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>['db mov bh si cs byte al bl',
+ 'people said know don didn anonymous privacy internet',
+ 'privacy internet anonymous information pub email eff use',
+ 'health 1993 hiv medical use 10 number 20',
+ 'turkish jews turkey key privacy government armenian eff',
+ 'turkish edu jews com turkey anonymous jewish nazis',
+ 'key edu encryption des com ripem chip keys',
+ 'com edu pub eff ftp electronic org computer',
+ 'dod rec denizens motorcycle motorcycles doom ftp terrible',
+ 'version machines contact type pc comments ftp keyboard']</code></pre>
+</div>
+</div>
+<p>So this is much faster taking a total of 20 seconds for randomised SVD compared to the full SVD of 2 minutes.</p>
+<p><a href="https://research.facebook.com/blog/2014/09/fast-randomized-svd/">Facebook Research implemented a version of Randomised SVD</a> based on the Halko paper.</p>
+</section>
+<section id="conclusion" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">5</span> Conclusion</h2>
+<p>In this article we introduced Singular Value Decomposition (SVD) and saw how it could be applied to the task of topic modelling in NLP. We also saw how this could be optimised for speed when only concerned with the most important topics, using truncated SVD implemented using a randomised approach.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

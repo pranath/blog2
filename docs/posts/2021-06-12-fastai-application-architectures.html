@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2021-06-12">
+<meta name="description" content="In this article we will look at how to build custom applications in the fastai library, by looking at how current fastai image model applications are actually built.">
+
+<title>blogtest1 - Fastai Application Architectures</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">blogtest1</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Fastai Application Architectures</h1>
+                  <div>
+        <div class="description">
+          In this article we will look at how to build custom applications in the fastai library, by looking at how current fastai image model applications are actually built.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">fastai</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 12, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#fastai-image-model-applications" id="toc-fastai-image-model-applications" class="nav-link" data-scroll-target="#fastai-image-model-applications"><span class="toc-section-number">2</span>  Fastai Image Model Applications</a>
+  <ul class="collapse">
+  <li><a href="#cnn_learner" id="toc-cnn_learner" class="nav-link" data-scroll-target="#cnn_learner"><span class="toc-section-number">2.1</span>  cnn_learner</a></li>
+  <li><a href="#unet_learner" id="toc-unet_learner" class="nav-link" data-scroll-target="#unet_learner"><span class="toc-section-number">2.2</span>  unet_learner</a></li>
+  <li><a href="#a-siamese-network" id="toc-a-siamese-network" class="nav-link" data-scroll-target="#a-siamese-network"><span class="toc-section-number">2.3</span>  A Siamese Network</a></li>
+  </ul></li>
+  <li><a href="#points-to-consider-with-architectures" id="toc-points-to-consider-with-architectures" class="nav-link" data-scroll-target="#points-to-consider-with-architectures"><span class="toc-section-number">3</span>  Points to consider with architectures</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">4</span>  Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>The <a href="https://www.fast.ai/2020/02/13/fastai-A-Layered-API-for-Deep-Learning/">fastai deep learning library (as of 2021)</a> is a layered API that has 4 levels of abstraction.</p>
+<ul>
+<li>Application layer</li>
+<li>High level API</li>
+<li>Mid level API</li>
+<li>Low level API</li>
+</ul>
+<p><img src="https://github.com/pranath/blog/raw/master/images/fastai-layered.png" title="The fastai layered API" class="img-fluid"></p>
+<p>In this article we will look at how to build custom applications in the fastai library, by looking at how current fastai image model applications are actually built.</p>
+</section>
+<section id="fastai-image-model-applications" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="fastai-image-model-applications"><span class="header-section-number">2</span> Fastai Image Model Applications</h2>
+<section id="cnn_learner" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="cnn_learner"><span class="header-section-number">2.1</span> cnn_learner</h3>
+<p>When using this application, the first parameter we need to give it is an architecture which will be used as the <em>body</em> of the network. Usually this will be a ResNet architecture we pre-trained weights that is automaticially downloaded for you.</p>
+<p>Next the final layer of the pre-trained model is cut, in fact all layers after the final pooling layer is also cut as well. Within each model we have a dictionary of information that allows us to identify these different points within the layers called <em>model_meta</em> here for example for ResNet50.</p>
+<div class="cell" data-outputid="5061529a-20dd-4392-caea-69df92aca75e" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>model_meta[resnet50]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>{'cut': -2,
+ 'split': &lt;function fastai.vision.learner._resnet_split&gt;,
+ 'stats': ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])}</code></pre>
+</div>
+</div>
+<p>Key parts of the network are:</p>
+<ul>
+<li><strong>Head</strong> - The part of the network specialised for a particular task i.e.&nbsp;with a CNN the part after the adaptive average pooling layer</li>
+<li><strong>Body</strong> - Everything else not the Head including the Stem</li>
+<li><strong>Stem</strong> - The first layers of the network</li>
+</ul>
+<p>We we take all the layers before the cut point of -2, we get the body of the model that fastai will keep to use for transfer learning. Then we can add a new head.</p>
+<div class="cell" data-outputid="95e529b4-6085-41fc-b458-f7bd8cbc75ce" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>create_head(<span class="dv">20</span>,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With this function we can choose how many extra layers should be added at the end as well as how much dropout and pooling. Fastai by default adds 2 linear layers rather than just one, as fastai have found this helps transfer learning work more quickly and easily than just one extra layer.</p>
+</section>
+<section id="unet_learner" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="unet_learner"><span class="header-section-number">2.2</span> unet_learner</h3>
+<p>This architecture is most often used for image segmentation tasks.</p>
+<p>We start of building this in the same way as the cnn_learner, chopping off the old head. For image segmentation, we are going to have to add a very different type of head to end up with a model that actually generates an image for segmentation.</p>
+<p>One way we could do this is to add layers that can increase the grid size in a CNN, for example duplicating each of the pixels to make an image twice as big - this is known as <em>nearest neighbour interpolation</em>. Another approach uses strides, in this case a stride of half, which is known as <em>transposed convolution</em>. However neither of these approaches works well in practice.</p>
+<p>They key problem here is there is simply not enough information in these downsampled activations alone to be able to recreate something like the oroginal image quality needed for segmentation - its a big ask! And perhaps not realistic.</p>
+<p>The solution to this problem here is our friend again <em>skip connections</em> however using them not accross one layer - but reaching these connections far accross to the opposite side of the architecture.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/unet.png" title="The Unet architecture" class="img-fluid"></p>
+<p>Here on the left half of the model is a CNN, and the transposed convolutional layers on the right, with the extra skip connections in gray. This helps the Unet do a much better job at generate the type of images we want for segmentation. One challenge with Unet’s is the exact architecture does in this case depend on the image size, however fastai has a <em>DynamicUnet</em> object that automatically generates the correct architecture based on the data and image sizes given.</p>
+</section>
+<section id="a-siamese-network" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="a-siamese-network"><span class="header-section-number">2.3</span> A Siamese Network</h3>
+<p>Let’s now try to create a custom model. <a href="2021-05-30-fastai-midlevel-api.html">In an earlier article we looked at creating a Siamese network model</a>. Let’s recap the details of that model.</p>
+<p>Let’s now build a custom model for the Siamese task. We will use a pre-trained model, pass 2 images through it, concatinate the results, then send them to a custom head that will return 2 predictions.</p>
+<p>In terms of overall architecture and models lets define it like this.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SiameseModel(Module):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, encoder, head):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.encoder,<span class="va">self</span>.head <span class="op">=</span> encoder,head</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x1, x2):</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        ftrs <span class="op">=</span> torch.cat([<span class="va">self</span>.encoder(x1), <span class="va">self</span>.encoder(x2)], dim<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.head(ftrs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can create a body/encoder by taking a pre-trained model and cutting it, we just need to specify where we want to cut. The cut position for a ResNet is -2.</p>
+<div class="cell" data-outputid="db9a3e55-4296-4a6a-86e5-e06d88b2fc80" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>encoder <span class="op">=</span> create_body(resnet34, cut<span class="op">=-</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Downloading: "https://download.pytorch.org/models/resnet34-333f7ec4.pth" to /root/.cache/torch/hub/checkpoints/resnet34-333f7ec4.pth</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"e58a8371e3244744906c7e25a16e99f3","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code></code></pre>
+</div>
+</div>
+<p>We can then create a head. If we look at the encoder/body it will tell us the last layer has 512 features, so this head will take 2*512 - as we will have 2 images.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>head <span class="op">=</span> create_head(<span class="dv">512</span><span class="op">*</span><span class="dv">2</span>, <span class="dv">2</span>, ps<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can now build our model from our constructed head and body.</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SiameseModel(encoder, head)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Before we can use a Learner to train the model we need to define 2 more things. Firstly, a loss function. We might use here cross-entropy, but as our targets are boolean we need to convert them to integers or Pytorch will throw and error.</p>
+<p>Secondly, we need to define a custom splitter that will tell the fastai library how to split the model into parameter groups, which will help train only the head of the model when we do transfer learning. Here we want 2 parameter groups one for the encoder/body and one for the head. So lets define a splitter as well.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> loss_func(out, targ):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.CrossEntropyLoss()(out, targ.<span class="bu">long</span>())</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> siamese_splitter(model):</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [params(model.encoder), params(model.head)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can now define a learner using our data, model, loss function, splitter and a metric. As we are defining a learner manually here, we also have to call freeze manually as well, to ensure only the last paramete group i.e.&nbsp;the head is trained.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> Learner(dls, model, loss_func<span class="op">=</span>loss_func, </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                splitter<span class="op">=</span>siamese_splitter, metrics<span class="op">=</span>accuracy)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>learn.freeze()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s now train our model.</p>
+<div class="cell" data-outputid="e66fdde1-692b-4345-ea22-1147fa8a594a" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">4</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>accuracy</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.523447</td>
+      <td>0.334643</td>
+      <td>0.861299</td>
+      <td>03:03</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>0.373501</td>
+      <td>0.231564</td>
+      <td>0.913396</td>
+      <td>03:02</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.299143</td>
+      <td>0.209658</td>
+      <td>0.920162</td>
+      <td>03:02</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.251663</td>
+      <td>0.188553</td>
+      <td>0.928281</td>
+      <td>03:03</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<p>This has trained only our head. Lets now unfreeze the whole model to make it all trainable, and use discriminative learning rates. This will give a lower learning rate for the body and a higher one for the head.</p>
+<div class="cell" data-outputid="1d94dbac-e7e5-4813-f371-8cdbe5ee84bc" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>learn.unfreeze()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">4</span>, <span class="bu">slice</span>(<span class="fl">1e-6</span>,<span class="fl">1e-4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>accuracy</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.235140</td>
+      <td>0.188717</td>
+      <td>0.924222</td>
+      <td>04:15</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>0.233328</td>
+      <td>0.179823</td>
+      <td>0.932341</td>
+      <td>04:12</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.210744</td>
+      <td>0.172465</td>
+      <td>0.928958</td>
+      <td>04:12</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.224448</td>
+      <td>0.176144</td>
+      <td>0.930311</td>
+      <td>04:14</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="points-to-consider-with-architectures" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="points-to-consider-with-architectures"><span class="header-section-number">3</span> Points to consider with architectures</h2>
+<p>There are a few points to consider when training models in practice. if you are running out of memory or time - then training a smaller model could be a good approach. If you are not training long enough to actually overfit, then you are probably not taking advantage of the capacity of your model.</p>
+<p>So one should first try to get to the point where your model is overfitting.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/practical_principles.png" title="Practical principles of applying deep learning in practice" class="img-fluid"></p>
+<p>Often many people when faced with a model that overfits, start with the wrong thing first i.e.&nbsp;to use a smaller model, or more regularization. Using a smaller model should be one of the last steps one tries, as this reduces the capaity of your model to actually learn what is needed.</p>
+<p>A better approach is to actually try to use <strong>more data</strong>, such as adding more labels to the data, or using data augmentation for example. Mixup can be useful for this. Only once you are using much more data and are still overfitting, one could consider more generalisable architectures - for example adding batch norm could help here.</p>
+<p>After this if its still not working, one could use regularisation, such as adding dropout to the last layers, but also throughout the model. Only after these have failed one should consider using a smaller model.</p>
+</section>
+<section id="conclusion" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">4</span> Conclusion</h2>
+<p>In this article we have looked at how to build custom fastai application architectures, using image model examples.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script type="application/vnd.jupyter.widget-state+json">
+{"02ddb25257b54c878eb599da96e65474":{"model_module":"@jupyter-widgets/controls","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"ProgressView","bar_style":"success","description":"100%","description_tooltip":null,"layout":"IPY_MODEL_ad68f0b4ab2d4e1b844655aaa6887a0f","max":87306240,"min":0,"orientation":"horizontal","style":"IPY_MODEL_235d6688b4f64b9ca845368146fa107a","value":87306240}},"235d6688b4f64b9ca845368146fa107a":{"model_module":"@jupyter-widgets/controls","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","bar_color":null,"description_width":"initial"}},"56d5191acc22490d86abfc609a796020":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"ad68f0b4ab2d4e1b844655aaa6887a0f":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"c7582be27cf64f469ff2d3d2d839601a":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"e3db04ef61d044d18a5b399d83216401":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"e58a8371e3244744906c7e25a16e99f3":{"model_module":"@jupyter-widgets/controls","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_02ddb25257b54c878eb599da96e65474","IPY_MODEL_ece02ba7171f49ee81a6457655f4c7e8"],"layout":"IPY_MODEL_e3db04ef61d044d18a5b399d83216401"}},"ece02ba7171f49ee81a6457655f4c7e8":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_56d5191acc22490d86abfc609a796020","placeholder":"​","style":"IPY_MODEL_c7582be27cf64f469ff2d3d2d839601a","value":" 83.3M/83.3M [10:03&lt;00:00, 145kB/s]"}}}
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

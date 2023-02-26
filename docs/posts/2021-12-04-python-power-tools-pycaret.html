@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2021-12-04">
+<meta name="description" content="In Python Power Tools for Data Science articles I look at python tools that help automate or simplify common tasks a Data Scientist would need to perform. In this article I look at how Pycaret can help automate the machine learning workflow.">
+
+<title>blogtest1 - Python Power Tools for Data Science - Pycaret</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">blogtest1</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Python Power Tools for Data Science - Pycaret</h1>
+                  <div>
+        <div class="description">
+          In Python Power Tools for Data Science articles I look at python tools that help automate or simplify common tasks a Data Scientist would need to perform. In this article I look at how Pycaret can help automate the machine learning workflow.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">python-power-tools</div>
+                <div class="quarto-category">pycaret</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 4, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#python-power-tools-for-data-science" id="toc-python-power-tools-for-data-science" class="nav-link active" data-scroll-target="#python-power-tools-for-data-science"><span class="toc-section-number">1</span>  Python Power Tools for Data Science</a></li>
+  <li><a href="#pycaret" id="toc-pycaret" class="nav-link" data-scroll-target="#pycaret"><span class="toc-section-number">2</span>  Pycaret</a></li>
+  <li><a href="#dataset---palmer-penguins" id="toc-dataset---palmer-penguins" class="nav-link" data-scroll-target="#dataset---palmer-penguins"><span class="toc-section-number">3</span>  Dataset - Palmer Penguins</a></li>
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation"><span class="toc-section-number">4</span>  Data Preparation</a></li>
+  <li><a href="#pycaret-workflow" id="toc-pycaret-workflow" class="nav-link" data-scroll-target="#pycaret-workflow"><span class="toc-section-number">5</span>  Pycaret workflow</a>
+  <ul class="collapse">
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="toc-section-number">5.1</span>  Setup</a></li>
+  <li><a href="#comparing-all-models" id="toc-comparing-all-models" class="nav-link" data-scroll-target="#comparing-all-models"><span class="toc-section-number">5.2</span>  Comparing All Models</a></li>
+  <li><a href="#selecting-and-fine-tuning-the-model" id="toc-selecting-and-fine-tuning-the-model" class="nav-link" data-scroll-target="#selecting-and-fine-tuning-the-model"><span class="toc-section-number">5.3</span>  Selecting and Fine Tuning the Model</a></li>
+  <li><a href="#model-evaluation" id="toc-model-evaluation" class="nav-link" data-scroll-target="#model-evaluation"><span class="toc-section-number">5.4</span>  Model Evaluation</a></li>
+  <li><a href="#prepare-model-for-use" id="toc-prepare-model-for-use" class="nav-link" data-scroll-target="#prepare-model-for-use"><span class="toc-section-number">5.5</span>  Prepare Model for Use</a></li>
+  </ul></li>
+  <li><a href="#review" id="toc-review" class="nav-link" data-scroll-target="#review"><span class="toc-section-number">6</span>  Review</a>
+  <ul class="collapse">
+  <li><a href="#pros" id="toc-pros" class="nav-link" data-scroll-target="#pros"><span class="toc-section-number">6.1</span>  Pros</a></li>
+  <li><a href="#cons" id="toc-cons" class="nav-link" data-scroll-target="#cons"><span class="toc-section-number">6.2</span>  Cons</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">7</span>  Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="python-power-tools-for-data-science" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="python-power-tools-for-data-science"><span class="header-section-number">1</span> Python Power Tools for Data Science</h2>
+<p>In this series of articles <a href="../#category=python-power-tools">Python Power Tools for Data Science</a> I will be looking at a series of python tools that can make a significant improvement on common Data Science tasks. In particular, <em>Python Power Tools</em> are python tools that can significantly <strong>automate</strong> or <strong>simplify</strong> common tasks a Data Scientist would need to perform.</p>
+<p>Automation and simplifcation of common tasks can bring many benefits such as:</p>
+<ul>
+<li>Less time needed to complete tasks</li>
+<li>Reduction of mistakes due to less complex code</li>
+<li>Improved readability and understanding of code</li>
+<li>Increased consistancy of approach to different problems</li>
+<li>Easier reproducability, verification, and comparison of results</li>
+</ul>
+</section>
+<section id="pycaret" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="pycaret"><span class="header-section-number">2</span> Pycaret</h2>
+<p><a href="https://pycaret.org">Pycaret</a> is a <strong>low code</strong> python library that aims to automate many tasks required for machine learning. Tasks that would usually take hundreds of lines of code can often be replaced with just a couple of lines. It was inspired by the <em>Caret</em> library in R.</p>
+<blockquote class="blockquote">
+<p>In comparison with the other open-source machine learning libraries, PyCaret is an alternate low-code library that can be used to replace hundreds of lines of code with few words only. This makes experiments exponentially fast and efficient. PyCaret is essentially a Python wrapper around several machine learning libraries and frameworks such as scikit-learn, XGBoost, LightGBM, CatBoost, spaCy, Optuna, Hyperopt, Ray, and many more. (Pycaret Documentation)</p>
+</blockquote>
+<p>Pycaret has different modules specialised for different machine learning use-cases these include:</p>
+<ul>
+<li>Classification</li>
+<li>Regression</li>
+<li>Clustering</li>
+<li>Anomaly Detection</li>
+<li>Natural Language Processing</li>
+<li>Assocation Rule Mining</li>
+<li>Time Series</li>
+</ul>
+<p><a href="../#category=pycaret">See further articles about these other Pycaret modules and what they can offer</a>.</p>
+<p>In this article to demonstrate the caperbilities of Pycaret we will use the <strong>classification module</strong> which has over 18 algorithms and 14 plots to analyze the results, plus many other features.</p>
+</section>
+<section id="dataset---palmer-penguins" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="dataset---palmer-penguins"><span class="header-section-number">3</span> Dataset - Palmer Penguins</h2>
+<p>We will use Pycaret on the <a href="https://github.com/allisonhorst/palmerpenguins">Palmer Penguins Dataset</a> which contains size and other measurements for three penguin species observed on three islands in the Palmer Archipelago, Antarctica. We will use the Pycaret classification module to train a model to predict the penguin species category. Given there are 3 species of Penguin, this would be considered a <a href="https://towardsdatascience.com/machine-learning-multiclass-classification-with-imbalanced-data-set-29f6a177c1a">Multiclass classification problem</a></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/penguin_types.png" title="Penguin Types (Artwork by @allison_horst)" class="img-fluid"></p>
+<div class="cell" data-outputid="aa0bbb77-bc2c-419f-df6a-10b1e952b51b">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load penguins dataset and show first few rows</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>penguins_df <span class="op">=</span> load_penguins()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>penguins_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>species</th>
+      <th>island</th>
+      <th>bill_length_mm</th>
+      <th>bill_depth_mm</th>
+      <th>flipper_length_mm</th>
+      <th>body_mass_g</th>
+      <th>sex</th>
+      <th>year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Adelie</td>
+      <td>Torgersen</td>
+      <td>39.1</td>
+      <td>18.7</td>
+      <td>181.0</td>
+      <td>3750.0</td>
+      <td>male</td>
+      <td>2007</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Adelie</td>
+      <td>Torgersen</td>
+      <td>39.5</td>
+      <td>17.4</td>
+      <td>186.0</td>
+      <td>3800.0</td>
+      <td>female</td>
+      <td>2007</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Adelie</td>
+      <td>Torgersen</td>
+      <td>40.3</td>
+      <td>18.0</td>
+      <td>195.0</td>
+      <td>3250.0</td>
+      <td>female</td>
+      <td>2007</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Adelie</td>
+      <td>Torgersen</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2007</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Adelie</td>
+      <td>Torgersen</td>
+      <td>36.7</td>
+      <td>19.3</td>
+      <td>193.0</td>
+      <td>3450.0</td>
+      <td>female</td>
+      <td>2007</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-outputid="8edddef9-aa65-4e24-94a8-bc6be36a6e9b">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Some more info on the data</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>penguins_df.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 344 entries, 0 to 343
+Data columns (total 8 columns):
+ #   Column             Non-Null Count  Dtype  
+---  ------             --------------  -----  
+ 0   species            344 non-null    object 
+ 1   island             344 non-null    object 
+ 2   bill_length_mm     342 non-null    float64
+ 3   bill_depth_mm      342 non-null    float64
+ 4   flipper_length_mm  342 non-null    float64
+ 5   body_mass_g        342 non-null    float64
+ 6   sex                333 non-null    object 
+ 7   year               344 non-null    int64  
+dtypes: float64(4), int64(1), object(3)
+memory usage: 21.6+ KB</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="0de53afa-8f9c-4160-93e0-1ce6aba7754f">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Percentage of penguins of each species in dataset</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>penguins_df[<span class="st">'species'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>Adelie       0.441860
+Gentoo       0.360465
+Chinstrap    0.197674
+Name: species, dtype: float64</code></pre>
+</div>
+</div>
+<p><img src="https://github.com/pranath/blog/raw/master/images/penguin_measurements.png" title="Penguin Measurements (Artwork by @allison_horst)" class="img-fluid"></p>
+<p>We can see that the dataset has different proportions of each penguin species.</p>
+<p>The data consists of a mixture of numeric and categorical data, which should help us test the caperbilities of Pycaret with regards to the machine learning workflow.</p>
+</section>
+<section id="data-preparation" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="data-preparation"><span class="header-section-number">4</span> Data Preparation</h2>
+<p>We will split our data into a training and test subset of our data to validate our final trained classification model on, this needs to be done without the use of Pycaret. We will ensure that our training and testing subsets have the same proportion for each penguin species as the original dataset.</p>
+<div class="cell" data-outputid="a36a40ea-d560-42dc-fbe1-318bd3e989a5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Split data into train/test and stratified on target class</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> penguins_df.iloc[:,<span class="dv">1</span>:]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> penguins_df[<span class="st">'species'</span>]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, Y, stratify<span class="op">=</span>Y, test_size<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>train_df <span class="op">=</span> X_train</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>train_df[<span class="st">'species'</span>] <span class="op">=</span> y_train</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>test_df <span class="op">=</span> X_test</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>test_df[<span class="st">'species'</span>] <span class="op">=</span> y_test</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify datasets have same proportion of each penguin species as the original</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(train_df.shape)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(test_df.shape)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(train_df[<span class="st">'species'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(test_df[<span class="st">'species'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(309, 8)
+(35, 8)
+Adelie       0.443366
+Gentoo       0.359223
+Chinstrap    0.197411
+Name: species, dtype: float64
+Adelie       0.428571
+Gentoo       0.371429
+Chinstrap    0.200000
+Name: species, dtype: float64</code></pre>
+</div>
+</div>
+</section>
+<section id="pycaret-workflow" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="pycaret-workflow"><span class="header-section-number">5</span> Pycaret workflow</h2>
+<section id="setup" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="setup"><span class="header-section-number">5.1</span> Setup</h3>
+<p>The Pycaret <em>setup()</em> is the first part of the workflow that always needs to be performed, and is a function that takes our data in the form of a pandas dataframe as well as the name of the target class to predict, and performs a number of tasks to get reading for the machine learning pipeline.</p>
+<div class="cell" data-outputid="b71f2739-90dc-494d-c477-dd238b36024c">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for further processing</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>predict_penguin_species_experiment <span class="op">=</span> setup(data <span class="op">=</span> train_df, target <span class="op">=</span> <span class="st">'species'</span>, session_id<span class="op">=</span><span class="dv">123</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Description</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>session_id</td>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Target</td>
+      <td>species</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Target Type</td>
+      <td>Multiclass</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Label Encoded</td>
+      <td>Adelie: 0, Chinstrap: 1, Gentoo: 2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Original Data</td>
+      <td>(309, 8)</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Missing Values</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Numeric Features</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Categorical Features</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Ordinal Features</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>High Cardinality Features</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>High Cardinality Method</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Transformed Train Set</td>
+      <td>(216, 13)</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Transformed Test Set</td>
+      <td>(93, 13)</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Shuffle Train-Test</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Stratify Train-Test</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Fold Generator</td>
+      <td>StratifiedKFold</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Fold Number</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>CPU Jobs</td>
+      <td>-1</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Use GPU</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>Log Experiment</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Experiment Name</td>
+      <td>clf-default-name</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>USI</td>
+      <td>ee22</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Imputation Type</td>
+      <td>simple</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>Iterative Imputation Iteration</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>Numeric Imputer</td>
+      <td>mean</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>Iterative Imputation Numeric Model</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>Categorical Imputer</td>
+      <td>constant</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>Iterative Imputation Categorical Model</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>Unknown Categoricals Handling</td>
+      <td>least_frequent</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>Normalize</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>Normalize Method</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>Transformation</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>Transformation Method</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>PCA</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>PCA Method</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>PCA Components</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>Ignore Low Variance</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>Combine Rare Levels</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>Rare Level Threshold</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>Numeric Binning</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>Remove Outliers</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>Outliers Threshold</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>42</th>
+      <td>Remove Multicollinearity</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>43</th>
+      <td>Multicollinearity Threshold</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>44</th>
+      <td>Remove Perfect Collinearity</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>Clustering</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>Clustering Iteration</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>Polynomial Features</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>Polynomial Degree</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>49</th>
+      <td>Trignometry Features</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>50</th>
+      <td>Polynomial Threshold</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>Group Features</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>52</th>
+      <td>Feature Selection</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>53</th>
+      <td>Feature Selection Method</td>
+      <td>classic</td>
+    </tr>
+    <tr>
+      <th>54</th>
+      <td>Features Selection Threshold</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>55</th>
+      <td>Feature Interaction</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>56</th>
+      <td>Feature Ratio</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>57</th>
+      <td>Interaction Threshold</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>58</th>
+      <td>Fix Imbalance</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>59</th>
+      <td>Fix Imbalance Method</td>
+      <td>SMOTE</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Calling the <em>setup()</em> function with one line of code does the following in the background:</p>
+<ul>
+<li>Data types will be inferred for each column</li>
+<li>A table of key information about the dataset and configuration settings is generated</li>
+<li>Included in this table are the names of the target categories and the numbers they will be encoded as</li>
+<li>Based on the types inferred and configuration chosen, the dataset will be transformed to be ready for the machine learning algorithms</li>
+<li>Split the data into training and validation (test) sets</li>
+</ul>
+<p>Various configuration settings are available, but defaults are selected so none are required.</p>
+<p>Some key configuration settings available include:</p>
+<ul>
+<li>Missing numeric values are imputed (default: mean) iterative option uses lightgbm model to estimate values</li>
+<li>Missing categorical values are imputed (default: constant dummy value, alteratives include mode and iterative)</li>
+<li>Encode categorical values as ordinal e.g.&nbsp;‘low’, ‘medium’, ‘high’</li>
+<li>High cardinality (default: false) options to compress to fewer levels or replace with frequency or k-means clustering derived class.</li>
+<li>Define date fields explictly</li>
+<li>Ignore fields for training models</li>
+<li>Normalise numeric fields (default: false) options include zscore, minmax, maxabs, robust</li>
+<li>Power transforms (default: false) will transform to make data more gaussian options include yeo-johnson, quantile</li>
+<li>PCA: Principal components analysis (default: false) reduce the dimensionality of the data down to a specified number of components</li>
+<li>Remove outliers from training data (using SVD)</li>
+<li>Remove features with high correlations with each other</li>
+<li>Create cluster category based on data</li>
+<li>Automatic feature selection (using ensemble models to identify best features)</li>
+<li>Fix target class imbalance using SMOTE synthentic data generation or resampling</li>
+<li>Stratify train-test split of datasetby target variable</li>
+<li>Various cross-validation strategies for splitting data for model training</li>
+</ul>
+</section>
+<section id="comparing-all-models" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="comparing-all-models"><span class="header-section-number">5.2</span> Comparing All Models</h3>
+<p>In Pycaret we can use a single line command <em>compare_models()</em> to train 14 different classification models on our data with default parameters to find the best model. Each model is trained using cross-fold validation accross multiple folds (default 10) and the average metric scores for multiple classification metrics are shown, including Accuracy, F1, etc.</p>
+<p>The results are shown in a grid, ranked by highest scoring on Accuracy by default.</p>
+<div class="cell" data-outputid="9f8f4714-9a00-43aa-eb54-481aaa4ce30f">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Train all classification models on data with default parameters using cross-fold validation</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>best_model <span class="op">=</span> compare_models()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Model</th>
+      <th>Accuracy</th>
+      <th>AUC</th>
+      <th>Recall</th>
+      <th>Prec.</th>
+      <th>F1</th>
+      <th>Kappa</th>
+      <th>MCC</th>
+      <th>TT (Sec)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ridge</th>
+      <td>Ridge Classifier</td>
+      <td>0.9955</td>
+      <td>0.0000</td>
+      <td>0.9917</td>
+      <td>0.9959</td>
+      <td>0.9952</td>
+      <td>0.9927</td>
+      <td>0.9930</td>
+      <td>0.013</td>
+    </tr>
+    <tr>
+      <th>lda</th>
+      <td>Linear Discriminant Analysis</td>
+      <td>0.9955</td>
+      <td>1.0000</td>
+      <td>0.9917</td>
+      <td>0.9959</td>
+      <td>0.9952</td>
+      <td>0.9927</td>
+      <td>0.9930</td>
+      <td>0.016</td>
+    </tr>
+    <tr>
+      <th>lr</th>
+      <td>Logistic Regression</td>
+      <td>0.9907</td>
+      <td>1.0000</td>
+      <td>0.9875</td>
+      <td>0.9916</td>
+      <td>0.9905</td>
+      <td>0.9852</td>
+      <td>0.9858</td>
+      <td>0.423</td>
+    </tr>
+    <tr>
+      <th>rf</th>
+      <td>Random Forest Classifier</td>
+      <td>0.9814</td>
+      <td>0.9988</td>
+      <td>0.9755</td>
+      <td>0.9832</td>
+      <td>0.9811</td>
+      <td>0.9706</td>
+      <td>0.9716</td>
+      <td>0.464</td>
+    </tr>
+    <tr>
+      <th>et</th>
+      <td>Extra Trees Classifier</td>
+      <td>0.9814</td>
+      <td>0.9987</td>
+      <td>0.9717</td>
+      <td>0.9840</td>
+      <td>0.9810</td>
+      <td>0.9701</td>
+      <td>0.9715</td>
+      <td>0.460</td>
+    </tr>
+    <tr>
+      <th>lightgbm</th>
+      <td>Light Gradient Boosting Machine</td>
+      <td>0.9766</td>
+      <td>0.9996</td>
+      <td>0.9721</td>
+      <td>0.9797</td>
+      <td>0.9765</td>
+      <td>0.9630</td>
+      <td>0.9643</td>
+      <td>0.090</td>
+    </tr>
+    <tr>
+      <th>gbc</th>
+      <td>Gradient Boosting Classifier</td>
+      <td>0.9721</td>
+      <td>0.9974</td>
+      <td>0.9630</td>
+      <td>0.9761</td>
+      <td>0.9708</td>
+      <td>0.9556</td>
+      <td>0.9580</td>
+      <td>0.250</td>
+    </tr>
+    <tr>
+      <th>dt</th>
+      <td>Decision Tree Classifier</td>
+      <td>0.9580</td>
+      <td>0.9685</td>
+      <td>0.9565</td>
+      <td>0.9638</td>
+      <td>0.9584</td>
+      <td>0.9353</td>
+      <td>0.9375</td>
+      <td>0.015</td>
+    </tr>
+    <tr>
+      <th>ada</th>
+      <td>Ada Boost Classifier</td>
+      <td>0.9494</td>
+      <td>0.9772</td>
+      <td>0.9356</td>
+      <td>0.9574</td>
+      <td>0.9486</td>
+      <td>0.9202</td>
+      <td>0.9241</td>
+      <td>0.093</td>
+    </tr>
+    <tr>
+      <th>nb</th>
+      <td>Naive Bayes</td>
+      <td>0.8333</td>
+      <td>0.9958</td>
+      <td>0.8726</td>
+      <td>0.9139</td>
+      <td>0.8388</td>
+      <td>0.7522</td>
+      <td>0.7853</td>
+      <td>0.016</td>
+    </tr>
+    <tr>
+      <th>knn</th>
+      <td>K Neighbors Classifier</td>
+      <td>0.7636</td>
+      <td>0.8905</td>
+      <td>0.6803</td>
+      <td>0.7660</td>
+      <td>0.7498</td>
+      <td>0.6143</td>
+      <td>0.6264</td>
+      <td>0.116</td>
+    </tr>
+    <tr>
+      <th>dummy</th>
+      <td>Dummy Classifier</td>
+      <td>0.4355</td>
+      <td>0.5000</td>
+      <td>0.3333</td>
+      <td>0.1904</td>
+      <td>0.2647</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.016</td>
+    </tr>
+    <tr>
+      <th>svm</th>
+      <td>SVM - Linear Kernel</td>
+      <td>0.4310</td>
+      <td>0.0000</td>
+      <td>0.3810</td>
+      <td>0.3575</td>
+      <td>0.3068</td>
+      <td>0.0860</td>
+      <td>0.1481</td>
+      <td>0.062</td>
+    </tr>
+    <tr>
+      <th>qda</th>
+      <td>Quadratic Discriminant Analysis</td>
+      <td>0.1758</td>
+      <td>0.0000</td>
+      <td>0.3333</td>
+      <td>0.0312</td>
+      <td>0.0529</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.018</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>We can see that the Extra Trees Classifier is the best performing model, which we would normally choose. For this example we will select a model that performs less well so has some mistakes, which will be useful later - so we will choose to use the Randon Forrest (rf) classifier.</p>
+</section>
+<section id="selecting-and-fine-tuning-the-model" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="selecting-and-fine-tuning-the-model"><span class="header-section-number">5.3</span> Selecting and Fine Tuning the Model</h3>
+<p>So we will create a Random Forrest Model. When we do this, it will train the model on the training data, using cross-fold validation (default 10 folds) and show the metrics for each fold iteration. This will train our model with default parameters, so should give us the same result as we observed in the compare models process.</p>
+<div class="cell" data-outputid="a60b7685-bf55-4400-b41d-2f917c6177df">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and train the random forrest model on our data</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> create_model(<span class="st">'rf'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Accuracy</th>
+      <th>AUC</th>
+      <th>Recall</th>
+      <th>Prec.</th>
+      <th>F1</th>
+      <th>Kappa</th>
+      <th>MCC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.9545</td>
+      <td>1.0000</td>
+      <td>0.9167</td>
+      <td>0.9591</td>
+      <td>0.9525</td>
+      <td>0.9269</td>
+      <td>0.9302</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.9545</td>
+      <td>0.9880</td>
+      <td>0.9167</td>
+      <td>0.9591</td>
+      <td>0.9525</td>
+      <td>0.9269</td>
+      <td>0.9302</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.9048</td>
+      <td>1.0000</td>
+      <td>0.9213</td>
+      <td>0.9143</td>
+      <td>0.9058</td>
+      <td>0.8521</td>
+      <td>0.8552</td>
+    </tr>
+    <tr>
+      <th>Mean</th>
+      <td>0.9814</td>
+      <td>0.9988</td>
+      <td>0.9755</td>
+      <td>0.9832</td>
+      <td>0.9811</td>
+      <td>0.9706</td>
+      <td>0.9716</td>
+    </tr>
+    <tr>
+      <th>SD</th>
+      <td>0.0312</td>
+      <td>0.0036</td>
+      <td>0.0375</td>
+      <td>0.0281</td>
+      <td>0.0313</td>
+      <td>0.0489</td>
+      <td>0.0476</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>We can also print some details about our trained model.</p>
+<div class="cell" data-outputid="a499f489-e263-496c-ecaa-b4e8d14bc0a8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Print model summary</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RandomForestClassifier(bootstrap=True, ccp_alpha=0.0, class_weight=None,
+                       criterion='gini', max_depth=None, max_features='auto',
+                       max_leaf_nodes=None, max_samples=None,
+                       min_impurity_decrease=0.0, min_impurity_split=None,
+                       min_samples_leaf=1, min_samples_split=2,
+                       min_weight_fraction_leaf=0.0, n_estimators=100,
+                       n_jobs=-1, oob_score=False, random_state=123, verbose=0,
+                       warm_start=False)</code></pre>
+</div>
+</div>
+<p>We can now fine tune our model to optimise parameters to get our best model using <em>tune_model</em>. This process uses <em>Random Grid Search</em> to find the best combination of parameters that produces the highest score. This will output the results of the cross-fold validation from our best model.</p>
+<div class="cell" data-outputid="a889bd67-ed9b-4726-9ebc-d90daabe50ad">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Fine tune our model using Random Grid Search on parameters</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>tuned_rf <span class="op">=</span> tune_model(rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Accuracy</th>
+      <th>AUC</th>
+      <th>Recall</th>
+      <th>Prec.</th>
+      <th>F1</th>
+      <th>Kappa</th>
+      <th>MCC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.9545</td>
+      <td>1.0000</td>
+      <td>0.9167</td>
+      <td>0.9591</td>
+      <td>0.9525</td>
+      <td>0.9269</td>
+      <td>0.9302</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.9545</td>
+      <td>0.9819</td>
+      <td>0.9167</td>
+      <td>0.9591</td>
+      <td>0.9525</td>
+      <td>0.9269</td>
+      <td>0.9302</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.9524</td>
+      <td>0.9893</td>
+      <td>0.9630</td>
+      <td>0.9619</td>
+      <td>0.9536</td>
+      <td>0.9263</td>
+      <td>0.9297</td>
+    </tr>
+    <tr>
+      <th>Mean</th>
+      <td>0.9861</td>
+      <td>0.9971</td>
+      <td>0.9796</td>
+      <td>0.9880</td>
+      <td>0.9859</td>
+      <td>0.9780</td>
+      <td>0.9790</td>
+    </tr>
+    <tr>
+      <th>SD</th>
+      <td>0.0212</td>
+      <td>0.0060</td>
+      <td>0.0333</td>
+      <td>0.0183</td>
+      <td>0.0216</td>
+      <td>0.0336</td>
+      <td>0.0321</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>We can observe that the grid search has improved our model Accuracy.</p>
+</section>
+<section id="model-evaluation" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="model-evaluation"><span class="header-section-number">5.4</span> Model Evaluation</h3>
+<p>Once we have our best model, it’s normal practice to look at the details of how its performing, what classification errors it makes, and what it gets correct.e can do this through a series of plots. The <em>plot_model()</em> function in Pycaret allows us to easily display a range of these plots to help with this.</p>
+<p>A <em>confusion matrix</em> is a very common plot to show the details of classification predicted vs actual results which we can plot with one line.</p>
+<div class="cell" data-outputid="ff9c560b-1211-4d05-bd7d-854db85a4368">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot confusion matrix </span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plot_model(tuned_rf, plot <span class="op">=</span> <span class="st">'confusion_matrix'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-04-python-power-tools-pycaret_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>We can see that our fine-tuned model only makes one mistake, predicting a penguin of class 0 as a class 2 penguin. Referring to our table from the <em>setup()</em> function we can see that the penguin species target class has the following number encodings:</p>
+<ul>
+<li>Adelie: 0</li>
+<li>Chinstrap: 1</li>
+<li>Gentoo: 2</li>
+</ul>
+<p>So it has predicted a Adelie penguin as a Gentoo penguin!</p>
+<p>We can also plot a decision boundry for the model to see how it divides the parameter space to be able to classify the penguins.</p>
+<div class="cell" data-outputid="eb2ee047-13c3-48e5-e297-365d0eec6fe5">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot model descision boundary</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plot_model(tuned_rf, plot<span class="op">=</span><span class="st">'boundary'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-04-python-power-tools-pycaret_files/figure-html/cell-13-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>We can see that for class 2 (Gentoo) penguins, there is a well defined decision boundry. However the decision boundry between the Adelie and Chinstrap penguins is more messy, implying its harder to distinguish between these two types of penguins. We will make a note of this for later.</p>
+<p>We can also total up the errors in a error bar plot in Pycaret.</p>
+<div class="cell" data-outputid="c7c0dbac-fdda-4715-9e0a-b4f857c004d3">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot class prediction error bar plot</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>plot_model(tuned_rf, plot <span class="op">=</span> <span class="st">'error'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-04-python-power-tools-pycaret_files/figure-html/cell-14-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Here we can see our one case of an Adelie penguin (blue/0) predicted as a Gentoo penguin (red/2) again.</p>
+<p>Another common plot when trying to understand how our model works is a feature importance plot. This plot will show us the most important features for the model to be able to predict the penguin species class.</p>
+<p>Again we can create this plot with one line of Pycaret.</p>
+<div class="cell" data-outputid="02cdcc77-6a7b-4605-ece5-8dbd4d5930fa">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot feature importance</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plot_model(tuned_rf, plot <span class="op">=</span> <span class="st">'feature'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-04-python-power-tools-pycaret_files/figure-html/cell-15-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>So it seems like bill length and flipper length are two of the most important features to help predict penguin species.</p>
+<p>The <em>interpret_model()</em> function is available to use a <strong>Game Theory</strong> approach on the model predictions on training data to explain the output of the model. This is mostly based upon the python <a href="https://shap.readthedocs.io/en/latest/index.html">SHAP</a> package. However this can only be used with tree-based models, which is why we deliberately chose the Random Forrest classifier earlier to be able to demonstrate this feature.</p>
+<div class="cell" data-outputid="d373e501-7663-48d8-ece6-9c634aa74760">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot shapley values for model interpretation</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>interpret_model(tuned_rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-04-python-power-tools-pycaret_files/figure-html/cell-16-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="prepare-model-for-use" class="level3" data-number="5.5">
+<h3 data-number="5.5" class="anchored" data-anchor-id="prepare-model-for-use"><span class="header-section-number">5.5</span> Prepare Model for Use</h3>
+<p>Once we are happy with our final model, we can prepare it for us with a range of functions. We can create our final model for deployment using the <em>finalise_model()</em> function, which will train the model on the entire training dataset.</p>
+<div class="cell" data-outputid="177e4f0c-c16a-4ef0-b8ac-74bdf2ee7773">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Train final model on all training data</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>final_rf <span class="op">=</span> finalize_model(tuned_rf)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(final_rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RandomForestClassifier(bootstrap=True, ccp_alpha=0.0,
+                       class_weight='balanced_subsample', criterion='entropy',
+                       max_depth=4, max_features='log2', max_leaf_nodes=None,
+                       max_samples=None, min_impurity_decrease=0.0002,
+                       min_impurity_split=None, min_samples_leaf=5,
+                       min_samples_split=9, min_weight_fraction_leaf=0.0,
+                       n_estimators=130, n_jobs=-1, oob_score=False,
+                       random_state=123, verbose=0, warm_start=False)</code></pre>
+</div>
+</div>
+<p>We can now test our final model on the holdout dataset we kept at the start, to get further confirmation of its performance. We can use the <em>predict_model()</em> function using our final model and the holdout test dataset to generate a set if predictions.</p>
+<p>This will also automatically apply any data transformations we configured in our <em>setup()</em> function to this new test dataset before the data is passed to the model.</p>
+<div class="cell" data-outputid="12f6f8b5-040d-4eaa-af6c-6ae9c3ec2916">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Use holdout test dataset to generate predictions for final model</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>new_predictions <span class="op">=</span> predict_model(final_rf, data<span class="op">=</span>test_df)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>new_predictions.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>island</th>
+      <th>bill_length_mm</th>
+      <th>bill_depth_mm</th>
+      <th>flipper_length_mm</th>
+      <th>body_mass_g</th>
+      <th>sex</th>
+      <th>year</th>
+      <th>species</th>
+      <th>Label</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>263</th>
+      <td>Biscoe</td>
+      <td>49.8</td>
+      <td>15.9</td>
+      <td>229.0</td>
+      <td>5950.0</td>
+      <td>male</td>
+      <td>2009</td>
+      <td>Gentoo</td>
+      <td>Gentoo</td>
+      <td>0.9857</td>
+    </tr>
+    <tr>
+      <th>216</th>
+      <td>Biscoe</td>
+      <td>45.8</td>
+      <td>14.2</td>
+      <td>219.0</td>
+      <td>4700.0</td>
+      <td>female</td>
+      <td>2008</td>
+      <td>Gentoo</td>
+      <td>Gentoo</td>
+      <td>0.9802</td>
+    </tr>
+    <tr>
+      <th>68</th>
+      <td>Torgersen</td>
+      <td>35.9</td>
+      <td>16.6</td>
+      <td>190.0</td>
+      <td>3050.0</td>
+      <td>female</td>
+      <td>2008</td>
+      <td>Adelie</td>
+      <td>Adelie</td>
+      <td>0.9280</td>
+    </tr>
+    <tr>
+      <th>55</th>
+      <td>Biscoe</td>
+      <td>41.4</td>
+      <td>18.6</td>
+      <td>191.0</td>
+      <td>3700.0</td>
+      <td>male</td>
+      <td>2008</td>
+      <td>Adelie</td>
+      <td>Adelie</td>
+      <td>0.9251</td>
+    </tr>
+    <tr>
+      <th>206</th>
+      <td>Biscoe</td>
+      <td>46.5</td>
+      <td>14.4</td>
+      <td>217.0</td>
+      <td>4900.0</td>
+      <td>female</td>
+      <td>2008</td>
+      <td>Gentoo</td>
+      <td>Gentoo</td>
+      <td>0.9851</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Note the predicted penguin class is in the newly created <strong>Label</strong> column. The actual penguin species is still in the original <strong>species</strong> column. We can use Pycaret’s utility <em>check_metric()</em> function to apply a metric to our predictions, in this case we will calculate the F1 classification metric.</p>
+<div class="cell" data-outputid="01991b53-6f83-4057-b474-d597de864dab">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate final model on test dataset predictions</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>check_metric(new_predictions[<span class="st">'species'</span>], new_predictions[<span class="st">'Label'</span>], metric <span class="op">=</span> <span class="st">'F1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>1.0</code></pre>
+</div>
+</div>
+<p>So we can see our final model has performed exteremely well on our holdout test data, getting a perfect score of 1.0.</p>
+<p>We can now save our final model using the <em>save_model()</em> function.</p>
+<div class="cell" data-outputid="d7c550c5-c513-4c9d-9ad3-429e81cfe22c">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Save final model (and data transformation pipeline process)</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>save_model(final_rf,<span class="st">'Final Penguin Model'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Transformation Pipeline and Model Successfully Saved</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>(Pipeline(memory=None,
+          steps=[('dtypes',
+                  DataTypes_Auto_infer(categorical_features=[],
+                                       display_types=True, features_todrop=[],
+                                       id_columns=[],
+                                       ml_usecase='classification',
+                                       numerical_features=[], target='species',
+                                       time_features=[])),
+                 ('imputer',
+                  Simple_Imputer(categorical_strategy='not_available',
+                                 fill_value_categorical=None,
+                                 fill_value_numerical=None,
+                                 numeric_stra...
+                  RandomForestClassifier(bootstrap=True, ccp_alpha=0.0,
+                                         class_weight='balanced_subsample',
+                                         criterion='entropy', max_depth=4,
+                                         max_features='log2',
+                                         max_leaf_nodes=None, max_samples=None,
+                                         min_impurity_decrease=0.0002,
+                                         min_impurity_split=None,
+                                         min_samples_leaf=5, min_samples_split=9,
+                                         min_weight_fraction_leaf=0.0,
+                                         n_estimators=130, n_jobs=-1,
+                                         oob_score=False, random_state=123,
+                                         verbose=0, warm_start=False)]],
+          verbose=False), 'Final Penguin Model.pkl')</code></pre>
+</div>
+</div>
+<p>Our saved model is easily re-loaded for use using the <em>load_model()</em> function. Note this also loads any data transformation configured as well specifed in our original <em>setup()</em> function.</p>
+<div class="cell" data-outputid="bac9cff9-2a92-426c-b241-baaef1be4cf4">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load final model (and data transformation pipeline process)</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>saved_final_rf <span class="op">=</span> load_model(<span class="st">'Final Penguin Model'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Transformation Pipeline and Model Successfully Loaded</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="review" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="review"><span class="header-section-number">6</span> Review</h2>
+<p>Overall, Pycaret is an incredibly useful and powerful library for speeding up and automating the machine learning pipeline and process. Lets highlight some key pros and cons.</p>
+<section id="pros" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="pros"><span class="header-section-number">6.1</span> Pros</h3>
+<p><strong>Less code</strong>: The library really lives up to its motto of being a ‘low code’ library, often one of code will replace what would normally have been an entire manually coded process of many lines of code. Accross a whole project, as we have seen in this example project, hundreds of lines of code can be replace by just a few lines. Note how most of this article length is more due to describing what the code does, than the code itself!</p>
+<p><strong>Easy to use</strong>: Pycaret library functions are well named, intiutive and easy to use, and easy to customise and configure.</p>
+<p><strong>A more consistant approach</strong>: Another benefit of being a low code library where most processes have been automated is that this ensures a more consistant approach when using Pycaret accross different projects. This is important not only for scientific reproducability, but for reducing the possibility of errors that are more likely when more custom and manual code is required to be written for a process.</p>
+<p><strong>Good practice</strong>: Each step of the machine learning pipeline that Pycaret simplifies and automates for you, does so in such a way to bake in best practice in Data Science. For example, when testing models cross-fold validation is done by default on all models. When evaluating models, multiple and relevant metrics are used to evaluate performance.</p>
+<p><strong>Performs all key tasks and more</strong>: Pycaret automates every key task in machine learning process, from wrangling to preparing your data, for selecting a model, for optimising and evaluating a final model, then testing and saving a model ready for deployment and use. In addition, Pycaret offers easy access to extra functions while not always required, can be useful for particular projects - for example the ability to calculate Shapley values as we have seen for model interpretability.</p>
+<p><strong>Educational</strong>: Using this library helps all kinds of users, from amateurs to professional Data Scientists, keep up to date with the latest methods and techniques. For example, Pycaret maintains a list of the most widely used models which are included automatically when selecting a potential model. For model understanding and interpretation, a wide range of plots and analyses are available. I was not fully aware for example about Shapley values, and how they can help interpret models from a very different perspective. These are some of the many advantages of having an open source library like Pycaret that’s intended to automate the Data Science process, everyone’s collaberative effort to use and update the library helps keep highlighting and providing some of the latest and best techniques to all who use it.</p>
+<p><strong>Excellent data wrangling and transformation</strong>: As we saw with the <em>setup()</em> function there are many useful features available to perform many common tasks that would normally require many lines of code. For example, the inclusion of the SMOTE and resampling techniques often used to correct for imbalances in the target variable in a dataset. Sensible automatic imputation methods by default to deal with missing values, and normalisation methods to scale and prepare numeric data - are key common tasks that need to be performed, expertly automated by the Pycaret library.</p>
+<p><strong>Quick consideration of a wide range of models</strong>: Pycaret’s <em>compare_models(), create_model() and tune_model()</em> functions allow you to quickly compare a wide range of the best models available (currently 18), then select and optimise the best model - in just 3 lines of code.</p>
+<p><strong>Creating a pipeline not just a model</strong>: The machine learning process is not just about producing a good model, you also need a process to transform the data into a format required for that model. This is often consider a separate bit of extra work, often referred to as an ETL process. (Extract, Transform &amp; Load). Pycaret blends these two essential things together for you, another benefit of the automation it provides, so when you save your model, you also save this data transformation process, all together. And when you load it ready for use, you load the data transformation and the model together - ready for immediate use - a huge saving of time and effort.</p>
+<p>These are just some of the key pros of the Pycaret library, in my opinion there are many many more. To illustrate what a huge advance and benefit the Pycaret library is in the pros highlighted, compare this to <a href="https://github.com/pranath/breast_cancer_prediction/blob/master/breast_cancer_prediction2.ipynb">a previous machine learning project of mine to classify breast cancer data</a>, where I used the common and more manual process of many more lines of code for each part of the machine learning pipeline.</p>
+</section>
+<section id="cons" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="cons"><span class="header-section-number">6.2</span> Cons</h3>
+<p><strong>Not good for beginners</strong>: Despite being pitched for begginners, this library may not be ideal for beginners in my opinion. While the functions are easy for a beginner to use, and indeed as highlighted you can run the entire machine learning process very easily, I would say this can be a bit deceptive and misleading. Simply running the process with little understanding what is going on underneath, is not a substitute for understanding the basics. For example when, why &amp; how should we transform data? (e.g.&nbsp;normalisation of numeric values) which is the most appropriate metric to interpret results? (e.g.&nbsp;balanced vs imbalanced target variable).</p>
+<p><strong>No ability to customose plots</strong>: This is perhaps a minor issue, but it would be nice to be able to customise plots at least a little for example to adjust the size of plots.</p>
+<p><strong>Can’t easily see what is going on under the hood</strong>: In a way, this is I feel both a Pro and a Con. If you know what is going on with these automated functions underneath, then to some extent it can be nice to not be overloaded with lots of detail about it. On the other hand, for both experienced Data Scientist’s and begginners it can be helpful to actually understand more of what each automated function is doing. Many functions do give some insight as to what they are doing, but many things are hidden - and can only be discovered by reading the documentation, which I would suggest is a good idea for anyone using this library, experienced or not. But again I feel this is a relatively minor con, as its a difficult balance to achieve in the trade off between simplifying and automating the process vs making every part of the process transparent.</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">7</span> Conclusion</h2>
+<p>In this article we have looked at Pycaret as a potential <a href="../#category=python-power-tools">Python Power Tool for Data Science</a>.</p>
+<p>While it does have some minor drawbacks in my view, overall I would say Pycaret is an incredibly useful and powerful tool that helps simplify the machine learning process. I will be using Pycaret from now on in my day to day Data Science work by default - I’m hugely impressed by this library and its ongoing development.</p>
+<p>In my honest opinion, I have no doubt in declaring the Pycaret is indeed a <strong>Python Power Tool for Data Science</strong>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

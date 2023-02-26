@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2022-03-15">
+<meta name="description" content="In this article we will further explore the MIMIC-III critical care Electronic Health Record Dataset, looking at how we examine clinical outcomes as well as extracting indivdual patient data.">
+
+<title>blogtest1 - MIMIC-III (EHR) Clinical Outcomes &amp; Patient Level Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">blogtest1</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">MIMIC-III (EHR) Clinical Outcomes &amp; Patient Level Data</h1>
+                  <div>
+        <div class="description">
+          In this article we will further explore the MIMIC-III critical care Electronic Health Record Dataset, looking at how we examine clinical outcomes as well as extracting indivdual patient data.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">health</div>
+                <div class="quarto-category">electronic-health-records</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 15, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#mimic-iii-and-clinical-outcomes" id="toc-mimic-iii-and-clinical-outcomes" class="nav-link" data-scroll-target="#mimic-iii-and-clinical-outcomes"><span class="toc-section-number">2</span>  MIMIC-III and Clinical Outcomes</a></li>
+  <li><a href="#extract-mortality-numbers" id="toc-extract-mortality-numbers" class="nav-link" data-scroll-target="#extract-mortality-numbers"><span class="toc-section-number">3</span>  Extract mortality numbers</a>
+  <ul class="collapse">
+  <li><a href="#mortality-numbers-in-icu-across-care-units" id="toc-mortality-numbers-in-icu-across-care-units" class="nav-link" data-scroll-target="#mortality-numbers-in-icu-across-care-units"><span class="toc-section-number">3.1</span>  1. Mortality numbers in ICU across care units</a></li>
+  <li><a href="#mortality-numbers-in-hospital-across-care-units" id="toc-mortality-numbers-in-hospital-across-care-units" class="nav-link" data-scroll-target="#mortality-numbers-in-hospital-across-care-units"><span class="toc-section-number">3.2</span>  2. Mortality numbers in hospital across care units</a></li>
+  </ul></li>
+  <li><a href="#extract-length-of-stay-numbers" id="toc-extract-length-of-stay-numbers" class="nav-link" data-scroll-target="#extract-length-of-stay-numbers"><span class="toc-section-number">4</span>  Extract length of stay numbers</a>
+  <ul class="collapse">
+  <li><a href="#length-of-stay-on-the-icu-across-care-units" id="toc-length-of-stay-on-the-icu-across-care-units" class="nav-link" data-scroll-target="#length-of-stay-on-the-icu-across-care-units"><span class="toc-section-number">4.1</span>  1. Length of stay on the ICU across care units</a></li>
+  <li><a href="#length-of-stay-in-hospital-across-care-units" id="toc-length-of-stay-in-hospital-across-care-units" class="nav-link" data-scroll-target="#length-of-stay-in-hospital-across-care-units"><span class="toc-section-number">4.2</span>  2. Length of stay in hospital across care units</a></li>
+  </ul></li>
+  <li><a href="#extracting-vital-signs-for-a-single-patient-from-mimic-iii" id="toc-extracting-vital-signs-for-a-single-patient-from-mimic-iii" class="nav-link" data-scroll-target="#extracting-vital-signs-for-a-single-patient-from-mimic-iii"><span class="toc-section-number">5</span>  Extracting Vital Signs for a single patient from MIMIC-III</a>
+  <ul class="collapse">
+  <li><a href="#hospital-admission-of-a-single-patient" id="toc-hospital-admission-of-a-single-patient" class="nav-link" data-scroll-target="#hospital-admission-of-a-single-patient"><span class="toc-section-number">5.1</span>  1. Hospital admission of a single patient</a></li>
+  <li><a href="#all-charted-events-of-a-single-patient" id="toc-all-charted-events-of-a-single-patient" class="nav-link" data-scroll-target="#all-charted-events-of-a-single-patient"><span class="toc-section-number">5.2</span>  2. All charted events of a single patient</a></li>
+  <li><a href="#all-outputs-recorded-during-an-icu-stay-of-a-single-patient" id="toc-all-outputs-recorded-during-an-icu-stay-of-a-single-patient" class="nav-link" data-scroll-target="#all-outputs-recorded-during-an-icu-stay-of-a-single-patient"><span class="toc-section-number">5.3</span>  3. All outputs recorded during an ICU stay of a single patient</a></li>
+  <li><a href="#all-inputs-recorded-during-an-icu-stay-of-a-single-patient" id="toc-all-inputs-recorded-during-an-icu-stay-of-a-single-patient" class="nav-link" data-scroll-target="#all-inputs-recorded-during-an-icu-stay-of-a-single-patient"><span class="toc-section-number">5.4</span>  4. All inputs recorded during an ICU stay of a single patient</a></li>
+  <li><a href="#all-lab-events-recorded-during-an-icu-stay-of-a-single-patient" id="toc-all-lab-events-recorded-during-an-icu-stay-of-a-single-patient" class="nav-link" data-scroll-target="#all-lab-events-recorded-during-an-icu-stay-of-a-single-patient"><span class="toc-section-number">5.5</span>  5. All lab events recorded during an ICU stay of a single patient</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In an <a href="2022-03-14-using-mimic3-ehr-database.html">earlier article we looked at how we can extract some useful descriptive statistics from the MIMIC-III EHR (Electronic Health Record) database</a>. In this article we will further explore the MIMIC-III Dataset, looking at how we examine clinical outcomes as well as extracting indivdual patient level data.</p>
+</section>
+<section id="mimic-iii-and-clinical-outcomes" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="mimic-iii-and-clinical-outcomes"><span class="header-section-number">2</span> MIMIC-III and Clinical Outcomes</h2>
+<p>Mortality is the most commonly used outcome in prediction studies in critical care, and in fact potentially across all of medicine. Since it is a strong surrogate for realness, machine learning practitioners use this signal to infer the relationship between clinical data and patient outcome. Mortality is a deceptively simple outcome to define. In fact, the nature of retrospective data often complicates matters. For example, in MIMIC database, a number of patients have two consecutive hospitalizations in which they die as organ donors. These consecutive hospitalizations are treated as distinct hospital admissions.</p>
+<p>However, the underlying reason is the same. Mortality is susceptible to selection bias based on the source of the information. For example, many studies report hospital mortality as it is feasible to collect this information. However, the number of deaths recorded in the hospital database might not include the number of people that have died after they have been discharged and went to the home care. This adds noise to the outcome.</p>
+<p>Other important factors in defining mortality as an outcome are controllable by the researcher. For example, defining mortality as death within 30 days of admission will provide a stronger signal for immediate physiological abnormality, which is likely related to the patient’s admission. On the other hand, one-year mortality will emphasize chronic illness in parallel conditions.</p>
+<p>in this article we will see how we can extract the mortality numbers of adult patients who were admitted to the ICU and the distribution of this mortality numbers across the different ICUs in MIMIC dataset. If a patient’s death was registered while the patient was in ICU, or six hours before being admitted to, or six hours after leaving the ICU, we will assume that the patient has died in the intensive care unit.</p>
+</section>
+<section id="extract-mortality-numbers" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="extract-mortality-numbers"><span class="header-section-number">3</span> Extract mortality numbers</h2>
+<section id="mortality-numbers-in-icu-across-care-units" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="mortality-numbers-in-icu-across-care-units"><span class="header-section-number">3.1</span> 1. Mortality numbers in ICU across care units</h3>
+<p>We would like to know the mortality numbers of adult patients who were admitted to the ICU, and the distribution of these mortality numbers across the different ICUs. If a patient’s death was registered while the patient was on the ICU, or 6 hours before being admitted to, or 6 hours after leaving the ICU, we assume that the patient has died on the ICU.</p>
+<p>The following diagram visualizes the SQL query that is needed to obtain the ICU mortality numbers. We combine the Patients and Icustays tables based on the subject identifier, and select each patient’s date of birth and date of death, and the care unit and admission time corresponding to each ICU stay. The admission time and date of death together indicate whether or not a patient died on the ICU. The age (age &gt;= 16) is again combined from the admission time and date of birth.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/mimic-sql6.png" class="img-fluid"></p>
+<div class="cell" data-execution_count="155">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Compose SQL query</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT i.first_careunit, </span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">round((EXTRACT(EPOCH FROM (i.intime-p.dob))/60/60/24/365.242) :: NUMERIC, 4) as age,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">CASE WHEN p.dod IS NOT NULL </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">     AND p.dod &gt;= i.intime - interval '6 hour'</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">     AND p.dod &lt;= i.outtime + interval '6 hour' THEN 'Died in ICU'</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">     ELSE 'Not dead' END AS icu_mortality</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">FROM public.patients p</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN public.icustays i ON p.subject_id = i.subject_id</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE round((EXTRACT(EPOCH FROM (i.intime-p.dob))/60/60/24/365.242) :: NUMERIC, 4) &gt;= 16;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Run query</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>query_output <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>query_output.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="155">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>first_careunit</th>
+      <th>age</th>
+      <th>icu_mortality</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>MICU</td>
+      <td>70.6378</td>
+      <td>Not dead</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>MICU</td>
+      <td>36.1923</td>
+      <td>Died in ICU</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>MICU</td>
+      <td>87.0874</td>
+      <td>Died in ICU</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CCU</td>
+      <td>73.6875</td>
+      <td>Not dead</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>MICU</td>
+      <td>48.9015</td>
+      <td>Died in ICU</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="156">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Print overall mortality</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Overall mortality - Totals'</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(query_output[<span class="st">'icu_mortality'</span>].value_counts())</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Overall mortality - Percentages'</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(query_output[<span class="st">'icu_mortality'</span>].value_counts()<span class="op">/</span>query_output.shape[<span class="dv">0</span>]<span class="op">*</span><span class="dv">100</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Print mortality per icu</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mortality per ICU - Totals'</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> query_output.groupby([<span class="st">'first_careunit'</span>,<span class="st">'icu_mortality'</span>])[<span class="st">'icu_mortality'</span>].count()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mortality per ICU - Percentages'</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> query_output.groupby([<span class="st">'first_careunit'</span>,<span class="st">'icu_mortality'</span>])[<span class="st">'icu_mortality'</span>].count() <span class="op">/</span> query_output.groupby([<span class="st">'first_careunit'</span>])[<span class="st">'icu_mortality'</span>].count() <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Print mortality percentages accross all icu</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mortality accross all ICUs'</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>dead_only_df <span class="op">=</span> query_output[query_output[<span class="st">'icu_mortality'</span>] <span class="op">==</span> <span class="st">'Died in ICU'</span>]</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>icu_percentages_df <span class="op">=</span> pd.DataFrame(dead_only_df.groupby([<span class="st">'first_careunit'</span>])[<span class="st">'icu_mortality'</span>].count())</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>icu_percentages_df <span class="op">=</span> icu_percentages_df.reset_index()</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>icu_percentages_df[<span class="st">'icu_mortality'</span>] <span class="op">=</span> icu_percentages_df[<span class="st">'icu_mortality'</span>] <span class="op">/</span> dead_only_df.shape[<span class="dv">0</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>icu_percentages_df.head()</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>fig1, ax1 <span class="op">=</span> plt.subplots()</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>ax1.pie(icu_percentages_df[<span class="st">'icu_mortality'</span>], labels<span class="op">=</span>icu_percentages_df[<span class="st">'first_careunit'</span>], autopct<span class="op">=</span><span class="st">'</span><span class="sc">%1.1f%%</span><span class="st">'</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>ax1.axis(<span class="st">'equal'</span>)  </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Overall mortality - Totals
+Not dead       105
+Died in ICU     31
+Name: icu_mortality, dtype: int64
+ 
+Overall mortality - Percentages
+Not dead       77.205882
+Died in ICU    22.794118
+Name: icu_mortality, dtype: float64
+ 
+Mortality per ICU - Totals
+first_careunit  icu_mortality
+CCU             Died in ICU       5
+                Not dead         14
+CSRU            Died in ICU       1
+                Not dead          5
+MICU            Died in ICU      18
+                Not dead         59
+SICU            Died in ICU       4
+                Not dead         19
+TSICU           Died in ICU       3
+                Not dead          8
+Name: icu_mortality, dtype: int64
+ 
+Mortality per ICU - Percentages
+first_careunit  icu_mortality
+CCU             Died in ICU      26.315789
+                Not dead         73.684211
+CSRU            Died in ICU      16.666667
+                Not dead         83.333333
+MICU            Died in ICU      23.376623
+                Not dead         76.623377
+SICU            Died in ICU      17.391304
+                Not dead         82.608696
+TSICU           Died in ICU      27.272727
+                Not dead         72.727273
+Name: icu_mortality, dtype: float64
+ 
+Mortality accross all ICUs</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2022-03-15-mimic-clinicial-outcomes-patient-data_files/figure-html/cell-4-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="mortality-numbers-in-hospital-across-care-units" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="mortality-numbers-in-hospital-across-care-units"><span class="header-section-number">3.2</span> 2. Mortality numbers in hospital across care units</h3>
+<p>We would also like to know the mortality numbers of adult patients who were admitted to hospital, and the distribution of those numbers across different ICUs. In this case, there is a variable called ‘hospital_expire_flag’ in the Admissions table that defines if a patient has died in hospital.</p>
+<p>The Patients and Icustays tables are combined based on the subject’s unique identifier, and the Admissions table is also joined based on the hospital admission’s identifier. We will need to select the hospital admission’s identifier, care unit, admission time and ‘hospital_expire_flag’. We also need the date of birth to obtain the age (age &gt;= 16).</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/mimic-sql7.png" class="img-fluid"></p>
+<div class="cell" data-execution_count="157">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Compose SQL query</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT i.first_careunit, a.hospital_expire_flag, round((EXTRACT(EPOCH FROM (a.admittime-p.dob))/60/60/24/365.242) :: NUMERIC, 4) as age</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">  FROM public.Icustays i</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">  INNER JOIN public.patients p ON i.subject_id = p.subject_id</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">  INNER JOIN public.Admissions a ON i.hadm_id = a.hadm_id</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">  WHERE round((EXTRACT(EPOCH FROM (a.admittime-p.dob))/60/60/24/365.242) :: NUMERIC, 4) &gt;= 16</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Run query</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>query_output <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>query_output.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="157">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>first_careunit</th>
+      <th>hospital_expire_flag</th>
+      <th>age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>MICU</td>
+      <td>0</td>
+      <td>70.6378</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>MICU</td>
+      <td>1</td>
+      <td>36.1923</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>MICU</td>
+      <td>1</td>
+      <td>87.0874</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CCU</td>
+      <td>0</td>
+      <td>73.6792</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>MICU</td>
+      <td>1</td>
+      <td>48.9014</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="158">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Print overall mortality</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Overall mortality - Totals'</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(query_output[<span class="st">'hospital_expire_flag'</span>].value_counts())</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Overall mortality - Percentages'</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(query_output[<span class="st">'hospital_expire_flag'</span>].value_counts()<span class="op">/</span>query_output.shape[<span class="dv">0</span>]<span class="op">*</span><span class="dv">100</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Print mortality per icu</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mortality per ICU - Totals'</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> query_output.groupby([<span class="st">'first_careunit'</span>,<span class="st">'hospital_expire_flag'</span>])[<span class="st">'hospital_expire_flag'</span>].count()</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mortality per ICU - Percentages'</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> query_output.groupby([<span class="st">'first_careunit'</span>,<span class="st">'hospital_expire_flag'</span>])[<span class="st">'hospital_expire_flag'</span>].count() <span class="op">/</span> query_output.groupby([<span class="st">'first_careunit'</span>])[<span class="st">'hospital_expire_flag'</span>].count() <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Print mortality percentages accross all icu</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mortality accross all ICUs'</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>dead_only_df <span class="op">=</span> query_output[query_output[<span class="st">'hospital_expire_flag'</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>icu_percentages_df <span class="op">=</span> pd.DataFrame(dead_only_df.groupby([<span class="st">'first_careunit'</span>])[<span class="st">'hospital_expire_flag'</span>].count())</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>icu_percentages_df <span class="op">=</span> icu_percentages_df.reset_index()</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>icu_percentages_df[<span class="st">'hospital_expire_flag'</span>] <span class="op">=</span> icu_percentages_df[<span class="st">'hospital_expire_flag'</span>] <span class="op">/</span> dead_only_df.shape[<span class="dv">0</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>icu_percentages_df.head()</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>fig1, ax1 <span class="op">=</span> plt.subplots()</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>ax1.pie(icu_percentages_df[<span class="st">'hospital_expire_flag'</span>], labels<span class="op">=</span>icu_percentages_df[<span class="st">'first_careunit'</span>], autopct<span class="op">=</span><span class="st">'</span><span class="sc">%1.1f%%</span><span class="st">'</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>ax1.axis(<span class="st">'equal'</span>)  </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Overall mortality - Totals
+0    90
+1    46
+Name: hospital_expire_flag, dtype: int64
+ 
+Overall mortality - Percentages
+0    66.176471
+1    33.823529
+Name: hospital_expire_flag, dtype: float64
+ 
+Mortality per ICU - Totals
+first_careunit  hospital_expire_flag
+CCU             0                       13
+                1                        6
+CSRU            0                        5
+                1                        1
+MICU            0                       52
+                1                       25
+SICU            0                       16
+                1                        7
+TSICU           0                        4
+                1                        7
+Name: hospital_expire_flag, dtype: int64
+ 
+Mortality per ICU - Percentages
+first_careunit  hospital_expire_flag
+CCU             0                       68.421053
+                1                       31.578947
+CSRU            0                       83.333333
+                1                       16.666667
+MICU            0                       67.532468
+                1                       32.467532
+SICU            0                       69.565217
+                1                       30.434783
+TSICU           0                       36.363636
+                1                       63.636364
+Name: hospital_expire_flag, dtype: float64
+ 
+Mortality accross all ICUs</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2022-03-15-mimic-clinicial-outcomes-patient-data_files/figure-html/cell-6-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="extract-length-of-stay-numbers" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="extract-length-of-stay-numbers"><span class="header-section-number">4</span> Extract length of stay numbers</h2>
+<section id="length-of-stay-on-the-icu-across-care-units" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="length-of-stay-on-the-icu-across-care-units"><span class="header-section-number">4.1</span> 1. Length of stay on the ICU across care units</h3>
+<p>We would like to know how many days each patient has to stay on the ICU. We want to know the median, lower quantile and upper quantile for the length of stay, and also these values for each different ICU. As for all queries, we only select adult patients (age &gt;= 16).</p>
+<p>The length of stay on the ICU can be found in the Icustays table. We also need the corresponding care unit and time of admission of each ICU admission. To get the date of birth for each patient (and hence the age, computed from the admission time and date of birth), we combine the Icustays and Patients tables.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/mimic-sql8.png" class="img-fluid"></p>
+<div class="cell" data-execution_count="159">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Compose SQL query</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT i.first_careunit, i.los, round((EXTRACT(EPOCH FROM (i.intime-p.dob))/60/60/24/365.242) :: NUMERIC, 4) as age</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="st">  FROM public.Icustays i</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="st">  INNER JOIN public.patients p ON i.subject_id = p.subject_id</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="st">  WHERE round((EXTRACT(EPOCH FROM (i.intime-p.dob))/60/60/24/365.242) :: NUMERIC, 4) &gt;= 16</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Run query</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>query_output <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>query_output.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="159">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>first_careunit</th>
+      <th>los</th>
+      <th>age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>MICU</td>
+      <td>1.6325</td>
+      <td>70.6378</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>MICU</td>
+      <td>13.8507</td>
+      <td>36.1923</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>MICU</td>
+      <td>2.6499</td>
+      <td>87.0874</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CCU</td>
+      <td>2.1436</td>
+      <td>73.6875</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>MICU</td>
+      <td>1.2938</td>
+      <td>48.9015</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="160">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Define function for descriptive stats 5 number summary for a field per icu</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> icu_descriptive_stats(field, df, boxplot_title):</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get list of ICUs</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    icu_list <span class="op">=</span> df[<span class="st">'first_careunit'</span>].unique()</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot descriptive stats for each ICU</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> icu <span class="kw">in</span> icu_list:</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">' '</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Descriptive statistics for '</span> <span class="op">+</span> <span class="bu">str</span>(icu) <span class="op">+</span> <span class="st">' by '</span> <span class="op">+</span> field)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        icu_df <span class="op">=</span> df[df[<span class="st">'first_careunit'</span>] <span class="op">==</span> icu]</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(icu_df[field].describe())   </span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot box plot of ICU by field</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">10</span>))</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    sns.boxplot(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">'first_careunit'</span>, y<span class="op">=</span>field)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    plt.xlabel(<span class="st">'ICU'</span>)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    plt.title(boxplot_title)   </span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 5 number summary all ICUs for los (length of stay within icu)</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>icu_descriptive_stats(<span class="st">'los'</span>, query_output, <span class="st">'ICU by Length of stay in days within ICU (los)'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 
+Descriptive statistics for MICU by los
+count    77.000000
+mean      3.955345
+std       5.193230
+min       0.190400
+25%       1.135800
+50%       1.925200
+75%       4.101400
+max      31.123500
+Name: los, dtype: float64
+ 
+Descriptive statistics for CCU by los
+count    19.000000
+mean      5.753900
+std       7.024671
+min       0.879900
+25%       1.862600
+50%       2.883300
+75%       4.242450
+max      24.996800
+Name: los, dtype: float64
+ 
+Descriptive statistics for SICU by los
+count    23.000000
+mean      5.668461
+std       8.751901
+min       0.743700
+25%       1.910350
+50%       2.405600
+75%       5.022700
+max      35.406500
+Name: los, dtype: float64
+ 
+Descriptive statistics for CSRU by los
+count    6.000000
+mean     3.631350
+std      3.199466
+min      0.901700
+25%      1.464500
+50%      2.084000
+75%      6.010175
+max      8.141500
+Name: los, dtype: float64
+ 
+Descriptive statistics for TSICU by los
+count    11.000000
+mean      3.589609
+std       6.422052
+min       0.105900
+25%       0.647600
+50%       1.276200
+75%       3.110500
+max      22.389500
+Name: los, dtype: float64</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2022-03-15-mimic-clinicial-outcomes-patient-data_files/figure-html/cell-8-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="length-of-stay-in-hospital-across-care-units" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="length-of-stay-in-hospital-across-care-units"><span class="header-section-number">4.2</span> 2. Length of stay in hospital across care units</h3>
+<p>This query is almost similar to the previous one, but now we are interested in the length of stay (in days) of adult patients in hospital instead of on the ICUs. We are also interested to know the distribution of those values across ICUs.</p>
+<p>We combine the Patients and Icustays tables based on the subject identifier, and the Admissions table based on the unique hospital admission identifier. This time, we use date of birth and time of admission to the hospital to compute age, and filter on it using age &gt;= 16. There is no variable for length of stay in hospital, but we can compute it by subtracting the discharge time from the admission time. Moreover, we will need the ICU the patient is admitted to. The unique hospital admission identifier is used to make sure each hospital admission corresponds to only one ICU (we use the hospital admission identifier to remove duplicates).</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/mimic-sql9.png" class="img-fluid"></p>
+<div class="cell" data-execution_count="161">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Compose SQL query</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""  </span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT i.first_careunit, a.hadm_id, a.dischtime, a.admittime, round((EXTRACT(EPOCH FROM (a.admittime-p.dob))/60/60/24/365.242) :: NUMERIC, 4) as age, </span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">round((EXTRACT(EPOCH FROM (a.dischtime-a.admittime))/60/60/24) :: NUMERIC, 4) as hospital_los</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">  FROM public.Icustays i</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">  INNER JOIN public.patients p ON i.subject_id = p.subject_id</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="st">  INNER JOIN public.Admissions a ON i.hadm_id = a.hadm_id</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="st">  WHERE round((EXTRACT(EPOCH FROM (a.admittime-p.dob))/60/60/24/365.242) :: NUMERIC, 4) &gt;= 16</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Run query</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>query_output <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop duplicates based on unique hospital admission id</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>query_output <span class="op">=</span> query_output.drop_duplicates([<span class="st">'hadm_id'</span>])</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove outliers</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>query_output <span class="op">=</span> query_output[query_output[<span class="st">'hospital_los'</span>] <span class="op">&lt;</span> <span class="dv">100</span>]</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>query_output.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="161">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>first_careunit</th>
+      <th>hadm_id</th>
+      <th>dischtime</th>
+      <th>admittime</th>
+      <th>age</th>
+      <th>hospital_los</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>MICU</td>
+      <td>142345</td>
+      <td>2164-11-01 17:15:00</td>
+      <td>2164-10-23 21:09:00</td>
+      <td>70.6378</td>
+      <td>8.8375</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>MICU</td>
+      <td>105331</td>
+      <td>2126-08-28 18:59:00</td>
+      <td>2126-08-14 22:32:00</td>
+      <td>36.1923</td>
+      <td>13.8521</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>MICU</td>
+      <td>165520</td>
+      <td>2125-10-07 15:13:00</td>
+      <td>2125-10-04 23:36:00</td>
+      <td>87.0874</td>
+      <td>2.6507</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CCU</td>
+      <td>199207</td>
+      <td>2149-06-03 18:42:00</td>
+      <td>2149-05-26 17:19:00</td>
+      <td>73.6792</td>
+      <td>8.0576</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>MICU</td>
+      <td>177759</td>
+      <td>2163-05-15 12:00:00</td>
+      <td>2163-05-14 20:43:00</td>
+      <td>48.9014</td>
+      <td>0.6368</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="162">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 5 number summary all ICUs for los (length of stay in hospital)</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>icu_descriptive_stats(<span class="st">'hospital_los'</span>, query_output, <span class="st">'ICU by length of stay in days in Hospital accross care units (hospital_los)'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 
+Descriptive statistics for MICU by hospital_los
+count    73.000000
+mean      8.073463
+std       6.847850
+min       0.144400
+25%       3.903500
+50%       5.988200
+75%       9.797900
+max      36.011800
+Name: hospital_los, dtype: float64
+ 
+Descriptive statistics for CCU by hospital_los
+count    16.000000
+mean      8.274125
+std       6.723373
+min       0.959000
+25%       2.949825
+50%       6.618750
+75%      11.067150
+max      24.997900
+Name: hospital_los, dtype: float64
+ 
+Descriptive statistics for SICU by hospital_los
+count    22.000000
+mean     11.616982
+std      10.893085
+min       2.107600
+25%       3.697600
+50%       8.138900
+75%      13.385575
+max      39.697200
+Name: hospital_los, dtype: float64
+ 
+Descriptive statistics for CSRU by hospital_los
+count     6.000000
+mean      7.588333
+std       4.976149
+min       0.770800
+25%       4.284925
+50%       8.046200
+75%      12.027300
+max      12.281300
+Name: hospital_los, dtype: float64
+ 
+Descriptive statistics for TSICU by hospital_los
+count    11.000000
+mean      5.184909
+std       6.637594
+min       0.038200
+25%       0.760750
+50%       2.320100
+75%       7.488200
+max      22.390300
+Name: hospital_los, dtype: float64</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2022-03-15-mimic-clinicial-outcomes-patient-data_files/figure-html/cell-10-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="extracting-vital-signs-for-a-single-patient-from-mimic-iii" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="extracting-vital-signs-for-a-single-patient-from-mimic-iii"><span class="header-section-number">5</span> Extracting Vital Signs for a single patient from MIMIC-III</h2>
+<p>It is useful to be able to extract vital signs and medication of a single patient that was admitted to an intensive care unit, for example we might need to extract clinical variables across patients such as lab exams, sign and wave forms, as well as doctor reports and prescriptions. For thsi example we will pick randomly an ICU stay identifier and the corresponding subject identifier. We will then look the data related to this patient and this ICU stay admission.</p>
+<section id="hospital-admission-of-a-single-patient" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="hospital-admission-of-a-single-patient"><span class="header-section-number">5.1</span> 1. Hospital admission of a single patient</h3>
+<p>First of all we would like to get the hospital admission of a single patient during a single ICU stay. We want to have table with the patient’s unique subject identifier, hospital identifier, the admission type, the diagnosis, the ICU stay identifier, the first and last care unit that he/she was admitted to, and the time of admission to the ICU. We also want to choose for our example a patient who died in-hospital.</p>
+<p>We will need the Admissions, Patients, and Icustays tables to collect the information that we need. We join the three tables, and find only the patients who have died i.e.&nbsp;where hospital_expire_flag is 1.</p>
+<div class="cell" data-execution_count="163">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load admissions</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT ad.subject_id, ad.hadm_id, ad.admission_type, ad.diagnosis, </span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">    ic.icustay_id, ic.first_careunit, ic.last_careunit, ic.intime as icu_intime, </span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">    ad.hospital_expire_flag, pa.expire_flag</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">FROM admissions ad</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN icustays ic</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">ON ad.subject_id = ic.subject_id</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN patients pa</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="st">ON ad.subject_id = pa.subject_id</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE ad.hospital_expire_flag = 1 </span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY ic.intime</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>admissions <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the (first few) rows of admissions:</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>admissions.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="163">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>subject_id</th>
+      <th>hadm_id</th>
+      <th>admission_type</th>
+      <th>diagnosis</th>
+      <th>icustay_id</th>
+      <th>first_careunit</th>
+      <th>last_careunit</th>
+      <th>icu_intime</th>
+      <th>hospital_expire_flag</th>
+      <th>expire_flag</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>10102</td>
+      <td>164869</td>
+      <td>EMERGENCY</td>
+      <td>CHRONIC MYELOGENOUS LEUKEMIA;TRANSFUSION REACTION</td>
+      <td>223870</td>
+      <td>MICU</td>
+      <td>MICU</td>
+      <td>2105-06-08 20:06:06</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10076</td>
+      <td>198503</td>
+      <td>EMERGENCY</td>
+      <td>LUNG CANCER;SHORTNESS OF BREATH</td>
+      <td>201006</td>
+      <td>MICU</td>
+      <td>MICU</td>
+      <td>2107-03-24 04:06:14</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>43746</td>
+      <td>167181</td>
+      <td>EMERGENCY</td>
+      <td>METASTIC MELANOMA;ANEMIA</td>
+      <td>289236</td>
+      <td>SICU</td>
+      <td>SICU</td>
+      <td>2111-01-07 16:36:48</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>43746</td>
+      <td>167181</td>
+      <td>EMERGENCY</td>
+      <td>METASTIC MELANOMA;ANEMIA</td>
+      <td>224458</td>
+      <td>SICU</td>
+      <td>SICU</td>
+      <td>2111-01-12 15:26:49</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>42066</td>
+      <td>171628</td>
+      <td>EMERGENCY</td>
+      <td>TRACHEAL STENOSIS</td>
+      <td>244243</td>
+      <td>TSICU</td>
+      <td>TSICU</td>
+      <td>2112-02-04 14:49:33</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="164">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select a single ICU stay. We will select one</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>icustay_id <span class="op">=</span> admissions[<span class="st">'icustay_id'</span>].iloc[<span class="dv">2</span>]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>icustay_id</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="164">
+<pre><code>289236</code></pre>
+</div>
+</div>
+</section>
+<section id="all-charted-events-of-a-single-patient" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="all-charted-events-of-a-single-patient"><span class="header-section-number">5.2</span> 2. All charted events of a single patient</h3>
+<p>Charted events contain information such as heart rate and respiratory rate of a patient. We would like all charted events of a single patient, along with the time of the charted events, the time between admission to the ICU and the charted event, the label corresponding to the event, and the value and measurement unit of the event.</p>
+<p>We need the Chartevents and Icustays tables to get the charted events for a single patient on the ICU. We also join the D_items table to get the label of a charted event. Moreover, we filter on a specific ICU stay ID to get the data for a single patient and single ICU admission.</p>
+<div class="cell" data-execution_count="165">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load chart events</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT  ic.icustay_id, ce.charttime, ce.charttime - ic.intime AS icutime, di.label, ce.value, ce.valuenum, ce.valueuom</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM Chartevents ce</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN D_items as di</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="st">ON ce.itemid = di.itemid</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN icustays ic</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="st">ON ce.icustay_id = ic.icustay_id</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE ic.icustay_id = """</span> <span class="op">+</span> <span class="bu">str</span>(icustay_id) <span class="op">+</span> <span class="st">""" </span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY ce.charttime</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>chartevents <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the (first few) rows of admissions:</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>chartevents.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="165">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>icustay_id</th>
+      <th>charttime</th>
+      <th>icutime</th>
+      <th>label</th>
+      <th>value</th>
+      <th>valuenum</th>
+      <th>valueuom</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>289236</td>
+      <td>2111-01-07 15:00:00</td>
+      <td>-1 days +22:23:12</td>
+      <td>Head of Bed</td>
+      <td>30 Degrees</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>289236</td>
+      <td>2111-01-07 15:00:00</td>
+      <td>-1 days +22:23:12</td>
+      <td>Activity</td>
+      <td>Bedrest</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>289236</td>
+      <td>2111-01-07 15:00:00</td>
+      <td>-1 days +22:23:12</td>
+      <td>Turn</td>
+      <td>Side to Side</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>289236</td>
+      <td>2111-01-07 15:00:00</td>
+      <td>-1 days +22:23:12</td>
+      <td>Assistance Device</td>
+      <td>2 Person Assist</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>289236</td>
+      <td>2111-01-07 15:00:00</td>
+      <td>-1 days +22:23:12</td>
+      <td>Position</td>
+      <td>Left Side</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="all-outputs-recorded-during-an-icu-stay-of-a-single-patient" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="all-outputs-recorded-during-an-icu-stay-of-a-single-patient"><span class="header-section-number">5.3</span> 3. All outputs recorded during an ICU stay of a single patient</h3>
+<p>Output events are also recorded during an ICU stay. We would like to collect the time of the output event, the time since admission to the ICU, the label of the event, the value and the corresponding measurement event.</p>
+<p>The query is similar to the previous query, however, this time we will need the Outputevents table and combine it with the Icustays and D_items tables. We again filter on a specific ICU stay ID to get the data for a single patient and a single ICU stay. The charted time and time of ICU admission are combined to get the time of the output event since the time of ICU admission.</p>
+<div class="cell" data-execution_count="166">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load Output events</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT  ic.icustay_id, oe.charttime, oe.charttime - ic.intime AS icutime, di.label, oe.value, oe.valueuom</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM Outputevents oe</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN D_items as di</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="st">ON oe.itemid = di.itemid</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN icustays ic</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="st">ON oe.icustay_id = ic.icustay_id</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE ic.icustay_id = """</span> <span class="op">+</span> <span class="bu">str</span>(icustay_id) <span class="op">+</span> <span class="st">""" </span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY oe.charttime</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>outputevents <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the (first few) rows of admissions:</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>outputevents.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="166">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>icustay_id</th>
+      <th>charttime</th>
+      <th>icutime</th>
+      <th>label</th>
+      <th>value</th>
+      <th>valueuom</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>289236</td>
+      <td>2111-01-07 17:00:00</td>
+      <td>0 days 00:23:12</td>
+      <td>Pre-Admission</td>
+      <td>194.0</td>
+      <td>mL</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>289236</td>
+      <td>2111-01-07 17:30:00</td>
+      <td>0 days 00:53:12</td>
+      <td>Foley</td>
+      <td>45.0</td>
+      <td>mL</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>289236</td>
+      <td>2111-01-07 18:28:00</td>
+      <td>0 days 01:51:12</td>
+      <td>Pre-Admission</td>
+      <td>194.0</td>
+      <td>mL</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>289236</td>
+      <td>2111-01-07 18:35:00</td>
+      <td>0 days 01:58:12</td>
+      <td>Foley</td>
+      <td>20.0</td>
+      <td>mL</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>289236</td>
+      <td>2111-01-07 19:00:00</td>
+      <td>0 days 02:23:12</td>
+      <td>Foley</td>
+      <td>30.0</td>
+      <td>mL</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="all-inputs-recorded-during-an-icu-stay-of-a-single-patient" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="all-inputs-recorded-during-an-icu-stay-of-a-single-patient"><span class="header-section-number">5.4</span> 4. All inputs recorded during an ICU stay of a single patient</h3>
+<p>Input events could be, for example, the use of medication. We would like to collect all input events for a single patient and ICU stay. We are also interested in the corresponding start and end times of the events, those times relative to ICU admission time, the label of the input event, the amount and measurement unit, and how often the input event (medication) is administered.</p>
+<p>The input events can be found in the Inputevents_mv table. We join this table with the Icustays and D_items tables to get the time of admission to the ICU and label corresponding to the input event. Again, we filter on a specific ICU stay ID to get the data for a single patient and a single ICU stay. We also filter out rewritten input events.</p>
+<div class="cell" data-execution_count="176">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load Input events</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT  ic.icustay_id, ie.starttime, ie.endtime, ie.starttime - ic.intime as icustarttime, ie.endtime - ic.intime as icuendtime, di.label, ie.amount, </span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="st">    ie.amountuom, ie.rate, ie.rateuom, ie.statusdescription</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="st">FROM inputevents_mv ie</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN icustays ic</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="st">ON ie.icustay_id = ic.icustay_id</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN D_items as di</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="st">ON ie.itemid = di.itemid</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE ic.icustay_id = """</span> <span class="op">+</span> <span class="bu">str</span>(icustay_id) <span class="op">+</span> <span class="st">""" </span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="st">AND lower(ie.statusdescription) != 'rewritten'</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY ie.starttime</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>inputevents <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the (first few) rows of admissions:</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>inputevents.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="176">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>icustay_id</th>
+      <th>starttime</th>
+      <th>endtime</th>
+      <th>icustarttime</th>
+      <th>icuendtime</th>
+      <th>label</th>
+      <th>amount</th>
+      <th>amountuom</th>
+      <th>rate</th>
+      <th>rateuom</th>
+      <th>statusdescription</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>289236</td>
+      <td>2111-01-07 16:45:00</td>
+      <td>2111-01-07 16:46:00</td>
+      <td>0 days 00:08:12</td>
+      <td>0 days 00:09:12</td>
+      <td>Pre-Admission Intake</td>
+      <td>3400.000000</td>
+      <td>ml</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>FinishedRunning</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>289236</td>
+      <td>2111-01-07 17:00:00</td>
+      <td>2111-01-08 00:56:00</td>
+      <td>0 days 00:23:12</td>
+      <td>0 days 08:19:12</td>
+      <td>D5 1/2NS</td>
+      <td>991.699971</td>
+      <td>ml</td>
+      <td>125.004198</td>
+      <td>mL/hour</td>
+      <td>FinishedRunning</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>289236</td>
+      <td>2111-01-07 18:00:00</td>
+      <td>2111-01-07 18:01:00</td>
+      <td>0 days 01:23:12</td>
+      <td>0 days 01:24:12</td>
+      <td>NaCl 0.9%</td>
+      <td>500.000000</td>
+      <td>ml</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>FinishedRunning</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>289236</td>
+      <td>2111-01-07 18:30:00</td>
+      <td>2111-01-07 18:31:00</td>
+      <td>0 days 01:53:12</td>
+      <td>0 days 01:54:12</td>
+      <td>Morphine Sulfate</td>
+      <td>2.000000</td>
+      <td>mg</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>FinishedRunning</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>289236</td>
+      <td>2111-01-07 20:13:00</td>
+      <td>2111-01-07 20:43:00</td>
+      <td>0 days 03:36:12</td>
+      <td>0 days 04:06:12</td>
+      <td>Albumin 25%</td>
+      <td>49.999998</td>
+      <td>ml</td>
+      <td>99.999996</td>
+      <td>mL/hour</td>
+      <td>FinishedRunning</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="all-lab-events-recorded-during-an-icu-stay-of-a-single-patient" class="level3" data-number="5.5">
+<h3 data-number="5.5" class="anchored" data-anchor-id="all-lab-events-recorded-during-an-icu-stay-of-a-single-patient"><span class="header-section-number">5.5</span> 5. All lab events recorded during an ICU stay of a single patient</h3>
+<p>Examples of lab events could be the number of red blood cells in the body, or magnesium levels. We want to get all lab events for a single patient and a single ICU stay. We also are interested to see the time of these lab events, time since ICU admission, label, value, and measurement unit.</p>
+<p>Lab events are in the Labevents table. We join the Icustays and D_labitems tables, and filter out any lab events that were recorded before or after the patient was at the ICU.</p>
+<div class="cell" data-execution_count="182">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load lab events</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT  ic.subject_id, ic.icustay_id, le.charttime, le.charttime - ic.intime as icutime, di.label, le.value, le.valuenum, le.valueuom </span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM labevents le</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN icustays ic</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="st">    ON le.subject_id = ic.subject_id</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="st">    AND le.charttime &gt;= ic.intime</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="st">    AND le.charttime &lt;= ic.outtime</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN D_labitems as di</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="st">    ON le.itemid = di.itemid</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE ic.icustay_id = """</span> <span class="op">+</span> <span class="bu">str</span>(icustay_id) <span class="op">+</span> <span class="st">""" </span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY le.charttime</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>labevents <span class="op">=</span> pd.read_sql_query(query,con)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the (first few) rows of admissions:</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>labevents.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="182">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>subject_id</th>
+      <th>icustay_id</th>
+      <th>charttime</th>
+      <th>icutime</th>
+      <th>label</th>
+      <th>value</th>
+      <th>valuenum</th>
+      <th>valueuom</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>43746</td>
+      <td>289236</td>
+      <td>2111-01-07 17:23:00</td>
+      <td>0 days 00:46:12</td>
+      <td>Specific Gravity</td>
+      <td>1.024</td>
+      <td>1.024</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>43746</td>
+      <td>289236</td>
+      <td>2111-01-07 17:23:00</td>
+      <td>0 days 00:46:12</td>
+      <td>GR HOLD</td>
+      <td>HOLD</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>43746</td>
+      <td>289236</td>
+      <td>2111-01-07 17:23:00</td>
+      <td>0 days 00:46:12</td>
+      <td>Creatinine</td>
+      <td>1.9</td>
+      <td>1.900</td>
+      <td>mg/dL</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>43746</td>
+      <td>289236</td>
+      <td>2111-01-07 17:23:00</td>
+      <td>0 days 00:46:12</td>
+      <td>Glucose</td>
+      <td>NEG</td>
+      <td>NaN</td>
+      <td>mg/dL</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>43746</td>
+      <td>289236</td>
+      <td>2111-01-07 17:23:00</td>
+      <td>0 days 00:46:12</td>
+      <td>Glucose</td>
+      <td>139</td>
+      <td>139.000</td>
+      <td>mg/dL</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

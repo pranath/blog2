@@ -1,0 +1,19 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "LivingDataLab"
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/pranath
+      - icon: twitter
+        href: https://twitter.com/LivingDataLab
+format:
+  html:
+    theme: flatly
+    css: styles.css
+    link-external-icon: true
+    link-external-newwindow: true
