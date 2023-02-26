@@ -62,8 +62,30 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
 
 <link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="LivingDataLab - Study Designs in Epidemiology">
+<meta property="og:description" content="In this article, we will learn about the main epidemiological study designs, including cross-sectional and ecological studies, case-control and cohort studies, as well as the more complex nested…">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/epidemiology2.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Study Designs in Epidemiology">
+<meta name="twitter:description" content="In this article, we will learn about the main epidemiological study designs, including cross-sectional and ecological studies, case-control and cohort studies, as well as the more complex nested…">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/epidemiology2.jpg">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-fixed">
@@ -471,7 +493,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }

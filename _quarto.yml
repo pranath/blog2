@@ -4,6 +4,11 @@ project:
 
 website:
   title: "LivingDataLab"
+  description: 'Professional Blog of Pranath Fernando, Data Scientist'
+  site-url: 'http://livingdatalab.com'
+  twitter-card: true
+  open-graph: true
+  google-analytics: "UA-91568149-1"
   navbar:
     right:
       - about.qmd

@@ -71,7 +71,7 @@ ul.task-list li input[type="checkbox"] {
 
     const options = {
       valueNames: ['listing-image','listing-date','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      page: 25,
+      page: 10,
     pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
       searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
@@ -91,9 +91,27 @@ ul.task-list li input[type="checkbox"] {
   })
   </script>
 
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="styles.css">
+<link rel="alternate" type="application/rss+xml" title="LivingDataLab" href="index.xml"><meta property="og:title" content="LivingDataLab -">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab -">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-fixed">
@@ -402,7 +420,7 @@ Jan 15, 2023
 </div>
 <div class="quarto-post image-right" data-index="10" data-categories="fastai,fastai-2022,deep-learning,mathematics" data-listing-date-sort="1671235200000" data-listing-file-modified-sort="1677431700756" data-listing-reading-time-sort="15.97">
 <div class="thumbnail">
-<p><a href="./posts/2022-12-17-machine-learning-to-deep-learning-from-scratch.html"> <img src="https://github.com/pranath/blog/raw/master/images/ml_v_dl.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-12-17-machine-learning-to-deep-learning-from-scratch.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ml_v_dl.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-12-17-machine-learning-to-deep-learning-from-scratch.html">
@@ -427,7 +445,7 @@ Dec 17, 2022
 </div>
 <div class="quarto-post image-right" data-index="11" data-categories="fastai,fastai-2022,deep-learning,natural-language-processing" data-listing-date-sort="1670630400000" data-listing-file-modified-sort="1677431650566" data-listing-reading-time-sort="7.675">
 <div class="thumbnail">
-<p><a href="./posts/2022-12-10-us-patent-phrase-to-phrase-matching.html"> <img src="https://github.com/pranath/blog/raw/master/images/ai_text.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-12-10-us-patent-phrase-to-phrase-matching.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ai_text.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-12-10-us-patent-phrase-to-phrase-matching.html">
@@ -452,7 +470,7 @@ Dec 10, 2022
 </div>
 <div class="quarto-post image-right" data-index="12" data-categories="fastai,fastai-2022,deep-learning" data-listing-date-sort="1670198400000" data-listing-file-modified-sort="1677433570386" data-listing-reading-time-sort="2.655">
 <div class="thumbnail">
-<p><a href="./posts/2022-12-05-using-ai-to-identify-galaxies.html"> <img src="https://github.com/pranath/blog/raw/master/images/spiral_galaxy.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-12-05-using-ai-to-identify-galaxies.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/spiral_galaxy.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-12-05-using-ai-to-identify-galaxies.html">
@@ -477,7 +495,7 @@ Dec 5, 2022
 </div>
 <div class="quarto-post image-right" data-index="13" data-categories="health" data-listing-date-sort="1659740400000" data-listing-file-modified-sort="1677433503262" data-listing-reading-time-sort="11.115">
 <div class="thumbnail">
-<p><a href="./posts/2022-08-06-predicting-10-year-death-risk-health-data.html"> <img src="https://github.com/pranath/blog/raw/master/images/epidemiology2.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-08-06-predicting-10-year-death-risk-health-data.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/epidemiology2.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-08-06-predicting-10-year-death-risk-health-data.html">
@@ -502,7 +520,7 @@ Aug 6, 2022
 </div>
 <div class="quarto-post image-right" data-index="14" data-categories="health" data-listing-date-sort="1654902000000" data-listing-file-modified-sort="1677433498549" data-listing-reading-time-sort="6.28">
 <div class="thumbnail">
-<p><a href="./posts/2022-06-11-a-prognostic-risk-score-model-for-retinopathy-in-diabetes-patients.html"> <img src="https://github.com/pranath/blog/raw/master/images/artificial-intelligence-medical.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-06-11-a-prognostic-risk-score-model-for-retinopathy-in-diabetes-patients.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/artificial-intelligence-medical.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-06-11-a-prognostic-risk-score-model-for-retinopathy-in-diabetes-patients.html">
@@ -527,7 +545,7 @@ Jun 11, 2022
 </div>
 <div class="quarto-post image-right" data-index="15" data-categories="health,deep-learning" data-listing-date-sort="1653174000000" data-listing-file-modified-sort="1677431388395" data-listing-reading-time-sort="11.925">
 <div class="thumbnail">
-<p><a href="./posts/2022-05-22-evaluation-diagnostic-medical-models.html"> <img src="https://github.com/pranath/blog/raw/master/images/ai_health.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-05-22-evaluation-diagnostic-medical-models.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ai_health.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-05-22-evaluation-diagnostic-medical-models.html">
@@ -552,7 +570,7 @@ May 22, 2022
 </div>
 <div class="quarto-post image-right" data-index="16" data-categories="health,deep-learning" data-listing-date-sort="1652569200000" data-listing-file-modified-sort="1677431236065" data-listing-reading-time-sort="12.405">
 <div class="thumbnail">
-<p><a href="./posts/2022-05-15-medical-diagnosis-chest-xrays.html"> <img src="https://github.com/pranath/blog/raw/master/images/ai-chest-xray.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-05-15-medical-diagnosis-chest-xrays.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ai-chest-xray.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-05-15-medical-diagnosis-chest-xrays.html">
@@ -577,7 +595,7 @@ May 15, 2022
 </div>
 <div class="quarto-post image-right" data-index="17" data-categories="health,electronic-health-records" data-listing-date-sort="1647561600000" data-listing-file-modified-sort="1677431129254" data-listing-reading-time-sort="10.14">
 <div class="thumbnail">
-<p><a href="./posts/2022-03-18-the-international-classification-of-disease.html"> <img src="https://github.com/pranath/blog/raw/master/images/ehr4.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-03-18-the-international-classification-of-disease.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ehr4.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-03-18-the-international-classification-of-disease.html">
@@ -602,7 +620,7 @@ Mar 18, 2022
 </div>
 <div class="quarto-post image-right" data-index="18" data-categories="health,electronic-health-records" data-listing-date-sort="1647302400000" data-listing-file-modified-sort="1677431040850" data-listing-reading-time-sort="8.035">
 <div class="thumbnail">
-<p><a href="./posts/2022-03-15-mimic-clinicial-outcomes-patient-data.html"> <img src="https://github.com/pranath/blog/raw/master/images/ehr2.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-03-15-mimic-clinicial-outcomes-patient-data.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ehr2.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-03-15-mimic-clinicial-outcomes-patient-data.html">
@@ -627,7 +645,7 @@ Mar 15, 2022
 </div>
 <div class="quarto-post image-right" data-index="19" data-categories="health,electronic-health-records" data-listing-date-sort="1647216000000" data-listing-file-modified-sort="1677430955696" data-listing-reading-time-sort="13">
 <div class="thumbnail">
-<p><a href="./posts/2022-03-14-using-mimic3-ehr-database.html"> <img src="https://github.com/pranath/blog/raw/master/images/ehr3.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-03-14-using-mimic3-ehr-database.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ehr3.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-03-14-using-mimic3-ehr-database.html">
@@ -652,7 +670,7 @@ Mar 14, 2022
 </div>
 <div class="quarto-post image-right" data-index="20" data-categories="health,electronic-health-records" data-listing-date-sort="1647216000000" data-listing-file-modified-sort="1677430825609" data-listing-reading-time-sort="10.09">
 <div class="thumbnail">
-<p><a href="./posts/2022-03-14-data-ehr-healthcare.html"> <img src="https://github.com/pranath/blog/raw/master/images/ehr.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-03-14-data-ehr-healthcare.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ehr.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-03-14-data-ehr-healthcare.html">
@@ -677,7 +695,7 @@ Mar 14, 2022
 </div>
 <div class="quarto-post image-right" data-index="21" data-categories="health,epidemiology" data-listing-date-sort="1646524800000" data-listing-file-modified-sort="1677430748753" data-listing-reading-time-sort="29.645">
 <div class="thumbnail">
-<p><a href="./posts/2022-03-06-validity-bias-epidemiology.html"> <img src="https://github.com/pranath/blog/raw/master/images/epidemiology3.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-03-06-validity-bias-epidemiology.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/epidemiology3.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-03-06-validity-bias-epidemiology.html">
@@ -702,7 +720,7 @@ Mar 6, 2022
 </div>
 <div class="quarto-post image-right" data-index="22" data-categories="health,epidemiology" data-listing-date-sort="1646352000000" data-listing-file-modified-sort="1677430695918" data-listing-reading-time-sort="24.505">
 <div class="thumbnail">
-<p><a href="./posts/2022-03-04-study-designs-in-epidemiology.html"> <img src="https://github.com/pranath/blog/raw/master/images/epidemiology2.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-03-04-study-designs-in-epidemiology.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/epidemiology2.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-03-04-study-designs-in-epidemiology.html">
@@ -727,7 +745,7 @@ Mar 4, 2022
 </div>
 <div class="quarto-post image-right" data-index="23" data-categories="health,epidemiology" data-listing-date-sort="1645488000000" data-listing-file-modified-sort="1677430327352" data-listing-reading-time-sort="32.23">
 <div class="thumbnail">
-<p><a href="./posts/2022-02-22-measuring-disease-in-epidemiology.html"> <img src="https://github.com/pranath/blog/raw/master/images/epidemiology.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-02-22-measuring-disease-in-epidemiology.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/epidemiology.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-02-22-measuring-disease-in-epidemiology.html">
@@ -752,7 +770,7 @@ Feb 22, 2022
 </div>
 <div class="quarto-post image-right" data-index="24" data-categories="health,deep-learning" data-listing-date-sort="1644105600000" data-listing-file-modified-sort="1677430143286" data-listing-reading-time-sort="2.085">
 <div class="thumbnail">
-<p><a href="./posts/2022-02-06-predict-alzheimers-3d-medical-imaging.html"> <img src="https://github.com/pranath/blog/raw/master/images/ai-mri.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/2022-02-06-predict-alzheimers-3d-medical-imaging.html"> <img data-src="https://github.com/pranath/blog/raw/master/images/ai-mri.jpg" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/2022-02-06-predict-alzheimers-3d-medical-imaging.html">
@@ -1440,7 +1458,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
