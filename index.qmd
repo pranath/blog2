@@ -1,5 +1,5 @@
 ---
-title: "Blog of Pranath Fernando - Data Scientist"
+title: "LivingDataLab Data Science Blog"
 listing:
   contents: posts
   sort: "date desc"

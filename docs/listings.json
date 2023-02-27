@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-02-24-custom-models-human-loop-pipelines-aws-augmented-ai.html",
       "/posts/2023-02-22-advanced-model-deployment-on-aws.html",
       "/posts/2023-02-14-optimize-models-in-the-cloud-using-aws-automatic-model-tuning.html",
       "/posts/2023-02-12-building-aws-sagemaker-pipeline-train-deploy-bert-text-classifier.html",
@@ -12,6 +13,7 @@
       "/posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify.html",
       "/posts/2023-02-03-loading-transforming-clothes-reviews-text-aws.html",
       "/posts/2023-01-15-using-satellite-images-and-deep-learning-to-track-deforestation-in-the-amazon.html",
+      "/posts/2023-01-08-nlp-text-classification-without-deep-learning-for-business-applications.html",
       "/posts/2022-12-17-machine-learning-to-deep-learning-from-scratch.html",
       "/posts/2022-12-10-us-patent-phrase-to-phrase-matching.html",
       "/posts/2022-12-05-using-ai-to-identify-galaxies.html",

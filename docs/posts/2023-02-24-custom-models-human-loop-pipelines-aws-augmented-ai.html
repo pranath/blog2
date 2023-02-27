@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-02-24">
+<meta name="description" content="In this project we will create our own human workforce, a human task UI, and then define the human review workflow to perform data labeling for an ML task.">
+
+<title>LivingDataLab - Custom Models and human-in-the-loop pipelines with AWS Augmented AI (A2I)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="LivingDataLab - Custom Models and human-in-the-loop pipelines with AWS Augmented AI (A2I)">
+<meta property="og:description" content="In this project we will create our own human workforce, a human task UI, and then define the human review workflow to perform data labeling for an ML task.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/aws4.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Custom Models and human-in-the-loop pipelines with AWS Augmented AI (A2I)">
+<meta name="twitter:description" content="In this project we will create our own human workforce, a human task UI, and then define the human review workflow to perform data labeling for an ML task.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/aws4.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Custom Models and human-in-the-loop pipelines with AWS Augmented AI (A2I)</h1>
+                  <div>
+        <div class="description">
+          In this project we will create our own human workforce, a human task UI, and then define the human review workflow to perform data labeling for an ML task.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">aws</div>
+                <div class="quarto-category">cloud-data-science</div>
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">February 24, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#set-up-amazon-cognito-user-pool-and-define-human-workforce" id="toc-set-up-amazon-cognito-user-pool-and-define-human-workforce" class="nav-link" data-scroll-target="#set-up-amazon-cognito-user-pool-and-define-human-workforce"><span class="toc-section-number">2</span>  Set up Amazon Cognito user pool and define human workforce</a>
+  <ul class="collapse">
+  <li><a href="#create-amazon-cognito-user-pool" id="toc-create-amazon-cognito-user-pool" class="nav-link" data-scroll-target="#create-amazon-cognito-user-pool"><span class="toc-section-number">2.1</span>  Create Amazon Cognito user pool</a></li>
+  <li><a href="#create-amazon-cognito-user-pool-client" id="toc-create-amazon-cognito-user-pool-client" class="nav-link" data-scroll-target="#create-amazon-cognito-user-pool-client"><span class="toc-section-number">2.2</span>  Create Amazon Cognito user pool client</a></li>
+  <li><a href="#create-amazon-cognito-user-pool-domain-and-group" id="toc-create-amazon-cognito-user-pool-domain-and-group" class="nav-link" data-scroll-target="#create-amazon-cognito-user-pool-domain-and-group"><span class="toc-section-number">2.3</span>  Create Amazon Cognito user pool domain and group</a></li>
+  <li><a href="#create-workforce-and-workteam" id="toc-create-workforce-and-workteam" class="nav-link" data-scroll-target="#create-workforce-and-workteam"><span class="toc-section-number">2.4</span>  Create workforce and workteam</a></li>
+  <li><a href="#create-an-amazon-cognito-user-and-add-the-user-to-the-group" id="toc-create-an-amazon-cognito-user-and-add-the-user-to-the-group" class="nav-link" data-scroll-target="#create-an-amazon-cognito-user-and-add-the-user-to-the-group"><span class="toc-section-number">2.5</span>  Create an Amazon Cognito user and add the user to the group</a></li>
+  </ul></li>
+  <li><a href="#create-human-task-ui" id="toc-create-human-task-ui" class="nav-link" data-scroll-target="#create-human-task-ui"><span class="toc-section-number">3</span>  Create Human Task UI</a></li>
+  <li><a href="#define-human-review-workflow" id="toc-define-human-review-workflow" class="nav-link" data-scroll-target="#define-human-review-workflow"><span class="toc-section-number">4</span>  Define human review workflow</a></li>
+  <li><a href="#start-human-loop-with-custom-ml-model" id="toc-start-human-loop-with-custom-ml-model" class="nav-link" data-scroll-target="#start-human-loop-with-custom-ml-model"><span class="toc-section-number">5</span>  Start human loop with custom ML model</a>
+  <ul class="collapse">
+  <li><a href="#start-the-human-loop" id="toc-start-the-human-loop" class="nav-link" data-scroll-target="#start-the-human-loop"><span class="toc-section-number">5.1</span>  Start the human loop</a></li>
+  <li><a href="#check-status-of-the-human-loop" id="toc-check-status-of-the-human-loop" class="nav-link" data-scroll-target="#check-status-of-the-human-loop"><span class="toc-section-number">5.2</span>  Check status of the human loop</a></li>
+  <li><a href="#complete-the-human-loop-tasks" id="toc-complete-the-human-loop-tasks" class="nav-link" data-scroll-target="#complete-the-human-loop-tasks"><span class="toc-section-number">5.3</span>  Complete the human loop tasks</a></li>
+  <li><a href="#verify-that-the-human-loops-were-completed-by-the-workforce" id="toc-verify-that-the-human-loops-were-completed-by-the-workforce" class="nav-link" data-scroll-target="#verify-that-the-human-loops-were-completed-by-the-workforce"><span class="toc-section-number">5.4</span>  Verify that the human loops were completed by the workforce</a></li>
+  <li><a href="#view-human-labels-and-prepare-the-data-for-re-training" id="toc-view-human-labels-and-prepare-the-data-for-re-training" class="nav-link" data-scroll-target="#view-human-labels-and-prepare-the-data-for-re-training"><span class="toc-section-number">5.5</span>  View human labels and prepare the data for re-training</a></li>
+  </ul></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">6</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In <a href="../#category=aws">earlier articles we introduced AWS cloud services for data science</a>, and showed how it can help with different stages of the data science &amp; machine learning workflow.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/aws_ds_workflow.png" title="The AWS Data Science Workflow" class="img-fluid"></p>
+<p>In this project we will create our own human workforce, a human task UI, and then define the human review workflow to perform data labeling for an ML task. We will make the original predictions of the labels with the custom ML model, and then create a human loop if the probability scores are lower than the preset threshold. After the completion of the human loop tasks, we will review the results and prepare data for re-training.</p>
+<p>Let’s install and import the required modules.</p>
+<div class="cell" data-tags="[]" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> boto3</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sagemaker</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pprint <span class="im">import</span> pprint</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> botocore</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> botocore.config.Config(user_agent_extra<span class="op">=</span><span class="st">'dlai-pds/c3/w3'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># low-level service client of the boto3 session</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> boto3.client(service_name<span class="op">=</span><span class="st">'sagemaker'</span>, </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                  config<span class="op">=</span>config)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>sm_runtime <span class="op">=</span> boto3.client(<span class="st">'sagemaker-runtime'</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                          config<span class="op">=</span>config)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>sess <span class="op">=</span> sagemaker.Session(sagemaker_client<span class="op">=</span>sm,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                         sagemaker_runtime_client<span class="op">=</span>sm_runtime)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>bucket <span class="op">=</span> sess.default_bucket()</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>role <span class="op">=</span> sagemaker.get_execution_role()</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> sess.boto_region_name</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>s3 <span class="op">=</span> boto3.Session().client(service_name<span class="op">=</span><span class="st">'s3'</span>, </span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>                            config<span class="op">=</span>config)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>cognito_idp <span class="op">=</span> boto3.Session().client(service_name<span class="op">=</span><span class="st">'cognito-idp'</span>, </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                                     config<span class="op">=</span>config)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>a2i <span class="op">=</span> boto3.Session().client(service_name<span class="op">=</span><span class="st">'sagemaker-a2i-runtime'</span>, </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>                             config<span class="op">=</span>config)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="set-up-amazon-cognito-user-pool-and-define-human-workforce" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="set-up-amazon-cognito-user-pool-and-define-human-workforce"><span class="header-section-number">2</span> Set up Amazon Cognito user pool and define human workforce</h2>
+<p>The first step in the creation of the human-in-the-loop pipeline will be to create our own private workforce.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/human-loop-workflow-1-workforce.png" title="Human in the loop workforce" class="img-fluid"></p>
+<p>Amazon Cognito provides authentication, authorization, and user management for apps. This enables our workers to sign in directly to the labeling UI with a username and password.</p>
+<p>We will construct an Amazon Cognito user pool, setting up its client, domain, and group. Then we’ll create a SageMaker workforce, linking it to the Cognito user pool. Followed by the creation of a SageMaker workteam, linking it to the Cognito user pool and group. And finally, we will create a pool user and add it to the group.</p>
+<p>To get started, let’s construct the user pool and user pool client names.</p>
+<div class="cell" data-tags="[]" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>timestamp <span class="op">=</span> <span class="bu">int</span>(time.time())</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>user_pool_name <span class="op">=</span> <span class="st">'groundtruth-user-pool-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>user_pool_client_name <span class="op">=</span> <span class="st">'groundtruth-user-pool-client-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Amazon Cognito user pool name: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(user_pool_name))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Amazon Cognito user pool client name: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(user_pool_client_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Amazon Cognito user pool name: groundtruth-user-pool-1677153775
+Amazon Cognito user pool client name: groundtruth-user-pool-client-1677153775</code></pre>
+</div>
+</div>
+<section id="create-amazon-cognito-user-pool" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="create-amazon-cognito-user-pool"><span class="header-section-number">2.1</span> Create Amazon Cognito user pool</h3>
+<p>The function <code>cognito_idp.create_user_pool</code> creates a new Amazon Cognito user pool. Passing the function result into a variable we can get the information about the response. The result is in dictionary format.</p>
+<div class="cell" data-tags="[]" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>create_user_pool_response <span class="op">=</span> cognito_idp.create_user_pool(PoolName<span class="op">=</span>user_pool_name)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>user_pool_id <span class="op">=</span> create_user_pool_response[<span class="st">'UserPool'</span>][<span class="st">'Id'</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Amazon Cognito user pool ID: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(user_pool_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Amazon Cognito user pool ID: us-east-1_8s0SOCEPn</code></pre>
+</div>
+</div>
+<p>Let’s pull the Amazon Cognito user pool name from its description.</p>
+<div class="cell" data-tags="[]" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(create_user_pool_response[<span class="st">'UserPool'</span>].keys())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>dict_keys(['Id', 'Name', 'Policies', 'DeletionProtection', 'LambdaConfig', 'LastModifiedDate', 'CreationDate', 'SchemaAttributes', 'VerificationMessageTemplate', 'UserAttributeUpdateSettings', 'MfaConfiguration', 'EstimatedNumberOfUsers', 'EmailConfiguration', 'AdminCreateUserConfig', 'Arn'])</code></pre>
+</div>
+</div>
+<div class="cell" data-tags="[]" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>user_pool_name <span class="op">=</span> create_user_pool_response[<span class="st">'UserPool'</span>][<span class="st">'Name'</span>] </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Amazon Cognito user pool name: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(user_pool_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Amazon Cognito user pool name: groundtruth-user-pool-1677153775</code></pre>
+</div>
+</div>
+</section>
+<section id="create-amazon-cognito-user-pool-client" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="create-amazon-cognito-user-pool-client"><span class="header-section-number">2.2</span> Create Amazon Cognito user pool client</h3>
+<p>Now let’s set up the Amazon Cognito user pool client for the created above user pool.</p>
+<p>The Amazon Cognito user pool client implements an open standard for authorization framework, <code>OAuth</code>. The standard enables apps to obtain limited access (scopes) to a user’s data without giving away a user’s password. It decouples authentication from authorization and supports multiple use cases addressing different device capabilities.</p>
+<p>Lets create the Amazon Cognito user pool client for the constructed user pool.</p>
+<div class="cell" data-tags="[]" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>create_user_pool_client_response <span class="op">=</span> cognito_idp.create_user_pool_client( <span class="co"># Replace None</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    UserPoolId<span class="op">=</span>user_pool_id, </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    ClientName<span class="op">=</span>user_pool_client_name, </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    GenerateSecret<span class="op">=</span><span class="va">True</span>, <span class="co"># boolean to specify whether you want to generate a secret</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># a list of provider names for the identity providers that are supported on this client, e.g. Cognito, Facebook, Google</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    SupportedIdentityProviders<span class="op">=</span>[</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'COGNITO'</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># a list of the allowed OAuth flows, e.g. code, implicit, client_credentials</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    AllowedOAuthFlows<span class="op">=</span>[</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'code'</span>,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'implicit'</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># a list of the allowed OAuth scopes, e.g. phone, email, openid, and profile</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    AllowedOAuthScopes<span class="op">=</span>[</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">'email'</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">'openid'</span>,</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">'profile'</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># a list of allowed redirect (callback) URLs for the identity providers</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    CallbackURLs<span class="op">=</span>[</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datascienceonaws.com'</span>, </span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># set to true if the client is allowed to follow the OAuth protocol when interacting with Cognito user pools</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    AllowedOAuthFlowsUserPoolClient<span class="op">=</span><span class="va">True</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>client_id <span class="op">=</span> create_user_pool_client_response[<span class="st">'UserPoolClient'</span>][<span class="st">'ClientId'</span>]</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Amazon Cognito user pool client ID: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(client_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Amazon Cognito user pool client ID: 4ebq1ga0irfdvssomfjhbh5fgq</code></pre>
+</div>
+</div>
+</section>
+<section id="create-amazon-cognito-user-pool-domain-and-group" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="create-amazon-cognito-user-pool-domain-and-group"><span class="header-section-number">2.3</span> Create Amazon Cognito user pool domain and group</h3>
+<p>Now we set up the Amazon Cognito user pool domain for the constructed user pool.</p>
+<div class="cell" data-tags="[]" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>user_pool_domain_name <span class="op">=</span> <span class="st">'groundtruth-user-pool-domain-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    cognito_idp.create_user_pool_domain( </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        UserPoolId<span class="op">=</span>user_pool_id, </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        Domain<span class="op">=</span>user_pool_domain_name </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Created Amazon Cognito user pool domain: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(user_pool_domain_name))</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span>:</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Amazon Cognito user pool domain </span><span class="sc">{}</span><span class="st"> already exists"</span>.<span class="bu">format</span>(user_pool_domain_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Created Amazon Cognito user pool domain: groundtruth-user-pool-domain-1677153775</code></pre>
+</div>
+</div>
+<p>We will use the following function to check if the Amazon Cognito user group already exists.</p>
+<div class="cell" data-tags="[]" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_user_pool_group_existence(user_pool_id, user_pool_group_name):  </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> group <span class="kw">in</span> cognito_idp.list_groups(UserPoolId<span class="op">=</span>user_pool_id)[<span class="st">'Groups'</span>]:</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> user_pool_group_name <span class="op">==</span> group[<span class="st">'GroupName'</span>]:</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we will set up the Amazon Cognito user group.</p>
+<div class="cell" data-tags="[]" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>user_pool_group_name <span class="op">=</span> <span class="st">'groundtruth-user-pool-group-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> check_user_pool_group_existence(user_pool_id, user_pool_group_name):</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    cognito_idp.create_group( </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        UserPoolId<span class="op">=</span>user_pool_id, </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        GroupName<span class="op">=</span>user_pool_group_name</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Created Amazon Cognito user group: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(user_pool_group_name))</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Amazon Cognito user group </span><span class="sc">{}</span><span class="st"> already exists"</span>.<span class="bu">format</span>(user_pool_group_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Created Amazon Cognito user group: groundtruth-user-pool-group-1677153775</code></pre>
+</div>
+</div>
+</section>
+<section id="create-workforce-and-workteam" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="create-workforce-and-workteam"><span class="header-section-number">2.4</span> Create workforce and workteam</h3>
+<p>We can use the following function to check if the workforce already exists. We can only create one workforce per region, therefore we’ll have to delete any other existing workforce, together with all of the related workteams.</p>
+<div class="cell" data-tags="[]" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_workforce_existence(workforce_name):  </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> workforce <span class="kw">in</span> sm.list_workforces()[<span class="st">'Workforces'</span>]:</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> workforce_name <span class="op">==</span> workforce[<span class="st">'WorkforceName'</span>]:</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> workteam <span class="kw">in</span> sm.list_workteams()[<span class="st">'Workteams'</span>]:</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                sm.delete_workteam(WorkteamName<span class="op">=</span>workteam[<span class="st">'WorkteamName'</span>])</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>            sm.delete_workforce(WorkforceName<span class="op">=</span>workforce[<span class="st">'WorkforceName'</span>])</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Lets create a workforce.</p>
+<div class="cell" data-tags="[]" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>workforce_name <span class="op">=</span> <span class="st">'groundtruth-workforce-name-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> check_workforce_existence(workforce_name):</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    create_workforce_response <span class="op">=</span> sm.create_workforce(</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        WorkforceName<span class="op">=</span>workforce_name,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        CognitoConfig<span class="op">=</span>{</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">'UserPool'</span>: user_pool_id, </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">'ClientId'</span>: client_id</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Workforce name: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(workforce_name))</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    pprint(create_workforce_response)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Workforce </span><span class="sc">{}</span><span class="st"> already exists"</span>.<span class="bu">format</span>(workforce_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Workforce name: groundtruth-workforce-name-1677153775
+{'ResponseMetadata': {'HTTPHeaders': {'content-length': '107',
+                                      'content-type': 'application/x-amz-json-1.1',
+                                      'date': 'Thu, 23 Feb 2023 12:04:42 GMT',
+                                      'x-amzn-requestid': '8e749026-4d1e-4758-949a-ab78fdfaafbe'},
+                      'HTTPStatusCode': 200,
+                      'RequestId': '8e749026-4d1e-4758-949a-ab78fdfaafbe',
+                      'RetryAttempts': 0},
+ 'WorkforceArn': 'arn:aws:sagemaker:us-east-1:753124839657:workforce/groundtruth-workforce-name-1677153775'}</code></pre>
+</div>
+</div>
+<p>You can use the <code>sm.describe_workforce</code> function to get the information about the workforce.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>describe_workforce_response <span class="op">=</span> sm.describe_workforce(WorkforceName<span class="op">=</span>workforce_name)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>describe_workforce_response</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We use the following function to check if the workteam already exists. If there are no workteams in the list, we will give some time for the workforce to set up.</p>
+<div class="cell" data-tags="[]" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_workteam_existence(workteam_name):  </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sm.list_workteams()[<span class="st">'Workteams'</span>]:</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> workteam <span class="kw">in</span> sm.list_workteams()[<span class="st">'Workteams'</span>]:</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> workteam_name <span class="op">==</span> workteam[<span class="st">'WorkteamName'</span>]:</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">60</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now lets create a workteam.</p>
+<div class="cell" data-tags="[]" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>workteam_name <span class="op">=</span> <span class="st">'groundtruth-workteam-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> check_workteam_existence(workteam_name):</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    create_workteam_response <span class="op">=</span> sm.create_workteam(</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        Description<span class="op">=</span><span class="st">'groundtruth workteam'</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>        WorkforceName<span class="op">=</span>workforce_name,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        WorkteamName<span class="op">=</span>workteam_name,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># objects that identify the workers that make up the work team</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        MemberDefinitions<span class="op">=</span>[{</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">'CognitoMemberDefinition'</span>: {</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>                <span class="st">'UserPool'</span>: user_pool_id, </span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">'ClientId'</span>: client_id, </span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>                <span class="st">'UserGroup'</span>: user_pool_group_name </span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        }]</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    pprint(create_workteam_response)</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Workteam </span><span class="sc">{}</span><span class="st"> already exists"</span>.<span class="bu">format</span>(workteam_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'ResponseMetadata': {'HTTPHeaders': {'content-length': '113',
+                                      'content-type': 'application/x-amz-json-1.1',
+                                      'date': 'Thu, 23 Feb 2023 12:06:06 GMT',
+                                      'x-amzn-requestid': 'bd89c3fa-45bb-439b-aa33-f2c685e69d8a'},
+                      'HTTPStatusCode': 200,
+                      'RequestId': 'bd89c3fa-45bb-439b-aa33-f2c685e69d8a',
+                      'RetryAttempts': 0},
+ 'WorkteamArn': 'arn:aws:sagemaker:us-east-1:753124839657:workteam/private-crowd/groundtruth-workteam-1677153775'}</code></pre>
+</div>
+</div>
+<p>We can use the <code>sm.describe_workteam</code> function to get information about the workteam.</p>
+<div class="cell" data-tags="[]" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>describe_workteam_response <span class="op">=</span> sm.describe_workteam(WorkteamName<span class="op">=</span>workteam_name)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>describe_workteam_response</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<pre><code>{'Workteam': {'WorkteamName': 'groundtruth-workteam-1677153775',
+  'MemberDefinitions': [{'CognitoMemberDefinition': {'UserPool': 'us-east-1_8s0SOCEPn',
+     'UserGroup': 'groundtruth-user-pool-group-1677153775',
+     'ClientId': '4ebq1ga0irfdvssomfjhbh5fgq'}}],
+  'WorkteamArn': 'arn:aws:sagemaker:us-east-1:753124839657:workteam/private-crowd/groundtruth-workteam-1677153775',
+  'Description': 'groundtruth workteam',
+  'SubDomain': 'aqa042udc1.labeling.us-east-1.sagemaker.aws',
+  'CreateDate': datetime.datetime(2023, 2, 23, 12, 6, 5, 715000, tzinfo=tzlocal()),
+  'LastUpdatedDate': datetime.datetime(2023, 2, 23, 12, 6, 7, 175000, tzinfo=tzlocal()),
+  'NotificationConfiguration': {}},
+ 'ResponseMetadata': {'RequestId': '615a618f-d243-4c27-a8d5-f94290f6c790',
+  'HTTPStatusCode': 200,
+  'HTTPHeaders': {'x-amzn-requestid': '615a618f-d243-4c27-a8d5-f94290f6c790',
+   'content-type': 'application/x-amz-json-1.1',
+   'content-length': '544',
+   'date': 'Thu, 23 Feb 2023 12:06:06 GMT'},
+  'RetryAttempts': 0}}</code></pre>
+</div>
+</div>
+<p>Now we can pull the workteam ARN either from <code>create_workteam_response</code> or <code>describe_workteam_response</code>.</p>
+<div class="cell" data-tags="[]" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>workteam_arn <span class="op">=</span> describe_workteam_response[<span class="st">'Workteam'</span>][<span class="st">'WorkteamArn'</span>]</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>workteam_arn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>'arn:aws:sagemaker:us-east-1:753124839657:workteam/private-crowd/groundtruth-workteam-1677153775'</code></pre>
+</div>
+</div>
+</section>
+<section id="create-an-amazon-cognito-user-and-add-the-user-to-the-group" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="create-an-amazon-cognito-user-and-add-the-user-to-the-group"><span class="header-section-number">2.5</span> Create an Amazon Cognito user and add the user to the group</h3>
+<p>We will use the following function to check if the Amazon Cognito user already exists.</p>
+<div class="cell" data-tags="[]" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_user_existence(user_pool_id, user_name):  </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> user <span class="kw">in</span> cognito_idp.list_users(UserPoolId<span class="op">=</span>user_pool_id)[<span class="st">'Users'</span>]:</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> user_name <span class="op">==</span> user[<span class="st">'Username'</span>]:</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we create a user passing the username, temporary password, and the Amazon Cognito user pool ID.</p>
+<div class="cell" data-tags="[]" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>user_name <span class="op">=</span> <span class="st">'user-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>temporary_password <span class="op">=</span> <span class="st">'Password@420'</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> check_user_existence(user_pool_id, user_name):</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    create_user_response<span class="op">=</span>cognito_idp.admin_create_user(</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        Username<span class="op">=</span>user_name,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>        UserPoolId<span class="op">=</span>user_pool_id,</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>        TemporaryPassword<span class="op">=</span>temporary_password,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>        MessageAction<span class="op">=</span><span class="st">'SUPPRESS'</span> <span class="co"># suppress sending the invitation message to a user that already exists</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    pprint(create_user_response)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Amazon Cognito user </span><span class="sc">{}</span><span class="st"> already exists"</span>.<span class="bu">format</span>(user_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'ResponseMetadata': {'HTTPHeaders': {'connection': 'keep-alive',
+                                      'content-length': '242',
+                                      'content-type': 'application/x-amz-json-1.1',
+                                      'date': 'Thu, 23 Feb 2023 12:06:07 GMT',
+                                      'x-amzn-requestid': '9799ecf1-9400-4385-a696-f3067a8ee4ab'},
+                      'HTTPStatusCode': 200,
+                      'RequestId': '9799ecf1-9400-4385-a696-f3067a8ee4ab',
+                      'RetryAttempts': 0},
+ 'User': {'Attributes': [{'Name': 'sub',
+                          'Value': '7e22b0c1-059a-45b4-b69a-e1b378950097'}],
+          'Enabled': True,
+          'UserCreateDate': datetime.datetime(2023, 2, 23, 12, 6, 7, 848000, tzinfo=tzlocal()),
+          'UserLastModifiedDate': datetime.datetime(2023, 2, 23, 12, 6, 7, 848000, tzinfo=tzlocal()),
+          'UserStatus': 'FORCE_CHANGE_PASSWORD',
+          'Username': 'user-1677153775'}}</code></pre>
+</div>
+</div>
+<p>Add the user into the Amazon Cognito user group.</p>
+<div class="cell" data-tags="[]" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>cognito_idp.admin_add_user_to_group(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    UserPoolId<span class="op">=</span>user_pool_id,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    Username<span class="op">=</span>user_name,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    GroupName<span class="op">=</span>user_pool_group_name</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>{'ResponseMetadata': {'RequestId': '18dd685f-63f6-4d5b-8f81-cd22d9304a5e',
+  'HTTPStatusCode': 200,
+  'HTTPHeaders': {'date': 'Thu, 23 Feb 2023 12:06:08 GMT',
+   'content-type': 'application/x-amz-json-1.1',
+   'content-length': '0',
+   'connection': 'keep-alive',
+   'x-amzn-requestid': '18dd685f-63f6-4d5b-8f81-cd22d9304a5e'},
+  'RetryAttempts': 0}}</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="create-human-task-ui" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="create-human-task-ui"><span class="header-section-number">3</span> Create Human Task UI</h2>
+<p><img src="https://github.com/pranath/blog/raw/master/images/human-loop-workflow-2-taskUI.png" title="Human in the loop Workflow" class="img-fluid"></p>
+<p>We will create a Human Task UI resource, using a worker task UI template. This template will be rendered to the human workers whenever human interaction is required.</p>
+<p>Below there is a simple template, that is compatible with the current use case of classifying product reviews into the three sentiment classes. For other pre-built UIs (there are 70+), check: https://github.com/aws-samples/amazon-a2i-sample-task-uis</p>
+<div class="cell" data-tags="[]" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>template <span class="op">=</span> <span class="vs">r"""</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="vs">&lt;script src="https://assets.crowd.aws/crowd-html-elements.js"&gt;&lt;/script&gt;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="vs">&lt;crowd-form&gt;</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="vs">    &lt;crowd-classifier name="sentiment"</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="vs">                      categories="['-1', '0', '1']"</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="vs">                      initial-value="</span><span class="sc">{{</span><span class="vs"> task.input.initialValue </span><span class="sc">}}</span><span class="vs">"</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="vs">                      header="Classify Reviews into Sentiment:  -1 (negative), 0 (neutral), and 1 (positive)"&gt;</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="vs">      </span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="vs">        &lt;classification-target&gt;</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="vs">            </span><span class="sc">{{</span><span class="vs"> task.input.taskObject </span><span class="sc">}}</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="vs">        &lt;/classification-target&gt;</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="vs">      </span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="vs">        &lt;full-instructions header="Classify reviews into sentiment:  -1 (negative), 0 (neutral), and 1 (positive)"&gt;</span></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="vs">            &lt;p&gt;&lt;strong&gt;1&lt;/strong&gt;: joy, excitement, delight&lt;/p&gt;       </span></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="vs">            &lt;p&gt;&lt;strong&gt;0&lt;/strong&gt;: neither positive or negative, such as stating a fact&lt;/p&gt;</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a><span class="vs">            &lt;p&gt;&lt;strong&gt;-1&lt;/strong&gt;: anger, sarcasm, anxiety&lt;/p&gt;</span></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a><span class="vs">        &lt;/full-instructions&gt;</span></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="vs">        &lt;short-instructions&gt;</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="vs">            Classify reviews into sentiment:  -1 (negative), 0 (neutral), and 1 (positive)</span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a><span class="vs">        &lt;/short-instructions&gt;</span></span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a><span class="vs">    &lt;/crowd-classifier&gt;</span></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a><span class="vs">&lt;/crowd-form&gt;</span></span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="vs">"""</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will now create a human task UI resource.</p>
+<div class="cell" data-tags="[]" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Task UI name - this value is unique per account and region. </span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>task_ui_name <span class="op">=</span> <span class="st">'ui-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>human_task_ui_response <span class="op">=</span> sm.create_human_task_ui(</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    HumanTaskUiName<span class="op">=</span>task_ui_name,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    UiTemplate<span class="op">=</span>{</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Content"</span>: template  </span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>human_task_ui_response</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>{'HumanTaskUiArn': 'arn:aws:sagemaker:us-east-1:753124839657:human-task-ui/ui-1677153775',
+ 'ResponseMetadata': {'RequestId': 'a3561000-dec3-44de-b527-1c26ea8b443d',
+  'HTTPStatusCode': 200,
+  'HTTPHeaders': {'x-amzn-requestid': 'a3561000-dec3-44de-b527-1c26ea8b443d',
+   'content-type': 'application/x-amz-json-1.1',
+   'content-length': '89',
+   'date': 'Thu, 23 Feb 2023 12:06:08 GMT'},
+  'RetryAttempts': 0}}</code></pre>
+</div>
+</div>
+<p>Pull the ARN of the human task UI:</p>
+<div class="cell" data-tags="[]" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>human_task_ui_arn <span class="op">=</span> human_task_ui_response[<span class="st">"HumanTaskUiArn"</span>]</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(human_task_ui_arn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>arn:aws:sagemaker:us-east-1:753124839657:human-task-ui/ui-1677153775</code></pre>
+</div>
+</div>
+</section>
+<section id="define-human-review-workflow" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="define-human-review-workflow"><span class="header-section-number">4</span> Define human review workflow</h2>
+<p><img src="https://github.com/pranath/blog/raw/master/images/human-loop-workflow-3-review.png" title="Human in the loop Workflow" class="img-fluid"></p>
+<p>In this section, we are going to create a Flow Definition. A flow Definitions allows you to specify:</p>
+<ul>
+<li>The workforce (in fact, it is a workteam) that our tasks will be sent to.</li>
+<li>The instructions that our workforce will receive (worker task template).</li>
+<li>The configuration of our worker tasks, including the number of workers that receive a task and time limits to complete tasks.</li>
+<li>Where our output data will be stored.</li>
+</ul>
+<p>Here we are going to use the API, but we can optionally create this workflow definition in the console as well.</p>
+<p>For more details and instructions, see: https://docs.aws.amazon.com/sagemaker/latest/dg/a2i-create-flow-definition.html.</p>
+<p>Let’s construct the S3 bucket output path.</p>
+<div class="cell" data-tags="[]" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>output_path <span class="op">=</span> <span class="st">'s3://</span><span class="sc">{}</span><span class="st">/a2i-results-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(bucket, timestamp)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(output_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>s3://sagemaker-us-east-1-753124839657/a2i-results-1677153775</code></pre>
+</div>
+</div>
+<p>Lets construct the Flow Definition with the workteam and human task UI in the human loop configurations that we created above.</p>
+<div class="cell" data-tags="[]" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Flow definition name - this value is unique per account and region</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>flow_definition_name <span class="op">=</span> <span class="st">'fd-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>create_workflow_definition_response <span class="op">=</span> sm.create_flow_definition(</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    FlowDefinitionName<span class="op">=</span>flow_definition_name,</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    RoleArn<span class="op">=</span>role,</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    HumanLoopConfig<span class="op">=</span>{</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"WorkteamArn"</span>: workteam_arn, </span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"HumanTaskUiArn"</span>: human_task_ui_arn, </span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"TaskCount"</span>: <span class="dv">1</span>, <span class="co"># the number of workers that receive a task</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"TaskDescription"</span>: <span class="st">"Classify Reviews into sentiment:  -1 (negative), 0 (neutral), 1 (positive)"</span>,</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"TaskTitle"</span>: <span class="st">"Classify Reviews into sentiment:  -1 (negative), 0 (neutral), 1 (positive)"</span>,</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    OutputConfig<span class="op">=</span>{<span class="st">"S3OutputPath"</span>: output_path},</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>augmented_ai_flow_definition_arn <span class="op">=</span> create_workflow_definition_response[<span class="st">"FlowDefinitionArn"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>You can pull information about the Flow Definition with the function <code>sm.describe_flow_definition</code> and wait for its status value <code>FlowDefinitionStatus</code> to become <code>Active</code>.</p>
+<div class="cell" data-scrolled="true" data-tags="[]" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">60</span>):</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    describe_flow_definition_response <span class="op">=</span> sm.describe_flow_definition(FlowDefinitionName<span class="op">=</span>flow_definition_name)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(describe_flow_definition_response[<span class="st">"FlowDefinitionStatus"</span>])</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> describe_flow_definition_response[<span class="st">"FlowDefinitionStatus"</span>] <span class="op">==</span> <span class="st">"Active"</span>:</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Flow Definition is active"</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Active
+Flow Definition is active</code></pre>
+</div>
+</div>
+</section>
+<section id="start-human-loop-with-custom-ml-model" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="start-human-loop-with-custom-ml-model"><span class="header-section-number">5</span> Start human loop with custom ML model</h2>
+<p><img src="https://github.com/pranath/blog/raw/master/images/human-loop-workflow-4-start.png" title="Human in the loop Workflow" class="img-fluid"></p>
+<p>We will now deploy a custom ML model into an endpoint and call it to predict labels for some sample reviews. We need to check the confidence score for each prediction. If it is smaller than the threshold, we will engage our workforce for a human review, starting a human loop. We can fix the labels by completing the human loop tasks and review the results.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/augmented-ai-loop.png" title="Human in the loop Workflow" class="img-fluid"></p>
+<p>Lets set up a sentiment predictor class to be wrapped later into the PyTorch Model.</p>
+<div class="cell" data-tags="[]" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.predictor <span class="im">import</span> Predictor</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.serializers <span class="im">import</span> JSONLinesSerializer</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.deserializers <span class="im">import</span> JSONLinesDeserializer</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SentimentPredictor(Predictor):</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, endpoint_name, sagemaker_session):</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>            endpoint_name, </span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>            sagemaker_session<span class="op">=</span>sagemaker_session,</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>            serializer<span class="op">=</span>JSONLinesSerializer(), </span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>            deserializer<span class="op">=</span>JSONLinesDeserializer() </span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we create a SageMaker model based on the model artifact saved in the S3 bucket.</p>
+<div class="cell" data-tags="[]" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.pytorch.model <span class="im">import</span> PyTorchModel</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>pytorch_model_name <span class="op">=</span> <span class="st">'model-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> PyTorchModel(name<span class="op">=</span>pytorch_model_name,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>                     model_data<span class="op">=</span><span class="st">'s3://dlai-practical-data-science/models/ab/variant_a/model.tar.gz'</span>,</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>                     predictor_cls<span class="op">=</span>SentimentPredictor,</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>                     entry_point<span class="op">=</span><span class="st">'inference.py'</span>,</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>                     source_dir<span class="op">=</span><span class="st">'src'</span>,</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>                     framework_version<span class="op">=</span><span class="st">'1.6.0'</span>,</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>                     py_version<span class="op">=</span><span class="st">'py3'</span>,</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>                     role<span class="op">=</span>role)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we will create a SageMaker Endpoint from the model. For the purposes of this project, we will use a relatively small instance type. Please refer to <a href="https://aws.amazon.com/sagemaker/pricing/">this link</a> for additional instance types that may work for your use cases outside of this lab.</p>
+<div class="cell" data-tags="[]" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>pytorch_endpoint_name <span class="op">=</span> <span class="st">'endpoint-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>predictor <span class="op">=</span> model.deploy(initial_instance_count<span class="op">=</span><span class="dv">1</span>, </span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>                         instance_type<span class="op">=</span><span class="st">'ml.m5.large'</span>, </span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>                         endpoint_name<span class="op">=</span>pytorch_endpoint_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>----------!CPU times: user 2min 15s, sys: 9.67 s, total: 2min 24s
+Wall time: 7min 24s</code></pre>
+</div>
+</div>
+<section id="start-the-human-loop" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="start-the-human-loop"><span class="header-section-number">5.1</span> Start the human loop</h3>
+<p>Let’s create a list of sample reviews.</p>
+<div class="cell" data-tags="[]" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>reviews <span class="op">=</span> [<span class="st">"I enjoy this product"</span>, </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>           <span class="st">"I am unhappy with this product"</span>, </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>           <span class="st">"It is okay"</span>, </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>           <span class="st">"sometimes it works"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can send each of the sample reviews to the model via the <code>predictor.predict()</code> API call. Note that we need to pass the reviews in the JSON format that model expects as input. Then, we parse the model’s response to obtain the predicted label and the confidence score.</p>
+<p>After that, we check the condition for when you want to engage a human for review. We can check whether the returned confidence score is under the defined threshold of 90%, which would mean that we would want to start the human loop with the predicted label and the review as inputs. Finally, we start the human loop passing the input content and Flow Definition defined above.</p>
+<div class="cell" data-tags="[]" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>human_loops_started <span class="op">=</span> []</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>CONFIDENCE_SCORE_THRESHOLD <span class="op">=</span> <span class="fl">0.90</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> review <span class="kw">in</span> reviews:</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> [</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"features"</span>: [review]},</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> predictor.predict(inputs)</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(response)</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>    prediction <span class="op">=</span> response[<span class="dv">0</span>][<span class="st">'predicted_label'</span>]</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>    confidence_score <span class="op">=</span> response[<span class="dv">0</span>][<span class="st">'probability'</span>]</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Checking prediction confidence </span><span class="sc">{}</span><span class="st"> for sample review: "</span><span class="sc">{}</span><span class="st">"'</span>.<span class="bu">format</span>(confidence_score, review))</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># condition for when we want to engage a human for review</span></span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> confidence_score <span class="op">&lt;</span> CONFIDENCE_SCORE_THRESHOLD:</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>        human_loop_name <span class="op">=</span> <span class="bu">str</span>(time.time()).replace(<span class="st">'.'</span>, <span class="st">'-'</span>) <span class="co"># using milliseconds</span></span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>        input_content <span class="op">=</span> {</span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"initialValue"</span>: prediction, </span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>            <span class="st">"taskObject"</span>: review </span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>        start_loop_response <span class="op">=</span> a2i.start_human_loop(</span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>            HumanLoopName<span class="op">=</span>human_loop_name,</span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>            FlowDefinitionArn<span class="op">=</span>augmented_ai_flow_definition_arn,</span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>            HumanLoopInput<span class="op">=</span>{<span class="st">"InputContent"</span>: json.dumps(input_content)},</span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>        human_loops_started.append(human_loop_name)</span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(</span>
+<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"Confidence score of </span><span class="sc">{</span>confidence_score <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="ss">% for prediction of </span><span class="sc">{</span>prediction<span class="sc">}</span><span class="ss"> is less than the threshold of </span><span class="sc">{</span>CONFIDENCE_SCORE_THRESHOLD <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="ss">%"</span></span>
+<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"*** ==&gt; Starting human loop with name: </span><span class="sc">{</span>human_loop_name<span class="sc">}</span><span class="ss">  </span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb48-38"><a href="#cb48-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb48-39"><a href="#cb48-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(</span>
+<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"Confidence score of </span><span class="sc">{</span>confidence_score <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="ss">% for star rating of </span><span class="sc">{</span>prediction<span class="sc">}</span><span class="ss"> is above threshold of </span><span class="sc">{</span>CONFIDENCE_SCORE_THRESHOLD <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="ss">%"</span></span>
+<span id="cb48-41"><a href="#cb48-41" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb48-42"><a href="#cb48-42" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Human loop not needed. </span><span class="ch">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[{'probability': 0.9376369118690491, 'predicted_label': 1}]
+Checking prediction confidence 0.9376369118690491 for sample review: "I enjoy this product"
+Confidence score of 93.76369118690491% for star rating of 1 is above threshold of 90.0%
+Human loop not needed. 
+
+[{'probability': 0.6340296864509583, 'predicted_label': -1}]
+Checking prediction confidence 0.6340296864509583 for sample review: "I am unhappy with this product"
+Confidence score of 63.402968645095825% for prediction of -1 is less than the threshold of 90.0%
+*** ==&gt; Starting human loop with name: 1677154445-9813657  
+
+[{'probability': 0.5422114729881287, 'predicted_label': 1}]
+Checking prediction confidence 0.5422114729881287 for sample review: "It is okay"
+Confidence score of 54.221147298812866% for prediction of 1 is less than the threshold of 90.0%
+*** ==&gt; Starting human loop with name: 1677154446-4558146  
+
+[{'probability': 0.3931102454662323, 'predicted_label': 1}]
+Checking prediction confidence 0.3931102454662323 for sample review: "sometimes it works"
+Confidence score of 39.31102454662323% for prediction of 1 is less than the threshold of 90.0%
+*** ==&gt; Starting human loop with name: 1677154446-8940263  
+</code></pre>
+</div>
+</div>
+<p>Three of the sample reviews with the probability scores lower than the threshold went into the human loop. The original predicted labels are passed together with the review text and will be seen in the task.</p>
+</section>
+<section id="check-status-of-the-human-loop" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="check-status-of-the-human-loop"><span class="header-section-number">5.2</span> Check status of the human loop</h3>
+<p>Function <code>a2i.describe_human_loop</code> can be used to pull the information about the human loop.</p>
+<div class="cell" data-tags="[]" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>completed_human_loops <span class="op">=</span> []</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> human_loop_name <span class="kw">in</span> human_loops_started:</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> a2i.describe_human_loop(HumanLoopName<span class="op">=</span>human_loop_name)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"HumanLoop Name: </span><span class="sc">{</span>human_loop_name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'HumanLoop Status: </span><span class="sc">{</span>resp[<span class="st">"HumanLoopStatus"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'HumanLoop Output Destination: </span><span class="sc">{</span>resp[<span class="st">"HumanLoopOutput"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">""</span>)</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> resp[<span class="st">"HumanLoopStatus"</span>] <span class="op">==</span> <span class="st">"Completed"</span>:</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>        completed_human_loops.append(resp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>HumanLoop Name: 1677154445-9813657
+HumanLoop Status: InProgress
+HumanLoop Output Destination: {'OutputS3Uri': 's3://sagemaker-us-east-1-753124839657/a2i-results-1677153775/fd-1677153775/2023/02/23/12/14/06/1677154445-9813657/output.json'}
+
+HumanLoop Name: 1677154446-4558146
+HumanLoop Status: InProgress
+HumanLoop Output Destination: {'OutputS3Uri': 's3://sagemaker-us-east-1-753124839657/a2i-results-1677153775/fd-1677153775/2023/02/23/12/14/06/1677154446-4558146/output.json'}
+
+HumanLoop Name: 1677154446-8940263
+HumanLoop Status: InProgress
+HumanLoop Output Destination: {'OutputS3Uri': 's3://sagemaker-us-east-1-753124839657/a2i-results-1677153775/fd-1677153775/2023/02/23/12/14/06/1677154446-8940263/output.json'}
+</code></pre>
+</div>
+</div>
+</section>
+<section id="complete-the-human-loop-tasks" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="complete-the-human-loop-tasks"><span class="header-section-number">5.3</span> Complete the human loop tasks</h3>
+<p>Now we will pull the labeling UI from the workteam information to get into the human loop tasks in the AWS console.</p>
+<div class="cell" data-tags="[]" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>labeling_ui <span class="op">=</span> sm.describe_workteam(WorkteamName<span class="op">=</span>workteam_name)[<span class="st">"Workteam"</span>][<span class="st">"SubDomain"</span>]</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(labeling_ui)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>aqa042udc1.labeling.us-east-1.sagemaker.aws</code></pre>
+</div>
+</div>
+<p>We will navigate to a link and login with the defined username and password.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/label-data-job-instructions.png" title="Human in the loop Workflow" class="img-fluid"></p>
+</section>
+<section id="verify-that-the-human-loops-were-completed-by-the-workforce" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="verify-that-the-human-loops-were-completed-by-the-workforce"><span class="header-section-number">5.4</span> Verify that the human loops were completed by the workforce</h3>
+<div class="cell" data-tags="[]" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>completed_human_loops <span class="op">=</span> []</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> human_loop_name <span class="kw">in</span> human_loops_started:</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> a2i.describe_human_loop(HumanLoopName<span class="op">=</span>human_loop_name)</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"HumanLoop Name: </span><span class="sc">{</span>human_loop_name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'HumanLoop Status: </span><span class="sc">{</span>resp[<span class="st">"HumanLoopStatus"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'HumanLoop Output Destination: </span><span class="sc">{</span>resp[<span class="st">"HumanLoopOutput"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">""</span>)</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> resp[<span class="st">"HumanLoopStatus"</span>] <span class="op">!=</span> <span class="st">"Completed"</span>:</span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Waiting for HumanLoop to complete."</span>)</span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">10</span>)</span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>        resp <span class="op">=</span> a2i.describe_human_loop(HumanLoopName<span class="op">=</span>human_loop_name)</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> resp[<span class="st">"HumanLoopStatus"</span>] <span class="op">==</span> <span class="st">"Completed"</span>:</span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>        completed_human_loops.append(resp)</span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Completed!"</span>)</span>
+<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>HumanLoop Name: 1677154445-9813657
+HumanLoop Status: InProgress
+HumanLoop Output Destination: {'OutputS3Uri': 's3://sagemaker-us-east-1-753124839657/a2i-results-1677153775/fd-1677153775/2023/02/23/12/14/06/1677154445-9813657/output.json'}
+
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Waiting for HumanLoop to complete.
+Completed!
+
+HumanLoop Name: 1677154446-4558146
+HumanLoop Status: Completed
+HumanLoop Output Destination: {'OutputS3Uri': 's3://sagemaker-us-east-1-753124839657/a2i-results-1677153775/fd-1677153775/2023/02/23/12/14/06/1677154446-4558146/output.json'}
+
+Completed!
+
+HumanLoop Name: 1677154446-8940263
+HumanLoop Status: Completed
+HumanLoop Output Destination: {'OutputS3Uri': 's3://sagemaker-us-east-1-753124839657/a2i-results-1677153775/fd-1677153775/2023/02/23/12/14/06/1677154446-8940263/output.json'}
+
+Completed!
+</code></pre>
+</div>
+</div>
+<p><strong>This process ^^ above ^^ will not complete until we label the data following the instructions above.</strong></p>
+</section>
+<section id="view-human-labels-and-prepare-the-data-for-re-training" class="level3" data-number="5.5">
+<h3 data-number="5.5" class="anchored" data-anchor-id="view-human-labels-and-prepare-the-data-for-re-training"><span class="header-section-number">5.5</span> View human labels and prepare the data for re-training</h3>
+<p>Once the work is complete, Amazon A2I stores the results in the specified S3 bucket and sends a Cloudwatch Event. Let’s check the S3 contents.</p>
+<div class="cell" data-scrolled="true" data-tags="[]" data-execution_count="46">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pprint <span class="im">import</span> pprint</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>fixed_items <span class="op">=</span> []</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> resp <span class="kw">in</span> completed_human_loops:</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    split_string <span class="op">=</span> re.split(<span class="st">"s3://"</span> <span class="op">+</span> bucket <span class="op">+</span> <span class="st">"/"</span>, resp[<span class="st">"HumanLoopOutput"</span>][<span class="st">"OutputS3Uri"</span>])</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>    output_bucket_key <span class="op">=</span> split_string[<span class="dv">1</span>]</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> s3.get_object(Bucket<span class="op">=</span>bucket, Key<span class="op">=</span>output_bucket_key)</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>    content <span class="op">=</span> response[<span class="st">"Body"</span>].read().decode(<span class="st">"utf-8"</span>)</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>    json_output <span class="op">=</span> json.loads(content)</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>    pprint(json_output)</span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>    input_content <span class="op">=</span> json_output[<span class="st">"inputContent"</span>]</span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>    human_answer <span class="op">=</span> json_output[<span class="st">"humanAnswers"</span>][<span class="dv">0</span>][<span class="st">"answerContent"</span>]</span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>    fixed_item <span class="op">=</span> {<span class="st">"input_content"</span>: input_content, <span class="st">"human_answer"</span>: human_answer}</span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>    fixed_items.append(fixed_item)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'flowDefinitionArn': 'arn:aws:sagemaker:us-east-1:753124839657:flow-definition/fd-1677153775',
+ 'humanAnswers': [{'acceptanceTime': '2023-02-23T12:16:28.736Z',
+                   'answerContent': {'sentiment': {'label': '-1'}},
+                   'submissionTime': '2023-02-23T12:16:33.547Z',
+                   'timeSpentInSeconds': 4.811,
+                   'workerId': '0e31fea759d04da1',
+                   'workerMetadata': {'identityData': {'identityProviderType': 'Cognito',
+                                                       'issuer': 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_8s0SOCEPn',
+                                                       'sub': '7e22b0c1-059a-45b4-b69a-e1b378950097'}}}],
+ 'humanLoopName': '1677154445-9813657',
+ 'inputContent': {'initialValue': -1,
+                  'taskObject': 'I am unhappy with this product'}}
+{'flowDefinitionArn': 'arn:aws:sagemaker:us-east-1:753124839657:flow-definition/fd-1677153775',
+ 'humanAnswers': [{'acceptanceTime': '2023-02-23T12:16:06.376Z',
+                   'answerContent': {'sentiment': {'label': '0'}},
+                   'submissionTime': '2023-02-23T12:16:23.626Z',
+                   'timeSpentInSeconds': 17.25,
+                   'workerId': '0e31fea759d04da1',
+                   'workerMetadata': {'identityData': {'identityProviderType': 'Cognito',
+                                                       'issuer': 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_8s0SOCEPn',
+                                                       'sub': '7e22b0c1-059a-45b4-b69a-e1b378950097'}}}],
+ 'humanLoopName': '1677154446-4558146',
+ 'inputContent': {'initialValue': 1, 'taskObject': 'It is okay'}}
+{'flowDefinitionArn': 'arn:aws:sagemaker:us-east-1:753124839657:flow-definition/fd-1677153775',
+ 'humanAnswers': [{'acceptanceTime': '2023-02-23T12:16:23.694Z',
+                   'answerContent': {'sentiment': {'label': '0'}},
+                   'submissionTime': '2023-02-23T12:16:28.668Z',
+                   'timeSpentInSeconds': 4.974,
+                   'workerId': '0e31fea759d04da1',
+                   'workerMetadata': {'identityData': {'identityProviderType': 'Cognito',
+                                                       'issuer': 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_8s0SOCEPn',
+                                                       'sub': '7e22b0c1-059a-45b4-b69a-e1b378950097'}}}],
+ 'humanLoopName': '1677154446-8940263',
+ 'inputContent': {'initialValue': 1, 'taskObject': 'sometimes it works'}}</code></pre>
+</div>
+</div>
+<p>Now we can prepare the data for re-training.</p>
+<div class="cell" data-tags="[]" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>df_fixed_items <span class="op">=</span> pd.DataFrame(fixed_items)  </span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>df_fixed_items.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="47">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>input_content</th>
+      <th>human_answer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>{'initialValue': -1, 'taskObject': 'I am unhap...</td>
+      <td>{'sentiment': {'label': '-1'}}</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>{'initialValue': 1, 'taskObject': 'It is okay'}</td>
+      <td>{'sentiment': {'label': '0'}}</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>{'initialValue': 1, 'taskObject': 'sometimes i...</td>
+      <td>{'sentiment': {'label': '0'}}</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="acknowledgements" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">6</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the great <a href="https://www.deeplearning.ai/courses/practical-data-science-specialization/">Deep Learning AI Practical Data Science on AWS Specialisation Course</a> which i completed, and acknowledge the use of some images and other materials from the training course in this article.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
