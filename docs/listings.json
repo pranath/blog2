@@ -2,6 +2,8 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-03-02-improving-seq2seq-language-models-using-dot-product-attention.html",
+      "/posts/2023-03-01-improving-seq2seq-language-models-using-basic-attention.html",
       "/posts/2023-02-24-custom-models-human-loop-pipelines-aws-augmented-ai.html",
       "/posts/2023-02-22-advanced-model-deployment-on-aws.html",
       "/posts/2023-02-14-optimize-models-in-the-cloud-using-aws-automatic-model-tuning.html",
