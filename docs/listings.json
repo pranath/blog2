@@ -2,6 +2,12 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-03-28-using-an-efficient-transformer-to-create-an-interactive-complex-chatbot.html",
+      "/posts/2023-03-27-reversable-residual-networks-for-transformer-models.html",
+      "/posts/2023-03-26-making-more-efficient-transformers-with-reversable-layers-and-lsh.html",
+      "/posts/2023-03-25-customising-a-chatbot-with-fine-tuning-and-huggingface-pre-trained-models.html",
+      "/posts/2023-03-24-creating-a-chatbot-with-huggingface-pre-trained-models.html",
+      "/posts/2023-03-22-implementing-the-t5-text-transfomer-model.html",
       "/posts/2023-03-18-creating-transformer-model-for-text-summarisation.html",
       "/posts/2023-03-11-implementing-gpt2-a-transformer-decoder-nlp-model.html",
       "/posts/2023-03-04-three-types-of-attention-for-transformer-nlp-models.html",
