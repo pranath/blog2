@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-03-29-a-basic-overview-of-transfomer-models.html",
       "/posts/2023-03-28-using-an-efficient-transformer-to-create-an-interactive-complex-chatbot.html",
       "/posts/2023-03-27-reversable-residual-networks-for-transformer-models.html",
       "/posts/2023-03-26-making-more-efficient-transformers-with-reversable-layers-and-lsh.html",

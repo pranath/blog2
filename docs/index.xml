@@ -10,7 +10,94 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description></description>
 <generator>quarto-1.2.335</generator>
-<lastBuildDate>Mon, 27 Mar 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 28 Mar 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>An Introduction to the Transformer Model - The power behind recent advances in AI</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-03-29-a-basic-overview-of-transfomer-models.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>AI and Deep Learning Models are behind recent applications such as Chat-GPT and GPT-4 which have amazed the world, and have created exciting possibilities for applications for business and society. But how do these models actually work? Most of the explanations online are deeply techincal which can make these models hard to understand for many people. Admitedly, most of my own previous articles on <a href="../#category=natural-language-processing">this topic</a> have also gone more into the technical details of how these models work, yet I also believe the essence of these models can be explained without any technical details or code. The main technology behind these recent advances is something called the <em>Transfomer Model</em> which was first created in 2017.</p>
+<p>In this article, I aim to give a high-level and non-technical overview of how transfomer models work, and the types of tasks they can peform.</p>
+</section>
+<section id="where-did-transfomer-models-come-from" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="where-did-transfomer-models-come-from"><span class="header-section-number">2</span> Where did Transfomer Models come from</h2>
+<p>Transfomer models came from within a sub-discipline of AI called <strong>Natural Language Processing</strong>. Its the part of AI concerned with <a href="https://www.ibm.com/uk-en/topics/natural-language-processing">giving computers the ability to understand text and spoken words in much the same way human beings</a> which has been an active area of research <a href="https://en.wikipedia.org/wiki/Natural_language_processing">since the 1950’s</a>.</p>
+<p>In 2015 the team behind Google Translate <a href="https://acutrans.com/history-of-google-translate/#:~:text=However%2C%20in%202006%20Google%20launched,good%2C%20but%20they%20were%20convenient">started using Neural Networks for machine translation for human languages</a> which did much better than previous methods. Yet even this method had some limitations, most notably something called the <a href="https://livingdatalab.com/posts/2023-03-01-improving-seq2seq-language-models-using-basic-attention.html">information bottleneck</a> issue that basically meant as the text you wanted to translate got longer it became more difficult to translate the text well.</p>
+<p>In 2017 the Google Brain team announced the creation of a new Transfomer architecture in the now famous research paper <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>. They developed this specically to solve the problem with Google Translate and the ‘information bottlneck’ that had issues translating longer texts. The new Transformer model was easily able to translate longer and longer texts with no problems, and its important to understand that the original intention of this research was to solve this problem.</p>
+<p>Yet this radically new model in AI created great excitement in the field, and many other researchers started to try it out to solve different types of problems such as in computer vision, voice recognition and more with great success - including most recently Chat-GPT and GPT-4. In fact it has now been so successful in so many areas, some are starting to consider if Transfomers could even be a general purpose problem solving model. It’s certainly worth noting this is one of the greatest examples of the value of free, open and collaberative scientific research, which enables researchers to build on and experiment with the work of others, leading to unexpected benefits.</p>
+</section>
+<section id="what-can-transformer-models-do" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="what-can-transformer-models-do"><span class="header-section-number">3</span> What can Transformer Models do</h2>
+<p>Transfomer models are being used for many tasks and problems currently including:</p>
+<ul>
+<li>Text Classification</li>
+<li>Sentiment Analysis</li>
+<li>Machine translation</li>
+<li>Named entity recognition (NER)</li>
+<li>Text summarization</li>
+<li>Text generation</li>
+<li>Question &amp; answering</li>
+<li>Biological sequence analysis</li>
+<li>Computer Vision</li>
+<li>Time Series Analysis</li>
+<li>Video understanding</li>
+</ul>
+</section>
+<section id="what-is-a-transfomer-model" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="what-is-a-transfomer-model"><span class="header-section-number">4</span> What is a Transfomer Model</h2>
+<p>Recall that Transfomers were orginally created to help improve machine translation, so translating from one sequence of text to another sequence of text.</p>
+<p>A Transfomer model is primarily composed of two blocks:</p>
+<ul>
+<li>Encoder (left): The encoder receives an input and builds a representation of it (its features). This means that the model is optimized to acquire understanding from the input.</li>
+<li>Decoder (right): The decoder uses the encoder’s representation (features) along with other inputs to generate a target sequence. This means that the model is optimized for generating outputs.</li>
+</ul>
+<p>Each of these parts can be used independently or together, depending on the task:</p>
+<p><img src="http://livingdatalab.com/posts/https:/github.com/pranath/blog/raw/master/images/hf_transfomers1.png"></p>
+<ul>
+<li><strong>Encoder-only models:</strong> Good for tasks that require understanding of the input, such as sentence classification and named entity recognition.</li>
+<li><strong>Decoder-only models:</strong> Good for generative tasks such as text generation.</li>
+<li><strong>Encoder-decoder models or sequence-to-sequence models:</strong> Good for generative tasks that require an input, such as translation or summarization.</li>
+</ul>
+<p>The original use of this for machine translation - so was therefore an encoder-decoder type transformer model.</p>
+</section>
+<section id="attention-layers" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="attention-layers"><span class="header-section-number">5</span> Attention Layers</h2>
+<p>A key feature of Transformer models is that they are built with special layers called attention layers. In fact, the title of the paper introducing the Transformer architecture was “Attention Is All You Need”. Here, all we need to know is that this layer will tell the model to pay specific attention to certain words in the sentence you passed it (and more or less ignore the others) when dealing with the representation of each word.</p>
+<p>To put this into context, consider the task of translating text from English to French. Given the input “You like this course”, a translation model will need to also attend to the adjacent word “You” to get the proper translation for the word “like”, because in French the verb “like” is conjugated differently depending on the subject. The rest of the sentence, however, is not useful for the translation of that word. In the same vein, when translating “this” the model will also need to pay attention to the word “course”, because “this” translates differently depending on whether the associated noun is masculine or feminine. Again, the other words in the sentence will not matter for the translation of “this”. With more complex sentences (and more complex grammar rules), the model would need to pay special attention to words that might appear farther away in the sentence to properly translate each word.</p>
+<p>The same concept applies to any task associated with natural language: a word by itself has a meaning, but that meaning is deeply affected by the context, which can be any other word (or words) before or after the word being studied.</p>
+<p>Now that we have an idea of what attention layers are all about, let’s take a closer look at the Transformer architecture.</p>
+</section>
+<section id="the-original-architecture" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="the-original-architecture"><span class="header-section-number">6</span> The Original Architecture</h2>
+<p>The Transformer architecture was originally designed for translation as we described previously. During training, the encoder receives inputs (sentences) in a certain language, while the decoder receives the same sentences in the desired target language. In the encoder, the attention layers can use all the words in a sentence (since, as we just saw, the translation of a given word can be dependent on what is after as well as before it in the sentence). The decoder, however, works sequentially and can only pay attention to the words in the sentence that it has already translated (so, only the words before the word currently being generated). For example, when we have predicted the first three words of the translated target, we give them to the decoder which then uses all the inputs of the encoder to try to predict the fourth word.</p>
+<p>To speed things up during training (when the model has access to target sentences), the decoder is fed the whole target, but it is not allowed to use future words (if it had access to the word at position 2 when trying to predict the word at position 2, the problem would not be very hard!). For instance, when trying to predict the fourth word, the attention layer will only have access to the words in positions 1 to 3.</p>
+<p>The original Transformer architecture looked like this, with the encoder on the left and the decoder on the right:</p>
+<p><img src="http://livingdatalab.com/posts/https:/github.com/pranath/blog/raw/master/images/hf_transformers2.png"></p>
+<p>Note that the first attention layer in a decoder block pays attention to all (past) inputs to the decoder, but the second attention layer uses the output of the encoder. It can thus access the whole input sentence to best predict the current word, also known as <strong>Bi-directional Attention</strong>. This is very useful as different languages can have grammatical rules that put the words in different orders, or some context provided later in the sentence may be helpful to determine the best translation of a given word.</p>
+<p>The attention mask can also be used in the encoder/decoder to prevent the model from paying attention to some special words — for instance, the special padding word used to make all the inputs the same length when batching together sentences.</p>
+<p>This completes our basic overview of the Transfomer model, I hope you found it insightful !</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the great <a href="https://huggingface.co/course/">Hugging Face Course</a> which i completed, and acknowledge the use of some images, content and other materials from the course in this article.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>hugging-face</category>
+  <guid>http://livingdatalab.com/posts/2023-03-29-a-basic-overview-of-transfomer-models.html</guid>
+  <pubDate>Tue, 28 Mar 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/aihuman.jpeg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Using an efficient transformer to create an interactive and more complex chatbot</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -14064,511 +14151,6 @@ Review:  This is not the right product.  Predicated class: -1
   <guid>http://livingdatalab.com/posts/2023-02-05-train-model-aws-sagemaker-autopilot.html</guid>
   <pubDate>Sun, 05 Feb 2023 00:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/aws3.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Detect data bias with Amazon SageMaker Clarify</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<section id="introduction" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
-<p>In Data Science and machine learning, bias can be present in data before any model training occurs. Inspecting a dataset for bias can help detect collection gaps, inform your feature engineering, and understand biases the dataset may reflect. In this article we will analyze bias on a dataset, generate and analyze bias reports, and prepare the dataset for the model training.</p>
-</section>
-<section id="setup-aws-sagemaker" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="setup-aws-sagemaker"><span class="header-section-number">2</span> Setup AWS Sagemaker</h2>
-<p>In an <a href="2023-02-03-loading-transforming-clothes-reviews-text-aws.html">earlier article we introduced AWS cloud services for data science</a>, and how it can help with different stages of the data science &amp; machine learning workflow.</p>
-<p><img src="http://livingdatalab.com/posts/https:/github.com/pranath/blog/raw/master/images/aws_ds_workflow.png" title="The AWS Data Science Workflow" class="img-fluid"></p>
-<p>In this project, we will be using AWS Sagemaker Clarify to explore the bias in a dataset.</p>
-<p>Let’s now set up AWS sagemaker for this new project.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;">import</span> boto3</span>
-<span id="cb1-2"><span class="im" style="color: #00769E;">import</span> sagemaker</span>
-<span id="cb1-3"><span class="im" style="color: #00769E;">import</span> pandas <span class="im" style="color: #00769E;">as</span> pd</span>
-<span id="cb1-4"><span class="im" style="color: #00769E;">import</span> numpy <span class="im" style="color: #00769E;">as</span> np</span>
-<span id="cb1-5"><span class="im" style="color: #00769E;">import</span> botocore</span>
-<span id="cb1-6"></span>
-<span id="cb1-7">config <span class="op" style="color: #5E5E5E;">=</span> botocore.config.Config(user_agent_extra<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'dlai-pds/c1/w2'</span>)</span>
-<span id="cb1-8"></span>
-<span id="cb1-9"><span class="co" style="color: #5E5E5E;"># low-level service client of the boto3 session</span></span>
-<span id="cb1-10">sm <span class="op" style="color: #5E5E5E;">=</span> boto3.client(service_name<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'sagemaker'</span>, </span>
-<span id="cb1-11">                  config<span class="op" style="color: #5E5E5E;">=</span>config)</span>
-<span id="cb1-12"></span>
-<span id="cb1-13">sess <span class="op" style="color: #5E5E5E;">=</span> sagemaker.Session(sagemaker_client<span class="op" style="color: #5E5E5E;">=</span>sm)</span>
-<span id="cb1-14"></span>
-<span id="cb1-15">bucket <span class="op" style="color: #5E5E5E;">=</span> sess.default_bucket()</span>
-<span id="cb1-16">role <span class="op" style="color: #5E5E5E;">=</span> sagemaker.get_execution_role()</span>
-<span id="cb1-17">region <span class="op" style="color: #5E5E5E;">=</span> sess.boto_region_name</span></code></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;">as</span> plt</span>
-<span id="cb2-2"><span class="op" style="color: #5E5E5E;">%</span>matplotlib inline</span>
-<span id="cb2-3"><span class="op" style="color: #5E5E5E;">%</span>config InlineBackend.figure_format<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'retina'</span></span></code></pre></div>
-</div>
-</section>
-<section id="analyze-the-dataset" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="analyze-the-dataset"><span class="header-section-number">3</span> Analyze the dataset</h2>
-<p>As with our <a href="2023-02-03-loading-transforming-clothes-reviews-text-aws.html">earlier article using AWS</a> we will be using the <a href="https://www.kaggle.com/nicapotato/womens-ecommerce-clothing-reviews">Women’s Clothing Reviews</a> a public dataset available on kaggle.</p>
-<p>It is shared in a public Amazon S3 bucket, and is available as a comma-separated value (CSV) text format:</p>
-<section id="create-a-pandas-data-frame-from-the-csv-file" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="create-a-pandas-data-frame-from-the-csv-file"><span class="header-section-number">3.1</span> Create a pandas data frame from the CSV file</h3>
-<p>Let’s create a pandas dataframe from each of the product categories and concatenate them into one.</p>
-<div class="cell" data-outputid="7568fb40-e703-4b60-aed8-b173878c0179">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="op" style="color: #5E5E5E;">!</span>aws s3 cp <span class="st" style="color: #20794D;">'s3://dlai-practical-data-science/data/transformed/womens_clothing_ecommerce_reviews_transformed.csv'</span> .<span class="op" style="color: #5E5E5E;">/</span></span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>download: s3://dlai-practical-data-science/data/transformed/womens_clothing_ecommerce_reviews_transformed.csv to ./womens_clothing_ecommerce_reviews_transformed.csv</code></pre>
-</div>
-</div>
-<div class="cell" data-outputid="fc28444e-e35b-409d-c5d5-ca00d8755d7a">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">path <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'./womens_clothing_ecommerce_reviews_transformed.csv'</span></span>
-<span id="cb5-2"></span>
-<span id="cb5-3">df <span class="op" style="color: #5E5E5E;">=</span> pd.read_csv(path)</span>
-<span id="cb5-4">df.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="82">
-
-<div>
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>sentiment</th>
-      <th>review_body</th>
-      <th>product_category</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>If this product was in petite  i would get the...</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>Love this dress!  it's sooo pretty.  i happene...</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0</td>
-      <td>I had such high hopes for this dress and reall...</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>I love  love  love this jumpsuit. it's fun  fl...</td>
-      <td>Pants</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1</td>
-      <td>This shirt is very flattering to all due to th...</td>
-      <td>Blouses</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-</div>
-<p>As we saw in the <a href="2023-02-03-loading-transforming-clothes-reviews-text-aws.html">earlier article</a>, there are way more positive reviews than negative or neutral. Such a dataset is called unbalanced.</p>
-<p>In this case, using a relatively small data subset we could visualize the occurring unbalances. At scale, we would need to perform bias analysis. Let’s use this dataset as an example.</p>
-<div class="cell" data-outputid="e59151d4-22b9-406d-b425-cce7c30d5e16">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="im" style="color: #00769E;">import</span> seaborn <span class="im" style="color: #00769E;">as</span> sns</span>
-<span id="cb6-2"></span>
-<span id="cb6-3">sns.countplot(data<span class="op" style="color: #5E5E5E;">=</span>df, x<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'sentiment'</span>, hue<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'product_category'</span>)</span>
-<span id="cb6-4"></span>
-<span id="cb6-5">plt.legend(loc<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'upper right'</span>,bbox_to_anchor<span class="op" style="color: #5E5E5E;">=</span>(<span class="fl" style="color: #AD0000;">1.3</span>, <span class="fl" style="color: #AD0000;">1.1</span>))</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="83">
-<pre><code>&lt;matplotlib.legend.Legend at 0x7fc9f6a32090&gt;</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<p><img src="http://livingdatalab.com/posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify_files/figure-html/cell-7-output-2.png" class="img-fluid"></p>
-</div>
-</div>
-</section>
-<section id="upload-the-dataset-to-s3-bucket" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="upload-the-dataset-to-s3-bucket"><span class="header-section-number">3.2</span> Upload the dataset to S3 bucket</h3>
-<p>Now we will upload the dataset to a private S3 bucket in a folder called <code>bias/unbalanced</code>.</p>
-<div class="cell" data-outputid="91f0862d-9e28-4b23-9cf6-e28e3d1cbc0a">
-<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">data_s3_uri_unbalanced <span class="op" style="color: #5E5E5E;">=</span> sess.upload_data(bucket<span class="op" style="color: #5E5E5E;">=</span>bucket, </span>
-<span id="cb8-2">                               key_prefix<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'bias/unbalanced'</span>, </span>
-<span id="cb8-3">                               path<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'./womens_clothing_ecommerce_reviews_transformed.csv'</span>)</span>
-<span id="cb8-4">data_s3_uri_unbalanced</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="84">
-<pre><code>'s3://sagemaker-us-east-1-763519884484/bias/unbalanced/womens_clothing_ecommerce_reviews_transformed.csv'</code></pre>
-</div>
-</div>
-</section>
-</section>
-<section id="analyze-class-imbalance-on-the-dataset-with-amazon-sagemaker-clarify" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="analyze-class-imbalance-on-the-dataset-with-amazon-sagemaker-clarify"><span class="header-section-number">4</span> Analyze class imbalance on the dataset with Amazon SageMaker Clarify</h2>
-<p>Let’s analyze bias in <code>sentiment</code> with respect to the <code>product_category</code> facet on the dataset.</p>
-<section id="configure-a-dataconfig" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="configure-a-dataconfig"><span class="header-section-number">4.1</span> Configure a <code>DataConfig</code></h3>
-<p>Information about the input data needs to be provided to the processor. This can be done with the <code>DataConfig</code> of the Clarify container. It stores information about the dataset to be analyzed, for example the dataset file, its format, headers and labels.</p>
-<p>We can use <code>DataConfig</code> to configure the target column (<code>'sentiment'</code> label), data input (<code>data_s3_uri_unbalanced</code>) and output paths (<code>bias_report_unbalanced_output_path</code>) with their formats (header names and the dataset type):</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="im" style="color: #00769E;">from</span> sagemaker <span class="im" style="color: #00769E;">import</span> clarify</span>
-<span id="cb10-2"></span>
-<span id="cb10-3">bias_report_unbalanced_output_path <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'s3://</span><span class="sc" style="color: #5E5E5E;">{}</span><span class="st" style="color: #20794D;">/bias/generated_bias_report/unbalanced'</span>.<span class="bu" style="color: null;">format</span>(bucket)</span>
-<span id="cb10-4"></span>
-<span id="cb10-5">data_config_unbalanced <span class="op" style="color: #5E5E5E;">=</span> clarify.DataConfig(</span>
-<span id="cb10-6">    s3_data_input_path<span class="op" style="color: #5E5E5E;">=</span>data_s3_uri_unbalanced, </span>
-<span id="cb10-7">    s3_output_path<span class="op" style="color: #5E5E5E;">=</span>bias_report_unbalanced_output_path, </span>
-<span id="cb10-8">    label<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'sentiment'</span>, </span>
-<span id="cb10-9">    headers<span class="op" style="color: #5E5E5E;">=</span>df.columns.to_list(),</span>
-<span id="cb10-10">    dataset_type<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'text/csv'</span></span>
-<span id="cb10-11">)</span></code></pre></div>
-</div>
-</section>
-<section id="configure-biasconfig" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="configure-biasconfig"><span class="header-section-number">4.2</span> Configure <code>BiasConfig</code></h3>
-<p>Bias is measured by calculating a metric and comparing it across groups. To compute it, we will specify the required information in the <code>BiasConfig</code> API. SageMaker Clarify needs the sensitive columns (<code>facet_name</code>) and the desirable outcomes (<code>label_values_or_threshold</code>). Here <code>product_category</code> is the sensitive facet and the desired outcome is with the <code>sentiment==1</code>.</p>
-<p>SageMaker Clarify can handle both categorical and continuous data for <code>label_values_or_threshold</code>. In this case we are using categorical data.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">bias_config_unbalanced <span class="op" style="color: #5E5E5E;">=</span> clarify.BiasConfig(</span>
-<span id="cb11-2">    label_values_or_threshold<span class="op" style="color: #5E5E5E;">=</span>[<span class="dv" style="color: #AD0000;">1</span>], <span class="co" style="color: #5E5E5E;"># desired sentiment</span></span>
-<span id="cb11-3">    facet_name<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'product_category'</span> <span class="co" style="color: #5E5E5E;"># sensitive column (facet)</span></span>
-<span id="cb11-4">)</span></code></pre></div>
-</div>
-</section>
-<section id="configure-amazon-sagemaker-clarify-as-a-processing-job" class="level3" data-number="4.3">
-<h3 data-number="4.3" class="anchored" data-anchor-id="configure-amazon-sagemaker-clarify-as-a-processing-job"><span class="header-section-number">4.3</span> Configure Amazon SageMaker Clarify as a processing job</h3>
-<p>Now we need to construct an object called <code>SageMakerClarifyProcessor</code>. This allows you to scale the process of data bias detection using two parameters, <code>instance_count</code> and <code>instance_type</code>.</p>
-<p><code>Instance_count</code> represents how many nodes you want in the distributor cluster during the data detection. <code>Instance_type</code> specifies the processing capability (compute capacity, memory capacity) available for each one of those nodes.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">clarify_processor_unbalanced <span class="op" style="color: #5E5E5E;">=</span> clarify.SageMakerClarifyProcessor(role<span class="op" style="color: #5E5E5E;">=</span>role,</span>
-<span id="cb12-2">                                                      instance_count<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">1</span>,</span>
-<span id="cb12-3">                                                      instance_type<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'ml.m5.large'</span>,</span>
-<span id="cb12-4">                                                      sagemaker_session<span class="op" style="color: #5E5E5E;">=</span>sess)</span></code></pre></div>
-</div>
-</section>
-<section id="run-the-amazon-sagemaker-clarify-processing-job" class="level3" data-number="4.4">
-<h3 data-number="4.4" class="anchored" data-anchor-id="run-the-amazon-sagemaker-clarify-processing-job"><span class="header-section-number">4.4</span> Run the Amazon SageMaker Clarify processing job</h3>
-<p>Let’s run the configured processing job to compute the requested bias <code>methods</code> of the input data.</p>
-<p>We will apply the <code>run_pre_training_bias</code> method to the configured Clarify processor, passing the configured input/output data (<code>data_config_unbalanced</code>), configuration of sensitive groups (<code>bias_config_unbalanced</code>) with the other job setup parameters.</p>
-<div class="cell" data-outputid="c641457e-8d33-42e4-83a9-ba493b264918">
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1">clarify_processor_unbalanced.run_pre_training_bias(</span>
-<span id="cb13-2">    data_config<span class="op" style="color: #5E5E5E;">=</span>data_config_unbalanced, </span>
-<span id="cb13-3">    data_bias_config<span class="op" style="color: #5E5E5E;">=</span>bias_config_unbalanced, </span>
-<span id="cb13-4">    methods<span class="op" style="color: #5E5E5E;">=</span>[<span class="st" style="color: #20794D;">"CI"</span>, <span class="st" style="color: #20794D;">"DPL"</span>, <span class="st" style="color: #20794D;">"KL"</span>, <span class="st" style="color: #20794D;">"JS"</span>, <span class="st" style="color: #20794D;">"LP"</span>, <span class="st" style="color: #20794D;">"TVD"</span>, <span class="st" style="color: #20794D;">"KS"</span>],</span>
-<span id="cb13-5">    wait<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">False</span>,</span>
-<span id="cb13-6">    logs<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">False</span></span>
-<span id="cb13-7">)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Job Name:  Clarify-Pretraining-Bias-2023-02-04-18-19-13-642
-Inputs:  [{'InputName': 'dataset', 'AppManaged': False, 'S3Input': {'S3Uri': 's3://sagemaker-us-east-1-763519884484/bias/unbalanced/womens_clothing_ecommerce_reviews_transformed.csv', 'LocalPath': '/opt/ml/processing/input/data', 'S3DataType': 'S3Prefix', 'S3InputMode': 'File', 'S3DataDistributionType': 'FullyReplicated', 'S3CompressionType': 'None'}}, {'InputName': 'analysis_config', 'AppManaged': False, 'S3Input': {'S3Uri': 's3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/unbalanced/analysis_config.json', 'LocalPath': '/opt/ml/processing/input/config', 'S3DataType': 'S3Prefix', 'S3InputMode': 'File', 'S3DataDistributionType': 'FullyReplicated', 'S3CompressionType': 'None'}}]
-Outputs:  [{'OutputName': 'analysis_result', 'AppManaged': False, 'S3Output': {'S3Uri': 's3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/unbalanced', 'LocalPath': '/opt/ml/processing/output', 'S3UploadMode': 'EndOfJob'}}]</code></pre>
-</div>
-</div>
-<div class="cell" data-outputid="c49425e3-3a7b-4a10-fb42-29dcb1a5b670">
-<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1">run_unbalanced_bias_processing_job_name <span class="op" style="color: #5E5E5E;">=</span> clarify_processor_unbalanced.latest_job.job_name</span>
-<span id="cb15-2"><span class="bu" style="color: null;">print</span>(run_unbalanced_bias_processing_job_name)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Clarify-Pretraining-Bias-2023-02-04-18-19-13-642</code></pre>
-</div>
-</div>
-</section>
-<section id="run-the-amazon-sagemaker-clarify-processing-job-on-the-unbalanced-dataset" class="level3" data-number="4.5">
-<h3 data-number="4.5" class="anchored" data-anchor-id="run-the-amazon-sagemaker-clarify-processing-job-on-the-unbalanced-dataset"><span class="header-section-number">4.5</span> Run the Amazon SageMaker Clarify processing job on the unbalanced dataset</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">running_processor <span class="op" style="color: #5E5E5E;">=</span> sagemaker.processing.ProcessingJob.from_processing_name(processing_job_name<span class="op" style="color: #5E5E5E;">=</span>run_unbalanced_bias_processing_job_name,</span>
-<span id="cb17-2">                                                                            sagemaker_session<span class="op" style="color: #5E5E5E;">=</span>sess)</span></code></pre></div>
-</div>
-<div class="cell" data-outputid="89c3b97e-f97f-49d6-c98a-30db64937351">
-<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
-<span id="cb18-2"></span>
-<span id="cb18-3">running_processor.wait(logs<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">False</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>.............................................................................!CPU times: user 304 ms, sys: 55.6 ms, total: 360 ms
-Wall time: 6min 30s</code></pre>
-</div>
-</div>
-</section>
-<section id="analyze-unbalanced-bias-report" class="level3" data-number="4.6">
-<h3 data-number="4.6" class="anchored" data-anchor-id="analyze-unbalanced-bias-report"><span class="header-section-number">4.6</span> Analyze unbalanced bias report</h3>
-<p>In this run, we analyzed bias for <code>sentiment</code> relative to the <code>product_category</code> for the unbalanced data. Let’s have a look at the bias report.</p>
-<p>List the files in the output path <code>bias_report_unbalanced_output_path</code>:</p>
-<div class="cell" data-outputid="071c0c96-8eb0-4284-f041-7eca7e395451">
-<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><span class="op" style="color: #5E5E5E;">!</span>aws s3 ls $bias_report_unbalanced_output_path<span class="op" style="color: #5E5E5E;">/</span></span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>2023-02-04 18:25:39      31732 analysis.json
-2023-02-04 18:19:14        346 analysis_config.json
-2023-02-04 18:25:39     607108 report.html
-2023-02-04 18:25:39     346473 report.ipynb
-2023-02-04 18:25:39     326001 report.pdf</code></pre>
-</div>
-</div>
-<p>Download generated bias report from S3 bucket:</p>
-<div class="cell" data-outputid="db213745-8f79-439d-c566-58e83616e649">
-<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><span class="op" style="color: #5E5E5E;">!</span>aws s3 cp <span class="op" style="color: #5E5E5E;">--</span>recursive $bias_report_unbalanced_output_path .<span class="op" style="color: #5E5E5E;">/</span>generated_bias_report<span class="op" style="color: #5E5E5E;">/</span>unbalanced<span class="op" style="color: #5E5E5E;">/</span></span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>download: s3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/unbalanced/analysis_config.json to generated_bias_report/unbalanced/analysis_config.json
-download: s3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/unbalanced/analysis.json to generated_bias_report/unbalanced/analysis.json
-download: s3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/unbalanced/report.pdf to generated_bias_report/unbalanced/report.pdf
-download: s3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/unbalanced/report.ipynb to generated_bias_report/unbalanced/report.ipynb
-download: s3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/unbalanced/report.html to generated_bias_report/unbalanced/report.html</code></pre>
-</div>
-</div>
-<p>You can view the bias report <a href="https://pranath.github.io/pds/report_unbalanced.html">here</a>.</p>
-<p>The bias report shows a number of metrics, but here we will focus on just two of them: - Class Imbalance (CI). Measures the imbalance in the number of members between different facet values. Answers the question, does a <code>product_category</code> have disproportionately more reviews than others? Values of CI will become equal for even distribution between facets. Here, different CI values show the existence of imbalance. - Difference in Positive Proportions in Labels (DPL). Measures the imbalance of positive outcomes between different facet values. Answers the question, does a <code>product_category</code> have disproportionately higher ratings than others? With the range over the interval from -1 to 1, if there is no bias, you want to see this value as close as possible to zero. Here, non-zero values indicate the imbalances.</p>
-</section>
-</section>
-<section id="balance-the-dataset-by-product_category-and-sentiment" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="balance-the-dataset-by-product_category-and-sentiment"><span class="header-section-number">5</span> Balance the dataset by <code>product_category</code> and <code>sentiment</code></h2>
-<p>Let’s balance the dataset by <code>product_category</code> and <code>sentiment</code>. Then we can configure and run SageMaker Clarify processing job to analyze the bias of it. Which metrics values do we expect to see in the bias report?</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1">df_grouped_by <span class="op" style="color: #5E5E5E;">=</span> df.groupby([<span class="st" style="color: #20794D;">'product_category'</span>, <span class="st" style="color: #20794D;">'sentiment'</span>])</span>
-<span id="cb24-2">df_balanced <span class="op" style="color: #5E5E5E;">=</span> df_grouped_by.<span class="bu" style="color: null;">apply</span>(<span class="kw" style="color: #003B4F;">lambda</span> x: x.sample(df_grouped_by.size().<span class="bu" style="color: null;">min</span>()).reset_index(drop<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>))</span></code></pre></div>
-</div>
-<div class="cell" data-outputid="0938f3c6-3893-4ce6-c7b9-401a42251c58">
-<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1">df_balanced</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="99">
-
-<div>
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th>sentiment</th>
-      <th>review_body</th>
-      <th>product_category</th>
-    </tr>
-    <tr>
-      <th>product_category</th>
-      <th>sentiment</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th rowspan="5" valign="top">Blouses</th>
-      <th rowspan="5" valign="top">-1</th>
-      <th>0</th>
-      <td>-1</td>
-      <td>I bought this top in the store  which was good...</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>-1</td>
-      <td>Wow this is huge! i'm all for the tent-look wi...</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>-1</td>
-      <td>If you have anything larger than an a cup  thi...</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>-1</td>
-      <td>Like another reviewer mentioned  this shirt is...</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>-1</td>
-      <td>I did not like this top at all-but had i looke...</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <th>...</th>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th rowspan="5" valign="top">Trend</th>
-      <th rowspan="5" valign="top">1</th>
-      <th>4</th>
-      <td>1</td>
-      <td>Never spent this much on a dress so it needs t...</td>
-      <td>Trend</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>1</td>
-      <td>I love this sweatshirt! i truly did not pay mu...</td>
-      <td>Trend</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>1</td>
-      <td>I am waist-challenged. i like a narrowly cut s...</td>
-      <td>Trend</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>1</td>
-      <td>I love the style and look oft this blouse but ...</td>
-      <td>Trend</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>1</td>
-      <td>I love this top  it is a cool style mix betwee...</td>
-      <td>Trend</td>
-    </tr>
-  </tbody>
-</table>
-<p>486 rows × 3 columns</p>
-</div>
-</div>
-</div>
-<p>Let’s now visualize the distribution of review sentiment in the balanced dataset.</p>
-<div class="cell" data-outputid="543ac772-98ee-4bbe-db6e-6455349fa8b4">
-<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><span class="im" style="color: #00769E;">import</span> seaborn <span class="im" style="color: #00769E;">as</span> sns</span>
-<span id="cb26-2"></span>
-<span id="cb26-3">sns.countplot(data<span class="op" style="color: #5E5E5E;">=</span>df_balanced, x<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'sentiment'</span>, hue<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'product_category'</span>)</span>
-<span id="cb26-4"></span>
-<span id="cb26-5">plt.legend(loc<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'upper right'</span>,bbox_to_anchor<span class="op" style="color: #5E5E5E;">=</span>(<span class="fl" style="color: #AD0000;">1.3</span>, <span class="fl" style="color: #AD0000;">1.1</span>))</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="100">
-<pre><code>&lt;matplotlib.legend.Legend at 0x7fc9f52ca4d0&gt;</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<p><img src="http://livingdatalab.com/posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify_files/figure-html/cell-20-output-2.png" class="img-fluid"></p>
-</div>
-</div>
-</section>
-<section id="analyze-bias-on-balanced-dataset-with-aws-sagemaker-clarify" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="analyze-bias-on-balanced-dataset-with-aws-sagemaker-clarify"><span class="header-section-number">6</span> Analyze bias on balanced dataset with AWS SageMaker Clarify</h2>
-<p>Let’s now analyze bias in <code>sentiment</code> with respect to the <code>product_category</code> facet on the balanced dataset.</p>
-<p>We need to save and upload the balanced data to the S3 bucket.</p>
-<div class="cell" data-outputid="4de7a09e-b535-4e53-fe8e-d63a5d3ac06e">
-<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1">path_balanced <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'./womens_clothing_ecommerce_reviews_balanced.csv'</span></span>
-<span id="cb28-2">df_balanced.to_csv(path_balanced, index<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">False</span>, header<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">True</span>)</span>
-<span id="cb28-3"></span>
-<span id="cb28-4">data_s3_uri_balanced <span class="op" style="color: #5E5E5E;">=</span> sess.upload_data(bucket<span class="op" style="color: #5E5E5E;">=</span>bucket, key_prefix<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'bias/balanced'</span>, path<span class="op" style="color: #5E5E5E;">=</span>path_balanced)</span>
-<span id="cb28-5">data_s3_uri_balanced</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="101">
-<pre><code>'s3://sagemaker-us-east-1-763519884484/bias/balanced/womens_clothing_ecommerce_reviews_balanced.csv'</code></pre>
-</div>
-</div>
-<section id="configure-a-dataconfig-1" class="level3" data-number="6.1">
-<h3 data-number="6.1" class="anchored" data-anchor-id="configure-a-dataconfig-1"><span class="header-section-number">6.1</span> Configure a <code>DataConfig</code></h3>
-<p>We need to configure a <code>DataConfig</code> for Clarify to analyze bias on the balanced dataset. To do this we pass the S3 object path containing the balanced dataset, the path to store the output (<code>bias_report_balanced_output_path</code>) and the target column.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><span class="im" style="color: #00769E;">from</span> sagemaker <span class="im" style="color: #00769E;">import</span> clarify</span>
-<span id="cb30-2"></span>
-<span id="cb30-3">bias_report_balanced_output_path <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'s3://</span><span class="sc" style="color: #5E5E5E;">{}</span><span class="st" style="color: #20794D;">/bias/generated_bias_report/balanced'</span>.<span class="bu" style="color: null;">format</span>(bucket)</span>
-<span id="cb30-4"></span>
-<span id="cb30-5">data_config_balanced <span class="op" style="color: #5E5E5E;">=</span> clarify.DataConfig(</span>
-<span id="cb30-6">    s3_data_input_path<span class="op" style="color: #5E5E5E;">=</span>data_s3_uri_balanced, </span>
-<span id="cb30-7">    s3_output_path<span class="op" style="color: #5E5E5E;">=</span>bias_report_balanced_output_path,</span>
-<span id="cb30-8">    label<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'sentiment'</span>, </span>
-<span id="cb30-9">    headers<span class="op" style="color: #5E5E5E;">=</span>df_balanced.columns.to_list(),</span>
-<span id="cb30-10">    dataset_type<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'text/csv'</span></span>
-<span id="cb30-11">)</span></code></pre></div>
-</div>
-</section>
-<section id="configure-biasconfig-1" class="level3" data-number="6.2">
-<h3 data-number="6.2" class="anchored" data-anchor-id="configure-biasconfig-1"><span class="header-section-number">6.2</span> Configure <code>BiasConfig</code></h3>
-<p><code>BiasConfig</code> for the balanced dataset will have the same settings as before.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1">bias_config_balanced <span class="op" style="color: #5E5E5E;">=</span> clarify.BiasConfig(</span>
-<span id="cb31-2">    label_values_or_threshold<span class="op" style="color: #5E5E5E;">=</span>[<span class="dv" style="color: #AD0000;">1</span>], <span class="co" style="color: #5E5E5E;"># desired sentiment</span></span>
-<span id="cb31-3">    facet_name<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'product_category'</span> <span class="co" style="color: #5E5E5E;"># sensitive column (facet)</span></span>
-<span id="cb31-4">)</span></code></pre></div>
-</div>
-</section>
-<section id="configure-sagemaker-clarify-as-a-processing-job" class="level3" data-number="6.3">
-<h3 data-number="6.3" class="anchored" data-anchor-id="configure-sagemaker-clarify-as-a-processing-job"><span class="header-section-number">6.3</span> Configure SageMaker Clarify as a processing job</h3>
-<p><code>SageMakerClarifyProcessor</code> object will also have the same parameters.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1">clarify_processor_balanced <span class="op" style="color: #5E5E5E;">=</span> clarify.SageMakerClarifyProcessor(role<span class="op" style="color: #5E5E5E;">=</span>role,</span>
-<span id="cb32-2">                                                      instance_count<span class="op" style="color: #5E5E5E;">=</span><span class="dv" style="color: #AD0000;">1</span>,</span>
-<span id="cb32-3">                                                      instance_type<span class="op" style="color: #5E5E5E;">=</span><span class="st" style="color: #20794D;">'ml.m5.large'</span>,</span>
-<span id="cb32-4">                                                      sagemaker_session<span class="op" style="color: #5E5E5E;">=</span>sess)</span></code></pre></div>
-</div>
-</section>
-<section id="run-the-amazon-sagemaker-clarify-processing-job-1" class="level3" data-number="6.4">
-<h3 data-number="6.4" class="anchored" data-anchor-id="run-the-amazon-sagemaker-clarify-processing-job-1"><span class="header-section-number">6.4</span> Run the Amazon SageMaker Clarify processing job</h3>
-<p>Let’s run the configured processing job for the balanced dataset.</p>
-<p>We will apply the <code>run_pre_training_bias</code> method to the configured Clarify processor, passing the input/output data, configuration of sensitive groups with the other job setup parameters.</p>
-<div class="cell" data-outputid="92df7f72-40e4-4aa6-e8f6-535ce3f83be8">
-<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">clarify_processor_balanced.run_pre_training_bias(</span>
-<span id="cb33-2">    data_config<span class="op" style="color: #5E5E5E;">=</span>data_config_balanced, </span>
-<span id="cb33-3">    data_bias_config<span class="op" style="color: #5E5E5E;">=</span>bias_config_balanced, </span>
-<span id="cb33-4">    methods<span class="op" style="color: #5E5E5E;">=</span>[<span class="st" style="color: #20794D;">"CI"</span>, <span class="st" style="color: #20794D;">"DPL"</span>, <span class="st" style="color: #20794D;">"KL"</span>, <span class="st" style="color: #20794D;">"JS"</span>, <span class="st" style="color: #20794D;">"LP"</span>, <span class="st" style="color: #20794D;">"TVD"</span>, <span class="st" style="color: #20794D;">"KS"</span>],</span>
-<span id="cb33-5">    wait<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">False</span>,</span>
-<span id="cb33-6">    logs<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">False</span></span>
-<span id="cb33-7">)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Job Name:  Clarify-Pretraining-Bias-2023-02-04-18-25-47-825
-Inputs:  [{'InputName': 'dataset', 'AppManaged': False, 'S3Input': {'S3Uri': 's3://sagemaker-us-east-1-763519884484/bias/balanced/womens_clothing_ecommerce_reviews_balanced.csv', 'LocalPath': '/opt/ml/processing/input/data', 'S3DataType': 'S3Prefix', 'S3InputMode': 'File', 'S3DataDistributionType': 'FullyReplicated', 'S3CompressionType': 'None'}}, {'InputName': 'analysis_config', 'AppManaged': False, 'S3Input': {'S3Uri': 's3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/balanced/analysis_config.json', 'LocalPath': '/opt/ml/processing/input/config', 'S3DataType': 'S3Prefix', 'S3InputMode': 'File', 'S3DataDistributionType': 'FullyReplicated', 'S3CompressionType': 'None'}}]
-Outputs:  [{'OutputName': 'analysis_result', 'AppManaged': False, 'S3Output': {'S3Uri': 's3://sagemaker-us-east-1-763519884484/bias/generated_bias_report/balanced', 'LocalPath': '/opt/ml/processing/output', 'S3UploadMode': 'EndOfJob'}}]</code></pre>
-</div>
-</div>
-<div class="cell" data-outputid="8c142b34-3dfd-493e-e85c-1f3cffabc19f">
-<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1">run_balanced_bias_processing_job_name <span class="op" style="color: #5E5E5E;">=</span> clarify_processor_balanced.latest_job.job_name</span>
-<span id="cb35-2"><span class="bu" style="color: null;">print</span>(run_balanced_bias_processing_job_name)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Clarify-Pretraining-Bias-2023-02-04-18-25-47-825</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1">running_processor <span class="op" style="color: #5E5E5E;">=</span> sagemaker.processing.ProcessingJob.from_processing_name(processing_job_name<span class="op" style="color: #5E5E5E;">=</span>run_balanced_bias_processing_job_name,</span>
-<span id="cb37-2">                                                                            sagemaker_session<span class="op" style="color: #5E5E5E;">=</span>sess)</span></code></pre></div>
-</div>
-<div class="cell" data-outputid="e81cff0d-e4e8-4da8-d98f-f1ba48118438">
-<div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><span class="op" style="color: #5E5E5E;">%%</span>time</span>
-<span id="cb38-2"></span>
-<span id="cb38-3">running_processor.wait(logs<span class="op" style="color: #5E5E5E;">=</span><span class="va" style="color: #111111;">False</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>...........................................................................!CPU times: user 312 ms, sys: 46.6 ms, total: 359 ms
-Wall time: 6min 20s</code></pre>
-</div>
-</div>
-</section>
-<section id="analyze-balanced-bias-report" class="level3" data-number="6.5">
-<h3 data-number="6.5" class="anchored" data-anchor-id="analyze-balanced-bias-report"><span class="header-section-number">6.5</span> Analyze balanced bias report</h3>
-<p>Let’s see again the files created by the report.</p>
-<div class="cell" data-outputid="d882e3fd-1d59-44b2-87e0-dbca4ba6caea">
-<div class="sourceCode cell-code" id="cb40" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><span class="op" style="color: #5E5E5E;">!</span>aws s3 ls $bias_report_balanced_output_path<span class="op" style="color: #5E5E5E;">/</span></span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>2023-02-04 18:32:02      29889 analysis.json
-2023-02-04 18:25:48        346 analysis_config.json
-2023-02-04 18:32:02     592454 report.html
-2023-02-04 18:32:02     331819 report.ipynb
-2023-02-04 18:32:02     320692 report.pdf</code></pre>
-</div>
-</div>
-<p>We can view the report <a href="https://pranath.github.io/pds/report_balanced.html">here</a>.</p>
-<p>In this run, we analyzed bias for <code>sentiment</code> relative to the <code>product_category</code> for the balanced data. Note that the Class Imbalance (CI) metric is equal across all product categories for the target label, <code>sentiment</code>. And Difference in Positive Proportions in Labels (DPL) metric values are zero.</p>
-</section>
-</section>
-<section id="acknowledgements" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
-<p>I’d like to express my thanks to the great <a href="https://www.deeplearning.ai/courses/practical-data-science-specialization/">Deep Learning AI Practical Data Science on AWS Specialisation Course</a> which i completed, and acknowledge the use of some images and other materials from the training course in this article.</p>
-
-
-</section>
-
- ]]></description>
-  <category>aws</category>
-  <category>cloud-data-science</category>
-  <category>natural-language-processing</category>
-  <guid>http://livingdatalab.com/posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify.html</guid>
-  <pubDate>Sat, 04 Feb 2023 00:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/aws2.png" medium="image" type="image/png"/>
 </item>
 </channel>
 </rss>
