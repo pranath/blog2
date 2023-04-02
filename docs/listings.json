@@ -2,6 +2,8 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-04-02-fine-tuning-a-pretrained-model-with-hugging-face.html",
+      "/posts/2023-04-01-fine-tuning-a-pretrained-model-with-hugging-face-dataset-preparation.html",
       "/posts/2023-03-29-a-basic-overview-of-transfomer-models.html",
       "/posts/2023-03-28-using-an-efficient-transformer-to-create-an-interactive-complex-chatbot.html",
       "/posts/2023-03-27-reversable-residual-networks-for-transformer-models.html",

@@ -177,7 +177,10 @@ ga('send', {
   <li><a href="#what-is-a-transfomer-model" id="toc-what-is-a-transfomer-model" class="nav-link" data-scroll-target="#what-is-a-transfomer-model"><span class="toc-section-number">4</span>  What is a Transfomer Model</a></li>
   <li><a href="#attention-layers" id="toc-attention-layers" class="nav-link" data-scroll-target="#attention-layers"><span class="toc-section-number">5</span>  Attention Layers</a></li>
   <li><a href="#the-original-architecture" id="toc-the-original-architecture" class="nav-link" data-scroll-target="#the-original-architecture"><span class="toc-section-number">6</span>  The Original Architecture</a></li>
-  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">7</span>  Acknowledgements</a></li>
+  <li><a href="#encoder-models" id="toc-encoder-models" class="nav-link" data-scroll-target="#encoder-models"><span class="toc-section-number">7</span>  Encoder Models</a></li>
+  <li><a href="#decoder-models" id="toc-decoder-models" class="nav-link" data-scroll-target="#decoder-models"><span class="toc-section-number">8</span>  Decoder Models</a></li>
+  <li><a href="#encoder-decoder-models" id="toc-encoder-decoder-models" class="nav-link" data-scroll-target="#encoder-decoder-models"><span class="toc-section-number">9</span>  Encoder-Decoder Models</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">10</span>  Acknowledgements</a></li>
   </ul>
 </nav>
     </div>
@@ -248,10 +251,50 @@ ga('send', {
 <p><img src="https://github.com/pranath/blog/raw/master/images/hf_transformers2.png"></p>
 <p>Note that the first attention layer in a decoder block pays attention to all (past) inputs to the decoder, but the second attention layer uses the output of the encoder. It can thus access the whole input sentence to best predict the current word, also known as <strong>Bi-directional Attention</strong>. This is very useful as different languages can have grammatical rules that put the words in different orders, or some context provided later in the sentence may be helpful to determine the best translation of a given word.</p>
 <p>The attention mask can also be used in the encoder/decoder to prevent the model from paying attention to some special words — for instance, the special padding word used to make all the inputs the same length when batching together sentences.</p>
+</section>
+<section id="encoder-models" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="encoder-models"><span class="header-section-number">7</span> Encoder Models</h2>
+<p>Encoder models use only the encoder of a Transformer model. At each stage, the attention layers can access all the words in the initial sentence. These models are often characterized as having “bi-directional” attention, and are often called <strong>auto-encoding models</strong>.</p>
+<p>The pretraining of these models usually revolves around somehow corrupting a given sentence (for instance, by masking random words in it) and tasking the model with finding or reconstructing the initial sentence.</p>
+<p>Encoder models are best suited for tasks requiring an understanding of the full sentence, such as sentence classification, named entity recognition (and more generally word classification), and extractive question answering.</p>
+<p>Representatives of this family of models include:</p>
+<ul>
+<li>ALBERT</li>
+<li>BERT</li>
+<li>DistilBERT</li>
+<li>ELECTRA</li>
+<li>RoBERTa</li>
+</ul>
+</section>
+<section id="decoder-models" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="decoder-models"><span class="header-section-number">8</span> Decoder Models</h2>
+<p>Decoder models use only the decoder of a Transformer model. At each stage, for a given word the attention layers can only access the words positioned before it in the sentence. These models are often called <strong>auto-regressive models</strong>.</p>
+<p>The pretraining of decoder models usually revolves around predicting the next word in the sentence.</p>
+<p>These models are best suited for tasks involving text generation.</p>
+<p>Representatives of this family of models include:</p>
+<ul>
+<li>CTRL</li>
+<li>GPT</li>
+<li>GPT-2</li>
+<li>Transformer XL</li>
+</ul>
+</section>
+<section id="encoder-decoder-models" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="encoder-decoder-models"><span class="header-section-number">9</span> Encoder-Decoder Models</h2>
+<p>Encoder-decoder models (also called sequence-to-sequence models) use both parts of the Transformer architecture. At each stage, the attention layers of the encoder can access all the words in the initial sentence, whereas the attention layers of the decoder can only access the words positioned before a given word in the input.</p>
+<p>The pretraining of these models can be done using the objectives of encoder or decoder models, but usually involves something a bit more complex. For instance, T5 is pretrained by replacing random spans of text (that can contain several words) with a single mask special word, and the objective is then to predict the text that this mask word replaces.</p>
+<p>Sequence-to-sequence models are best suited for tasks revolving around generating new sentences depending on a given input, such as summarization, translation, or generative question answering.</p>
+<p>Representatives of this family of models include:</p>
+<ul>
+<li>BART</li>
+<li>mBART</li>
+<li>Marian</li>
+<li>T5</li>
+</ul>
 <p>This completes our basic overview of the Transfomer model, I hope you found it insightful !</p>
 </section>
-<section id="acknowledgements" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
+<section id="acknowledgements" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">10</span> Acknowledgements</h2>
 <p>I’d like to express my thanks to the great <a href="https://huggingface.co/course/">Hugging Face Course</a> which i completed, and acknowledge the use of some images, content and other materials from the course in this article.</p>
 
 
