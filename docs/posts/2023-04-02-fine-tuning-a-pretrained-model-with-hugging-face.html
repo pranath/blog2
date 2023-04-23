@@ -8,9 +8,9 @@
 
 <meta name="author" content="Pranath Fernando">
 <meta name="dcterms.date" content="2023-04-02">
-<meta name="description" content="In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model using Hugging Face">
+<meta name="description" content="In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model for text similarity using Hugging Face">
 
-<title>LivingDataLab - Fine-tuning a pre-trained model with Hugging Face - Fine-tune the Model</title>
+<title>LivingDataLab - Fine-tuning a Text Similarity model with Hugging Face - Fine Tune the Model</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -145,12 +145,12 @@ ga('send', {
 
 
 <link rel="stylesheet" href="../styles.css">
-<meta property="og:title" content="LivingDataLab - Fine-tuning a pre-trained model with Hugging Face - Fine-tune the Model">
-<meta property="og:description" content="In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model using Hugging Face">
+<meta property="og:title" content="LivingDataLab - Fine-tuning a Text Similarity model with Hugging Face - Fine Tune the Model">
+<meta property="og:description" content="In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model for text similarity using Hugging Face">
 <meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/hugging_face_course.png">
 <meta property="og:site-name" content="LivingDataLab">
-<meta name="twitter:title" content="LivingDataLab - Fine-tuning a pre-trained model with Hugging Face - Fine-tune the Model">
-<meta name="twitter:description" content="In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model using Hugging Face">
+<meta name="twitter:title" content="LivingDataLab - Fine-tuning a Text Similarity model with Hugging Face - Fine Tune the Model">
+<meta name="twitter:description" content="In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model for text similarity using Hugging Face">
 <meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/hugging_face_course.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -195,10 +195,10 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Fine-tuning a pre-trained model with Hugging Face - Fine-tune the Model</h1>
+      <h1 class="title">Fine-tuning a Text Similarity model with Hugging Face - Fine Tune the Model</h1>
                   <div>
         <div class="description">
-          In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model using Hugging Face
+          In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model for text similarity using Hugging Face
         </div>
       </div>
                           <div class="quarto-categories">
@@ -257,7 +257,7 @@ ga('send', {
 <p>In <a href="../#category=natural-language-processing">previous articles</a> we have seen how to use transformer models for a wide range of natural language tasks, including machine translation, summarization, and question answering. Transformers have become the standard model for NLP, similar to convolutional models in computer vision.</p>
 <p>In practice, you’ll rarely train a transformer model from scratch. Transformers tend to be very large, so they take time, money, and lots of data to train fully. Instead, you’ll want to start with a pre-trained model and fine-tune it with a dataset if you need to for specific needs, which has become the norm in this new but thriving area of AI.</p>
 <p><a href="https://huggingface.co/">Hugging Face</a> (🤗) is the best resource for pre-trained transformers. Their open-source libraries simplifies downloading and using transformer models like BERT, T5, and GPT-2. And you can use them alongside libraries such as FastAi, TensorFlow, PyTorch and Flax.</p>
-<p>In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model for your task.</p>
+<p>In this article we will look in a bit more detail at what you might need to do to fine-tune a pre-trained model for text similarity.</p>
 </section>
 <section id="fine-tuning-a-model-with-hugging-face" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="fine-tuning-a-model-with-hugging-face"><span class="header-section-number">2</span> Fine-tuning a model with Hugging Face</h2>

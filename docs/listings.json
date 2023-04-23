@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-04-23-fine-tuning-a-sentiment-analysis-model-with-huggingface.html",
       "/posts/2023-04-02-fine-tuning-a-pretrained-model-with-hugging-face.html",
       "/posts/2023-04-01-fine-tuning-a-pretrained-model-with-hugging-face-dataset-preparation.html",
       "/posts/2023-03-29-a-basic-overview-of-transfomer-models.html",
