@@ -2,6 +2,13 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-05-07-using-chatgpt-to-create-a-customised-chatbot.html",
+      "/posts/2023-05-06-expanding-and-customising-text-using-large-language-models.html",
+      "/posts/2023-05-05-large-language-models-for-text-transformation.html",
+      "/posts/2023-05-04-inferring-with-text-prompts-for-large-language-models.html",
+      "/posts/2023-05-03-creating-prompts-to-summarise-text-with-large-language-models.html",
+      "/posts/2023-05-02-iterative-prompt-development-for-large-language-models.html",
+      "/posts/2023-05-01-best-practice-for-prompting-large-language-models.html",
       "/posts/2023-04-23-fine-tuning-a-sentiment-analysis-model-with-huggingface.html",
       "/posts/2023-04-02-fine-tuning-a-pretrained-model-with-hugging-face.html",
       "/posts/2023-04-01-fine-tuning-a-pretrained-model-with-hugging-face-dataset-preparation.html",

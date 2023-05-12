@@ -1,263 +1,291 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://livingdatalab.com/posts/2023-05-02-iterative-prompt-development-for-large-language-models.html</loc>
+    <lastmod>2023-05-12T15:23:03.548Z</lastmod>
+  </url>
+  <url>
     <loc>http://livingdatalab.com/posts/2023-02-08-feature-transformation-aws-sagemaker-processing-job-feature-store.html</loc>
-    <lastmod>2023-04-23T16:08:34.282Z</lastmod>
+    <lastmod>2023-05-11T18:41:25.044Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-12-building-aws-sagemaker-pipeline-train-deploy-bert-text-classifier.html</loc>
-    <lastmod>2023-04-23T16:08:35.232Z</lastmod>
+    <lastmod>2023-05-11T18:41:26.039Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-14-optimize-models-in-the-cloud-using-aws-automatic-model-tuning.html</loc>
-    <lastmod>2023-04-23T16:08:35.788Z</lastmod>
+    <lastmod>2023-05-11T18:41:26.650Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-05-15-satellite-recognition-buildings-woodland-water-ai.html</loc>
-    <lastmod>2023-04-23T16:08:36.208Z</lastmod>
+    <lastmod>2023-05-11T18:41:27.084Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-06-17-neural-network-from-foundations.html</loc>
-    <lastmod>2023-04-23T16:08:36.666Z</lastmod>
+    <lastmod>2023-05-11T18:41:27.552Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-05-22-evaluation-diagnostic-medical-models.html</loc>
-    <lastmod>2023-04-23T16:08:37.390Z</lastmod>
+    <lastmod>2023-05-11T18:41:28.417Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-03-18-the-international-classification-of-disease.html</loc>
-    <lastmod>2023-04-23T16:08:37.866Z</lastmod>
+    <lastmod>2023-05-11T18:41:28.997Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-26-making-more-efficient-transformers-with-reversable-layers-and-lsh.html</loc>
-    <lastmod>2023-04-23T16:08:38.675Z</lastmod>
+    <lastmod>2023-05-11T18:41:29.897Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-05-train-model-aws-sagemaker-autopilot.html</loc>
-    <lastmod>2023-04-23T16:08:39.240Z</lastmod>
+    <lastmod>2023-05-11T18:41:30.547Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-04-02-fine-tuning-a-pretrained-model-with-hugging-face.html</loc>
-    <lastmod>2023-04-23T16:16:46.358Z</lastmod>
+    <lastmod>2023-05-11T18:41:30.999Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-02-06-predict-alzheimers-3d-medical-imaging.html</loc>
-    <lastmod>2023-04-23T16:08:39.992Z</lastmod>
+    <lastmod>2023-05-11T18:41:31.355Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-03-loading-transforming-clothes-reviews-text-aws.html</loc>
-    <lastmod>2023-04-23T16:08:40.626Z</lastmod>
+    <lastmod>2023-05-11T18:41:32.061Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-05-15-medical-diagnosis-chest-xrays.html</loc>
-    <lastmod>2023-04-23T16:08:41.269Z</lastmod>
+    <lastmod>2023-05-11T18:41:32.758Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-05-06-expanding-and-customising-text-using-large-language-models.html</loc>
+    <lastmod>2023-05-12T14:24:23.093Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-04-04-ai-human-preferences.html</loc>
-    <lastmod>2023-04-23T16:08:41.808Z</lastmod>
+    <lastmod>2023-05-11T18:41:33.722Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-04-23-fine-tuning-a-sentiment-analysis-model-with-huggingface.html</loc>
-    <lastmod>2023-04-23T16:12:15.181Z</lastmod>
+    <lastmod>2023-05-11T18:41:34.169Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-25-customising-a-chatbot-with-fine-tuning-and-huggingface-pre-trained-models.html</loc>
-    <lastmod>2023-04-23T16:08:42.800Z</lastmod>
+    <lastmod>2023-05-11T18:41:34.709Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-22-advanced-model-deployment-on-aws.html</loc>
-    <lastmod>2023-04-23T16:08:43.470Z</lastmod>
+    <lastmod>2023-05-11T18:41:35.427Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-06-creating-text-classifier-using-aws-sagemaker-blazingtext.html</loc>
-    <lastmod>2023-04-23T16:08:43.926Z</lastmod>
+    <lastmod>2023-05-11T18:41:36.065Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-05-25-collaberative-filtering-from-scratch.html</loc>
-    <lastmod>2023-04-23T16:08:44.467Z</lastmod>
+    <lastmod>2023-05-11T18:41:36.716Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-18-creating-transformer-model-for-text-summarisation.html</loc>
-    <lastmod>2023-04-23T16:08:45.249Z</lastmod>
+    <lastmod>2023-05-11T18:41:37.586Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-05-03-creating-prompts-to-summarise-text-with-large-language-models.html</loc>
+    <lastmod>2023-05-12T14:23:51.215Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-05-30-fastai-midlevel-api.html</loc>
-    <lastmod>2023-04-23T16:08:45.766Z</lastmod>
+    <lastmod>2023-05-11T18:41:38.698Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-01-02-python-power-tools-pycaret-anomaly.html</loc>
-    <lastmod>2023-04-23T16:08:46.300Z</lastmod>
+    <lastmod>2023-05-11T18:41:39.282Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-12-10-us-patent-phrase-to-phrase-matching.html</loc>
-    <lastmod>2023-04-23T16:08:46.783Z</lastmod>
+    <lastmod>2023-05-11T18:41:39.828Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-02-06-patient-select-diabetes.html</loc>
-    <lastmod>2023-04-23T16:08:47.955Z</lastmod>
+    <lastmod>2023-05-11T18:41:41.145Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-04-three-types-of-attention-for-transformer-nlp-models.html</loc>
-    <lastmod>2023-04-23T16:08:48.345Z</lastmod>
+    <lastmod>2023-05-11T18:41:41.579Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-11-train-reviews-text-classifier-with-bert-and-aws-sagemaker.html</loc>
-    <lastmod>2023-04-23T16:08:48.921Z</lastmod>
+    <lastmod>2023-05-11T18:41:42.181Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-22-implementing-the-t5-text-transfomer-model.html</loc>
-    <lastmod>2023-04-23T16:08:49.457Z</lastmod>
+    <lastmod>2023-05-11T18:41:42.823Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-10-31-network-analysis-karate.html</loc>
-    <lastmod>2023-04-23T16:08:50.100Z</lastmod>
+    <lastmod>2023-05-11T18:41:43.558Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-02-22-measuring-disease-in-epidemiology.html</loc>
-    <lastmod>2023-04-23T16:08:50.924Z</lastmod>
+    <lastmod>2023-05-11T18:41:44.487Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-12-27-topic-modelling-svd.html</loc>
-    <lastmod>2023-04-23T16:08:51.450Z</lastmod>
+    <lastmod>2023-05-11T18:41:45.050Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-04-01-fine-tuning-a-pretrained-model-with-hugging-face-dataset-preparation.html</loc>
-    <lastmod>2023-04-23T16:16:36.426Z</lastmod>
+    <lastmod>2023-05-11T18:41:45.563Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-01-08-nlp-text-classification-without-deep-learning-for-business-applications.html</loc>
-    <lastmod>2023-04-23T16:08:52.522Z</lastmod>
+    <lastmod>2023-05-11T18:41:46.315Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-01-15-using-satellite-images-and-deep-learning-to-track-deforestation-in-the-amazon.html</loc>
-    <lastmod>2023-04-23T16:08:53.110Z</lastmod>
+    <lastmod>2023-05-11T18:41:47.042Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-03-14-using-mimic3-ehr-database.html</loc>
-    <lastmod>2023-04-23T16:08:53.687Z</lastmod>
+    <lastmod>2023-05-11T18:41:47.698Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-12-04-python-power-tools-pycaret.html</loc>
-    <lastmod>2023-04-23T16:08:54.279Z</lastmod>
+    <lastmod>2023-05-11T18:41:48.455Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-05-29-custom-text-classifier-movie-reviews.html</loc>
-    <lastmod>2023-04-23T16:08:54.704Z</lastmod>
+    <lastmod>2023-05-11T18:41:48.916Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-05-22-state-of-the-art-deep-learning-image-model-2021.html</loc>
-    <lastmod>2023-04-23T16:08:55.143Z</lastmod>
+    <lastmod>2023-05-11T18:41:49.390Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-29-a-basic-overview-of-transfomer-models.html</loc>
-    <lastmod>2023-04-23T16:08:55.589Z</lastmod>
+    <lastmod>2023-05-11T18:41:49.920Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-05-31-lstm-language-model-from-scratch.html</loc>
-    <lastmod>2023-04-23T16:08:56.190Z</lastmod>
+    <lastmod>2023-05-11T18:41:50.672Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-05-01-best-practice-for-prompting-large-language-models.html</loc>
+    <lastmod>2023-05-12T14:23:03.344Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-11-implementing-gpt2-a-transformer-decoder-nlp-model.html</loc>
-    <lastmod>2023-04-23T16:08:56.566Z</lastmod>
+    <lastmod>2023-05-11T18:41:51.946Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-05-05-large-language-models-for-text-transformation.html</loc>
+    <lastmod>2023-05-12T15:38:51.723Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-06-12-resnets-the-key-to-training-deep-neural-networks.html</loc>
-    <lastmod>2023-04-23T16:08:57.066Z</lastmod>
+    <lastmod>2023-05-11T18:41:53.169Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-27-reversable-residual-networks-for-transformer-models.html</loc>
-    <lastmod>2023-04-23T16:08:57.514Z</lastmod>
+    <lastmod>2023-05-11T18:41:53.779Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-01-improving-seq2seq-language-models-using-basic-attention.html</loc>
-    <lastmod>2023-04-23T16:08:57.931Z</lastmod>
+    <lastmod>2023-05-11T18:41:54.310Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-04-detecting-bias-with-aws-sagemaker-clarify.html</loc>
-    <lastmod>2023-04-23T16:08:58.440Z</lastmod>
+    <lastmod>2023-05-11T18:41:54.895Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-02-24-custom-models-human-loop-pipelines-aws-augmented-ai.html</loc>
-    <lastmod>2023-04-23T16:08:59.063Z</lastmod>
+    <lastmod>2023-05-11T18:41:55.661Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-06-11-convolutional-image-model-from-scratch.html</loc>
-    <lastmod>2023-04-23T16:08:59.581Z</lastmod>
+    <lastmod>2023-05-11T18:41:56.430Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-05-04-inferring-with-text-prompts-for-large-language-models.html</loc>
+    <lastmod>2023-05-12T15:29:18.603Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-12-28-topic-modelling-nmf.html</loc>
-    <lastmod>2023-04-23T16:09:00.060Z</lastmod>
+    <lastmod>2023-05-11T18:41:57.765Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-12-17-machine-learning-to-deep-learning-from-scratch.html</loc>
-    <lastmod>2023-04-23T16:09:00.896Z</lastmod>
+    <lastmod>2023-05-11T18:41:58.669Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-03-04-study-designs-in-epidemiology.html</loc>
-    <lastmod>2023-04-23T16:09:01.539Z</lastmod>
+    <lastmod>2023-05-11T18:41:59.444Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-03-06-validity-bias-epidemiology.html</loc>
-    <lastmod>2023-04-23T16:09:02.299Z</lastmod>
+    <lastmod>2023-05-11T18:42:00.332Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-28-using-an-efficient-transformer-to-create-an-interactive-complex-chatbot.html</loc>
-    <lastmod>2023-04-23T16:09:03.012Z</lastmod>
+    <lastmod>2023-05-11T18:42:01.245Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-06-13-optimisation-methods-for-deep-learning.html</loc>
-    <lastmod>2023-04-23T16:09:03.431Z</lastmod>
+    <lastmod>2023-05-11T18:42:01.806Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-02-improving-seq2seq-language-models-using-dot-product-attention.html</loc>
-    <lastmod>2023-04-23T16:09:03.843Z</lastmod>
+    <lastmod>2023-05-11T18:42:02.298Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-06-19-understanding-cnn-with-cam-class-activation-maps.html</loc>
-    <lastmod>2023-04-23T16:09:04.242Z</lastmod>
+    <lastmod>2023-05-11T18:42:02.834Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-03-14-data-ehr-healthcare.html</loc>
-    <lastmod>2023-04-23T16:09:04.657Z</lastmod>
+    <lastmod>2023-05-11T18:42:03.367Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-08-06-predicting-10-year-death-risk-health-data.html</loc>
-    <lastmod>2023-04-23T16:09:05.414Z</lastmod>
+    <lastmod>2023-05-11T18:42:04.364Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2023-03-24-creating-a-chatbot-with-huggingface-pre-trained-models.html</loc>
-    <lastmod>2023-04-23T16:09:05.812Z</lastmod>
+    <lastmod>2023-05-11T18:42:04.885Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-03-15-mimic-clinicial-outcomes-patient-data.html</loc>
-    <lastmod>2023-04-23T16:09:06.424Z</lastmod>
+    <lastmod>2023-05-11T18:42:05.621Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-02-06-detect-pneumonia-chest-xrays.html</loc>
-    <lastmod>2023-04-23T16:09:07.114Z</lastmod>
+    <lastmod>2023-05-11T18:42:06.599Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-06-12-fastai-application-architectures.html</loc>
-    <lastmod>2023-04-23T16:09:07.540Z</lastmod>
+    <lastmod>2023-05-11T18:42:07.279Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2021-05-14-ai-satellite-images.html</loc>
-    <lastmod>2023-04-23T16:09:07.922Z</lastmod>
+    <lastmod>2023-05-11T18:42:07.733Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-12-05-using-ai-to-identify-galaxies.html</loc>
-    <lastmod>2023-04-23T16:09:08.380Z</lastmod>
+    <lastmod>2023-05-11T18:42:08.299Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/posts/2022-06-11-a-prognostic-risk-score-model-for-retinopathy-in-diabetes-patients.html</loc>
-    <lastmod>2023-04-23T16:09:08.949Z</lastmod>
+    <lastmod>2023-05-11T18:42:09.059Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/index.html</loc>
-    <lastmod>2023-04-23T16:16:48.900Z</lastmod>
+    <lastmod>2023-05-12T15:58:40.870Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/about.html</loc>
-    <lastmod>2023-04-23T16:09:10.501Z</lastmod>
+    <lastmod>2023-05-12T14:17:30.129Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-05-07-using-chatgpt-to-create-a-customised-chatbot.html</loc>
+    <lastmod>2023-05-12T15:58:39.100Z</lastmod>
   </url>
 </urlset>
