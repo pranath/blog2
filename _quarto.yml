@@ -11,7 +11,7 @@ website:
   favicon: "favicon.ico"
   google-analytics: "UA-91568149-1"
   navbar:
-    logo: "favicon.ico"
+    logo: "logo.png"
     right:
       - about.qmd
       - icon: github
