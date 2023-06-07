@@ -10,6 +10,7 @@ website:
   open-graph: true
   favicon: "favicon.ico"
   google-analytics: "UA-91568149-1"
+  margin-header: subscribe.html
   navbar:
     logo: "logo.png"
     right:

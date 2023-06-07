@@ -1,1 +1,20 @@
 /* css styles */
+
+#mc_embed_signup form {
+  margin: 0 !important;
+  width: 100%;
+}
+#mc_embed_signup div#mce-responses {
+  margin: 0 !important;
+  padding: 0 0 15px 0 !important;
+  width: 100% !important;
+  float: none;
+}
+#mc_embed_signup .response  {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+#mc_embed_signup .foot {
+  display: block !important;
+}
