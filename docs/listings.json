@@ -1,5 +1,13 @@
 [
   {
+    "listing": "/projects.html",
+    "items": [
+      "/projects/doc-summarisation.html",
+      "/projects/web-page-summarisation.html",
+      "/projects/youtube-summarisation.html"
+    ]
+  },
+  {
     "listing": "/index.html",
     "items": [
       "/posts/2023-06-06-creating-llm-based-agents-using-langchain.html",

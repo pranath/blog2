@@ -1,6 +1,9 @@
 ---
 title: "About"
-image: profile.jpeg
+image: images/profile.jpeg
+format:
+  html:
+    css: css/about.css
 about:
   template: jolla
   links:
@@ -16,6 +19,6 @@ about:
 
 ---
 
-Livingdatalab is the professional blog of Pranath Fernando, a Data Scientist in the water industry.
+Livingdatalab is the professional blog of Pranath Fernando, a Data Scientist with a special interest in NLP, Large Language Models (LLM's) and its applications.
 
-I can be contacted via Linkedin using the link below.
+I can be contacted via Linkedin or Twitter using the links below.

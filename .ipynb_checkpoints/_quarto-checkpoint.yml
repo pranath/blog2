@@ -8,18 +8,33 @@ website:
   site-url: 'http://livingdatalab.com'
   twitter-card: true
   open-graph: true
-  favicon: "favicon.ico"
+  favicon: "images/favicon.ico"
   google-analytics: "UA-91568149-1"
   margin-header: subscribe.html
+  page-footer: "LivingDataLab Data Science Blog" 
   navbar:
-    logo: "logo.png"
+    logo: "images/logo.png"
     right:
-      - about.qmd
+      - text: "Blog"
+        file: index.qmd
+      - text: "Projects"
+        file: projects.qmd
+      - text: "About"
+        file: about.qmd
       - icon: github
         href: https://github.com/pranath
       - icon: twitter
         href: https://twitter.com/LivingDataLab
+      - icon: rss
+        href: index.xml
+  sidebar:
+    - title: "Projects"
+      style: "docked"
+      contents: 
+        - projects.qmd
+        - section: Projects
+          contents: projects/*
 format:
   html:
     theme: flatly
-    css: styles.css
+    css: css/styles.css

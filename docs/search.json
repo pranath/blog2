@@ -3542,6 +3542,27 @@
     "text": "2 Conclusion\nIn this project, we will built a prognostic risk score model for retinopathy in diabetes patients using logistic regression.\nWe considered the following topics:\n\nData preprocessing\n\nLog transformations\nStandardization\n\nBasic Risk Models\n\nLogistic Regression\nC-index\nInteractions Terms"
   },
   {
+    "objectID": "projects/web-page-summarisation.html",
+    "href": "projects/web-page-summarisation.html",
+    "title": "Web Page Summarisation",
+    "section": "",
+    "text": "This tool will summarise the content of any web page.\nPlease note: the technology behind this AI tool is a Large Language Model which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of what a human would do."
+  },
+  {
+    "objectID": "projects/project2.html",
+    "href": "projects/project2.html",
+    "title": "Project 2",
+    "section": "",
+    "text": "Project 2 content"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects Overview",
+    "section": "",
+    "text": "This is where I showcase some of the most recent skills I’ve learned in Data Science and Artificial Intelligence, by building projects to demonstrate what is possible using some of the most recent advances and tools.\nMore technical details about the tools I used to build these can be found in articles from my Blog.\nIf you have any feedback, comments or suggestions about any of these projects do let me know.\n\n\n\n\n\n\n\n\n\n\nDocument Summarisation\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n\n\nWeb Page Summarisation\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n\n\nYouTube Summarisation\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\nNo matching items"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "LivingDataLab Data Science Blog",
@@ -3553,6 +3574,20 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "Livingdatalab is the professional blog of Pranath Fernando, a Data Scientist in the water industry.\nI can be contacted via Linkedin using the link below."
+    "text": "Livingdatalab is the professional blog of Pranath Fernando, a Data Scientist with a special interest in NLP, Large Language Models (LLM’s) and its applications.\nI can be contacted via Linkedin or Twitter using the links below."
+  },
+  {
+    "objectID": "projects/youtube-summarisation.html",
+    "href": "projects/youtube-summarisation.html",
+    "title": "YouTube Summarisation",
+    "section": "",
+    "text": "This tool will summarise the content of a YouTube video.\nPlease note: the technology behind this AI tool is a Large Language Model which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of what a human would do."
+  },
+  {
+    "objectID": "projects/doc-summarisation.html",
+    "href": "projects/doc-summarisation.html",
+    "title": "Document Summarisation",
+    "section": "",
+    "text": "This tool will summarise the content of a PDF document.\nPlease note: the technology behind this AI tool is a Large Language Model which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of what a human would do."
   }
 ]

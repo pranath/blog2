@@ -1,6 +1,9 @@
 ---
 title: "About"
-image: profile.jpeg
+image: images/profile.jpeg
+format:
+  html:
+    css: css/about.css
 about:
   template: jolla
   links:

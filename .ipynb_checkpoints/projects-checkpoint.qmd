@@ -1,0 +1,10 @@
+---
+title: "Projects Overview"
+format:
+  html:
+    css: css/projects.css
+listing:
+  contents: projects
+---
+
+Projects content

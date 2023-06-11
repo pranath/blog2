@@ -1,0 +1,7 @@
+#quarto-sidebar {
+    display:block;
+}
+.quarto-post {
+    display: block !important;
+    border-bottom: none !important;
+}

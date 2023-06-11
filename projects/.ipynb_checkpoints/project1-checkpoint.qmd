@@ -1,0 +1,15 @@
+---
+title: "Project 1"
+format:
+  html:
+    css: ../css/projects.css
+website:
+  sidebar:
+    style: "docked"
+    search: true
+    contents: 
+      - section: Projects
+        contents: ../projects
+---
+
+Project 1 content
