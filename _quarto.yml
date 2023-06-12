@@ -4,7 +4,7 @@ project:
 
 website:
   title: "LivingDataLab"
-  description: ''
+  description: 'LivingDataLab Data Science Blog'
   site-url: 'http://livingdatalab.com'
   twitter-card: true
   open-graph: true

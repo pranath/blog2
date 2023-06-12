@@ -3542,6 +3542,13 @@
     "text": "2 Conclusion\nIn this project, we will built a prognostic risk score model for retinopathy in diabetes patients using logistic regression.\nWe considered the following topics:\n\nData preprocessing\n\nLog transformations\nStandardization\n\nBasic Risk Models\n\nLogistic Regression\nC-index\nInteractions Terms"
   },
   {
+    "objectID": "projects/youtube-summarisation.html",
+    "href": "projects/youtube-summarisation.html",
+    "title": "YouTube Summarisation",
+    "section": "",
+    "text": "This tool will summarise the content of a YouTube video.\nPlease note: the technology behind this AI tool is a Large Language Model which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of what a human would do."
+  },
+  {
     "objectID": "projects/web-page-summarisation.html",
     "href": "projects/web-page-summarisation.html",
     "title": "Web Page Summarisation",
@@ -3549,11 +3556,11 @@
     "text": "This tool will summarise the content of any web page.\nPlease note: the technology behind this AI tool is a Large Language Model which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of what a human would do."
   },
   {
-    "objectID": "projects/project2.html",
-    "href": "projects/project2.html",
-    "title": "Project 2",
+    "objectID": "projects/doc-summarisation.html",
+    "href": "projects/doc-summarisation.html",
+    "title": "Document Summarisation",
     "section": "",
-    "text": "Project 2 content"
+    "text": "This tool will summarise the content of a PDF document.\nPlease note: the technology behind this AI tool is a Large Language Model which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of what a human would do."
   },
   {
     "objectID": "projects.html",
@@ -3575,19 +3582,5 @@
     "title": "About",
     "section": "",
     "text": "Livingdatalab is the professional blog of Pranath Fernando, a Data Scientist with a special interest in NLP, Large Language Models (LLM’s) and its applications.\nI can be contacted via Linkedin or Twitter using the links below."
-  },
-  {
-    "objectID": "projects/youtube-summarisation.html",
-    "href": "projects/youtube-summarisation.html",
-    "title": "YouTube Summarisation",
-    "section": "",
-    "text": "This tool will summarise the content of a YouTube video.\nPlease note: the technology behind this AI tool is a Large Language Model which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of what a human would do."
-  },
-  {
-    "objectID": "projects/doc-summarisation.html",
-    "href": "projects/doc-summarisation.html",
-    "title": "Document Summarisation",
-    "section": "",
-    "text": "This tool will summarise the content of a PDF document.\nPlease note: the technology behind this AI tool is a Large Language Model which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of what a human would do."
   }
 ]
