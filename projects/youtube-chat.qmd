@@ -1,0 +1,27 @@
+---
+title: "YouTube Chat"
+format:
+  html:
+    css: ../css/projects.css
+website:
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - section: Projects
+        contents: ../projects
+---
+
+This tool will allow you to chat with a YouTube video, and ask it questions about its content.
+
+*Please note: the technology behind this AI tool is a [Large Language Model](https://techcrunch.com/2022/04/28/the-emerging-types-of-language-models-and-why-they-matter/) 
+which is a very experimental and cutting edge area of AI research. As such, the output of this tool may vary and may not always be perfect or always at the same level of 
+what a human would do.*
+
+```{=html}
+<iframe
+  src="https://livingdatalab-youtube-chat.streamlit.app/?embed=true"
+  height="1050"
+  style="width:100%;border:none;"
+></iframe>
+```

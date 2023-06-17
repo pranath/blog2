@@ -7,9 +7,8 @@ listing:
   contents: projects
 ---
 
-This is where I showcase some of the most recent skills I've learned in Data Science and Artificial Intelligence, by building projects to demonstrate what is possible using some
- of the most recent advances and tools.
+This is where I showcase some of the most recent skills I've learned in Data Science and Artificial Intelligence, by building projects to demonstrate what is possible using some of the most recent advances and tools.
 
-More technical details about the tools I used to build these can be found in articles from my [Blog](/).
+More details about how I built these projects can be found in [this article](/posts/2023-06-14-key-considerations-when-creating-practical-applications-with-llms.html).
 
 If you have any feedback, comments or suggestions about any of these projects do [let me know](/about.html).

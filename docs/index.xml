@@ -10,7 +10,20 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science Blog</description>
 <generator>quarto-1.2.335</generator>
-<lastBuildDate>Mon, 05 Jun 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 13 Jun 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Key Considerations when Creating Practical Applications using Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-06-14-key-considerations-when-creating-practical-applications-with-llms.html</link>
+  <description><![CDATA[ AI and Large Language Models such as ChatGPT have brought some dramatic developments in recent years. But trying to actually build useful applications using these involves many challenges and considerations. However, the potential number of useful applications using LLM’s is huge. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>hugging-face</category>
+  <guid>http://livingdatalab.com/posts/2023-06-14-key-considerations-when-creating-practical-applications-with-llms.html</guid>
+  <pubDate>Tue, 13 Jun 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/ai_applications.png" medium="image" type="image/png"/>
+</item>
 <item>
   <title>Creating LLM based Agents using LangChain</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -242,17 +255,6 @@
   <guid>http://livingdatalab.com/posts/2023-03-27-reversable-residual-networks-for-transformer-models.html</guid>
   <pubDate>Sun, 26 Mar 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/Revnet7.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Making more efficient attention for transformers with reversable layers and Locality Sensitive Hashing (LSH)</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-03-26-making-more-efficient-transformers-with-reversable-layers-and-lsh.html</link>
-  <description><![CDATA[ Two ‘reforms’ can make the Transformer more memory and compute efficient. The <em>Reversible Layers</em> reduce memory and <em>Locality Sensitive Hashing (LSH)</em> reduces the cost of the Dot Product attention for large input sizes. In this article we will look more closely at LSH and how it is used in the Reformer model. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <guid>http://livingdatalab.com/posts/2023-03-26-making-more-efficient-transformers-with-reversable-layers-and-lsh.html</guid>
-  <pubDate>Sun, 26 Mar 2023 00:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/C4W4_LN2_image13.png" medium="image" type="image/png"/>
 </item>
 </channel>
 </rss>

@@ -2,14 +2,18 @@
   {
     "listing": "/projects.html",
     "items": [
+      "/projects/doc-chat.html",
       "/projects/doc-summarisation.html",
+      "/projects/web-page-chat.html",
       "/projects/web-page-summarisation.html",
+      "/projects/youtube-chat.html",
       "/projects/youtube-summarisation.html"
     ]
   },
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-06-14-key-considerations-when-creating-practical-applications-with-llms.html",
       "/posts/2023-06-06-creating-llm-based-agents-using-langchain.html",
       "/posts/2023-06-05-using-langchain-to-evaluate-llm-applications.html",
       "/posts/2023-06-04-question-answering-over-documents-with-langchain.html",
