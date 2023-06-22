@@ -21,3 +21,9 @@
 #quarto-sidebar {
     display:none;
 }
+main #mc_embed_signup form {
+    display:none;
+}
+.page-layout-article main #mc_embed_signup form {
+    display:block;
+}

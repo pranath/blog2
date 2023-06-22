@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-06-18">
+<meta name="description" content="Here we give a brief overview of how LLM’s work, how they are trained, what is a tokeniser and how a choice of different tokenisers can effect the output of the LLM. We will also look at what the ‘chat format’ for LLM’s is all about">
+
+<title>LivingDataLab - An overview Language Models, the Chat format and Tokens</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - An overview Language Models, the Chat format and Tokens">
+<meta property="og:description" content="Here we give a brief overview of how LLM's work, how they are trained, what is a tokeniser and how a choice of different tokenisers can effect the output of the LLM.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/chatgpt1.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - An overview Language Models, the Chat format and Tokens">
+<meta name="twitter:description" content="Here we give a brief overview of how LLM's work, how they are trained, what is a tokeniser and how a choice of different tokenisers can effect the output of the LLM.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/chatgpt1.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">An overview Language Models, the Chat format and Tokens</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">An overview Language Models, the Chat format and Tokens</h1>
+                  <div>
+        <div class="description">
+          Here we give a brief overview of how LLM’s work, how they are trained, what is a tokeniser and how a choice of different tokenisers can effect the output of the LLM. We will also look at what the ‘chat format’ for LLM’s is all about
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">openai</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 18, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="toc-section-number">2</span>  Setup</a></li>
+  <li><a href="#different-ways-of-using-a-language-model" id="toc-different-ways-of-using-a-language-model" class="nav-link" data-scroll-target="#different-ways-of-using-a-language-model"><span class="toc-section-number">3</span>  Different ways of using a Language Model</a>
+  <ul class="collapse">
+  <li><a href="#how-does-an-llm-get-created" id="toc-how-does-an-llm-get-created" class="nav-link" data-scroll-target="#how-does-an-llm-get-created"><span class="toc-section-number">3.1</span>  How does an LLM get created?</a></li>
+  <li><a href="#types-of-llm" id="toc-types-of-llm" class="nav-link" data-scroll-target="#types-of-llm"><span class="toc-section-number">3.2</span>  Types of LLM</a></li>
+  </ul></li>
+  <li><a href="#prompt-the-model-and-get-a-completion" id="toc-prompt-the-model-and-get-a-completion" class="nav-link" data-scroll-target="#prompt-the-model-and-get-a-completion"><span class="toc-section-number">4</span>  Prompt the model and get a completion</a></li>
+  <li><a href="#tokens" id="toc-tokens" class="nav-link" data-scroll-target="#tokens"><span class="toc-section-number">5</span>  Tokens</a></li>
+  <li><a href="#using-system-user-assistant-format-messages" id="toc-using-system-user-assistant-format-messages" class="nav-link" data-scroll-target="#using-system-user-assistant-format-messages"><span class="toc-section-number">6</span>  Using system-user-assistant format messages</a></li>
+  <li><a href="#how-prompting-is-revolutionisng-ai-application-development" id="toc-how-prompting-is-revolutionisng-ai-application-development" class="nav-link" data-scroll-target="#how-prompting-is-revolutionisng-ai-application-development"><span class="toc-section-number">7</span>  How Prompting is revolutionisng AI application development</a></li>
+  <li><a href="#newline-characters" id="toc-newline-characters" class="nav-link" data-scroll-target="#newline-characters"><span class="toc-section-number">8</span>  Newline Characters</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">9</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots.</p>
+<p>In <a href="../#category=openai">earlier articles</a> i’ve looked at how you can use ChatGPT to solve some of these tasks with simple prompts. But in many use cases, what is required is not just one prompt but a sequence of prompts where we need to also consider the outputs at each stage, before providing a final output - for example with a customer service chatbot.</p>
+<p>In this article, we will give a brief overview of how LLM’s work. We will look at how they are trained, as well as other details like what is a tokeniser and how a choice of different tokenisers can effect the output of the LLM. We will also look at what the ‘chat format’ for LLM’s is all about, distinguishing what are system vs user messages are as well as understanding the different things they do.</p>
+</section>
+<section id="setup" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="setup"><span class="header-section-number">2</span> Setup</h2>
+<p>First we need to load certain python libs and connect the OpenAi api.</p>
+<p>The OpenAi api library needs to be configured with an account’s secret key, which is available on the <a href="https://platform.openai.com/account/api-keys">website</a>.</p>
+<p>You can either set it as the <code>OPENAI_API_KEY</code> environment variable before using the library: <code>!export OPENAI_API_KEY='sk-...'</code></p>
+<p>Or, set <code>openai.api_key</code> to its value:</p>
+<pre><code>import openai
+openai.api_key = "sk-..."</code></pre>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> openai</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tiktoken</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv, find_dotenv</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> load_dotenv(find_dotenv()) <span class="co"># read local .env file</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>openai.api_key  <span class="op">=</span> os.environ[<span class="st">'OPENAI_API_KEY'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define helper function</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_completion(prompt, model<span class="op">=</span><span class="st">"gpt-3.5-turbo"</span>):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    messages <span class="op">=</span> [{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt}]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> openai.ChatCompletion.create(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span>model,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>messages,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> response.choices[<span class="dv">0</span>].message[<span class="st">"content"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="different-ways-of-using-a-language-model" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="different-ways-of-using-a-language-model"><span class="header-section-number">3</span> Different ways of using a Language Model</h2>
+<section id="how-does-an-llm-get-created" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="how-does-an-llm-get-created"><span class="header-section-number">3.1</span> How does an LLM get created?</h3>
+<p>How does a large language model get created? You might be familiar with the text generation process where you can provide a prompt, such as “I love eating,” and ask an LLM to fill in what the items are likely completions given this prompt. Additionally, it might mention “Bagels with cream cheese, my mom’s meatloaf or going out with friends.” But how did the model acquire this skill?</p>
+<p><em>Supervised learning</em> is the main training method for an LLM. A computer learns an input-output or X or Y mapping using labelled training data in supervised learning. For instance, if you’re using supervised learning to figure out how to categorise the sentiment of restaurant reviews, you might gather a training set like this, where a review like “The pastrami sandwich is great!” is labelled as a positive sentiment review, and so on so “The earl grey tea was fantastic” has a positive label and “Service was slow, the food was so-so.”</p>
+<p>In order to perform supervised learning, labelled data must first be obtained before an AI model can be trained using the data. After training, you may deploy the model, give it a call, and tell it what restaurant has the best pizza you’ve ever had. So the fundamental building component for training large language models is supervised learning. In particular, a Large Language Model can be created by repeatedly predicting the next word using supervised learning.</p>
+</section>
+<section id="types-of-llm" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="types-of-llm"><span class="header-section-number">3.2</span> Types of LLM</h3>
+<p>So today there are broadly two major types of Large Language Models. The first is a “Base LLM” and the second, which is what is increasingly used, is the “Instruction Tuned LLM”.</p>
+<p>Using text training data, the <em>base LLM</em> continuously predicts the subsequent word. In other words, if I give it the prompt, “Once upon a time there was a unicorn,” it might, by repeatedly predicting one word at a time, produce a completion that describes a unicorn living in a lovely woodland with all of her unicorn pals. An issue with this is that if you were to ask it, “What is the capital of France?” it’s entirely conceivable that a list of quiz questions about France would appear online. Therefore, it may finish this by asking questions like “What is the largest city in France? How many people lives there? In contrast, you presumably want to know what the capital of France is rather than having all these questions listed.</p>
+<p>A LLM that is tuned to instructions will therefore attempt to do so and, perhaps, respond with the statement, “The capital of France is Paris.” How does a Base LLM become an Instruction Tuned LLM?</p>
+<p>To make an <em>Instruction Tuned LLM</em>, a Base LLM must first be trained on a large amount of data, or perhaps even more than a hundred billion words. On a big supercomputing system, this operation could take months. After training the Base LLM, you would refine the model on a smaller collection of cases in which the output complies with an input directive. In order to write a number of examples of instructions and then a solid answer to instructions, for instance, you might hire contractors. So a training set for performing this additional fine-tuning is created. Therefore, if it is trying to follow instructions, it learns to anticipate what word will come next.</p>
+<p>The next step is to gather human evaluations of the output quality of numerous distinct LLMs on a variety of criteria, such as whether the output is beneficial, truthful, and safe, in order to improve the quality of the LLM’s output. To enhance the likelihood of the LLM producing outputs with higher ratings, you can then further fine-tune it. RLHF, or Reinforcement Learning from Human Feedback, is the method used most frequently to do this. And whereas training the Base LLM can take months, the process of moving from the Base LLM to the Instruction Tuned LLM can be completed in a matter of days using significantly smaller data sets and computational resources.</p>
+</section>
+</section>
+<section id="prompt-the-model-and-get-a-completion" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="prompt-the-model-and-get-a-completion"><span class="header-section-number">4</span> Prompt the model and get a completion</h2>
+<p>Let’s try using the LLM for one of the basic tasks we discussed which is to complete a bit of text.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> get_completion(<span class="st">"What is the capital of France?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The capital of France is Paris.</code></pre>
+</div>
+</div>
+</section>
+<section id="tokens" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="tokens"><span class="header-section-number">5</span> Tokens</h2>
+<p>Let’s try something different. If you were to tell the LLM to reverse the letters in the word “lollipop,” it would appear like a simple assignment that even a four-year-old could complete. However, if you ask ChatGPT to do this, it really produces something that is a little jumbled. This isn’t Lollipop, and the letters aren’t backwards either. So why can’t ChatGPT do what looks to be a very straightforward task?</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> get_completion(<span class="st">"Take the letters in lollipop </span><span class="ch">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="st">and reverse them"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ppilolol</code></pre>
+</div>
+</div>
+<p>“lollipop” in reverse should be “popillol”</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> get_completion(<span class="st">"""Take the letters in </span><span class="ch">\</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="st">l-o-l-l-i-p-o-p and reverse them"""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>response</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>'p-o-p-i-l-l-o-l'</code></pre>
+</div>
+</div>
+<p>It turns out that there is one more crucial aspect of how a large language model functions, namely that it <em>repeatedly predicts the next token rather than the next word</em>.</p>
+<p>In fact, an LLM groups characters together to create tokens, which are collections of frequently occurring character sequences, by taking a series of characters, such as “Learning new things is fun!” . Learning new things is enjoyable in this situation since each token stands for one word, one word with a space between them, or an exclamation point.</p>
+<p>The word prompting is still not that widespread in the English language, although it is undoubtedly rising in popularity. However, if you were to input other rather less commonly used words, such as “Prompting as powerful developer tool.” Because those three letter combinations are frequently found, prompting is actually divided into three tokens: “prom”, “pt”, and “ing”. Additionally, if you were to give it the word “lollipop,” the tokenizer actually splits it into the letters “l,” “oll,” and “ipop.” Furthermore, since ChatGPT only sees these three tokens rather than the individual characters, it has a harder time printing out these letters in the proper reverse order.</p>
+<p>So, here’s a hack you can employ to resolve this.</p>
+<p>It actually does a much better job, this L-O-L-L-I-P-O-P, if I were to add dashes to the word dashes, between these letters; spaces would also work, or other things would work; and tell it to take the letters and lollipop and reverse them. Because it tokenizes each of these characters into an own token when you provide it a lollipops with dashes between the letters, it can more easily discern the individual letters and print them out in reverse order. Therefore, this clever tip makes it easier for ChatGPT to distinguish between the different letters in words if you ever wish to use it to play a word game like Word or Scrabble.</p>
+<p>One token often corresponds to four letters, or roughly three-quarters of a word, in the English language. As a result, the maximum amount of input + output tokens that a given large language model can handle will frequently vary. The result is frequently referred to as completion, while the input is frequently referred to as the context. And the most widely used conversation GPT model, the GPT 3.5 Turbo, has a cap of about 4,000 tokens in the input plus output. As a result, if you attempt to provide it with an input context that is significantly longer than this, it will throw an exception or produce an error.</p>
+</section>
+<section id="using-system-user-assistant-format-messages" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="using-system-user-assistant-format-messages"><span class="header-section-number">6</span> Using system-user-assistant format messages</h2>
+<p>Let’s take a look at yet another effective LLM API use case that includes specifying distinct system, user, and assistant messages. Let’s look at an illustration before going into greater detail about what it does. We are going to prompt this LLM using a new helper function named “get_completion_from_messages” and a number of messages. Here is an illustration of what you can do.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define helper function</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_completion_from_messages(messages, </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                                 model<span class="op">=</span><span class="st">"gpt-3.5-turbo"</span>, </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                                 temperature<span class="op">=</span><span class="dv">0</span>, </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                                 max_tokens<span class="op">=</span><span class="dv">500</span>):</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> openai.ChatCompletion.create(</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span>model,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>messages,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span>temperature, <span class="co"># this is the degree of randomness of the model's output</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        max_tokens<span class="op">=</span>max_tokens, <span class="co"># the maximum number of tokens the model can ouptut </span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> response.choices[<span class="dv">0</span>].message[<span class="st">"content"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>I’m going to start off by defining what a system message looks like. Since this is a system message, its content is “You are an assistant who responds in the style of Dr.&nbsp;Seuss.” The second message’s role is “role: user” and its content is “write me a very short poem about a happy carrot.” I’ll then define a user message. Let’s run it, and with “temperature = 1”, which has the most unpredictability/creativity in its output.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>messages <span class="op">=</span>  [  </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>{<span class="st">'role'</span>:<span class="st">'system'</span>, </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a> <span class="st">'content'</span>:<span class="st">"""You are an assistant who</span><span class="ch">\</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st"> responds in the style of Dr Seuss."""</span>},    </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>{<span class="st">'role'</span>:<span class="st">'user'</span>, </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a> <span class="st">'content'</span>:<span class="st">"""write me a very short poem</span><span class="ch">\</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st"> about a happy carrot"""</span>},  </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>] </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> get_completion_from_messages(messages, temperature<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Oh, this carrot is a happy chap
+Bright orange and full of sap
+With a smile so wide and free
+He's the happiest veggie I do see</code></pre>
+</div>
+</div>
+<p>Well done ChatGPT! Not a bad result. Thus, in this illustration, the system message describes the general tone of what you want the Large Language Model to accomplish, whereas the user message is a specific directive you wished to implement in light of the higher level behaviour that was stated in the system message.</p>
+<p>So this is how the chat format works.</p>
+<p>The <em>system message</em> establishes the Large Language Model’s or the assistant’s general behaviour, and when you give it a user message—for example, “Tell me a joke” or “Write me a poem”—it responds appropriately while maintaining the general behaviour established in the system message. In addition, even though we are not illustrating it here, if you want to use this in a multi-term conversation, you can input assistant messages in this messages format to let ChatGPT know what it had previously said if you wanted to continue the conversation based on things that it had also said previously.</p>
+<p>But let’s look at a few more instances. I can specify in the system message that all of your responses must be one sentence long if you want to establish the tone and instruct it to produce only one sentence of text.</p>
+<p>And it only produces one sentence when I run this. It is now only one statement and no longer a poetry in the Dr.&nbsp;Seuss vein. The joyful carrot is the subject of a tale. I can utilise the system message to say, “You are an assistant who responds in the style of Dr.&nbsp;Seuss,” if we want to specify both the style and the length. Your sentences must all be composed of one sentence. Finally, this results in a lovely one-sentence poetry.</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># length</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>messages <span class="op">=</span>  [  </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>{<span class="st">'role'</span>:<span class="st">'system'</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a> <span class="st">'content'</span>:<span class="st">'All your responses must be </span><span class="ch">\</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">one sentence long.'</span>},    </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>{<span class="st">'role'</span>:<span class="st">'user'</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a> <span class="st">'content'</span>:<span class="st">'write me a story about a happy carrot'</span>},  </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>] </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> get_completion_from_messages(messages, temperature <span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>There once was a happy carrot named Carl, who lived in a lush vegetable garden and enjoyed the warm sunshine and rain showers, until one day he was picked by a kind farmer who complimented him on his bright orange color and brought him home to be the star ingredient in a delicious carrot cake that his family loved.</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># combined</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>messages <span class="op">=</span>  [  </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>{<span class="st">'role'</span>:<span class="st">'system'</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a> <span class="st">'content'</span>:<span class="st">"""You are an assistant who </span><span class="ch">\</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="st">responds in the style of Dr Seuss. </span><span class="ch">\</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="st">All your responses must be one sentence long."""</span>},    </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>{<span class="st">'role'</span>:<span class="st">'user'</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a> <span class="st">'content'</span>:<span class="st">"""write me a story about a happy carrot"""</span>},</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>] </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> get_completion_from_messages(messages, </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                                        temperature <span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Once there was a carrot so round and so bright, who lived in a garden soaking up sunlight; he worked with his friends and grew every day, and when he was picked, he was overjoyed to say, "I'm happy and grateful, thank you for the care, I'll nourish and delight, don't you dare despair!"</code></pre>
+</div>
+</div>
+<p>And finally, just for fun, here is a helper function that is a little bit more sophisticated that will tell you how many prompt tokens, completion tokens, and total tokens were used in your API call if you are using an LLM and want to know how many tokens you are using. It does this by getting a response from the OpenAI API endpoint and using other values in the response.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_completion_and_token_count(messages, </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                                   model<span class="op">=</span><span class="st">"gpt-3.5-turbo"</span>, </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                                   temperature<span class="op">=</span><span class="dv">0</span>, </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                                   max_tokens<span class="op">=</span><span class="dv">500</span>):</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> openai.ChatCompletion.create(</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span>model,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>messages,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span>temperature, </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        max_tokens<span class="op">=</span>max_tokens,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    content <span class="op">=</span> response.choices[<span class="dv">0</span>].message[<span class="st">"content"</span>]</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    token_dict <span class="op">=</span> {</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="st">'prompt_tokens'</span>:response[<span class="st">'usage'</span>][<span class="st">'prompt_tokens'</span>],</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="st">'completion_tokens'</span>:response[<span class="st">'usage'</span>][<span class="st">'completion_tokens'</span>],</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="st">'total_tokens'</span>:response[<span class="st">'usage'</span>][<span class="st">'total_tokens'</span>],</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> content, token_dict</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>messages <span class="op">=</span> [</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>{<span class="st">'role'</span>:<span class="st">'system'</span>, </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a> <span class="st">'content'</span>:<span class="st">"""You are an assistant who responds</span><span class="ch">\</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="st"> in the style of Dr Seuss."""</span>},    </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>{<span class="st">'role'</span>:<span class="st">'user'</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a> <span class="st">'content'</span>:<span class="st">"""write me a very short poem \ </span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="st"> about a happy carrot"""</span>},  </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>] </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>response, token_dict <span class="op">=</span> get_completion_and_token_count(messages)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Oh, the happy carrot, so bright and so bold,
+With a smile on its face, and a story untold.
+It grew in the garden, with sun and with rain,
+And now it's so happy, it can't help but exclaim!</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(token_dict)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'prompt_tokens': 39, 'completion_tokens': 52, 'total_tokens': 91}</code></pre>
+</div>
+</div>
+<p>And this is a list of the tokens we use. In contrast to the prompt input’s 37 tokens, its output had 55. Therefore, 92 tokens were consumed in total. To be honest, I don’t really give the quantity of tokens I use while utilising LL Models much thought.</p>
+<p>If you are concerned that the user may have provided you with an input that is too long and goes beyond ChatGPT’s 4,000 or so token limits, it may be worthwhile to check the number of tokens. In this case, you should double check the number of tokens and truncate the input to ensure that you are staying within the large language model’s input token limits.</p>
+</section>
+<section id="how-prompting-is-revolutionisng-ai-application-development" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="how-prompting-is-revolutionisng-ai-application-development"><span class="header-section-number">7</span> How Prompting is revolutionisng AI application development</h2>
+<p>In the conventional supervised machine learning workflow, such as the example of classifying the positive and negative sentiments in restaurant reviews, if you want to build a classifier to categorise restaurant review positive and negative sentiments, you first get a tonne of label data, possibly hundreds of examples. I have no idea how long this will take—possibly a month. The next step would be to tune the model after it had been trained on data, obtain an adequate open source model, and evaluate it. That can require a few days, a few weeks, or even a few months. And after that, you might need to locate a cloud service to deploy it, upload your model there, execute it, and then you can finally call your model. And it’s again not uncommon for this to take a team a few months to get working.</p>
+<p>In contrast with prompting-based machine learning, when you have a text application, you can specify a prompt. This can take minutes, maybe hours, if you need to iterate a few times to get an effective prompt. And then in hours, maybe at most days, but frankly more often hours, you can have this running using API calls and start making calls to the model. And once you’ve done that, in just again, maybe minutes or hours, you can start calling the model and start making inferences. And so there are applications that used to take me maybe six months or a year to build, that you can now build in minutes or hours, maybe very small numbers of days using prompting.</p>
+<p>This is revolutionising the types of AI applications that can be developed quickly. One key caveat: although vision technology is now far less developed, it’s kind of getting there. This applies to many unstructured data applications, including text applications in particular and perhaps increasingly vision applications. This formula doesn’t really work for machine learning applications on tabular data with plenty of numerical values in Excel spreadsheets. The speed with which AI components can be developed, however, is altering the process by which a whole system might be developed for the applications to which this does apply. Even though the full system might still take days, weeks, or something, at least this component can be built considerably more quickly.</p>
+</section>
+<section id="newline-characters" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="newline-characters"><span class="header-section-number">8</span> Newline Characters</h2>
+<p>Here, we are using a backslash <code>\</code> to make the text fit on the screen without inserting newline ‘’ characters. GPT-3 isn’t really affected whether you insert newline characters or not. But when working with LLMs in general, you may consider whether newline characters in your prompt may affect the model’s performance.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">9</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/">Building Systems with the ChatGPT API Course</a> by DeepLearning.ai and OpenAI - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

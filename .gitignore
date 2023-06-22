@@ -1,4 +1,6 @@
 /.quarto/
 docs/CNAME
 posts/.env
+posts/utils.py
+posts/products.json
 devnotes.txt

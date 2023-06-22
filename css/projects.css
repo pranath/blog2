@@ -1,7 +1,17 @@
-#quarto-sidebar {
-    display:block;
+#quarto-margin-sidebar {
+    display:none;
+}
+
+@media (min-width: 992px) {
+    #quarto-sidebar,
+    #quarto-margin-sidebar{
+        display:block;
+    }
 }
 .quarto-post {
     display: block !important;
     border-bottom: none !important;
+}
+.page-layout-article main #mc_embed_signup form {
+    display:none;
 }

@@ -13,6 +13,15 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-06-26-evaluating-outputs-of-llm-applications-ambiguous-criteria.html",
+      "/posts/2023-06-25-evaluating-outputs-of-llm-applications-clear-criteria.html",
+      "/posts/2023-06-24-creating-better-chatbots-using-chained-prompts-and-quality-checks.html",
+      "/posts/2023-06-23-checking-outputs-of-llms-like-chatgpt.html",
+      "/posts/2023-06-22-chaining-multiple-prompts-together-using-chatgpt.html",
+      "/posts/2023-06-21-chain-of-thought-reasoning-with-chatgpt.html",
+      "/posts/2023-06-20-evaluating-moderation-inputs-large-language-models.html",
+      "/posts/2023-06-19-evaluating-classification-inputs-large-language-models.html",
+      "/posts/2023-06-18-an-overview-of-llms-the-chat-format-and-tokens.html",
       "/posts/2023-06-14-key-considerations-when-creating-practical-applications-with-llms.html",
       "/posts/2023-06-06-creating-llm-based-agents-using-langchain.html",
       "/posts/2023-06-05-using-langchain-to-evaluate-llm-applications.html",
