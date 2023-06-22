@@ -41,3 +41,4 @@ format:
   html:
     theme: flatly
     css: css/styles.css
+    link-external-newwindow: true

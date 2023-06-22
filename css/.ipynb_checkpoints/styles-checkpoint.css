@@ -27,3 +27,6 @@ main #mc_embed_signup form {
 .page-layout-article main #mc_embed_signup form {
     display:block;
 }
+a.external:after {
+    background-image: none !important;
+}
