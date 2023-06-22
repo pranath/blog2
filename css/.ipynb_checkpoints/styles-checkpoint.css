@@ -29,4 +29,5 @@ main #mc_embed_signup form {
 }
 a.external:after {
     background-image: none !important;
+    display: none !important;
 }
