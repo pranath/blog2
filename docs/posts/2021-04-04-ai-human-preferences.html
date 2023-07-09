@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2021-04-04">
+<meta name="description" content="AI systems are being used everywhere, but often little work is done to gain a deeper understanding how and why they work. We have so much to gain from trying to look deeper inside these AI systems to understand them better.">
+
+<title>LivingDataLab - What AI can tell us about the hidden preferences of human beings</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - What AI can tell us about the hidden preferences of human beings">
+<meta property="og:description" content="AI systems are being used everywhere, but often little work is done to gain a deeper understanding how and why they work.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/aihuman.jpeg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - What AI can tell us about the hidden preferences of human beings">
+<meta name="twitter:description" content="AI systems are being used everywhere, but often little work is done to gain a deeper understanding how and why they work.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/aihuman.jpeg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">What AI can tell us about the hidden preferences of human beings</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">What AI can tell us about the hidden preferences of human beings</h1>
+                  <div>
+        <div class="description">
+          AI systems are being used everywhere, but often little work is done to gain a deeper understanding how and why they work. We have so much to gain from trying to look deeper inside these AI systems to understand them better.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">opinion</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 4, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#what-are-recommendation-systems" id="toc-what-are-recommendation-systems" class="nav-link" data-scroll-target="#what-are-recommendation-systems"><span class="toc-section-number">2</span>  What are Recommendation Systems?</a></li>
+  <li><a href="#creating-a-book-recommendation-system" id="toc-creating-a-book-recommendation-system" class="nav-link" data-scroll-target="#creating-a-book-recommendation-system"><span class="toc-section-number">3</span>  Creating a book recommendation system</a></li>
+  <li><a href="#going-down-the-rabbit-hole-what-is-our-book-recommendation-system-actually-doing" id="toc-going-down-the-rabbit-hole-what-is-our-book-recommendation-system-actually-doing" class="nav-link" data-scroll-target="#going-down-the-rabbit-hole-what-is-our-book-recommendation-system-actually-doing"><span class="toc-section-number">4</span>  Going down the rabbit hole: what is our book recommendation system actually doing?</a>
+  <ul class="collapse">
+  <li><a href="#negative-bias-books" id="toc-negative-bias-books" class="nav-link" data-scroll-target="#negative-bias-books"><span class="toc-section-number">4.1</span>  Negative bias books</a></li>
+  <li><a href="#positive-bias-books" id="toc-positive-bias-books" class="nav-link" data-scroll-target="#positive-bias-books"><span class="toc-section-number">4.2</span>  Positive bias books</a></li>
+  <li><a href="#looking-at-other-latent-factors" id="toc-looking-at-other-latent-factors" class="nav-link" data-scroll-target="#looking-at-other-latent-factors"><span class="toc-section-number">4.3</span>  Looking at other latent factors</a></li>
+  <li><a href="#books-with-high-values-for-latent-factor-1" id="toc-books-with-high-values-for-latent-factor-1" class="nav-link" data-scroll-target="#books-with-high-values-for-latent-factor-1"><span class="toc-section-number">4.4</span>  Books with high values for latent factor 1</a></li>
+  <li><a href="#books-with-low-values-for-latent-factor-1" id="toc-books-with-low-values-for-latent-factor-1" class="nav-link" data-scroll-target="#books-with-low-values-for-latent-factor-1"><span class="toc-section-number">4.5</span>  Books with low values for latent factor 1</a></li>
+  <li><a href="#so-what-is-latent-factor-1" id="toc-so-what-is-latent-factor-1" class="nav-link" data-scroll-target="#so-what-is-latent-factor-1"><span class="toc-section-number">4.6</span>  So what is latent factor 1?</a></li>
+  </ul></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="toc-section-number">5</span>  Discussion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">6</span>  Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>AI systems are increasingly being used in almost every area of human activity, from the online world, in streaming media, social media &amp; online shopping - to the offline world, in policing, healthcare and other public services as well as many different physical industries such as water, energy, agriculture and manufacturing. These applications of AI are having a huge impact, often beyond what is commonly known to the public, both <a href="https://www.nature.com/articles/d41586-020-03348-4">positive</a> and <a href="https://www.fast.ai/2017/11/02/ethics/">negative</a>.</p>
+<p>Most work in the field is focussed on trying to use AI to solve a particular problem at hand, and if the problem is ‘solved’ then little more thought is often done. Much less work goes on into understanding the fundamental nature of the AI created to solve a particular problem. To some extent this is of course because the main motivation is to solve the problem, but another reason is often because AI systems i.e.&nbsp;artificial neural networks, are often incredibly complicated, are not directly created by humans - and so can actually be very difficult to understand the inner workings of. Questions such as How is it doing it? Why is it doing it? What has it learnt? are questions often not addressed - as long as the AI system seems to ‘get the job done’.</p>
+<p>It’s certainly my belief that this much neglected area is worth far more work than it often gets, not only to allow us to understand the AI system at a deeper level, but that it might also give us new insights and understandings into the area the AI system is being applied to.</p>
+<p>In this article I’m going to look at one particular area of AI application called <em>Recommendation Systems</em>. For a recent project, I created an AI system for recommending new books to readers. I then extended the project to study how this AI book recommendation system itself was working, and discovered what it had learnt about the hidden preferences of book readers.</p>
+</section>
+<section id="what-are-recommendation-systems" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="what-are-recommendation-systems"><span class="header-section-number">2</span> What are Recommendation Systems?</h2>
+<p>Recommendation systems are very common particularly in online services. For example, Amazon suggestions for alternative products, on Netflix suggestions for films, on Spotify for music, or on Facebook for the content you see on your newsfeed. All of these services and more use recommendation systems to suggest new content to people, but what are these systems and how do these actually work?</p>
+<p>A very simple approach might be to recommend the most popular items to people. Of course, popular items would probably appeal to many - but not to everyone. With modern AI based recommendation systems we can do much better than this, to make more personalised suggestions that are unique to each person. There are two main approaches to this: content-based filtering and collaborative filtering.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/reccsystems.png" title="Types of Reccomendation Systems" class="img-fluid"></p>
+<p>With <em>content-based filtering</em>, we look at the content a person has previously looked at (eg songs or films you have previously watched) as a basis to recommend new content. In this case, the AI system does the work here to understand what content is similar, for example what films are similar. This might be based on more obvious things such as the film genre, or which actors are in the film. However it can also be based on less obvious things that the AI can learn for itself about what makes films similar or different, things that are not given to the AI at all, but that the AI system can learn itself. These hidden aspects are called <strong>latent factors</strong>.</p>
+<p>With <em>collaborative filtering</em>, we look at other people who are similar to us, and suggest items that they have liked, that we have not yet seen. Here the AI system does the work to understand which people are similar to us, as a basis to make suggestions. As a simple example, on a music service, we could find another listener who has listened to some of the same songs we have, find a song they have listened to that we have not, then recommend that to us. However, this simple strategy may not always be effective, just because 2 people like the same song, that does not always mean they would both like another song that one of them liked, let alone that both people are ‘similar’? What makes people similar and different, might be based on things like the genre of music they liked, which artists etc.</p>
+<p>But what truly makes people similar or different in their preferences can also be based on less obvious things, more nuanced and subtle reasons, things people often do not perhaps even understand themselves, biases, etc that are hidden and unconscious, and yet drive and influence people’s choices and behaviour. These hidden biases and influences are things not given to the AI at all, how could they be? and yet, they are things AI systems can still learn about for itself, which are again here called latent factors.</p>
+</section>
+<section id="creating-a-book-recommendation-system" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="creating-a-book-recommendation-system"><span class="header-section-number">3</span> Creating a book recommendation system</h2>
+<p>For my book recommendation system, I used the collaborative filtering approach. The data I used to create this system is the <a href="http://www2.informatik.uni-freiburg.de/~cziegler/BX/">Book Crossing dataset</a> which is data on peoples book ratings of around 27,000 different books, from the Book Crossing community website, gathered in September 2004. There are around 28,000 users of this website who are from all over the world, and from a range of different ages. The key data is a table of individual ratings of a person (identified by a unique user id), a book and a the value of the rating (a number between 0-10).</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/rating_table.png" title="Ratings table data" class="img-fluid"></p>
+<p>These user ratings are not exhaustive, i.e.&nbsp;every user has not rated every book. Note also there is no extra information about the books such as categories, or about each person such as their ages. But we don’t actually need this extra data, we can create an AI collaborative filter based system (commonly called a ‘model’) that learns just from the table of users, books and ratings, to build up an understanding of the latent factors that uniquely describes each book, and each person. Once the model has been ‘trained’ on this data, and learnt these latent factors - the model can then use these latent factors to make recommendations for each person, about what new books they might like.</p>
+<p>When the AI model learns, it doesn’t directly see the real ratings - it just tries to make guesses about what the ratings should be. We then compare the guesses to the actual ratings we know, and give the model back some measure of accuracy, which the model then uses to improve its guesses in the next cycle. This training process repeats for many cycles.</p>
+</section>
+<section id="going-down-the-rabbit-hole-what-is-our-book-recommendation-system-actually-doing" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="going-down-the-rabbit-hole-what-is-our-book-recommendation-system-actually-doing"><span class="header-section-number">4</span> Going down the rabbit hole: what is our book recommendation system actually doing?</h2>
+<p>So we now have a book recommendation system that can suggest new books to people. But we can if we choose, take things further. Simply from the data of book ratings and the learning process, the system has had to understand something more, about the implicit reasons certain people prefer certain books over others - and indeed perhaps about general qualities that drive these choices. These qualities might correspond to categories we might recognise as more obvious book genres, but they might also correspond to other qualities that are not commonly recognised as ‘categories’ yet might still be factors that drive people to prefer different books.</p>
+<p>How might we try and understand these latent factors that drive people’s preferences for books?</p>
+<p>We actually have 2 types of latent factors, normal factors and bias factors. Bias factors represent a general bias towards a book, either positive or negative. This will mean for that book, regardless if it would be generally a good suggestion for a person - if it has a negative bias it will be far less likely to be suggested. Similarly, if a book has a very positive bias, it might be more likely to be suggested to you, even if you would not normally read that kind of book i.e.&nbsp;you would not normally read that genre. We can think of bias then as some kind of measure of ‘general popularity’ of a book.</p>
+<section id="negative-bias-books" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="negative-bias-books"><span class="header-section-number">4.1</span> Negative bias books</h3>
+<p>So these are the bottom 10 books with the most negative bias in the AI model:</p>
+<ul>
+<li>Wild Animus</li>
+<li>The Law of Love</li>
+<li>Blood and Gold (Rice Anne Vampire Chronicles)</li>
+<li>Gorky Park</li>
+<li>The Cat Who Went into the Closet</li>
+<li>Waiting to Exhale</li>
+<li>Night Moves (Tom Clancy’s Net Force No.&nbsp;3)</li>
+<li>Ruthless.Com (Tom Clancy’s Power Plays)</li>
+<li>Ground Zero and Beyond</li>
+<li>Say Cheese and Die!</li>
+</ul>
+<p>Let us look at the 2 books with the most negative bias, ‘Wild Animus’ and ‘The Law of love’. So what is Wild Animus about? The synopsis reads:</p>
+<blockquote class="blockquote">
+<p>“Sam Altman is an intense young man with an animal energy whose unleashed and increasingly unhinged imagination takes him first to Seattle and then farther north, to the remote Alaskan wilderness. …”</p>
+</blockquote>
+<p>This book does have many many online reviews, on the whole which can be summarized by the review <a href="https://litreactor.com/columns/what-the-hell-is-wild-animus">What the hell is Wild animus?</a>. The review concludes with a quote from a goodreads reviewer:</p>
+<blockquote class="blockquote">
+<p>“I’ll tell you the ending. A column of lava erupts from beneath his feet while he is dressed in a goat costume and wolves are in mid-air tearing him apart.”</p>
+</blockquote>
+<p>On the whole it seems, Wild Animus seems to provoke a very unfavourable response from most reviewers! The next most negative bias book is ‘The law of love’, it’s synopsis reads:</p>
+<blockquote class="blockquote">
+<p>“After one night of passion, Azucena, an astroanalyst in twenty-third-century Mexico City, is separated from her Twin Soul, Rodrigo, and journeys across the galaxy and through past lives to find her lost love, encountering a deadly enemy along the way…”</p>
+</blockquote>
+<p>As it happens this book has as many positive reviews as negative online, in fact few reviews seem neutral at all. So this is not universally seen as a bad book, by humans who post reviews online anyway. Nevertheless, our AI model regards this as a book that should not really be suggested to anyone. Is that because the book seems to be so divisive? and perhaps there are other books that are ‘safer bets’? Either way, the computer says no.</p>
+</section>
+<section id="positive-bias-books" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="positive-bias-books"><span class="header-section-number">4.2</span> Positive bias books</h3>
+<p>Let’s now look at the top 10 books with the most positive bias in the AI model:</p>
+<ul>
+<li>The Lovely Bones: A Novel</li>
+<li>Harry Potter and the Goblet of Fire</li>
+<li>The Da Vinci Code</li>
+<li>Harry Potter and the Prisoner of Azkaban</li>
+<li>The Secret Life of Bees</li>
+<li>Harry Potter and the Sorcerer’s Stone</li>
+<li>Harry Potter and the Chamber of Secrets</li>
+<li>Where the Heart Is</li>
+<li>To Kill a Mockingbird</li>
+<li>The Red Tent</li>
+</ul>
+<p>So looking in more detail at the 2 books with the most positive bias we have ‘The lovely bones’ and ‘Harry Potter and the Goblet of Fire’. So the synopsis of “The lovely bones” is as follows:</p>
+<blockquote class="blockquote">
+<p>“It is the story of a teenage girl who, after being raped and murdered, watches from her personal Heaven as her family and friends struggle to move on with their lives while she comes to terms with her own death.”</p>
+</blockquote>
+<p>This book has a large number of very favourable reviews, in fact it was hard to find a very negative review of this book at all. <a href="https://www.nytimes.com/2002/07/14/books/what-remains.html">The New York Time’s review</a> perhaps sums up well the general sentiment felt by most reviewers of this book:</p>
+<blockquote class="blockquote">
+<p>“…Sebold deals with almost unthinkable subjects with humor and intelligence and a kind of mysterious grace. The Lovely Bones takes the stuff of neighborhood tragedy – the unexplained disappearance of a child, the shattered family alone with its grief – and turns it into literature…”</p>
+</blockquote>
+<p>So we can perhaps appreciate some of the reasons perhaps why the AI model thinks this is a good book to recommend to anyone, regardless of what their normal reading preferences might be. The second most positively biased book is “Harry Potter and the Goblet of fire”. Being one of a series of some of the most popular books of all time - this is perhaps not surprising at all that the AI model thinks this would be a good book to recommend to most people, regardless of their normal reading preferences.</p>
+</section>
+<section id="looking-at-other-latent-factors" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="looking-at-other-latent-factors"><span class="header-section-number">4.3</span> Looking at other latent factors</h3>
+<p>So for the remaining latent factors, we actually have 50 of them for each of our 27,000 books - so quite a few! However we can use a process called <em>dimensionality reduction</em> to actually reduce these down, to the 2 most important latent factors for all books. We can then plot each book on a graph, with the measure that book has for each of these 2 key latent factors.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/factors0-1.png" title="Key latent factor 1 (horizontal axis) and factor 2 (vertical axis) for 50 books" class="img-fluid"></p>
+<p>A bigger view of this image of latent factors 1 &amp; 2 can be seen <a href="https://livingdatalab.com/images/factors0-1.png">here</a></p>
+<p>Here we can see 50 books plotted. On the horizontal axis that is a measure of how much of latent factor 1 each book has. On the vertical axis, that is a measure of how much of latent factor 2 each book has.</p>
+<p>Let’s look into latent factor 1, which is the strongest latent factor used by the AI model to make book recommendations.</p>
+</section>
+<section id="books-with-high-values-for-latent-factor-1" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="books-with-high-values-for-latent-factor-1"><span class="header-section-number">4.4</span> Books with high values for latent factor 1</h3>
+<p>We can see in the bottom right corner of the chart ‘The lovely bones’. This has one of the highest measures of factor 1, because it is one of the furthest to the right. We also know from our look at bias factors, that this is the book with the strongest positive bias latent factor as well i.e.&nbsp;a generally popular book. Let’s also note it falls into the categories of ‘Crime, Thriller, Mystery’.</p>
+<p>Looking at another book with a high factor 1, in the top right we have ‘Good in Bed’. The synopsis of the book is:</p>
+<blockquote class="blockquote">
+<p>“It tells the story of an overweight Jewish female journalist, her love and work life and her emotional abuse issues with her father.”</p>
+</blockquote>
+<p>It generally also has good reviews, and would fall into the category of ‘Women’s fiction’. Let’s look at a third book with a high factor 1, “The life of Pi”. The synopsis of this book is:</p>
+<blockquote class="blockquote">
+<p>“After the tragic sinking of a cargo ship, a solitary lifeboat remains bobbing on the wild, blue Pacific. The only survivors from the wreck are a sixteen year-old boy named Pi, a hyena, a zebra (with a broken leg), a female orang-utan and a 450-pound Royal Bengal tiger.”</p>
+</blockquote>
+<p>Again this book generated very good reviews, was very popular, and might fall into the category of ‘Contemporary fiction’. What are some common things to note about all of these books with a high latent factor 1?</p>
+<ul>
+<li>They are all very popular and have great critical acclaim</li>
+<li>2 of these books turned into films, and the third is currently being adapted for film.</li>
+<li>All 3 have a theme of a huge personal tragedy, which the protagonist is successful in overcoming and rising above by themselves</li>
+</ul>
+<p>So lets bear this in mind, while we look at books with the lowest latent factor 1.</p>
+</section>
+<section id="books-with-low-values-for-latent-factor-1" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="books-with-low-values-for-latent-factor-1"><span class="header-section-number">4.5</span> Books with low values for latent factor 1</h3>
+<p>Books with low values for factor one are on the far left of the chart. For example we have ‘A painted house’ the synopsis of this being:</p>
+<blockquote class="blockquote">
+<p>“A Painted House is a moving story of one boy’s journey from innocence to experience, drawn from the personal experience of legendary legal thriller author John Grisham”</p>
+</blockquote>
+<p>Let’s also note this would fall into the categories of ‘Contemporary fiction, mystery’. Looking at another book with a low factor 1 ‘The street lawyer’, the synopsis being:</p>
+<blockquote class="blockquote">
+<p>“…about an attorney who leaves his high-priced firm to work for the less fortunate.”</p>
+</blockquote>
+<p>This also seems to be another book by John Grisham, that would fall into categories such as ‘Thriller, Mystery’. Looking at Grisham’s work, how might we characterise his work more generally? He is well known for writing legal thrillers, and themes such as ‘the triumph of the underdog’, however A painted house seems not to quite fit these themes, an exception - so why is it here? A theme that might link both is ‘the triumph of working together’ in the case of the legal thrillers it’s the lawyer, the legal system his collaborators, in ‘a painted house’ its the family that needs to pull together to triumph, as explained in <a href="https://www.enotes.com/topics/painted-house/themes">this review</a>:</p>
+<blockquote class="blockquote">
+<p>“…The primary theme is the importance of family: only by pulling together does the family achieve even moderate success”</p>
+</blockquote>
+<p>In fact when we look at the other books with the lowest factor 1, on the far left of the chart, they pretty much are all John Grisham legal thriller books such as:</p>
+<ul>
+<li>The Pelican brief</li>
+<li>The Brethren</li>
+<li>The Summons</li>
+<li>The Firm</li>
+</ul>
+</section>
+<section id="so-what-is-latent-factor-1" class="level3" data-number="4.6">
+<h3 data-number="4.6" class="anchored" data-anchor-id="so-what-is-latent-factor-1"><span class="header-section-number">4.6</span> So what is latent factor 1?</h3>
+<p>Let’s now consider what factor 1 might actually be about. Given most of these books, regardless of having a low or high value of factor 1, have all been popular and successful - so popularity I would argue has nothing to do with what factor 1 is really about.</p>
+<p>Based on what we have learnt about these books so far, I would speculate that latent factor 1 might represent a measure of <strong>‘The triumph of the group vs the triumph of the individual’</strong> as a theme-axis. So, low values of factor 1 would correspond to ‘The triumph of the group’ type themes, and high values of factor 1 would correspond to ‘The triumph of the individual’ type themes for books.</p>
+<p>Remember the AI model is given no information about book categories, authors, genres, themes etc. All the AI has to learn from is the ratings between users and books - that’s all. Not only has our AI model discovered this particular axis theme by itself from very limited information, but it has done so because the AI model has judged that this theme-axis, whatever it is, is one of the most useful for the purposes of making good book recommendations to people.</p>
+</section>
+</section>
+<section id="discussion" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="discussion"><span class="header-section-number">5</span> Discussion</h2>
+<p>So how do we make sense of our findings? We can’t conclusively say that my suggested ‘triumph of the group vs triumph of the individual’ theme-axis is generally true, or the key hidden factor for understanding generally why people prefer certain books over others. Firstly, it’s based on an inevitably limited data set of books, people and ratings. Perhaps the people who made those ratings are not representative of the general population? Secondly, we only randomly chose 50 books to plot for our latent factors. What if we randomly picked a different set of 50 books, would we see the same kind of themes for latent factor 1, or something else? If the ‘triumph of the group vs triumph of the individual’ theme axis does appear to be a key factor over many more books and people - why is this the case? and what does it suggest about human beings more generally? However these are questions that could be further investigated, researched, and better answered - with more time, and the conclusions of which could potentially be very interesting indeed.</p>
+<p>What we can say is that from very limited information, looking at a limited number of books, and looking at some of its latent factors such as biases and the main key factor - this AI model seems to have discovered many relationships we could recognise as humans such as ‘generally popular books’ and ‘generally awful books’. The interpretation of the key latent factor as ‘triumph of the group vs triumph of the individual’ as a theme-axis is of course very speculative at this stage, and yet very intriguing! Would you come to a different conclusion looking at the books at either end of the axis of latent factor 1 on the chart? What do you think latent factor 1 on the horizontal axis is all about? What do you think latent factor 2 on the vertical axis is about? I’d love to hear your feedback and thoughts on this, so do feel free to comment below.</p>
+</section>
+<section id="conclusion" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">6</span> Conclusion</h2>
+<p>In this article I’ve tried to highlight a few key themes: that AI is being used everywhere, that little work is often done to understand how and why these AI systems work, and that we have so much to gain by actually trying to look inside and understand these AI systems better. I’d also argue this is becoming more and more important, given the growing impact of these increasingly powerful systems on our world and human life.</p>
+<p>Looking inside these AI systems, even though not straightforward - gives us the chance to know more about what they are really doing and why, and can give us intriguing hints about the domains in which they are used, which I have tried to illustrate with my book recommendation project.</p>
+<p>When these AI systems are used in the domain of human choices, the potential is there hidden within these systems to perhaps discover new insights, and pose new questions about ourselves and our choices, that we may have never even considered or knew to ask. Perhaps by looking a little deeper into AI, we can see a little deeper into ourselves.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

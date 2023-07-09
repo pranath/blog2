@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2022-03-04">
+<meta name="description" content="In this article, we will learn about the main epidemiological study designs, including cross-sectional and ecological studies, case-control and cohort studies, as well as the more complex nested case-control, case-cohort designs, and randomised controlled trials.">
+
+<title>LivingDataLab - Study Designs in Epidemiology</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Study Designs in Epidemiology">
+<meta property="og:description" content="In this article, we will learn about the main epidemiological study designs, including cross-sectional and ecological studies, case-control and cohort studies, as well as the more complex nested…">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/epidemiology2.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Study Designs in Epidemiology">
+<meta name="twitter:description" content="In this article, we will learn about the main epidemiological study designs, including cross-sectional and ecological studies, case-control and cohort studies, as well as the more complex nested…">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/epidemiology2.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Study Designs in Epidemiology</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Study Designs in Epidemiology</h1>
+                  <div>
+        <div class="description">
+          In this article, we will learn about the main epidemiological study designs, including cross-sectional and ecological studies, case-control and cohort studies, as well as the more complex nested case-control, case-cohort designs, and randomised controlled trials.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">health</div>
+                <div class="quarto-category">epidemiology</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 4, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#epidemiological-study-designs" id="toc-epidemiological-study-designs" class="nav-link" data-scroll-target="#epidemiological-study-designs"><span class="toc-section-number">2</span>  Epidemiological Study Designs</a></li>
+  <li><a href="#descriptive-study-designs" id="toc-descriptive-study-designs" class="nav-link" data-scroll-target="#descriptive-study-designs"><span class="toc-section-number">3</span>  Descriptive Study Designs</a></li>
+  <li><a href="#analytic-study-designs" id="toc-analytic-study-designs" class="nav-link" data-scroll-target="#analytic-study-designs"><span class="toc-section-number">4</span>  Analytic Study Designs</a></li>
+  <li><a href="#ecological-studies" id="toc-ecological-studies" class="nav-link" data-scroll-target="#ecological-studies"><span class="toc-section-number">5</span>  Ecological Studies</a></li>
+  <li><a href="#primary-and-secondary-data" id="toc-primary-and-secondary-data" class="nav-link" data-scroll-target="#primary-and-secondary-data"><span class="toc-section-number">6</span>  Primary and Secondary Data</a>
+  <ul class="collapse">
+  <li><a href="#some-covid-19-examples" id="toc-some-covid-19-examples" class="nav-link" data-scroll-target="#some-covid-19-examples"><span class="toc-section-number">6.1</span>  Some COVID-19 examples</a></li>
+  </ul></li>
+  <li><a href="#cross-sectional-studies" id="toc-cross-sectional-studies" class="nav-link" data-scroll-target="#cross-sectional-studies"><span class="toc-section-number">7</span>  Cross-sectional Studies</a></li>
+  <li><a href="#case-control-studies" id="toc-case-control-studies" class="nav-link" data-scroll-target="#case-control-studies"><span class="toc-section-number">8</span>  Case-control Studies</a></li>
+  <li><a href="#cohort-studies" id="toc-cohort-studies" class="nav-link" data-scroll-target="#cohort-studies"><span class="toc-section-number">9</span>  Cohort Studies</a></li>
+  <li><a href="#strengths-and-weaknesses-of-cohort-and-case-control-studies-compared" id="toc-strengths-and-weaknesses-of-cohort-and-case-control-studies-compared" class="nav-link" data-scroll-target="#strengths-and-weaknesses-of-cohort-and-case-control-studies-compared"><span class="toc-section-number">10</span>  Strengths and Weaknesses of Cohort and Case-control Studies Compared</a>
+  <ul class="collapse">
+  <li><a href="#cohort-studies-1" id="toc-cohort-studies-1" class="nav-link" data-scroll-target="#cohort-studies-1"><span class="toc-section-number">10.1</span>  Cohort studies</a></li>
+  <li><a href="#case-control-studies-1" id="toc-case-control-studies-1" class="nav-link" data-scroll-target="#case-control-studies-1"><span class="toc-section-number">10.2</span>  Case-control studies</a></li>
+  </ul></li>
+  <li><a href="#nested-studies" id="toc-nested-studies" class="nav-link" data-scroll-target="#nested-studies"><span class="toc-section-number">11</span>  Nested Studies</a></li>
+  <li><a href="#randomised-controlled-trials" id="toc-randomised-controlled-trials" class="nav-link" data-scroll-target="#randomised-controlled-trials"><span class="toc-section-number">12</span>  Randomised Controlled Trials</a>
+  <ul class="collapse">
+  <li><a href="#strengths-and-weaknesses-of-randomised-controlled-trials" id="toc-strengths-and-weaknesses-of-randomised-controlled-trials" class="nav-link" data-scroll-target="#strengths-and-weaknesses-of-randomised-controlled-trials"><span class="toc-section-number">12.1</span>  Strengths and Weaknesses of Randomised Controlled Trials</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">13</span>  Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Choosing an appropriate study design in Epidemiology is a critical decision that can largely determine whether a study will successfully answer your research question. A quick look at the contents page of a biomedical journal or even at the health news section of a news website is enough to tell you that there are many different ways to conduct epidemiological research.</p>
+<p>In this article, we will learn about the main epidemiological study designs, including cross-sectional and ecological studies, case-control and cohort studies, as well as the more complex nested case-control and case-cohort designs. Finally we will look at randomised controlled trials, which is often considered the optimal study design, especially in clinical research. You will also develop the skills to identify strengths and limitations of the various study designs.</p>
+</section>
+<section id="epidemiological-study-designs" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="epidemiological-study-designs"><span class="header-section-number">2</span> Epidemiological Study Designs</h2>
+<p>Not all study designs are born equal. It is widely accepted that results from certain types of studies, are more likely to reflect the truth than others. This is often called <em>Hierarchy of Evidence</em> and considers systematic reviews, meta-analysis, and randomized controlled trials, as the best sources of evidence.</p>
+<p>While this is mostly true, it does not account for the quality of studies. Many would argue that a well conducted case-control study, can be more informative than a trial with methodological problems.</p>
+<p>Websites that publish epidemiological studies include <a href="https://scholar.google.co.uk/">Google Scholar</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/">PubMed</a>.</p>
+</section>
+<section id="descriptive-study-designs" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="descriptive-study-designs"><span class="header-section-number">3</span> Descriptive Study Designs</h2>
+<p>Descriptive Study Designs include case reports, case series cross-sectional studies and ecologic studies. As implied by the name, descriptive studies are used to <em>describe patterns in a population</em>. These patterns can be related to prevalence or incidence or trends. A descriptive study could be about a single individual, this is known as a case report. An example would be an unusual set of symptoms or clinical features, such as a child with visual disturbances accompanied by abdominal pain or it can be about separate individuals with unusual symptoms. This would be known as case series. Descriptive studies can also be based on populations, as is the case with cross-sectional studies. These studies look at a snapshot in a given moment in time.</p>
+<p>Using the findings of these descriptive studies, epidemiologists can then develop hypotheses about the causes of disease patterns and about the factors that affect disease risk. To further examine these hypotheses epidemiologists must turn to analytic epidemiology. <em>Where descriptive studies describe the occurrence of disease or its determinants within a population, analytic studies are concerned with how the determinant may influence the occurrence of disease among individuals</em>.</p>
+</section>
+<section id="analytic-study-designs" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="analytic-study-designs"><span class="header-section-number">4</span> Analytic Study Designs</h2>
+<p>An analytic study aims to quantify the effect of an intervention or an exposure on an outcome. To quantify the effect you need to know the rate of occurrence in a comparison group as well as in the exposed group. There are 2 types of analytic study: observational and experimental. In an observational study you simply observe the exposure and the disease status of each participant. You don’t try and change the exposure in any way. The 2 most common types of observational studies are case control studies and cohort studies. In a case control study, you would identify your cases when you initiate the study and then you find controls to compare them to. In this type of study you assess the exposure in the disease cases and compare them to the controls. A cohort study is different in that you identify a population first, for example nurses in England and then you would assess exposure, for example physical activity.</p>
+<p>The second type of analytic study designs are referred to as experimental studies and you can think of these as analogous to treating people like lab rats. In this case the investigator is able to assign the exposure to individuals from a particular population after which the outcome is measured in exposed and then unexposed groups. Ideally the assignment of the exposure should be random. These types of experiments are called randomized controlled trials and they usually considered the gold standard in analytic epidemiology. An example of a randomized control trial would be assigning some people to receive a particular vaccine, and then other people no vaccine and then examining whether the vaccine works in reducing the occurrence of a given condition.</p>
+<p><strong>To summarise, we search for the determinants of disease first by relying on descriptive epidemiology to generate hypotheses about associations between exposures and outcomes and then analytic studies are undertaken to test specific hypotheses.</strong></p>
+</section>
+<section id="ecological-studies" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="ecological-studies"><span class="header-section-number">5</span> Ecological Studies</h2>
+<p>In many epidemiological studies data is collected from individuals who are compared to each other in terms of exposure and outcome. But individual data is not always available and can be difficult to collect. Alternatively, we can conduct an ecological study which does not require data from individuals.</p>
+<p><em>The core principle of ecological studies is that it focuses on the comparison of groups rather than individuals</em>. In other words, the unit of observation is the group. This implies that you analyze only aggregate level data which usually cannot be linked to a specific person. The size of the group can vary. You could use a school or a work site as a unit of analysis, but it could also be something much larger, such as a geographic region or an entire country. Sometimes, the unit of analysis is not geographically defined. It could be an occupation or even a time interval. The idea is the same though. You aggregate data on exposure and outcome at the group level and subsequently, you take a number of groups and use the aggregate data in your analysis.</p>
+<p>If we did an ecological study and found an association between a group and a exposure does that imply the exposure caused the outcome? Not necessarily. There can be many alternative explanations for this association. From chance to bias and confounding that apply to all study designs. Association does not always imply causation. But there is also something specific to this study design that we should never forget. <strong>Assuming that associations between groups hold for individuals is called ecological fallacy or aggregation bias.</strong></p>
+<p>So why bother with ecological studies? Well, usually, an ecological study is the first step in exploring a research question and can generate hypothesis about disease etiology. Ecological studies typically use secondary data sources that are already available. So, they’re relatively inexpensive and quick to complete. Sometimes, the level of inference that you’re interested in is at the population level anyway. For example, when looking at the impact of tax increases on cigarette consumption, in which case, conducting an ecological study is absolutely fine. Ecological studies are also suitable when the variability of exposure within each group is limited. If there is little variation in individual chocolate consumption within each country, you can be more confident about the association shown in the graph. On the other hand, any ecological study is subject to the ecological fallacy and relies on secondary data collected for different purposes which may not always be comparable between countries or time periods. It might also be unclear if the exposure preceded the outcome.</p>
+<p>Ecological studies can be a valuable tool in epidemiology especially when we have limited time and resources. However, we should not assume that group level associations are necessarily applicable to individuals.</p>
+</section>
+<section id="primary-and-secondary-data" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="primary-and-secondary-data"><span class="header-section-number">6</span> Primary and Secondary Data</h2>
+<p>Data collection is crucial for epidemiological research. Whilst there are various methods to collect data, all information which is gathered can be categorised into two different types: primary and secondary.</p>
+<p>Primary data is data that has been collected for the first time by an investigator. Primary data can be collected via questionnaires, interviews or tests. The advantage of primary data is that collection methods can be adapted to the objectives of the study. However, collecting primary data can be costly and time intensive, which may mean that it is not always feasible to obtain.</p>
+<p>Secondary data, also known as existing data, is data which has already been collected for other purposes. Some examples of secondary data include census data, medical records, employment records and mortality registers. Secondary data is readily available and therefore cheaper to obtain. Moreover, secondary data often has large sample sizes and is collected both comprehensively as well as on a routine basis. This can be advantageous to researchers who want to compare data over time to detect population-level changes. On the other hand, the format of secondary data may not be suitable for the researcher. Similarly, data coverage could be insufficient or the type of data collected may not be tailored to the research objectives of the researcher.</p>
+<p>Primary and secondary data have strengths and limitations. The type of data which a researcher chooses to obtain or use can depend on a variety of factors such as the research question at hand, the time and resources available for the project, as well as the skills of the researcher. Several studies make use of both primary and secondary data to fulfil different requirements of the research.</p>
+<section id="some-covid-19-examples" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="some-covid-19-examples"><span class="header-section-number">6.1</span> Some COVID-19 examples</h3>
+<p>The rapid developments during the first few months of the COVID-19 pandemic created an urgent need for data and analyses that would provide much needed information about this new disease.</p>
+<p>Examples of primary data used for such analyses include (a) results of PCR tests among travellers leaving Wuhan early in the epidemic (e.g.&nbsp;all passengers in a repatriation flight) to assess the prevalence of infection among them; (b) data from seroprevalence studies in which a representative sample of the population is tested to measure antibodies against the SARS-CoV-2 virus; (c) data collected during clinical trials testing the effectiveness of potential treatments of COVID-19.</p>
+<p>Examples of secondary data used for such analyses incude (a) data on the number of confirmed cases or/and deaths by country or region used to conduct ecological analyses; (b) data from the electronic health records of patients hospitalised for COVID-19 to investigate potential risk factors for worse COVID-19 outcomes.</p>
+</section>
+</section>
+<section id="cross-sectional-studies" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="cross-sectional-studies"><span class="header-section-number">7</span> Cross-sectional Studies</h2>
+<p>Cross-sectional studies, are usually described as snapshots of the population of interest, at a specific point in time. We use the word snapshot, because we assess both the exposure and the outcome at the same moment in time.</p>
+<p>The same moment in time, may last for days or weeks, if you’re collecting data from large numbers of people. The point here, is that each individual is only assessed once, and there is no follow up. As a result, you can assess the prevalence of a disease or condition with a cross-sectional study, but not the incidence rate or risk, both of which require follow-up period. This is as you can imagine, the main limitation of cross-sectional studies. No information regarding the temporal relationship between exposure and outcome, can be collected and therefore, you’re unable to determine if the exposure preceded the outcome. This is why surveys are most frequently used for descriptive purposes. If you want to investigate causal associations, you would probably choose a different study design.</p>
+<p>The fact that there is no follow-up, makes cross-sectional studies relatively cheap and easy to conduct. On the other hand, the lack of follow-up means that you only assess cases of the disease that are present at the time of the survey. Those who have been cured or have died of the disease, are not in the sample anymore, which limits our ability to measure the true extent of the disease. While the most frequent method of data collection in cross-sectional studies is through questionnaires, you could collect blood samples, use diagnostic tests or do physical measurements. As long as participants are only assessed once, it will still be a cross-sectional study.</p>
+<p>Overall cross-sectional studies despite all their limitations, still play a key role in epidemiology and public health, and provide valuable data for both researchers and policy makers.</p>
+</section>
+<section id="case-control-studies" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="case-control-studies"><span class="header-section-number">8</span> Case-control Studies</h2>
+<p>A case control study involves comparing individuals with a particular condition or disease, known as the cases, to a group of individuals with the same general characteristics but without the condition or disease of interest known as controls. Information on past exposure to possible risk factors is obtained for both the cases and the controls, and the frequency and intensity of exposure in the cases is then compared with that in the controls. The starting point of most case control studies is the identification of cases, however prior to selecting cases clear eligibility criteria should be defined, based on the objectives of your study. This is referred to as the case definition, for example, you may only be concerned with a population within a certain age bracket or a specific gender. Cases can be sourced from a variety of places such as hospitals, clinics or the community setting, however, you must be aware of capturing all representative cases, for example not just those that are more advanced that make it to surgery. These cases should be representative of everyone with the disease under investigation. Usually it is not too difficult to obtain a suitable source of cases but selecting controls tends to be more problematic.</p>
+<p>Assessing exposure in cases and controls has to be carefully considered. Self reported recall of usual behavior may not be comparable in cases and controls, for example if you have a chronic illness such as cancer, you may be more motivated to find out why you got the disease and thus think about your past differently and more likely to report it differently compared to if you did not have cancer or were a control participant. This is called <strong>recall bias</strong>. Another important factor is how many cases and controls are required. The number of cases that can be studied is often limited by the rarity of the disease being studied. If this is the case statistical confidence can be increased by having more than one control per case. As a result studies often allocate 2 or more controls per case.</p>
+<p>The advantages of case control studies are: they good for studying rare diseases because you can identify all of the existing cases that have already accrued over many years; they are relatively inexpensive to conduct; they can be quick to obtain data because you can assess exposure and outcome all at the same time. However they have disadvantages, and these include: there can be bias associated with exposure assessment, that is, the presence of disease may affect how an individual reports past exposure. There’s often difficulty in selecting a good control group, and they are limited to assessing just one chosen outcome. They also can’t tell you any information about the temporal relationship between exposure and the disease.</p>
+<p>The main principle of case-control studies is that we select a group of individuals with the outcome of interest (cases) and a group of individuals without the outcome (controls), and we explore whether they have been exposed to the exposure under study.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/case-control-studies.jpg" class="img-fluid"></p>
+<p>The measure of association that can be estimated in a case-control study is the odds ratio (OR).</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/case-control-or.jpg" class="img-fluid"></p>
+</section>
+<section id="cohort-studies" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="cohort-studies"><span class="header-section-number">9</span> Cohort Studies</h2>
+<p>In relation to the hierarchy of evidence, we’re climbing up the ladder. And with regards to observational study designs, cohort studies are considered the most robust than case-control studies.</p>
+<p>The cohort study typically involves a group of people without disease who are observed over a period of time to see what happens to them. This is also known as a longitudinal study. As a result, the first step in conducting a cohort study is to select your target population and assess their exposure status. Next you will follow these people to check up if they develop the disease of outcome or outcome of interest. So the defining characteristic of a cohort study is that you track people forward in time, you always assess exposure prior to disease.</p>
+<p>The key principal of a cohort study is that a number of individuals without the disease or outcome of interest are selected and followed up for a period of time. Some of them are exposed to the exposure under study, while the rest are unexposed. By the end of the study period, some individuals will have developed the disease/outcome of interest both in the exposed and in the unexposed group.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/cohort.jpg" class="img-fluid"></p>
+<p>Depending on the data you have collected during the follow-up period, you can calculate the risk and/or the incidence rate of the disease in the exposed and the unexposed groups. Hence, you are able to calculate the Relative Risk or Risk Ratio (RR), the Risk Difference or Attributable Risk (AR) and the Incidence Rate Ratio (IRR).</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/cohort-rr1.jpg" class="img-fluid"></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/cohort-rr2.jpg" class="img-fluid"></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/cohort-ar.jpg" class="img-fluid"></p>
+</section>
+<section id="strengths-and-weaknesses-of-cohort-and-case-control-studies-compared" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="strengths-and-weaknesses-of-cohort-and-case-control-studies-compared"><span class="header-section-number">10</span> Strengths and Weaknesses of Cohort and Case-control Studies Compared</h2>
+<p>In epidemiology, studies can be either observational or experimental. Observational studies are studies in which the investigator only observes populations or individuals, and does not interfere or manipulate the exposure. We will look at the strengths and limitations of two most commonly used observational study designs: cohort studies and case-control studies.</p>
+<section id="cohort-studies-1" class="level3" data-number="10.1">
+<h3 data-number="10.1" class="anchored" data-anchor-id="cohort-studies-1"><span class="header-section-number">10.1</span> Cohort studies</h3>
+<p>In cohort studies, a group of individuals without the disease are followed-up over a period of time to observe what happens to them. Cohort studies try to find associations between previously defined characteristics of a cohort and the development of disease.</p>
+<p>Advantages of cohort studies include:</p>
+<ul>
+<li>They enable researchers to investigate multiple outcomes simultaneously.</li>
+<li>The temporal relationship between exposure and disease can be explored. In other words, we can be certain that the exposure preceded the disease.</li>
+<li>Cohort studies can allow researchers to calculate incidence rates as well as risks (and the respective ratios).</li>
+<li>Cohort studies suffer from fewer ethical concerns as researchers are not assigning exposures or intervening with participants.</li>
+</ul>
+<p>On the other hand, there are also limitations of cohort studies which should be acknowledged.</p>
+<ul>
+<li>One weakness of cohort studies is that they usually have a long duration which also implies larger costs.</li>
+<li>Cohort studies are not useful for studying rare diseases.</li>
+<li>Loss to follow-up which is likely to occur when running cohort studies can introduce bias.</li>
+<li>In occupational cohorts, the healthy worker effect may introduce bias. The healthy worker effect refers to the low mortality or disease incidence in healthy populations or industrial cohorts compared to the general population.</li>
+</ul>
+<p>Cohort studies are warranted when the time between exposure and disease is relatively short, the occurrence of the disease is not rare, and when adequate funding is available.</p>
+</section>
+<section id="case-control-studies-1" class="level3" data-number="10.2">
+<h3 data-number="10.2" class="anchored" data-anchor-id="case-control-studies-1"><span class="header-section-number">10.2</span> Case-control studies</h3>
+<p>Case-control studies are another type of observational study where the investigator does not interfere or manipulate the exposure. In case-control studies, individuals with a particular disease are compared with individuals without the disease with regard to their exposure status.</p>
+<p>Advantages of case-control studies include:</p>
+<ul>
+<li>One of the major strengths of a case-control study is that it is good for studying rare diseases.</li>
+<li>Compared to cohort studies, it is also relatively inexpensive and has a shorter duration, reducing the time required to acquire results.</li>
+</ul>
+<p>On the other hand, like all study designs, case-control studies have limitations.</p>
+<ul>
+<li>Case-control studies are prone to selection bias. Selection bias can occur as a result of how the participants are recruited into the study; this bias can be related to the case-control status of the participant or the exposure status.</li>
+<li>Case-control studies do not allow the investigation of multiple outcomes.</li>
+</ul>
+</section>
+</section>
+<section id="nested-studies" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="nested-studies"><span class="header-section-number">11</span> Nested Studies</h2>
+<p>Cohort studies are often extremely large national or international studies, and subsequently there are very rich data sources. As a result it’s important that epidemiologists utilize this data effectively. One way to do so is to conduct new studies within these cohorts. One such study is a nested case control study.</p>
+<p>A nested case control study is a case control study embedded within a prospective cohort study. The prospective cohort study generates cases, and potential controls, for the nested case control study. As a result, the cohort study provides a well defined source population of both cases and controls. One of the main differences between a traditional case control study, and a nested case control study, is that the cases are diagnosed after exposure assessment during the follow up period.</p>
+<p>In case cohort studies the aim is to achieve the same goal as cohort studies but more efficiently using a sample of the denominators of the exposed and unexposed cohorts and if conducted properly case cohort studies provide information that should replicate findings from a cohort study case cohort studies are very similar to nested case control studies. The main difference is the way in which the controls is selected. In the case cohort study cases are defined as those participants of the cohort who develop the disease of interest but the control group selected from all cohort participants at baseline before the cases develop. This means that controls are randomly selected from all cohort disciplines regardless of whether they go on to develop the disease of interest or not.</p>
+<p>Case cohort studies share the same advantages of nested case control studies including the efficiency, flexibility and the reduction of information and selection bias however they also have some additional benefits. These include the ability to examine multiple outcomes; the ability to include person time in the analyses and they are good when excluding cases from the control group is logistically difficult. For example in diseases with a high proportion of subclinical phases such as prostate cancer to exclude all prostate cancers you would have to screen detect them however case cohort studies are not always feasible in particular they’re not suitable when exposures change over time; for example if exposure is measured at the beginning of a follow up period and differs from the overall exposure during the entire study period. To summarize - the case cohort study is an efficient alternative to analyzing the full cohort. When carefully planned and analyzed it is a strong choice for follow up studies with multiple outcomes of interest.</p>
+<p><strong>Nested case-control</strong> and <strong>case-cohort</strong> studies are studies nested within cohort studies.</p>
+<ul>
+<li>One of the major strengths of nested case-control and case-cohort studies is that the data or biospecimen is collected prior to the disease, ensuring that the exposure preceded the disease. This also means there is less chance of bias when assessing the exposure. Finally, nested studies also reduce selection bias.</li>
+<li>When dealing with valuable biological samples it may be too costly to analyse all biological samples or researchers may want to use samples for investigating multiple research questions. In that case, it is more advantageous to use nested case-control or case-cohort studies than full cohort analyses. Similarly, costs to data entry can be high and it may be more cost-effective to only analyse data from those who become cases and a sub cohort of non-cases.</li>
+<li>Overall, they allow for the most efficient use of resources.</li>
+<li>Nested studies are useful for studying rare outcomes.</li>
+<li>Specific to case-cohort studies, one of its strengths is that it allows for the estimation of risk factor distributions and prevalence rates as well as unbiased assessment of correlations among variables, and can also include person-time in the analyses.</li>
+<li>Nested case-control and case-cohort studies have limitations as well. For example, nested case-control studies can suffer from reduced precision and power as a result of the sampling of controls.</li>
+</ul>
+</section>
+<section id="randomised-controlled-trials" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="randomised-controlled-trials"><span class="header-section-number">12</span> Randomised Controlled Trials</h2>
+<p>Whether practicing clinical medicine, or working on a research project, all you’re ever trying to look for are associations. In medicine, this could be an association between a clinical symptom, like a cough, or a potential cause, like smoking, with a diagnosis, say heart failure or lung cancer. There are two basic approaches for assessing whether an exposure is associated with a particular outcome: using experimental or observational studies. However, the strength of an association is judged by the robustness of the evidence. We’ve already learnt about observational study designs where, as the name suggests, you simply observe the study sample.</p>
+<p>A major problem with observational studies is that the observed groups may differ in many other characteristics in addition to the one being investigated. As a result, clinical medicine puts most emphasis on robust evidence from experimental studies or clinical trials, which are considered gold standards in terms of evidence. The best sort of trials are randomised controlled trials. Randomised controlled trials are experimental studies which compare and assess the effectiveness of two or more treatments, to see if one treatment is better than another. The treatment being tested could be a drug or some method of care, but there must always be a comparator group which acts as the control.</p>
+<p>Treatments being tested could be compared with no treatment, ideally using a placebo as the control. For example, if you were testing a new drug, the placebo would be a tablet which looked identical, ideally, to the active drug in every way, but does not contain any active ingredient. Trials using this method are referred to as placebo controlled trials. Alternatively, once you have a treatment that is effective and safe, you may test a new treatment against the existing standard treatment, to check if it is more effective or to examine what the side effects are, and how common they are.</p>
+<p>Information from the follow up of the control group allows the researchers to see whether the new treatment, or treatments, that they’re testing are any more or less effective than the existing treatment or placebo. To maximise the value of the clinical trial, the choice of controls is clearly critical. There’s no point in showing you a new drug or intervention is better than one that no one uses, or than the wrong dose of a drug that people do use. Randomised trials are characterised by the fact that the study subjects are allocated by the investigator to the different study groups through the use of randomisation, and the investigators then intervene differentially on participants. It’s an experiment. While randomised controlled trials are recognised as the gold standard study design for evaluating the impact of an intervention on an outcome, the process of randomisation alone does not wholly protect against bias. Incorrect analyses of the data can introduce bias, even where randomisation has been correctly implemented. It’s important to preserve the advantages of randomisation during the conduct of the study, and in analysis. If you don’t investigators may reach an incorrect and biased assessment of results.</p>
+<p>For example, by not evaluating patients according to the group which they were originally assigned. This concept of analysing patients according to which group they were originally assigned is called <strong>‘intention to treat’</strong>. Imagine you have 200 patients who had an acute myocardial infarction, a heart attack. You randomised them so that 100 go to the coronary care units, and 100 go mountain climbing. In the coronary care unit, 18 died and 82 went home, so the survival rate is 82%. On the other hand, with the mountain climbers, 1 died because he was daft enough to go up the mountain, but 9 others who went up the mountain lived. The other 90 were lost, or if they were wise, they went home - we don’t know whether they went home or died on the mountain. So indeed, they might have died at the mountain somewhere - you don’t know. But if you just analyse the data for the 10 participants that you do have outcome information on, mountain climbing gives you a survival rate of 90% - one died out of the 10 you found. So, mountain climbing appears to be better than the coronary care unit?</p>
+<p>This story also emphasises that you have to try very hard not to lose patients. What happened to the 90 last mountaineers is critical to interpreting your trial, but equally importantly, you must include them in your analysis. If patients withdraw from the trial, you try to find out whether they are alive at the end, and what happened to them, and you include them in your original groups, because they were randomised to do that, even if they didn’t take the drugs or carry out the instructions they were supposed to. This is the basic idea of why a trial should be randomised and controlled, and of the importance of selecting control interventions. Remember, importantly, you must account for missing trial participants, and include all participants in your analysis and in their original groups, regardless of whether or not they followed their allocation intervention.</p>
+<section id="strengths-and-weaknesses-of-randomised-controlled-trials" class="level3" data-number="12.1">
+<h3 data-number="12.1" class="anchored" data-anchor-id="strengths-and-weaknesses-of-randomised-controlled-trials"><span class="header-section-number">12.1</span> Strengths and Weaknesses of Randomised Controlled Trials</h3>
+<p>Randomised Controlled Trials (RCTs) is often considered the optimal study design for a number of reasons.</p>
+<ul>
+<li>Randomisation substantially reduces the risk of bias in the study.</li>
+<li>RCTs are also relevant to actual interventions in populations and settings of interest.</li>
+<li>They can provide precise measures of efficacy which we can use to evaluate interventions.</li>
+</ul>
+<p>However, RCTs are also subject to certain limitations, including:</p>
+<ul>
+<li>The results may not be generalisable to populations that are different than the sample used in the study.</li>
+<li>They can be quite complex and costly to conduct.</li>
+<li>Due to cost and practical considerations, they often rely on surrogate endpoints. For example, a biomarker is measured instead of a health outcome which might require a long time to develop.</li>
+<li>They are experimental studies, which raises ethical issues. Some exposures (e.g.&nbsp;smoking or radiation) cannot be studied with RCTs because it is unethical to intentionally expose people to them.</li>
+</ul>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="13">
+<h2 data-number="13" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">13</span> Conclusion</h2>
+<p>We have looked at the main types of Epidemiological study designs. There are many classifications of study designs which may slightly differ from each other, depending on the criteria they use to characterise studies. We looked at two main categories of studies; analytic vs.&nbsp;descriptive, but one could also start with the contrast between experimental and observational studies.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/epidemiology-study-designs.jpg" class="img-fluid"></p>
+<p>Note that a cross-sectional study can also be considered descriptive when, for example, its main purpose is to describe the prevalence of a disease. Experimental studies are, by definition, analytic. Study designs such as nested case-control and case-cohort also belong to the analytic studies.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

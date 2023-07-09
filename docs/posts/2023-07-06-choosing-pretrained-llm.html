@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-06">
+<meta name="description" content="In this article we will look at different types of pre-trained models and see how these are suited for different tasks - this can help you choose the best model for your LLM use-case">
+
+<title>LivingDataLab - Choosing a Pre-Trained Large Language Model</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Choosing a Pre-Trained Large Language Model">
+<meta property="og:description" content="In this article we will look at different types of pre-trained models and see how these are suited for different tasks - this can help you choose the best model for your LLM use-case">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/genai2.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Choosing a Pre-Trained Large Language Model">
+<meta name="twitter:description" content="In this article we will look at different types of pre-trained models and see how these are suited for different tasks - this can help you choose the best model for your LLM use-case">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/genai2.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Choosing a Pre-Trained Large Language Model</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Choosing a Pre-Trained Large Language Model</h1>
+                  <div>
+        <div class="description">
+          In this article we will look at different types of pre-trained models and see how these are suited for different tasks - this can help you choose the best model for your LLM use-case
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">hugging-face</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 6, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#choosing-open-source-models" id="toc-choosing-open-source-models" class="nav-link" data-scroll-target="#choosing-open-source-models"><span class="toc-section-number">2</span>  Choosing Open Source Models</a></li>
+  <li><a href="#the-training-process-for-large-language-models" id="toc-the-training-process-for-large-language-models" class="nav-link" data-scroll-target="#the-training-process-for-large-language-models"><span class="toc-section-number">3</span>  The Training Process for Large Language Models</a></li>
+  <li><a href="#the-three-varients-of-the-transfomer-model" id="toc-the-three-varients-of-the-transfomer-model" class="nav-link" data-scroll-target="#the-three-varients-of-the-transfomer-model"><span class="toc-section-number">4</span>  The Three Varients of the Transfomer Model</a>
+  <ul class="collapse">
+  <li><a href="#autoenconder-models" id="toc-autoenconder-models" class="nav-link" data-scroll-target="#autoenconder-models"><span class="toc-section-number">4.1</span>  Autoenconder Models</a></li>
+  <li><a href="#autoregressive-models" id="toc-autoregressive-models" class="nav-link" data-scroll-target="#autoregressive-models"><span class="toc-section-number">4.2</span>  Autoregressive Models</a></li>
+  <li><a href="#sequence-to-sequence-models" id="toc-sequence-to-sequence-models" class="nav-link" data-scroll-target="#sequence-to-sequence-models"><span class="toc-section-number">4.3</span>  Sequence to Sequence Models</a></li>
+  </ul></li>
+  <li><a href="#overview-of-the-three-transformer-models" id="toc-overview-of-the-three-transformer-models" class="nav-link" data-scroll-target="#overview-of-the-three-transformer-models"><span class="toc-section-number">5</span>  Overview of the Three Transformer Models</a></li>
+  <li><a href="#the-future-of-transfomer-models" id="toc-the-future-of-transfomer-models" class="nav-link" data-scroll-target="#the-future-of-transfomer-models"><span class="toc-section-number">6</span>  The Future of Transfomer Models</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">7</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>The project life cycle for generative AI was introduced in this <a href="../posts/2023-07-04-generative-ai-project-lifecycle.html">previous article</a>. There are a few tasks to complete before you can launch your generative AI app, as we saw there. Selecting a model to work with comes after you have defined your use case and chosen how the LLM will operate within your application. Working with an existing model or creating your own from scratch will be your first option. In some situations, it may be advantageous to build your own model from scratch. In most cases, though, you’ll use an existing foundation model to start the process of constructing your application.</p>
+<p>In this article we will look at different types of pre-trained models, and see how these are suited for different tasks. This can help you choose the best model for your LLM use-case.</p>
+</section>
+<section id="choosing-open-source-models" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="choosing-open-source-models"><span class="header-section-number">2</span> Choosing Open Source Models</h2>
+<p>Members of the AI community can employ a wide variety of open-source models for an application. Hugging Face and PyTorch, two well-known frameworks for creating generative AI applications, have created curated hubs where you can browse these models. The inclusion of model cards in these hubs, which define key information such as the best use cases for each model, how it was trained, and known constraints, is a tremendously helpful feature.</p>
+<p>The specific model you decide on will rely on the specifics of the activity you must do. Because of changes in the models’ training methods, different transformer model architectures are better suited to certain linguistic tasks. Let’s take a closer look at how large language models are trained in order to assist you comprehend these variations and build intuition about which model to utilise for a specific task. With this information in hand, navigating the model hubs and selecting the ideal model for your use case will be simpler. Let’s start by taking a broad look at the LLMs’ basic training programme.</p>
+</section>
+<section id="the-training-process-for-large-language-models" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-training-process-for-large-language-models"><span class="header-section-number">3</span> The Training Process for Large Language Models</h2>
+<p>This stage is frequently known as pre-training. Deep statistical representations of language are encoded by LLMs. During the pre-training phase of the model, when it is learning from a sizable amount of unstructured textual data, this knowledge is generated. This amount of text can range from gigabytes to petabytes. This information is gathered from a variety of sources, including Internet scraping and corpora of texts that have been produced especially for the purpose of training language models. The model internalises the linguistic structures and patterns during this stage of self-supervised learning.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai37.png" width="800"></p>
+<p>Depending on the model’s design, these patterns then allow the model to accomplish its training aim. The model weights are changed during pre-training to reduce the loss of the training aim. Each token is given a vector representation by the encoder in the form of an embedding. The utilisation of GPUs and a lot of computation are also needed for pre-training. It should be noted that after gathering training data from open sources like the Internet, processing is frequently required to improve quality, correct bias, and remove negative information. Because of this data quality curation, only 1% to 3% of tokens are frequently used for pre-training.</p>
+</section>
+<section id="the-three-varients-of-the-transfomer-model" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="the-three-varients-of-the-transfomer-model"><span class="header-section-number">4</span> The Three Varients of the Transfomer Model</h2>
+<p>If you choose to pre-train your own model, you should take this into account when estimating how much data you need to gather. The transformer model comes in three different variations: encoder-only, encoder-decoder, and decode-only. Each of them receives training with a distinct goal in mind, learning how to perform various jobs in the process.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai38.png" width="800"></p>
+<section id="autoenconder-models" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="autoenconder-models"><span class="header-section-number">4.1</span> Autoenconder Models</h3>
+<p>Autoencoding models, also referred to as encoder-only models, are pre-trained utilising masked language modelling. In this case, the training goal is to predict the mask tokens in order to reconstruct the original text. Tokens in the input sequence or randomly mask. This is sometimes referred to as a denoising goal.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai39.png" width="800"></p>
+<p>Autoencoding models spilled bi-directional representations of the input sequence, which indicates that the model is aware of the entire context of a token and not just its immediate surroundings. The tasks that benefit from these bi-directional contexts are best suited for encoder-only models. They can be used for tasks like sentiment analysis, token-level activities like named entity recognition, or tasks at the word or sentence level like classification of words. BERT and RoBERTa are two well-known autoencoder model examples.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai40.png" width="800"></p>
+</section>
+<section id="autoregressive-models" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="autoregressive-models"><span class="header-section-number">4.2</span> Autoregressive Models</h3>
+<p>Using causal language modelling, decoder-only or autoregressive models are pre-trained. Here, predicting the following token using the preceding sequence of tokens is the training goal. Researchers occasionally refer to full language modelling as token prediction. The input sequence is hidden in decoder-based autoregressive models, which can only observe the input tokens preceding the token in question. The conclusion of the phrase is unknown to the model. To forecast the next token, the model repeats the input sequence one at a time. This indicates that the context is unidirectional in contrast to the encoder architecture.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai41.png" width="800"></p>
+<p>The model constructs a statistical model of language by learning to predict the following token from a large number of examples. The decoder portion of the original design, not the encoder, is used in models of this type. Larger decoder-only models provide high zero-shot inference capabilities and are frequently capable of a variety of tasks, although they are rarely employed for text production. GBT and BLOOM are well-known illustrations of decoder-based autoregressive models.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai42.png" width="800"></p>
+</section>
+<section id="sequence-to-sequence-models" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="sequence-to-sequence-models"><span class="header-section-number">4.3</span> Sequence to Sequence Models</h3>
+<p>The sequence-to-sequence transformer model, which utilises both the encoder and decoder components of the original transformer architecture, is the last transformer model variant. The pre-training objective’s specifics differ from model to model. T5, a well-known sequence-to-sequence model, pre-trains the encoder via span corruption, which hides input tokens in random sequences. The unique Sentinel token, shown above as x, is then used to replace those mass sequences. Sentinel tokens are additional special tokens to the vocabulary that don’t actually correspond to any words from the input text. The work of rebuilding the mask token sequences automatically falls to the decoder after that. The Sentinel token and the projected tokens are the output.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai43.png" width="800"></p>
+<p>Translation, summarization, and question-answering are all possible with sequence-to-sequence models. In general, they come in handy when you need to input and output a large body of text. In addition to T5, BART is a well-known encoder-decoder model.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai44.png" width="800"></p>
+</section>
+</section>
+<section id="overview-of-the-three-transformer-models" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="overview-of-the-three-transformer-models"><span class="header-section-number">5</span> Overview of the Three Transformer Models</h2>
+<p>Here is a quick summary of the various transformer model architectures and their targets in relation to the pre-training objectives. Using masked language modelling, autoencoding models are trained beforehand. They are commonly employed in conjunction with sentence classification or token classification, and they relate to the encoder portion of the original transformer architecture. Using causal language modelling, autoregressive models are pre-trained. These models make use of the decoder element of the original transformer architecture, which is frequently employed for text production. In sequence-to-sequence models, the encoder and decoder components of the original transformer architecture are used.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai45.png" width="800"></p>
+<p>The pre-training objective’s specifics differ from model to model. Span corruption is used for pre-training the T5 model. For translation, summarization, and question-answering, sequence-to-sequence models are frequently employed. You can now choose the type of model that is most appropriate for your use case after seeing how the various model architectures are trained and the particular tasks they are ideally suited to. Another thing to keep in mind is that larger models of any architecture are often better at doing the jobs they are designed to do. According to research, the bigger the model, the more probable it is to perform as required without the need for further in-context learning or additional training.</p>
+</section>
+<section id="the-future-of-transfomer-models" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="the-future-of-transfomer-models"><span class="header-section-number">6</span> The Future of Transfomer Models</h2>
+<p>In recent years, the construction of larger and larger models has been motivated by the observed pattern of enhanced model capabilities with size. The development of more potent compute resources, access to enormous amounts of data for training, and the introduction of the highly scalable transformer architecture are just a few examples of how inflection points and research have contributed to this expansion. A new Moore’s law for LLMs may have emerged as a result of the constant increase in model size, according to some academics.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai46.png" width="800"></p>
+<p>Can we just keep adding parameters to improve performance and make models smarter, you could be asking? Where might the expansion of this model go? While this may sound exciting, it turns out that training these massive models is challenging and expensive, possibly making training larger and larger models impossible.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai47.png" width="800"></p>
+</section>
+<section id="acknowledgements" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> by DeepLearning.ai and AWS - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

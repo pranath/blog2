@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2021-12-28">
+<meta name="description" content="Singular Value Decomposition (SVD) is a method from Linear Algebra widley used accross science and engineering. In this article we will introduce the concept and show how it can be used for Topic Modelling in Natural Language Processing (NLP).">
+
+<title>LivingDataLab - Topic Modelling using Non-negative Matrix Factorization (NMF)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Topic Modelling using Non-negative Matrix Factorization (NMF)">
+<meta property="og:description" content="Singular Value Decomposition (SVD) is a method from Linear Algebra widley used accross science and engineering.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/nmf.png">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Topic Modelling using Non-negative Matrix Factorization (NMF)">
+<meta name="twitter:description" content="Singular Value Decomposition (SVD) is a method from Linear Algebra widley used accross science and engineering.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/nmf.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Topic Modelling using Non-negative Matrix Factorization (NMF)</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Topic Modelling using Non-negative Matrix Factorization (NMF)</h1>
+                  <div>
+        <div class="description">
+          Singular Value Decomposition (SVD) is a method from Linear Algebra widley used accross science and engineering. In this article we will introduce the concept and show how it can be used for Topic Modelling in Natural Language Processing (NLP).
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">mathematics</div>
+                <div class="quarto-category">linear-algebra</div>
+                <div class="quarto-category">natural-language-processing</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 28, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="toc-section-number">2</span>  Dataset</a></li>
+  <li><a href="#non-negative-matrix-factorization-nmf" id="toc-non-negative-matrix-factorization-nmf" class="nav-link" data-scroll-target="#non-negative-matrix-factorization-nmf"><span class="toc-section-number">3</span>  Non-negative Matrix Factorization (NMF)</a></li>
+  <li><a href="#nmf-using-gradient-descent" id="toc-nmf-using-gradient-descent" class="nav-link" data-scroll-target="#nmf-using-gradient-descent"><span class="toc-section-number">4</span>  NMF using Gradient Descent</a>
+  <ul class="collapse">
+  <li><a href="#comparing-approaches" id="toc-comparing-approaches" class="nav-link" data-scroll-target="#comparing-approaches"><span class="toc-section-number">4.1</span>  Comparing Approaches</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">5</span>  Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p><strong>Non-negative Matrix Factorization (NMF)</strong> is a method from Linear Algebra that is used in a wide range of applications in science and engineering, similar to <a href="https://livingdatalab.com/mathematics/linear-algebra/natural-language-processing/2021/12/27/topic-modelling-svd.html">Singular Value Decomopistion (SVD) which I covered in an earlier article</a>. It can be used for tasks such as missing data imputation, audio signal processing and bioinformatics.</p>
+<p><strong>Topic modeling</strong> is an unsupervised machine learning technique used in Natural Language Processing (NLP) that’s capable of scanning a set of texts, detecting word and phrase patterns within them, and automatically clustering word groups and similar expressions that best characterize a set of documents.</p>
+<p>In this article we will will use NMF to perform topic modelling.</p>
+<p>This article is based in large part on the material from the <a href="https://github.com/fastai/numerical-linear-algebra/blob/master/README.md">fastai linear algebra course</a>.</p>
+</section>
+<section id="dataset" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="dataset"><span class="header-section-number">2</span> Dataset</h2>
+<p>We will use the <a href="https://archive.ics.uci.edu/ml/datasets/Twenty+Newsgroups">20 Newsgroups</a> dataset which consists of 20,000 messages taken from 20 different newsgroups from the Usenet bulletin board service, which pre-dates the world-wide-web and websites. We will look at a subset of 4 of these newsgroup categories:</p>
+<ul>
+<li>rec.motorcycles</li>
+<li>talk.politics.mideast</li>
+<li>sci.med</li>
+<li>sci.crypt</li>
+</ul>
+<p>We will now get this data.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>categories <span class="op">=</span> [<span class="st">'rec.motorcycles'</span>, <span class="st">'talk.politics.mideast'</span>, <span class="st">'sci.med'</span>, <span class="st">'sci.crypt'</span>]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>remove <span class="op">=</span> (<span class="st">'headers'</span>, <span class="st">'footers'</span>, <span class="st">'quotes'</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>newsgroups_train <span class="op">=</span> fetch_20newsgroups(subset<span class="op">=</span><span class="st">'train'</span>, categories<span class="op">=</span>categories, remove<span class="op">=</span>remove)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>newsgroups_test <span class="op">=</span> fetch_20newsgroups(subset<span class="op">=</span><span class="st">'test'</span>, categories<span class="op">=</span>categories, remove<span class="op">=</span>remove)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s check how many posts this gives us in total</p>
+<div class="cell" data-outputid="c923b48b-b594-460e-c128-ac13b235100f" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>newsgroups_train.filenames.shape, newsgroups_train.target.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>((2351,), (2351,))</code></pre>
+</div>
+</div>
+<p>Let’s print the first few lines of 3 of the posts to see what the text looks like</p>
+<div class="cell" data-outputid="9f6723a4-1aa7-4068-eac0-42666793436d" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(newsgroups_train.data[<span class="dv">0</span>].split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)[:<span class="dv">3</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+I am not an expert in the cryptography science, but some basic things
+seem evident to me, things which this Clinton Clipper do not address.</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="e3c35eed-513a-45c0-8426-7391abcab80a" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(newsgroups_train.data[<span class="dv">2</span>].split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)[:<span class="dv">3</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Does the Bates method work?  I first heard about it in this newsgroup 
+several years ago, and I have just got hold of a book, "How to improve your
+sight - simple daily drills in relaxation", by Margaret D. Corbett, </code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="85d7b25d-d1fd-40b3-e165-8eca039d2841" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(newsgroups_train.data[<span class="dv">5</span>].split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)[:<span class="dv">3</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Suggest McQuires #1 plastic polish.  It will help somewhat but nothing 
+will remove deep scratches without making it worse than it already is.</code></pre>
+</div>
+</div>
+<p>We can also get the newsgroup category for each from the ‘target_names’ attribute</p>
+<div class="cell" data-outputid="3183864e-4f10-43e0-d242-ac8b7cc25f9e" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>np.array(newsgroups_train.target_names)[newsgroups_train.target[:<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>array(['sci.crypt', 'sci.med', 'sci.med'], dtype='&lt;U21')</code></pre>
+</div>
+</div>
+<p>To use this text dataset for topic modelling we will need to convert this into a <strong>document-term</strong> matrix. This is a matrix where the rows will correspond to to each of the newsgroup posts (a ‘document’ conceptually) and the columns will be for each of the words that exists in all posts (a ‘term’ conceptually). The values of the matrix will be the count of the number of words that exists for a particular post for each post/word combination in the matrix.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/document-term-matrix.png" title="An example Document-Term matrix" class="img-fluid"></p>
+<p>This method of converting text into a count of the words in the text matrix, without regard for anything else (such as order, context etc) is called a <strong>bag of words</strong> model. We can create this matrix using a <em>CountVectoriser()</em> function.</p>
+<div class="cell" data-outputid="38757e84-da3b-4661-c057-224710fb0bd1" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>vectorizer <span class="op">=</span> CountVectorizer(stop_words<span class="op">=</span><span class="st">'english'</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>vectors <span class="op">=</span> vectorizer.fit_transform(newsgroups_train.data).todense() <span class="co"># (documents, vocab)</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>vectors.shape </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>(2351, 32291)</code></pre>
+</div>
+</div>
+<p>We can see this matrix has the same number of rows as we have posts (2351) and we must have 32,291 unique words accross all posts which is the number of columns we have.</p>
+<div class="cell" data-outputid="892b64df-092b-4393-bf5d-b7c0180a71ff" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(newsgroups_train.data), vectors.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2351 (2351, 32291)</code></pre>
+</div>
+</div>
+<p>If we print the matrix, its just an array of counts for each of the words in each post</p>
+<div class="cell" data-outputid="9742be74-8260-46a3-8504-b6ba95ca4d5b" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>vectors</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>matrix([[0, 0, 0, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0],
+        ...,
+        [0, 0, 0, ..., 0, 0, 0],
+        [0, 2, 0, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0]])</code></pre>
+</div>
+</div>
+<p>This matrix does not actually contain the names of the words, so it will be helpful for us to extract these as well to create a vocabulary of terms used in the matrix. We can extract these using <em>get_feature_names()</em></p>
+<div class="cell" data-outputid="bf017a9f-8fa6-4421-9eac-7ce5ca230916" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>vocab <span class="op">=</span> np.array(vectorizer.get_feature_names())</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>vocab.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>(32291,)</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="87c92db0-1ded-488a-ca8d-9c78a28c3e7c" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>vocab[:<span class="dv">32000</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>array(['00', '000', '0000', ..., 'yarn', 'yarvin', 'yashir'], dtype='&lt;U79')</code></pre>
+</div>
+</div>
+<p>While we have the newsgroup categories here, we will not actually use them for our topic modelling exercise, where we want to create topics independantly based on the posts alone, but we would hope these will correspond to the newsgroup categories in some way, indeed this would be a good check that the topic modelling is working.</p>
+<p>Now we have our Document-Term matrix and the vocabulary, we are now ready to use Singular Value Decompostion.</p>
+</section>
+<section id="non-negative-matrix-factorization-nmf" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="non-negative-matrix-factorization-nmf"><span class="header-section-number">3</span> Non-negative Matrix Factorization (NMF)</h2>
+<p>NMF is a method of matrix decomposition, so for a given matrix A we can convert it into 2 other matrices: W and H. Also A most have non-negative values, and as such W and H will also have non-negative values.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/nmf.png" title="Non-negative Matrix Factorization" class="img-fluid"></p>
+<p>K is a value we choose in advance, in the case of our intention here K will repesent the number of topics we want to create for our topic model of the newsgroup posts.</p>
+<p>So if we assume in the original matrix A for our exercise, N are the documents/posts and M are the words in our Document-Term matrix, each of these matricies represents the following:</p>
+<ul>
+<li>W: <strong>Feature Matrix</strong> this has M rows for words and K columns for the topics, and indicates which words characterise which topics.</li>
+<li>H: <strong>Coefficient Matrix</strong> this has K rows for topics, and N columns for documents/posts, and indicates which topics best describe which documents/posts.</li>
+</ul>
+<p>So one reason NMF can be more popular to use, is due to that fact that the factors it produces are always positive and so are more easily interpretable. Consider for example with <a href="https://livingdatalab.com/mathematics/linear-algebra/natural-language-processing/2021/12/27/topic-modelling-svd.html">SVD</a> we could produce factors that indicated negative values for topics - what would that mean to say a text has ‘negative indications for the topic of bikes’ ?</p>
+<p>Another difference with SVD is that NMF is not an exact decompostion - which means if we multiply W and H matrices we won’t get back our original matrix A exactly.</p>
+<p>So we can peform NMF on our Document-Term matrix using the sklearn <em>decomposition</em> module.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Define constants and functions</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>m,n<span class="op">=</span>vectors.shape</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>d<span class="op">=</span><span class="dv">10</span>  <span class="co"># num topics</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>num_top_words<span class="op">=</span><span class="dv">8</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_topics(a):</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    top_words <span class="op">=</span> <span class="kw">lambda</span> t: [vocab[i] <span class="cf">for</span> i <span class="kw">in</span> np.argsort(t)[:<span class="op">-</span>num_top_words<span class="op">-</span><span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]]</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    topic_words <span class="op">=</span> ([top_words(t) <span class="cf">for</span> t <span class="kw">in</span> a])</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="st">' '</span>.join(t) <span class="cf">for</span> t <span class="kw">in</span> topic_words]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="787d3dd8-e9eb-4257-ee57-d423b4028392" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate NMF</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>time clf <span class="op">=</span> decomposition.NMF(n_components<span class="op">=</span>d, random_state<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 29 µs, sys: 0 ns, total: 29 µs
+Wall time: 34.3 µs</code></pre>
+</div>
+</div>
+<p>We can notice here this has run extremely fast taking just 19.6 microseconds. If we recall in an <a href="https://livingdatalab.com/mathematics/linear-algebra/natural-language-processing/2021/12/27/topic-modelling-svd.html">earlier article for the same dataset when we performed one of the fastest versions of SVD Randomised/Trucated SVD this took 20 seconds</a>.</p>
+<div class="cell" data-outputid="da727985-7aed-414b-b150-887436d22c1f" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract W and H matrices</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>W1 <span class="op">=</span> clf.fit_transform(vectors)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>H1 <span class="op">=</span> clf.components_</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Show topics from H matrix</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Top 10 topics, described by top words in each topic'</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>show_topics(H1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Top 10 topics, described by top words in each topic</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>['db mov bh si cs byte al bl',
+ 'people said didn know don went just like',
+ 'privacy internet pub eff email information computer electronic',
+ 'health 1993 use hiv medical 10 20 number',
+ 'turkish jews turkey armenian jewish nazis ottoman war',
+ 'anonymous anonymity posting internet anon service people users',
+ 'key encryption des chip ripem use keys used',
+ 'edu com cs david ca uk org john',
+ 'dod rec denizens motorcycle motorcycles doom like terrible',
+ 'version machines contact type edu pc comments ftp']</code></pre>
+</div>
+</div>
+<p>So if you recall our original news group categories were:</p>
+<ul>
+<li>rec.motorcycles</li>
+<li>talk.politics.mideast</li>
+<li>sci.med</li>
+<li>sci.crypt</li>
+</ul>
+<p>We can see that the topics discovered correspond fairly well to these, bar a few anomalies.</p>
+<div class="cell" data-outputid="65b02057-47ae-4972-daab-2986ceb365a1" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Show dimensions of matrices</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(W1.shape, H1.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(2351, 10) (10, 32291)</code></pre>
+</div>
+</div>
+<p>The shapes of the matrices also make sense. Given our original matrix A was 2351 rows for posts and 32291 columns for words, and we requested 10 topics this NMF has returned:</p>
+<ul>
+<li>Matrix W with 2351 rows for posts and 10 columns for topics</li>
+<li>Matrix H with 10 rows for topics and 32291 columns for words</li>
+</ul>
+</section>
+<section id="nmf-using-gradient-descent" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="nmf-using-gradient-descent"><span class="header-section-number">4</span> NMF using Gradient Descent</h2>
+<p>So in the method just used, we performed NMF using a built in library function from Sklearn. One of the obvious benefits of using this is that it runs extremely fast. However, in order to create this function it took many years of research and expertise in this area. Using this function also means we are limited, if we want to do something slightly different, we can’t really change it.</p>
+<p>Alternatively, we can use a very different method to calculate the NMF matrices using <strong>Gradient Descent</strong>.</p>
+<p>The basic process of Gradient Descent is as follows:</p>
+<ol type="1">
+<li>Randomly choose some weights to start</li>
+<li>Loop:</li>
+</ol>
+<ul>
+<li>Use weights to calculate a prediction</li>
+<li>Calculate the loss (loss is a measure of the difference between the prediction and what we want)</li>
+<li>Calculate the derivative of the loss</li>
+<li>Update the weights using this derivative to tell us how much to change them</li>
+</ul>
+<ol start="3" type="1">
+<li>Repeat step 2 lots of times. Eventually we end up with some decent weights</li>
+</ol>
+<p>In our case, the weights would be the values of the matrices we want to calculate for NMF which are the values of W and H.</p>
+<p>In <strong>Stocastic Gradient Decent (SGD)</strong> we evaluate our loss function on just a sample of our data (sometimes called a mini-batch). We would get different loss values on different samples of the data, so this is why it is stochastic. It turns out that this is still an effective way to optimize, and it’s much more efficient.</p>
+<p><a href="https://livingdatalab.com/deep-learning-theory/2021/06/13/optimisation-methods-for-deep-learning.html">SGD is also a key technique used in Deep Learning which I have covered in an earlier article</a>.</p>
+<section id="applying-sgd-to-nmf" class="level4">
+<h4 class="anchored" data-anchor-id="applying-sgd-to-nmf">Applying SGD to NMF</h4>
+<p>The <a href="https://mathworld.wolfram.com/FrobeniusNorm.html">Frobenius norm</a> is a way to measure how different two matrices are. We can use this to calculate the loss by multipling W and H together to create a matrix, and then calculating the Frobenius norm between this matrix and our original matrix A to give us our loss value.</p>
+<p><strong>Goal</strong>: Decompose <span class="math inline">\(A\;(m \times n)\)</span> into <span class="math display">\[A \approx WH\]</span> where <span class="math inline">\(W\;(m \times k)\)</span> and <span class="math inline">\(H\;(k \times n)\)</span>, <span class="math inline">\(W,\;H\;&gt;=\;0\)</span>, and we’ve minimized the Frobenius norm of <span class="math inline">\(A-WH\)</span>.</p>
+<p><strong>Approach</strong>: We will pick random positive <span class="math inline">\(W\)</span> &amp; <span class="math inline">\(H\)</span>, and then use SGD to optimize.</p>
+<p>We will also make use of the <a href="https://pytorch.org/">Pytorch</a> library for these calculations for 2 key reasons:</p>
+<ul>
+<li>It facilitates calculations on the GPU which enables matrix calculations to be run in parallel and therefore much faster</li>
+<li>Pytorch has the <em>autograd</em> functionality which will automatically calculate the derivatives of functions for us and thereby give us the gradients that we need for the process in a convenient way</li>
+</ul>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Define constants and functions required</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>lam<span class="op">=</span><span class="fl">1e6</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create W and H matrices</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>pW <span class="op">=</span> Variable(tc.FloatTensor(m,d), requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>pH <span class="op">=</span> Variable(tc.FloatTensor(d,n), requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>pW.data.normal_(std<span class="op">=</span><span class="fl">0.01</span>).abs_()</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>pH.data.normal_(std<span class="op">=</span><span class="fl">0.01</span>).abs_()</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Define report</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> report():</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    W,H <span class="op">=</span> pW.data, pH.data</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>((A<span class="op">-</span>pW.mm(pH)).norm(<span class="dv">2</span>).item(), W.<span class="bu">min</span>(), H.<span class="bu">min</span>(), (W<span class="op">&lt;</span><span class="dv">0</span>).<span class="bu">sum</span>(), (H<span class="op">&lt;</span><span class="dv">0</span>).<span class="bu">sum</span>())</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Define penalty - encourage positive and low loss values</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> penalty(P):</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> torch.<span class="bu">pow</span>((P<span class="op">&lt;</span><span class="dv">0</span>).<span class="bu">type</span>(tc.FloatTensor)<span class="op">*</span>torch.clamp(P, <span class="bu">max</span><span class="op">=</span><span class="fl">0.</span>), <span class="dv">2</span>)</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define penalise - for both W and H matrices we want to improve</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> penalize(): <span class="cf">return</span> penalty(pW).mean() <span class="op">+</span> penalty(pH).mean()</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Define loss - Calculate the Frobenius norm between Matrix A and Matrices W x H</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> loss(): <span class="cf">return</span> (A<span class="op">-</span>pW.mm(pH)).norm(<span class="dv">2</span>) <span class="op">+</span> penalize()<span class="op">*</span>lam</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Define optimiser to update weights using gradients</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>opt <span class="op">=</span> torch.optim.Adam([pW,pH], lr<span class="op">=</span><span class="fl">1e-3</span>, betas<span class="op">=</span>(<span class="fl">0.9</span>,<span class="fl">0.9</span>))</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Load our original matrix A onto the GPU</span></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>t_vectors <span class="op">=</span> torch.Tensor(v.astype(np.float32)).cuda()</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> Variable(t_vectors).cuda()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Create and run the Stocastic Gradient Descent process</p>
+<div class="cell" data-outputid="2685842c-8cc0-4b5f-92d0-5a1752319962" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For 1000 cycles</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>): </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Clear the previous gradients</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    opt.zero_grad()</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the loss i.e. the Frobenius norm between Matrix A and Matrices W x H</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    l <span class="op">=</span> loss()</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the gradients</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    l.backward()</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the values of Matrices W x H using the gradients</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>    opt.step()</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Every 100 cycles print a report of progress</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">%</span> <span class="dv">100</span> <span class="op">==</span> <span class="dv">99</span>: </span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>        report()</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>        lr <span class="op">*=</span> <span class="fl">0.9</span>     <span class="co"># learning rate annealling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>47.2258186340332 tensor(-0.0010, device='cuda:0') tensor(-0.0023, device='cuda:0') tensor(1013, device='cuda:0') tensor(42676, device='cuda:0')
+46.8864631652832 tensor(-0.0008, device='cuda:0') tensor(-0.0027, device='cuda:0') tensor(1424, device='cuda:0') tensor(53463, device='cuda:0')
+46.73139572143555 tensor(-0.0004, device='cuda:0') tensor(-0.0031, device='cuda:0') tensor(929, device='cuda:0') tensor(53453, device='cuda:0')
+46.66544723510742 tensor(-0.0004, device='cuda:0') tensor(-0.0020, device='cuda:0') tensor(736, device='cuda:0') tensor(54012, device='cuda:0')
+46.620338439941406 tensor(-0.0006, device='cuda:0') tensor(-0.0018, device='cuda:0') tensor(631, device='cuda:0') tensor(56201, device='cuda:0')
+46.586158752441406 tensor(-0.0003, device='cuda:0') tensor(-0.0018, device='cuda:0') tensor(595, device='cuda:0') tensor(56632, device='cuda:0')
+46.576072692871094 tensor(-0.0003, device='cuda:0') tensor(-0.0019, device='cuda:0') tensor(585, device='cuda:0') tensor(54036, device='cuda:0')
+46.573974609375 tensor(-0.0003, device='cuda:0') tensor(-0.0018, device='cuda:0') tensor(578, device='cuda:0') tensor(53401, device='cuda:0')
+46.573814392089844 tensor(-0.0003, device='cuda:0') tensor(-0.0017, device='cuda:0') tensor(667, device='cuda:0') tensor(52781, device='cuda:0')
+46.573760986328125 tensor(-0.0003, device='cuda:0') tensor(-0.0019, device='cuda:0') tensor(662, device='cuda:0') tensor(52658, device='cuda:0')</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="a7f23ba6-7ad7-421b-d25a-9f585a4a8691" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Show topics discovered</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> pH.data.cpu().numpy()</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>show_topics(h)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>['msg don people know just food think like',
+ 'clipper chip phone crypto phones government nsa secure',
+ 'armenian armenians turkish genocide armenia turks turkey people',
+ 'jews adam jewish land shostack das harvard arabs',
+ 'com edu pgp mail faq rsa list ripem',
+ 'israel israeli lebanese arab lebanon peace israelis arabs',
+ 'key keys bit chip serial bits 80 number',
+ 'encryption government technology law privacy enforcement administration use',
+ 'geb dsl cadre chastity n3jxp pitt intellect shameful',
+ 'bike bikes ride motorcycle riding dod dog good']</code></pre>
+</div>
+</div>
+<p>So if you recall our original news group categories were:</p>
+<ul>
+<li>rec.motorcycles</li>
+<li>talk.politics.mideast</li>
+<li>sci.med</li>
+<li>sci.crypt</li>
+</ul>
+<p>We can see that the topics discovered using SGD correspond fairly well to these, bar a few anomalies.</p>
+</section>
+<section id="comparing-approaches" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="comparing-approaches"><span class="header-section-number">4.1</span> Comparing Approaches</h3>
+<p>If we compare our two approaches to calculating NMF.</p>
+<p><strong>Scikit-Learn’s NMF</strong> - Fast - No parameter tuning - Relies on decades of academic research, took experts a long time to implement - Can’t be customised - Method can only be applied to calculating NMF</p>
+<p><strong>Using PyTorch and SGD</strong> - Took an hour to implement, didn’t have to be NMF experts - Parameters were fiddly - Not as fast - Easily customised - Method can be applied to a vast range of problems</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">5</span> Conclusion</h2>
+<p>In this article we introduced Non-negative Matrix Factorization (NMF) and saw how it could be applied to the task of topic modelling in NLP. We also compared two approaches to calculating NMF using Scikit-Learn’s library function as well as Stocastic Gradient Descent (SGD) and highlighted various pros and cons of each approach.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>
