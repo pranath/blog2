@@ -13,6 +13,12 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-07-06-choosing-pretrained-llm.html",
+      "/posts/2023-07-05-summarising-dialogue-using-generative-ai.html",
+      "/posts/2023-07-04-generative-ai-project-lifecycle.html",
+      "/posts/2023-07-03-generative-config-for-large-language-models.html",
+      "/posts/2023-07-02-high-level-prompting-prompt-engineering.html",
+      "/posts/2023-07-01-high-level-overview-of-the-transformer-model-the-magic-behind-AI.html",
       "/posts/2023-06-26-evaluating-outputs-of-llm-applications-ambiguous-criteria.html",
       "/posts/2023-06-25-evaluating-outputs-of-llm-applications-clear-criteria.html",
       "/posts/2023-06-24-creating-better-chatbots-using-chained-prompts-and-quality-checks.html",

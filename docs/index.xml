@@ -10,7 +10,75 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science Blog</description>
 <generator>quarto-1.2.335</generator>
-<lastBuildDate>Sun, 25 Jun 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 05 Jul 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Chossing a Pre-Trained Large Language Model</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-06-choosing-pretrained-llm.html</link>
+  <description><![CDATA[ The project life cycle for generative AI was introduced in this <a href="../posts/2023-07-04-generative-ai-project-lifecycle.html">previous article</a>. There are a few tasks to complete before you can launch your generative AI app, as we saw there. Selecting a model to work with comes after you have defined your use case and chosen how the LLM will operate within your application. Working with an existing model or creating your own from scratch will be your first option. In some situations, it may be advantageous to build your own model from scratch. In most cases, though, you’ll use an existing foundation model to start the process of constructing your application. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>hugging-face</category>
+  <guid>http://livingdatalab.com/posts/2023-07-06-choosing-pretrained-llm.html</guid>
+  <pubDate>Wed, 05 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Summarising Dialogue using Generative AI</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-05-summarising-dialogue-using-generative-ai.html</link>
+  <description><![CDATA[ In this article I will perform dialogue summarization using generative AI. We will explore how the input text affects the output of the model, and perform prompt engineering to direct it towards the task we need. By comparing zero shot, one shot, and few shot inferences, we will take the first steps towards prompt engineering and see how it can enhance the generative output of Large Language Models. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>hugging-face</category>
+  <guid>http://livingdatalab.com/posts/2023-07-05-summarising-dialogue-using-generative-ai.html</guid>
+  <pubDate>Tue, 04 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai1.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>An Approach to the Generative AI Project Lifecyle</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-04-generative-ai-project-lifecycle.html</link>
+  <description><![CDATA[ Recent advances in AI such as ChatGPT have demonstrated impressive abilities for performing a wide range of tasks previously only done by humans, these are known as Large Language Models (LLM’s). However, there are so many different options and methods for building applications with these models, and these are all new methods. It can seem overhelming and not obvious how to approach building Generative AI applications. In this article, I will present a high level project architecture for building Generative AI projects that could be applied to any project, which has been proposed by DeepLearning AI and AWS in their <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> which I recently completed. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-04-generative-ai-project-lifecycle.html</guid>
+  <pubDate>Mon, 03 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai4.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Generative Configuration for Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-03-generative-config-for-large-language-models.html</link>
+  <description><![CDATA[ Recent advances in AI such as ChatGPT have demonstrated impressive abilities for performing a wide range of tasks previously only done by humans, these are known as Large Language Models (LLM’s). Once you have chosen a model, you often have some configuration options that let you control the outputs. In this article we will take a high level non-technical view of what these generative configuration options allow you to do. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-03-generative-config-for-large-language-models.html</guid>
+  <pubDate>Sun, 02 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai3.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>A High Level Overview of Prompting and In-Context Learning for Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-02-high-level-prompting-prompt-engineering.html</link>
+  <description><![CDATA[ Recent advances in AI such as ChatGPT have demonstrated impressive abilities for performing a wide range of tasks previously only done by humans, these are known as Large Language Models (LLM’s). One key aspect for using these LLM’s is called prompting - which is how to write text requests to get the outputs you want from these models. In <a href="../#category=natural-language-processing">previous articles</a> I’ve looked at detailed practical use cases for how to make these prompts. In this article we will take a high level non-technical view of what prompting is all about, and introduce what in-context learning is. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-02-high-level-prompting-prompt-engineering.html</guid>
+  <pubDate>Sat, 01 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>A High Level Overview of the Transformer Model - The Magic Behind Recent Advances in AI</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-01-high-level-overview-of-the-transformer-model-the-magic-behind-AI.html</link>
+  <description><![CDATA[ Recent advances in AI such as ChatGPT have demonstrated impressive abilities for performing a wide range of tasks previously only done by humans. The key technology used in these models is called the Transformer Model. In <a href="../#category=natural-language-processing">previous articles</a> I’ve looked at the detailed theoretical underpinnings of this model as well as practical use cases. In this article we will take a high level non-technical view of key aspects of the Transformer Model that have enabled it to make the huge advances that it has made. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-01-high-level-overview-of-the-transformer-model-the-magic-behind-AI.html</guid>
+  <pubDate>Fri, 30 Jun 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai1.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Evaluating the outputs of Large Language Model Applications for Ambiguous Criteria</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -183,80 +251,6 @@
   <guid>http://livingdatalab.com/posts/2023-06-03-using-chains-with-langchain.html</guid>
   <pubDate>Fri, 02 Jun 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/langchain3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Using LangChain Memory for LLM Applications</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-02-using-langchain-memory-for-llm-applications.html</link>
-  <description><![CDATA[ Large language models (LLMs) are emerging as a transformative technology, enabling developers to build applications that they previously could not. But using LLMs in isolation is often not enough in practice to create a truly powerful or useful business application - the real power comes when you are able to combine them with other sources of computation, services or knowledge. <a href="https://python.langchain.com/en/latest/index.html">LangChain</a> is an intuitive open-source python framework created to simplify the development of useful applications using large language models (LLMs), such as OpenAI or Hugging Face. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-02-using-langchain-memory-for-llm-applications.html</guid>
-  <pubDate>Thu, 01 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Using LangChain for LLM Application Development</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-01-using-langchain-for-llm-application-develoment.html</link>
-  <description><![CDATA[ Large language models (LLMs) are emerging as a transformative technology, enabling developers to build applications that they previously could not. But using LLMs in isolation is often not enough in practice to create a truly powerful or useful business application - the real power comes when you are able to combine them with other sources of computation, services or knowledge. <a href="https://python.langchain.com/en/latest/index.html">LangChain</a> is an intuitive open-source python framework created to simplify the development of useful applications using large language models (LLMs), such as OpenAI or Hugging Face. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-01-using-langchain-for-llm-application-develoment.html</guid>
-  <pubDate>Wed, 31 May 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Using ChatGPT to Create a Customised Chatbot</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-05-07-using-chatgpt-to-create-a-customised-chatbot.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-05-07-using-chatgpt-to-create-a-customised-chatbot.html</guid>
-  <pubDate>Sat, 06 May 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Expanding &amp; Customising Text using Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-05-06-expanding-and-customising-text-using-large-language-models.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-05-06-expanding-and-customising-text-using-large-language-models.html</guid>
-  <pubDate>Fri, 05 May 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Large Language Models for Text Transformation</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-05-05-large-language-models-for-text-transformation.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-05-05-large-language-models-for-text-transformation.html</guid>
-  <pubDate>Thu, 04 May 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Inferring with Text Prompts for Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-05-04-inferring-with-text-prompts-for-large-language-models.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-05-04-inferring-with-text-prompts-for-large-language-models.html</guid>
-  <pubDate>Wed, 03 May 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt1.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

@@ -374,10 +374,34 @@
   </url>
   <url>
     <loc>http://livingdatalab.com/index.html</loc>
-    <lastmod>2023-06-22T17:44:18.438Z</lastmod>
+    <lastmod>2023-07-09T17:20:37.326Z</lastmod>
   </url>
   <url>
     <loc>http://livingdatalab.com/about.html</loc>
     <lastmod>2023-06-22T17:44:18.836Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-07-02-high-level-prompting-prompt-engineering.html</loc>
+    <lastmod>2023-07-09T15:15:03.611Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-07-04-generative-ai-project-lifecycle.html</loc>
+    <lastmod>2023-07-09T15:15:03.991Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-07-05-summarising-dialogue-using-generative-ai.html</loc>
+    <lastmod>2023-07-09T15:29:23.510Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-07-01-high-level-overview-of-the-transformer-model-the-magic-behind-AI.html</loc>
+    <lastmod>2023-07-09T17:26:02.237Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-07-03-generative-config-for-large-language-models.html</loc>
+    <lastmod>2023-07-09T15:15:05.543Z</lastmod>
+  </url>
+  <url>
+    <loc>http://livingdatalab.com/posts/2023-07-06-choosing-pretrained-llm.html</loc>
+    <lastmod>2023-07-09T17:20:35.430Z</lastmod>
   </url>
 </urlset>
