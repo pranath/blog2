@@ -14,12 +14,12 @@
 <item>
   <title>Choosing a Pre-Trained Large Language Model</title>
   <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-06-choosing-pretrained-llm.html</link>
+  <link>http://livingdatalab.com/posts/2023-07-06-choosing-a-pretrained-llm.html</link>
   <description><![CDATA[ The project life cycle for generative AI was introduced in this <a href="../posts/2023-07-04-generative-ai-project-lifecycle.html">previous article</a>. There are a few tasks to complete before you can launch your generative AI app, as we saw there. Selecting a model to work with comes after you have defined your use case and chosen how the LLM will operate within your application. Working with an existing model or creating your own from scratch will be your first option. In some situations, it may be advantageous to build your own model from scratch. In most cases, though, you’ll use an existing foundation model to start the process of constructing your application. ]]></description>
   <category>natural-language-processing</category>
   <category>deep-learning</category>
   <category>hugging-face</category>
-  <guid>http://livingdatalab.com/posts/2023-07-06-choosing-pretrained-llm.html</guid>
+  <guid>http://livingdatalab.com/posts/2023-07-06-choosing-a-pretrained-llm.html</guid>
   <pubDate>Wed, 05 Jul 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
 </item>
