@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-11">
+<meta name="description" content="In this post, we’ll look at techniques you might employ to make an existing large language model more effective for your particular use case using a method called instruction fine-tuning, and in particular see how this can be used to optimise for multiple tasks as the same time.">
+
+<title>LivingDataLab - Multi-task Instruction Fine-Tuning for Large Language Models</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Multi-task Instruction Fine-Tuning for Large Language Models">
+<meta property="og:description" content="In this post, we'll look at techniques you might employ to make an existing large language model more effective for your particular use case using a method called instruction fine-tuning, and in…">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/genai3.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Multi-task Instruction Fine-Tuning for Large Language Models">
+<meta name="twitter:description" content="In this post, we'll look at techniques you might employ to make an existing large language model more effective for your particular use case using a method called instruction fine-tuning, and in…">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/genai3.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Multi-task Instruction Fine-Tuning for Large Language Models</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Multi-task Instruction Fine-Tuning for Large Language Models</h1>
+                  <div>
+        <div class="description">
+          In this post, we’ll look at techniques you might employ to make an existing large language model more effective for your particular use case using a method called instruction fine-tuning, and in particular see how this can be used to optimise for multiple tasks as the same time.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 11, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#multi-task-instruction-fine-tuning" id="toc-multi-task-instruction-fine-tuning" class="nav-link" data-scroll-target="#multi-task-instruction-fine-tuning"><span class="toc-section-number">2</span>  Multi-Task Instruction Fine-Tuning</a></li>
+  <li><a href="#instruction-fine-tuning-with-flan" id="toc-instruction-fine-tuning-with-flan" class="nav-link" data-scroll-target="#instruction-fine-tuning-with-flan"><span class="toc-section-number">3</span>  Instruction Fine-Tuning with FLAN</a></li>
+  <li><a href="#use-case-summarising-customer-requests" id="toc-use-case-summarising-customer-requests" class="nav-link" data-scroll-target="#use-case-summarising-customer-requests"><span class="toc-section-number">4</span>  Use-Case: Summarising Customer Requests</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">5</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In this post, we’ll look at techniques you might employ to make an existing large language model more effective for your particular use case using a method called instruction fine-tuning, and in particular see how this can be used to optimise for multiple tasks as the same time.</p>
+</section>
+<section id="multi-task-instruction-fine-tuning" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="multi-task-instruction-fine-tuning"><span class="header-section-number">2</span> Multi-Task Instruction Fine-Tuning</h2>
+<p>An extension of single task fine-tuning, multitask fine-tuning uses sample inputs and outputs for multiple tasks as part of the training dataset. Here, the dataset includes examples that teach the model how to perform a number of tasks, including entity recognition, code translation, summarization, and review rating. To increase the model’s performance across all tasks simultaneously and prevent catastrophic forgetting, you train the model using this mixed dataset. The weights of the model are updated throughout multiple training epochs using the computed losses across samples, creating a tailored model that has learned how to be proficient at several tasks at once.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai90.png" width="800"></p>
+<p>The fact that multitask fine-tuning needs a lot of data is one disadvantage. In your training set, you can need as many as 50–100,000 samples. However, compiling this data can be quite beneficial and worthwhile. The resulting models are frequently quite powerful and appropriate for application in circumstances where good performance across a wide range of activities is desired. Let’s look at a particular model family that was trained utilising multitask instruction fine-tuning. Depending on the datasets and tasks utilised during fine-tuning, instruct model variance varies.</p>
+</section>
+<section id="instruction-fine-tuning-with-flan" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="instruction-fine-tuning-with-flan"><span class="header-section-number">3</span> Instruction Fine-Tuning with FLAN</h2>
+<p>The FLAN family of models is one instance. FLAN, or fine-tuned language net, is a particular set of guidelines used to fine-tune various models. The authors of the original research referred to FLAN fine-tuning as the metaphorical dessert to the main dish of pre-training because it is the final stage of the training process, which is a fair description.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai91.png" width="800"></p>
+<p>In contrast to FLAN-PALM, which is the flattening struct version of the palm foundation model, FLAN-T5 is the FLAN instruct version of the T5 foundation model. You get the picture; the FLAN-T5 is a fantastic all-purpose teaching model. It has been improved on 473 datasets total, spanning 146 different task categories.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai92.png" width="800"></p>
+<p>SAMSum is one illustration of a prompt dataset used for FLAN-T5 summarising jobs. It is used to train language models that will summarise discourse. It is a component of the muffin collection of tasks and datasets. SAMSum is a dataset that contains summaries of 16,000 messenger-like chats. The dialogue for three cases is on the left, and the summaries are on the right. Linguists created the summaries and dialogues specifically to create a high-quality training dataset for language models. The linguists were asked to construct dialogues resembling those they would write every day, reflecting the percentage of themes of their actual messenger exchanges.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai93.png" width="800"></p>
+<p>Although language experts then created short summaries of those conversations that included important pieces of information and names of the people in the dialogue. Here is a prompt template designed to work with this SAMSum dialogue summary dataset. The template is actually comprised of several different instructions that all basically ask the model to do this same thing. Summarize a dialogue. For example, briefly summarize that dialogue. What is a summary of this dialogue? What was going on in that conversation? Including different ways of saying the same instruction helps the model generalize and perform better. Just like the prompt templates you saw earlier.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai94.png" width="800"></p>
+<p>You can see that wherever the dialogue field appears in each scenario, the dialogue from the SAMSum dataset is added to the template. The label is created using the summary. You can use this template to fine-tune a dialogue summarization task by applying it to each row in the SAMSum dataset.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai95.png" width="800"></p>
+<p>Even while the FLAN-T5 is a fantastic general-use model, it struggles at times. It still might need work on certain activities for your particular use case, so keep that in mind.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai96.png" width="800"></p>
+</section>
+<section id="use-case-summarising-customer-requests" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="use-case-summarising-customer-requests"><span class="header-section-number">4</span> Use-Case: Summarising Customer Requests</h2>
+<p>Consider, for instance, that you are a data scientist developing an app to assist your customer care staff in handling requests made through a chat bot like the one displayed here.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai97.png" width="800"></p>
+<p>To identify the main steps the client is seeking and to decide what actions should be taken in response, your customer care staff needs a summary of every conversation. FLAN-T5 has some conversation-summarizing capabilities thanks to the SAMSum dataset. The examples in the dataset, which primarily consist of talks between friends about everyday activities, don’t significantly resemble the language pattern found in chats with customer service representatives. Use a dialogue dataset that is considerably more similar to the discussions that took place with your bot to further fine-tune the FLAN-T5 model.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai98.png" width="800"></p>
+<p>Let’s examine an illustration from dialogsum and talk about how more fine-tuning can make the model better. This support chat is representative of the dialogsum dataset’s sample examples. A customer and a service member are speaking at a hotel check-in desk. A template has been applied to the chat so that the direction to start the text with a summary of the conversation is present.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai99.png" width="800"></p>
+<p>Before performing any further fine-tuning, let’s have a look at how FLAN-T5 answers to this question. You’ll see that the prompt has been compressed to the left to give you more room to analyse the model’s completion.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai100.png" width="800"></p>
+<p>This is how the model responded to the directive. You can tell that the model works because it was able to determine that Tommy’s reservation was the topic of the conversation. However, it falls short of the human-generated baseline summary, which also includes crucial details like Mike’s request for information to speed up check-in and the models’ creation of information that was not part of the original dialogue. In particular, the brand of the hotel and the location where it was situated. Let’s examine the model’s performance after making adjustments based on the dialogue dataset. We think you will agree that this is closer to a human-produced summary.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai101.png" width="800"></p>
+<p>The summary has all the crucial information, including the names of both participants in the conversation, and there is no faked information. This example shows how to fine-tune custom data using a dataset and a public discussion. Using the internal data collected by your business can help you fine-tune your strategy the most effectively.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai102.png" width="800"></p>
+<p>As an illustration, consider the support chat exchanges from your customer service application. This will enable the model to pick up on the nuances of how your business prefers to sum up discussions and what information your customer service colleagues find most helpful.</p>
+<p><a href="https://arxiv.org/abs/2210.11416">This paper</a> introduces FLAN (Fine-tuned LAnguage Net), a technique for fine-tuning instructions, and demonstrates the outcomes of its use. The study shows that by optimising the 540B PaLM model on 1836 tasks and including Chain-of-Thought Reasoning data, FLAN provides improvements in generalisation, human usability, and zero-shot reasoning over the original model. The article also includes comprehensive information on the evaluation process for each of these factors</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">5</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> by DeepLearning.ai and AWS - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

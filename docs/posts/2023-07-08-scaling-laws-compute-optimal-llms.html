@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-08">
+<meta name="description" content="In this article we look at research that has looked at the relationship between model size, training, configuration, and performance to try to pinpoint the optimal size for large language models">
+
+<title>LivingDataLab - Scaling Laws and Compute Optimal Large Language Models</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Scaling Laws and Compute Optimal Large Language Models">
+<meta property="og:description" content="In this article we look at research that has looked at the relationship between model size, training, configuration, and performance to try to pinpoint the optimal size for large language models">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/genai4.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Scaling Laws and Compute Optimal Large Language Models">
+<meta name="twitter:description" content="In this article we look at research that has looked at the relationship between model size, training, configuration, and performance to try to pinpoint the optimal size for large language models">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/genai4.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Scaling Laws and Compute Optimal Large Language Models</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Scaling Laws and Compute Optimal Large Language Models</h1>
+                  <div>
+        <div class="description">
+          In this article we look at research that has looked at the relationship between model size, training, configuration, and performance to try to pinpoint the optimal size for large language models
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 8, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#dataset-vs-model-size" id="toc-dataset-vs-model-size" class="nav-link" data-scroll-target="#dataset-vs-model-size"><span class="toc-section-number">2</span>  Dataset vs Model Size</a></li>
+  <li><a href="#the-chinchilla-paper" id="toc-the-chinchilla-paper" class="nav-link" data-scroll-target="#the-chinchilla-paper"><span class="toc-section-number">3</span>  The Chinchilla paper</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">4</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In this article we’ll look at research that has looked at the relationship between model size, training, configuration, and performance to try to pinpoint the optimal size for large language models. It’s important to keep in mind that the objective of pre-training is to maximise the model’s achievement of its learning objective, which is to minimise the loss while predicting tokens.</p>
+</section>
+<section id="dataset-vs-model-size" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="dataset-vs-model-size"><span class="header-section-number">2</span> Dataset vs Model Size</h2>
+<p>Expanding the dataset size used to train your model and expanding the number of model parameters are two ways to improve performance. Theoretically, scaling one or the other of these amounts would enhance performance. Your compute budget, which includes elements like the number of GPUs you have access to and the amount of time you have available for model training, is an additional problem to take into account. Let’s first create a unit of compute that quantifies the necessary resources so that you may better grasp some of the discussion that will follow.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai59.png" width="800"></p>
+<p>The number of floating point operations carried out at a rate of one petaFLOP per second over the course of a single day is referred to as a petaFLOP per second day. Remember that 1 quadrillion floating point operations per second equates to 1 petaFLOP. One petaFLOP per second day is about similar to eight NVIDIA V100 GPUs running at maximum efficiency for a complete day when primarily considering training transformers. A petaFLOP per second day can be achieved with fewer chips if you have a more potent processor that is capable of processing more tasks simultaneously. For instance, eight V100 chips are equivalently computed by two NVIDIA A100 GPUs.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai60.png" width="800"></p>
+<p>This graph compares the petaFLOP per second days needed to pre-train different variances of Bert and Roberta, both encoder only models, to give you an idea of the scope of these compute budgets. T5 and the encoder-decoder and decoder-only GPT-3 models. The number of parameters that were trained, which ranges from a few hundred million for Bert basic to 175 billion for the largest GPT-3 variation, distinguishes the models in each family. The y-axis is logarithmic, as you can see. A power of 10 is added vertically with each step. We can observe that T5 XL took around 100 petaFLOP per second days to run with three billion parameters.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai61.png" width="800"></p>
+<p>As opposed to the larger GPT-3 175 billion parameter model, which needed about 3,700 petaFLOP per second days. This graph clearly shows how many computers were needed to train the biggest models. As you can see, larger models require more computing power to train and typically more data to function well. It turns out that the relationships between these three scaling options are fairly clearly defined. The trade-offs between the size of the training dataset, the size of the model, and the compute budget have been studied. Here is a diagram from a work by OpenAI researchers that examines how the compute budget affects model performance.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai62.png" width="800"></p>
+<p>The test loss is plotted on the y-axis, where lesser values indicate better model performance. The compute budget is represented on the x-axis as petaFLOP per second days. As you’ve just shown, higher numbers can be obtained by increasing compute power, extending training periods, or doing both. The model loss over a single training run is represented by each fine blue line in this diagram. A obvious correlation between the compute budget and the model’s performance can be seen by examining the point at which the loss starts to decrease more slowly for each run. This can be roughly represented by a power-law connection, as this pink line demonstrates.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai63.png" width="800"></p>
+<p>A mathematical relationship between two variables in which one is proportionate to the other raised to a certain power is known as a power law. Power-law relationships are shown as straight lines on a graph with two logarithmic axes. As long as model size and training dataset size do not hinder the training process, the link in this case is valid. If taken at face value, this would imply that all you need to do to improve model performance is raise your compute budget. In reality, however, the computing resources you have at your disposal for training will typically be subject to strict limitations imposed by things like the hardware you have access to, the amount of time you have for training, and the project’s budget.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai64.png" width="800"></p>
+<p>The size of the training dataset and the number of parameters in your model are the two levers you have to increase the performance of your model if you keep your compute budget fixed. When the other two variables are maintained constant, the OpenAI researchers discovered that these two quantities likewise exhibit a power-law connection with a test loss. This graphic, which examines the effect of training dataset size on model performance, is taken from the same paper. Here, the training dataset size is variable but the compute budget and model size are remained constant. The graph demonstrates that the model’s performance keeps getting better as the amount of training data grows.</p>
+<p>Both the compute budget and the size of the training dataset are constant in the second graph. Models with various parameter counts are trained. The test loss diminishes as the model’s size grows, showing improved performance.</p>
+</section>
+<section id="the-chinchilla-paper" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-chinchilla-paper"><span class="header-section-number">3</span> The Chinchilla paper</h2>
+<p>You might be wondering at this point what the best ratio between these three values is? It seems that a lot of people are curious about this issue. Numerous empirical data for pre-training compute optimum models have been published by both the research and business worlds.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai65.png" width="800"></p>
+<p>A team of scientists led by Jordan Hoffmann, Sebastian Borgeaud, and Arthur Mensch conducted a thorough analysis of the performance of language models with varying sizes and amounts of training data, and the results were published in a paper in 2022.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai66.png" width="800"></p>
+<p>Finding the ideal quantity of training data and number of parameters for a specific compute budget was the objective. Chinchilla is the name of the computed optimal model. This paper is frequently called the Chinchilla paper. Let’s look at a few of their conclusions. The Chinchilla paper makes a suggestion that many of the 100 billion parameter large language models, like GPT-3, may actually be undertrained and over parameterized, meaning they have more parameters than are necessary to achieve a thorough understanding of language. Smaller models might be able to perform as well as much larger ones, according to the scientists’ theory, if they are trained on larger datasets.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai67.png" width="800"></p>
+<p>You can see a number of models in this table, along with their sizes and details on the training dataset. <strong>The size of the ideal training dataset for a particular model is around 20 times bigger than the number of parameters in the model</strong>, according to the Chinchilla study. Chinchilla was found to be the most efficient to compute. The ideal training dataset has 1.4 trillion tokens, or 20 times the number of parameters, for a model with 70 billion parameters. The table’s final three models were developed using datasets that were smaller than the Chinchilla ideal size.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai68.png" width="800"></p>
+<p>These models might not have received enough training. LLaMA, on the other hand, was trained on a dataset size of 1.4 trillion tokens, which is close to the Chinchilla suggested amount. The Chinchilla model, which is compute optimal, outperforms non-compute optimal models, like GPT-3, on a variety of downstream evaluation tasks, which is another significant finding from the research. As a result of the Chinchilla paper’s findings, teams have lately begun to create smaller models that produced outcomes that were comparable to or even superior to those of bigger models that had undergone suboptimal training.</p>
+<p>As more teams or developers begin to optimise their model design going forward, you can anticipate seeing a departure from the bigger is always better tendencies of the last several years. Bloomberg GPT, the last model displayed, is a really intriguing model. Following the Chinchilla loss, it was trained in a compute-optimal manner, and as a result, it performs well with a size of 50 billion parameters. It’s also an intriguing illustration of a circumstance in which good task performance required pre-training a model entirely from scratch.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/chinchilla.jpg" width="800"></p>
+<p>And of course it should go without saying, the entire AI community is extremely grateful to all Chinchillas for their significant inspiration and contributions to AI research!</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">4</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> by DeepLearning.ai and AWS - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

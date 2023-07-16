@@ -10,7 +10,97 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science Blog</description>
 <generator>quarto-1.2.335</generator>
-<lastBuildDate>Wed, 05 Jul 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 13 Jul 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Fine-Tuning a Generative AI Model for Dialogue Summarization</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-14-finetune-generative-ai-model-summarisation.html</link>
+  <description><![CDATA[ In this project I will fine-tune an existing LLM from Hugging Face for enhanced dialogue summarization. We will use the <a href="https://huggingface.co/docs/transformers/model_doc/flan-t5">FLAN-T5</a> model, which provides a high quality instruction tuned model and can summarize text out of the box. To improve the inferences, we will explore a full fine-tuning approach and evaluate the results with ROUGE metrics. Then we will perform Parameter Efficient Fine-Tuning (PEFT), evaluate the resulting model and see that the benefits of PEFT outweigh the slightly-lower performance metrics. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>aws</category>
+  <category>hugging-face</category>
+  <guid>http://livingdatalab.com/posts/2023-07-14-finetune-generative-ai-model-summarisation.html</guid>
+  <pubDate>Thu, 13 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Parameter Efficient Fine-Tuning (PEFT) for Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-13-parameter-efficient-fine-tuning-of-llms.html</link>
+  <description><![CDATA[ It takes a lot of computation to train LLMs. Memory is needed for complete fine-tuning not just to store the model but also a number of other training-related factors. You must be able to allocate memory for optimizer states, gradients, forward activations, and temporary memory throughout the training process even if your computer can hold the model weights, which are currently on the order of hundreds of terabytes for the largest models. These extra parts may be many times bigger than the model and can easily outgrow the capabilities of consumer hardware. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-13-parameter-efficient-fine-tuning-of-llms.html</guid>
+  <pubDate>Wed, 12 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai1.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Evaluating Fine-Tuned Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-12-evaluating-fine-tuned-large-language-models.html</link>
+  <description><![CDATA[ When looking at large language models such as ChatGPT and others we might customise and fine tune to improve, we might often describe it by saying the model demonstrated good performance on this task or this fine-tuned model showed a large improvement in performance over the base model. But what do statements like this mean? How can you formalize the improvement in performance of your fine-tuned model over the pre-trained model you started with? In this article we explore several metrics that are used by developers of large language models that you can use to assess the performance of your own models and compare to other models out in the world. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-12-evaluating-fine-tuned-large-language-models.html</guid>
+  <pubDate>Tue, 11 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai4.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Multi-task Instruction Fine-Tuning for Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-11-multi-task-instruction-fine-tuning.html</link>
+  <description><![CDATA[ In this post, we’ll look at techniques you might employ to make an existing large language model more effective for your particular use case using a method called instruction fine-tuning, and in particular see how this can be used to optimise for multiple tasks as the same time. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-11-multi-task-instruction-fine-tuning.html</guid>
+  <pubDate>Mon, 10 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai3.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Improve Large Language Models with Instruction Fine-Tuning</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-10-fine-tuning-llms-with-instructions.html</link>
+  <description><![CDATA[ In this post, we’ll look at techniques you might employ to make an existing large language model more effective for your particular use case using a method called instruction fine-tuning. We will also see how this differs from using prompts and in-context prompt learning. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-10-fine-tuning-llms-with-instructions.html</guid>
+  <pubDate>Sun, 09 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Pre-training Large Language Models for Domain Adaptation</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-09-pretraining-llms-for-domain-adaptation.html</link>
+  <description><![CDATA[ Here we will examine particular use cases where it might make sense to train a large language model from scratch. These use cases are often characterised by situations that use language in a very unique way such as legal or medical text. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-09-pretraining-llms-for-domain-adaptation.html</guid>
+  <pubDate>Sat, 08 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai1.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Scaling Laws and Compute Optimal Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-08-scaling-laws-compute-optimal-llms.html</link>
+  <description><![CDATA[ In this article we’ll look at research that has looked at the relationship between model size, training, configuration, and performance to try to pinpoint the optimal size for large language models. It’s important to keep in mind that the objective of pre-training is to maximise the model’s achievement of its learning objective, which is to minimise the loss while predicting tokens. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-08-scaling-laws-compute-optimal-llms.html</guid>
+  <pubDate>Fri, 07 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai4.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Computational Challenges fo training LLMs</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-07-computational-challenges-of-training-llms.html</link>
+  <description><![CDATA[ Running out of memory is one of the most frequent problems you still encounter when trying to train large language models. Compute Unified Device Architecture, or CUDA, is a group of tools and libraries created specifically for Nvidia GPUs. Libraries like PyTorch and TensorFlow make advantage of CUDA to improve performance on deep learning operations like metrics multiplication. Because most LLMs are large and need a lot of memory to store and train all of their parameters, you’ll run across these memory concerns. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-07-computational-challenges-of-training-llms.html</guid>
+  <pubDate>Thu, 06 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai3.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Choosing a Pre-Trained Large Language Model</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -150,107 +240,6 @@
   <guid>http://livingdatalab.com/posts/2023-06-21-chain-of-thought-reasoning-with-chatgpt.html</guid>
   <pubDate>Tue, 20 Jun 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Evaluating Moderation Inputs for Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-20-evaluating-moderation-inputs-large-language-models.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-20-evaluating-moderation-inputs-large-language-models.html</guid>
-  <pubDate>Mon, 19 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Evaluating Classification Inputs for Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-19-evaluating-classification-inputs-large-language-models.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-19-evaluating-classification-inputs-large-language-models.html</guid>
-  <pubDate>Sun, 18 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>An overview Language Models, the Chat format and Tokens</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-18-an-overview-of-llms-the-chat-format-and-tokens.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-18-an-overview-of-llms-the-chat-format-and-tokens.html</guid>
-  <pubDate>Sat, 17 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Key Considerations when Creating Practical Applications using Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-14-key-considerations-when-creating-practical-applications-with-llms.html</link>
-  <description><![CDATA[ AI and Large Language Models such as ChatGPT have brought some dramatic developments in recent years. But trying to actually build useful applications using these involves many challenges and considerations. However, the potential number of useful applications using LLM’s is huge. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>hugging-face</category>
-  <guid>http://livingdatalab.com/posts/2023-06-14-key-considerations-when-creating-practical-applications-with-llms.html</guid>
-  <pubDate>Tue, 13 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/ai_applications.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Creating LLM based Agents using LangChain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-06-creating-llm-based-agents-using-langchain.html</link>
-  <description><![CDATA[ Large language models (LLMs) are emerging as a transformative technology, enabling developers to build applications that they previously could not. But using LLMs in isolation is often not enough in practice to create a truly powerful or useful business application - the real power comes when you are able to combine them with other sources of computation, services or knowledge. <a href="https://python.langchain.com/en/latest/index.html">LangChain</a> is an intuitive open-source python framework created to simplify the development of useful applications using large language models (LLMs), such as OpenAI or Hugging Face. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-06-creating-llm-based-agents-using-langchain.html</guid>
-  <pubDate>Mon, 05 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Using LangChain to Evaluate LLM Applications</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-05-using-langchain-to-evaluate-llm-applications.html</link>
-  <description><![CDATA[ Large language models (LLMs) are emerging as a transformative technology, enabling developers to build applications that they previously could not. But using LLMs in isolation is often not enough in practice to create a truly powerful or useful business application - the real power comes when you are able to combine them with other sources of computation, services or knowledge. <a href="https://python.langchain.com/en/latest/index.html">LangChain</a> is an intuitive open-source python framework created to simplify the development of useful applications using large language models (LLMs), such as OpenAI or Hugging Face. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-05-using-langchain-to-evaluate-llm-applications.html</guid>
-  <pubDate>Sun, 04 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Question and Answering for Documents using LangChain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-04-question-answering-over-documents-with-langchain.html</link>
-  <description><![CDATA[ Large language models (LLMs) are emerging as a transformative technology, enabling developers to build applications that they previously could not. But using LLMs in isolation is often not enough in practice to create a truly powerful or useful business application - the real power comes when you are able to combine them with other sources of computation, services or knowledge. <a href="https://python.langchain.com/en/latest/index.html">LangChain</a> is an intuitive open-source python framework created to simplify the development of useful applications using large language models (LLMs), such as OpenAI or Hugging Face. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-04-question-answering-over-documents-with-langchain.html</guid>
-  <pubDate>Sat, 03 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Using Chains with LangChain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-03-using-chains-with-langchain.html</link>
-  <description><![CDATA[ Large language models (LLMs) are emerging as a transformative technology, enabling developers to build applications that they previously could not. But using LLMs in isolation is often not enough in practice to create a truly powerful or useful business application - the real power comes when you are able to combine them with other sources of computation, services or knowledge. <a href="https://python.langchain.com/en/latest/index.html">LangChain</a> is an intuitive open-source python framework created to simplify the development of useful applications using large language models (LLMs), such as OpenAI or Hugging Face. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-03-using-chains-with-langchain.html</guid>
-  <pubDate>Fri, 02 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain3.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

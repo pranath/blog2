@@ -13,6 +13,14 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-07-14-finetune-generative-ai-model-summarisation.html",
+      "/posts/2023-07-13-parameter-efficient-fine-tuning-of-llms.html",
+      "/posts/2023-07-12-evaluating-fine-tuned-large-language-models.html",
+      "/posts/2023-07-11-multi-task-instruction-fine-tuning.html",
+      "/posts/2023-07-10-fine-tuning-llms-with-instructions.html",
+      "/posts/2023-07-09-pretraining-llms-for-domain-adaptation.html",
+      "/posts/2023-07-08-scaling-laws-compute-optimal-llms.html",
+      "/posts/2023-07-07-computational-challenges-of-training-llms.html",
       "/posts/2023-07-06-choosing-a-pretrained-llm.html",
       "/posts/2023-07-05-summarising-dialogue-using-generative-ai.html",
       "/posts/2023-07-04-generative-ai-project-lifecycle.html",
