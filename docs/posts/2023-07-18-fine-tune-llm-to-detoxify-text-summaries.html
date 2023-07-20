@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-18">
+<meta name="description" content="In this project we will fine-tune a FLAN-T5 model to generate less toxic content with Meta AI’s hate speech reward model">
+
+<title>LivingDataLab - Fine-Tuning FLAN-T5 with Reinforcement Learning (PPO) and PEFT to Generate Less-Toxic Summaries</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Fine-Tuning FLAN-T5 with Reinforcement Learning (PPO) and PEFT to Generate Less-Toxic Summaries">
+<meta property="og:description" content="In this project we will fine-tune a FLAN-T5 model to generate less toxic content with Meta AI's hate speech reward model">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/genai2.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Fine-Tuning FLAN-T5 with Reinforcement Learning (PPO) and PEFT to Generate Less-Toxic Summaries">
+<meta name="twitter:description" content="In this project we will fine-tune a FLAN-T5 model to generate less toxic content with Meta AI's hate speech reward model">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/genai2.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Fine-Tuning FLAN-T5 with Reinforcement Learning (PPO) and PEFT to Generate Less-Toxic Summaries</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Fine-Tuning FLAN-T5 with Reinforcement Learning (PPO) and PEFT to Generate Less-Toxic Summaries</h1>
+                  <div>
+        <div class="description">
+          In this project we will fine-tune a FLAN-T5 model to generate less toxic content with Meta AI’s hate speech reward model
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">aws</div>
+                <div class="quarto-category">hugging-face</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 18, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#set-up-required-dependencies" id="toc-set-up-required-dependencies" class="nav-link" data-scroll-target="#set-up-required-dependencies"><span class="toc-section-number">2</span>  Set up Required Dependencies</a></li>
+  <li><a href="#load-flan-t5-model---prepare-reward-model-and-toxicity-evaluator" id="toc-load-flan-t5-model---prepare-reward-model-and-toxicity-evaluator" class="nav-link" data-scroll-target="#load-flan-t5-model---prepare-reward-model-and-toxicity-evaluator"><span class="toc-section-number">3</span>  Load FLAN-T5 Model - Prepare Reward Model and Toxicity Evaluator</a>
+  <ul class="collapse">
+  <li><a href="#load-data-and-flan-t5-model-fine-tuned-with-summarization-instruction" id="toc-load-data-and-flan-t5-model-fine-tuned-with-summarization-instruction" class="nav-link" data-scroll-target="#load-data-and-flan-t5-model-fine-tuned-with-summarization-instruction"><span class="toc-section-number">3.1</span>  Load Data and FLAN-T5 Model Fine-Tuned with Summarization Instruction</a></li>
+  <li><a href="#prepare-reward-model" id="toc-prepare-reward-model" class="nav-link" data-scroll-target="#prepare-reward-model"><span class="toc-section-number">3.2</span>  Prepare Reward Model</a></li>
+  <li><a href="#evaluate-toxicity" id="toc-evaluate-toxicity" class="nav-link" data-scroll-target="#evaluate-toxicity"><span class="toc-section-number">3.3</span>  Evaluate Toxicity</a></li>
+  </ul></li>
+  <li><a href="#perform-fine-tuning-to-detoxify-the-summaries" id="toc-perform-fine-tuning-to-detoxify-the-summaries" class="nav-link" data-scroll-target="#perform-fine-tuning-to-detoxify-the-summaries"><span class="toc-section-number">4</span>  Perform Fine-Tuning to Detoxify the Summaries</a>
+  <ul class="collapse">
+  <li><a href="#initialize-ppotrainer" id="toc-initialize-ppotrainer" class="nav-link" data-scroll-target="#initialize-ppotrainer"><span class="toc-section-number">4.1</span>  Initialize <code>PPOTrainer</code></a></li>
+  <li><a href="#fine-tune-the-model" id="toc-fine-tune-the-model" class="nav-link" data-scroll-target="#fine-tune-the-model"><span class="toc-section-number">4.2</span>  Fine-Tune the Model</a></li>
+  <li><a href="#evaluate-the-model-quantitatively" id="toc-evaluate-the-model-quantitatively" class="nav-link" data-scroll-target="#evaluate-the-model-quantitatively"><span class="toc-section-number">4.3</span>  Evaluate the Model Quantitatively</a></li>
+  <li><a href="#evaluate-the-model-qualitatively" id="toc-evaluate-the-model-qualitatively" class="nav-link" data-scroll-target="#evaluate-the-model-qualitatively"><span class="toc-section-number">4.4</span>  Evaluate the Model Qualitatively</a></li>
+  </ul></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">5</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In this project, we will fine-tune a FLAN-T5 model to generate less toxic content with Meta AI’s hate speech reward model. The reward model is a binary classifier that predicts either “not hate” or “hate” for the given text. We will use Proximal Policy Optimization (PPO) to fine-tune and reduce the model’s toxicity.</p>
+</section>
+<section id="set-up-required-dependencies" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="set-up-required-dependencies"><span class="header-section-number">2</span> Set up Required Dependencies</h2>
+<div class="cell" data-tags="[]" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> pipeline, AutoTokenizer, AutoModelForSequenceClassification, AutoModelForSeq2SeqLM, GenerationConfig</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> PeftModel, PeftConfig, LoraConfig, TaskType</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># trl: Transformer Reinforcement Learning library</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> trl <span class="im">import</span> PPOTrainer, PPOConfig, AutoModelForSeq2SeqLMWithValueHead</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> trl <span class="im">import</span> create_reference_model</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> trl.core <span class="im">import</span> LengthSampler</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> evaluate</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># tqdm library makes the loops show a smart progress meter.</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>tqdm.pandas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="load-flan-t5-model---prepare-reward-model-and-toxicity-evaluator" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="load-flan-t5-model---prepare-reward-model-and-toxicity-evaluator"><span class="header-section-number">3</span> Load FLAN-T5 Model - Prepare Reward Model and Toxicity Evaluator</h2>
+<section id="load-data-and-flan-t5-model-fine-tuned-with-summarization-instruction" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="load-data-and-flan-t5-model-fine-tuned-with-summarization-instruction"><span class="header-section-number">3.1</span> Load Data and FLAN-T5 Model Fine-Tuned with Summarization Instruction</h3>
+<p>We will use the Hugging Face dataset <a href="https://huggingface.co/datasets/knkarthick/dialogsum">DialogSum</a> and the pre-trained model <a href="https://huggingface.co/docs/transformers/model_doc/flan-t5">FLAN-T5</a>.</p>
+<div class="cell" data-tags="[]" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>model_name<span class="op">=</span><span class="st">"google/flan-t5-base"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>huggingface_dataset_name <span class="op">=</span> <span class="st">"knkarthick/dialogsum"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dataset_original <span class="op">=</span> load_dataset(huggingface_dataset_name)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>dataset_original</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"2e1a277c8ac74fbdae69f2457167b73a","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Downloading and preparing dataset csv/knkarthick--dialogsum to /root/.cache/huggingface/datasets/knkarthick___csv/knkarthick--dialogsum-391706c81424fc80/0.0.0/6954658bab30a358235fa864b05cf819af0e179325c740e4bc853bcc7ec513e1...</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"546a369f65b14e7e9599ce3556d072e4","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"c120113d30db44619d9e3bf1273ed54d","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"686e8805d86449bfaf11b88e5161bdb7","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"34c23f677fe94e58b9018afd6eefe8c2","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"387f7effe9b34ad9bc3e1b675f8fd46d","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset csv downloaded and prepared to /root/.cache/huggingface/datasets/knkarthick___csv/knkarthick--dialogsum-391706c81424fc80/0.0.0/6954658bab30a358235fa864b05cf819af0e179325c740e4bc853bcc7ec513e1. Subsequent calls will reuse this data.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"0a339411641d497ab703aff844963572","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>DatasetDict({
+    train: Dataset({
+        features: ['id', 'dialogue', 'summary', 'topic'],
+        num_rows: 12460
+    })
+    test: Dataset({
+        features: ['id', 'dialogue', 'summary', 'topic'],
+        num_rows: 1500
+    })
+    validation: Dataset({
+        features: ['id', 'dialogue', 'summary', 'topic'],
+        num_rows: 500
+    })
+})</code></pre>
+</div>
+</div>
+<p>The next step will be to preprocess the dataset. We will take only a part of it, then filter the dialogues of a particular length (just to make those examples long enough and, at the same time, easy to read). Then wrap each dialogue with the instruction and tokenize the prompts. Save the token ids in the field <code>input_ids</code> and decoded version of the prompts in the field <code>query</code>.</p>
+<p>We could do that all step by step in the cell below, but it is a good habit to organize that all in a function <code>build_dataset</code>:</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_dataset(model_name,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                  dataset_name,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                  input_min_text_length, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                  input_max_text_length):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Preprocess the dataset and split it into train and test parts.</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">    - model_name (str): Tokenizer model name.</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">    - dataset_name (str): Name of the dataset to load.</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">    - input_min_text_length (int): Minimum length of the dialogues.</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">    - input_max_text_length (int): Maximum length of the dialogues.</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">        </span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">    - dataset_splits (datasets.dataset_dict.DatasetDict): Preprocessed dataset containing train and test parts.</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># load dataset (only "train" part will be enough for this lab).</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    dataset <span class="op">=</span> load_dataset(dataset_name, split<span class="op">=</span><span class="st">"train"</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter the dialogues of length between input_min_text_length and input_max_text_length characters.</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    dataset <span class="op">=</span> dataset.<span class="bu">filter</span>(<span class="kw">lambda</span> x: <span class="bu">len</span>(x[<span class="st">"dialogue"</span>]) <span class="op">&gt;</span> input_min_text_length <span class="kw">and</span> <span class="bu">len</span>(x[<span class="st">"dialogue"</span>]) <span class="op">&lt;=</span> input_max_text_length, batched<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare tokenizer. Setting device_map="auto" allows to switch between GPU and CPU automatically.</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name, device_map<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> tokenize(sample):</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Wrap each dialogue with the instruction.</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        prompt <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="ss">Summarize the following conversation.</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="sc">{</span>sample[<span class="st">"dialogue"</span>]<span class="sc">}</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="ss">Summary:</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>        sample[<span class="st">"input_ids"</span>] <span class="op">=</span> tokenizer.encode(prompt)</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># This must be called "query", which is a requirement of our PPO library.</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>        sample[<span class="st">"query"</span>] <span class="op">=</span> tokenizer.decode(sample[<span class="st">"input_ids"</span>])</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> sample</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Tokenize each dialogue.</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    dataset <span class="op">=</span> dataset.<span class="bu">map</span>(tokenize, batched<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    dataset.set_format(<span class="bu">type</span><span class="op">=</span><span class="st">"torch"</span>)</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Split the dataset into train and test parts.</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    dataset_splits <span class="op">=</span> dataset.train_test_split(test_size<span class="op">=</span><span class="fl">0.2</span>, shuffle<span class="op">=</span><span class="va">False</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dataset_splits</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> build_dataset(model_name<span class="op">=</span>model_name,</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>                        dataset_name<span class="op">=</span>huggingface_dataset_name,</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>                        input_min_text_length<span class="op">=</span><span class="dv">200</span>, </span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>                        input_max_text_length<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dataset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Found cached dataset csv (/root/.cache/huggingface/datasets/knkarthick___csv/knkarthick--dialogsum-391706c81424fc80/0.0.0/6954658bab30a358235fa864b05cf819af0e179325c740e4bc853bcc7ec513e1)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"c4798c3823944e3cbbd124d7c824803d","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"29a92bb391824daaa053601408569155","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"4b61e824f7234ae3a537876022e076c7","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"bcb333b1ac934e499723b8d45687f86a","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>DatasetDict({
+    train: Dataset({
+        features: ['id', 'dialogue', 'summary', 'topic', 'input_ids', 'query'],
+        num_rows: 8017
+    })
+    test: Dataset({
+        features: ['id', 'dialogue', 'summary', 'topic', 'input_ids', 'query'],
+        num_rows: 2005
+    })
+})</code></pre>
+</div>
+</div>
+<p>In a <a href="../posts/2023-07-14-finetune-generative-ai-model-summarisation.html">previous project</a> we fine-tuned the PEFT model with summarization instructions. The training in the notebook was done on a subset of data. Then we downloaded the checkpoint of the fully trained PEFT model from S3.</p>
+<p>Let’s load the same model checkpoint here:</p>
+<div class="cell" data-tags="[]" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>aws s3 cp <span class="op">--</span>recursive s3:<span class="op">//</span>dlai<span class="op">-</span>generative<span class="op">-</span>ai<span class="op">/</span>models<span class="op">/</span>peft<span class="op">-</span>dialogue<span class="op">-</span>summary<span class="op">-</span>checkpoint<span class="op">/</span> .<span class="op">/</span>peft<span class="op">-</span>dialogue<span class="op">-</span>summary<span class="op">-</span>checkpoint<span class="op">-</span><span class="im">from</span><span class="op">-</span>s3<span class="op">/</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>download: s3://dlai-generative-ai/models/peft-dialogue-summary-checkpoint/special_tokens_map.json to peft-dialogue-summary-checkpoint-from-s3/special_tokens_map.json
+download: s3://dlai-generative-ai/models/peft-dialogue-summary-checkpoint/adapter_config.json to peft-dialogue-summary-checkpoint-from-s3/adapter_config.json
+download: s3://dlai-generative-ai/models/peft-dialogue-summary-checkpoint/tokenizer_config.json to peft-dialogue-summary-checkpoint-from-s3/tokenizer_config.json
+download: s3://dlai-generative-ai/models/peft-dialogue-summary-checkpoint/tokenizer.json to peft-dialogue-summary-checkpoint-from-s3/tokenizer.json
+download: s3://dlai-generative-ai/models/peft-dialogue-summary-checkpoint/adapter_model.bin to peft-dialogue-summary-checkpoint-from-s3/adapter_model.bin</code></pre>
+</div>
+</div>
+<p>List the model item and check its size (it’s less than 15 Mb):</p>
+<div class="cell" data-tags="[]" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls <span class="op">-</span>alh .<span class="op">/</span>peft<span class="op">-</span>dialogue<span class="op">-</span>summary<span class="op">-</span>checkpoint<span class="op">-</span><span class="im">from</span><span class="op">-</span>s3<span class="op">/</span>adapter_model.<span class="bu">bin</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r-- 1 root root 14M May 15 11:18 ./peft-dialogue-summary-checkpoint-from-s3/adapter_model.bin</code></pre>
+</div>
+</div>
+<p>Prepare a function to pull out the number of model parameters (it is the same as in the previous project):</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> print_number_of_trainable_model_parameters(model):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    trainable_model_params <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    all_model_params <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, param <span class="kw">in</span> model.named_parameters():</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        all_model_params <span class="op">+=</span> param.numel()</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> param.requires_grad:</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>            trainable_model_params <span class="op">+=</span> param.numel()</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"</span><span class="ch">\n</span><span class="ss">trainable model parameters: </span><span class="sc">{</span>trainable_model_params<span class="sc">}</span><span class="ch">\n</span><span class="ss">all model parameters: </span><span class="sc">{</span>all_model_params<span class="sc">}</span><span class="ch">\n</span><span class="ss">percentage of trainable model parameters: </span><span class="sc">{</span><span class="dv">100</span> <span class="op">*</span> trainable_model_params <span class="op">/</span> all_model_params<span class="sc">:.2f}</span><span class="ss">%"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Add the adapter to the original FLAN-T5 model. In the previous project we were adding the fully trained adapter only for inferences, so there was no need to pass LoRA configurations doing that. Now we need to pass them to the constructed PEFT model, also putting <code>is_trainable=True</code>.</p>
+<div class="cell" data-tags="[]" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>lora_config <span class="op">=</span> LoraConfig(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    r<span class="op">=</span><span class="dv">32</span>, <span class="co"># Rank</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    lora_alpha<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    target_modules<span class="op">=</span>[<span class="st">"q"</span>, <span class="st">"v"</span>],</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    lora_dropout<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    bias<span class="op">=</span><span class="st">"none"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    task_type<span class="op">=</span>TaskType.SEQ_2_SEQ_LM <span class="co"># FLAN-T5</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForSeq2SeqLM.from_pretrained(model_name, </span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                                              torch_dtype<span class="op">=</span>torch.bfloat16)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>peft_model <span class="op">=</span> PeftModel.from_pretrained(model, </span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">'./peft-dialogue-summary-checkpoint-from-s3/'</span>, </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                                       lora_config<span class="op">=</span>lora_config,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                                       torch_dtype<span class="op">=</span>torch.bfloat16, </span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>                                       device_map<span class="op">=</span><span class="st">"auto"</span>,                                       </span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                                       is_trainable<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'PEFT model parameters to be updated:</span><span class="ch">\n</span><span class="sc">{</span>print_number_of_trainable_model_parameters(peft_model)<span class="sc">}</span><span class="ch">\n</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"763f108c17ac4a1ca121a3cb94f486f3","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"40d9b17e863c485f936043745eedd02d","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"a61e9c26c5774ba0b02630badb42390d","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PEFT model parameters to be updated:
+
+trainable model parameters: 3538944
+all model parameters: 251116800
+percentage of trainable model parameters: 1.41%
+</code></pre>
+</div>
+</div>
+<p>In this project, we are preparing to fine-tune the LLM using Reinforcement Learning (RL). RL will be briefly discussed in the next section of this article, but at this stage, we just need to prepare the Proximal Policy Optimization (PPO) model passing the instruct-fine-tuned PEFT model to it. PPO will be used to optimize the RL policy against the reward model.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>ppo_model <span class="op">=</span> AutoModelForSeq2SeqLMWithValueHead.from_pretrained(peft_model,                                                               </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                                                               torch_dtype<span class="op">=</span>torch.bfloat16,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                                                               is_trainable<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'PPO model parameters to be updated (ValueHead + 769 params):</span><span class="ch">\n</span><span class="sc">{</span>print_number_of_trainable_model_parameters(ppo_model)<span class="sc">}</span><span class="ch">\n</span><span class="ss">'</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ppo_model.v_head)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PPO model parameters to be updated (ValueHead + 769 params):
+
+trainable model parameters: 3539713
+all model parameters: 251117569
+percentage of trainable model parameters: 1.41%
+
+ValueHead(
+  (dropout): Dropout(p=0.1, inplace=False)
+  (summary): Linear(in_features=768, out_features=1, bias=True)
+  (flatten): Flatten(start_dim=1, end_dim=-1)
+)</code></pre>
+</div>
+</div>
+<p>During PPO, only a few parameters will be updated. Specifically, the parameters of the <code>ValueHead</code>. More information about this class of models can be found in the <a href="https://huggingface.co/docs/trl/main/en/models#trl.create_reference_model">documentation</a>. The number of trainable parameters can be computed as <span class="math inline">\((n+1)*m\)</span>, where <span class="math inline">\(n\)</span> is the number of input units (here <span class="math inline">\(n=768\)</span>) and <span class="math inline">\(m\)</span> is the number of output units (you have <span class="math inline">\(m=1\)</span>). The <span class="math inline">\(+1\)</span> term in the equation takes into account the bias term.</p>
+<p>Now create a frozen copy of the PPO which will not be fine-tuned - a reference model. The reference model will represent the LLM before detoxification. None of the parameters of the reference model will be updated during PPO training. This is on purpose.</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ref_model <span class="op">=</span> create_reference_model(ppo_model)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Reference model parameters to be updated:</span><span class="ch">\n</span><span class="sc">{</span>print_number_of_trainable_model_parameters(ref_model)<span class="sc">}</span><span class="ch">\n</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reference model parameters to be updated:
+
+trainable model parameters: 0
+all model parameters: 251117569
+percentage of trainable model parameters: 0.00%
+</code></pre>
+</div>
+</div>
+<p>Everything is set. It is time to prepare the reward model!</p>
+</section>
+<section id="prepare-reward-model" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="prepare-reward-model"><span class="header-section-number">3.2</span> Prepare Reward Model</h3>
+<p><strong>Reinforcement Learning (RL)</strong> is one type of machine learning where agents take actions in an environment aimed at maximizing their cumulative rewards. The agent’s behavior is defined by the <strong>policy</strong>. And the goal of reinforcement learning is for the agent to learn an optimal, or nearly-optimal, policy that maximizes the <strong>reward function</strong>.</p>
+<p>In the previous section the original policy is based on the instruct PEFT model - this is the LLM before detoxification. Then you could ask human labelers to give feedback on the outputs’ toxicity. However, it can be expensive to use them for the entire fine-tuning process. A practical way to avoid that is to use a reward model encouraging the agent to detoxify the dialogue summaries. The intuitive approach would be to do some form of sentiment analysis across two classes (<code>nothate</code> and <code>hate</code>) and give a higher reward if there is higher a chance of getting class <code>nothate</code> as an output.</p>
+<p>For example, we can mention that having human labelers for the entire finetuning process can be expensive. A practical way to avoid that is to use a reward model.</p>
+<p>We will use <a href="https://huggingface.co/facebook/roberta-hate-speech-dynabench-r4-target">Meta AI’s RoBERTa-based hate speech model</a> for the reward model. This model will output <strong>logits</strong> and then predict probabilities across two classes: <code>nothate</code> and <code>hate</code>. The logits of the output <code>nothate</code> will be taken as a positive reward. Then, the model will be fine-tuned with PPO using those reward values.</p>
+<p>Create the instance of the required model class for the RoBERTa model. We also need to load a tokenizer to test the model. Notice that the model label <code>0</code> will correspond to the class <code>nothate</code> and label <code>1</code> to the class <code>hate</code>.</p>
+<div class="cell" data-tags="[]" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>toxicity_model_name <span class="op">=</span> <span class="st">"facebook/roberta-hate-speech-dynabench-r4-target"</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>toxicity_tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(toxicity_model_name, device_map<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>toxicity_model <span class="op">=</span> AutoModelForSequenceClassification.from_pretrained(toxicity_model_name, device_map<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(toxicity_model.config.id2label)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"cef70a32f21e4efabfc7159c7adaab20","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"d5fbc918bbdd48f697601310b469020c","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"b30912c6b9784e2fb22e8899b0d99e25","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"d4db6ca3ff9f44538d0872aaba41804d","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"bdbbb2f007a84233aeccec6d1cf62de7","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"04cb234ceb2b436dbfea3e2b8cec3af2","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The model weights are not tied. Please use the `tie_weights` method before using the `infer_auto_device` function.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{0: 'nothate', 1: 'hate'}</code></pre>
+</div>
+</div>
+<p>Take some non-toxic text, tokenize it, and pass it to the model. Print the output logits, probabilities, and the corresponding reward that will be used for fine-tuning.</p>
+<div class="cell" data-tags="[]" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>non_toxic_text <span class="op">=</span> <span class="st">"#Person 1# tells Tommy that he didn't like the movie."</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>toxicity_input_ids <span class="op">=</span> toxicity_tokenizer(non_toxic_text, return_tensors<span class="op">=</span><span class="st">"pt"</span>).input_ids</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> toxicity_model(input_ids<span class="op">=</span>toxicity_input_ids).logits</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'logits [not hate, hate]: </span><span class="sc">{</span>logits<span class="sc">.</span>tolist()[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the probabilities for [not hate, hate]</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>probabilities <span class="op">=</span> logits.softmax(dim<span class="op">=-</span><span class="dv">1</span>).tolist()[<span class="dv">0</span>]</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'probabilities [not hate, hate]: </span><span class="sc">{</span>probabilities<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co"># get the logits for "not hate" - this is the reward!</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>not_hate_index <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>nothate_reward <span class="op">=</span> (logits[:, not_hate_index]).tolist()</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'reward (high): </span><span class="sc">{</span>nothate_reward<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>logits [not hate, hate]: [3.114100694656372, -2.4896175861358643]
+probabilities [not hate, hate]: [0.9963293671607971, 0.003670616541057825]
+reward (high): [3.114100694656372]</code></pre>
+</div>
+</div>
+<p>Let’s show a toxic comment. This will have a low reward because it is more toxic.</p>
+<div class="cell" data-tags="[]" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>toxic_text <span class="op">=</span> <span class="st">"#Person 1# tells Tommy that the movie was terrible, dumb and stupid."</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>toxicity_input_ids <span class="op">=</span> toxicity_tokenizer(toxic_text, return_tensors<span class="op">=</span><span class="st">"pt"</span>).input_ids</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> toxicity_model(toxicity_input_ids).logits</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'logits [not hate, hate]: </span><span class="sc">{</span>logits<span class="sc">.</span>tolist()[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the probabilities for [not hate, hate]</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>probabilities <span class="op">=</span> logits.softmax(dim<span class="op">=-</span><span class="dv">1</span>).tolist()[<span class="dv">0</span>]</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'probabilities [not hate, hate]: </span><span class="sc">{</span>probabilities<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the logits for "not hate" - this is the reward!</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>nothate_reward <span class="op">=</span> (logits[:, not_hate_index]).tolist() </span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'reward (low): </span><span class="sc">{</span>nothate_reward<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>logits [not hate, hate]: [-0.6921188831329346, 0.3722729980945587]
+probabilities [not hate, hate]: [0.25647106766700745, 0.7435289621353149]
+reward (low): [-0.6921188831329346]</code></pre>
+</div>
+</div>
+<p>Setup Hugging Face inference pipeline to simplify the code for the toxicity reward model:</p>
+<div class="cell" data-tags="[]" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> <span class="dv">0</span> <span class="cf">if</span> torch.cuda.is_available() <span class="cf">else</span> <span class="st">"cpu"</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>sentiment_pipe <span class="op">=</span> pipeline(<span class="st">"sentiment-analysis"</span>, </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                          model<span class="op">=</span>toxicity_model_name, </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                          device<span class="op">=</span>device)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>reward_logits_kwargs <span class="op">=</span> {</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top_k"</span>: <span class="va">None</span>, <span class="co"># Return all scores.</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"function_to_apply"</span>: <span class="st">"none"</span>, <span class="co"># Set to "none" to retrieve raw logits.</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"batch_size"</span>: <span class="dv">16</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>reward_probabilities_kwargs <span class="op">=</span> {</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top_k"</span>: <span class="va">None</span>, <span class="co"># Return all scores.</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"function_to_apply"</span>: <span class="st">"softmax"</span>, <span class="co"># Set to "softmax" to apply softmax and retrieve probabilities.</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"batch_size"</span>: <span class="dv">16</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Reward model output:"</span>)</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"For non-toxic text"</span>)</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentiment_pipe(non_toxic_text, <span class="op">**</span>reward_logits_kwargs))</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentiment_pipe(non_toxic_text, <span class="op">**</span>reward_probabilities_kwargs))</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"For toxic text"</span>)</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentiment_pipe(toxic_text, <span class="op">**</span>reward_logits_kwargs))</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentiment_pipe(toxic_text, <span class="op">**</span>reward_probabilities_kwargs))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reward model output:
+For non-toxic text
+[{'label': 'nothate', 'score': 3.114100694656372}, {'label': 'hate', 'score': -2.4896175861358643}]
+[{'label': 'nothate', 'score': 0.9963293671607971}, {'label': 'hate', 'score': 0.003670616541057825}]
+For toxic text
+[{'label': 'hate', 'score': 0.3722729980945587}, {'label': 'nothate', 'score': -0.6921188831329346}]
+[{'label': 'hate', 'score': 0.7435289621353149}, {'label': 'nothate', 'score': 0.25647106766700745}]</code></pre>
+</div>
+</div>
+<p>The outputs are the logits for both <code>nothate</code> (positive) and <code>hate</code> (negative) classes. But PPO will be using logits only of the <code>nothate</code> class as the positive reward signal used to help detoxify the LLM outputs.</p>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentiment_pipe(non_toxic_text, <span class="op">**</span>reward_logits_kwargs))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentiment_pipe(non_toxic_text, <span class="op">**</span>reward_probabilities_kwargs))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[{'label': 'nothate', 'score': 3.114100694656372}, {'label': 'hate', 'score': -2.4896175861358643}]
+[{'label': 'nothate', 'score': 0.9963293671607971}, {'label': 'hate', 'score': 0.003670616541057825}]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentiment_pipe(toxic_text, <span class="op">**</span>reward_logits_kwargs))</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentiment_pipe(toxic_text, <span class="op">**</span>reward_probabilities_kwargs))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[{'label': 'hate', 'score': 0.3722729980945587}, {'label': 'nothate', 'score': -0.6921188831329346}]
+[{'label': 'hate', 'score': 0.7435289621353149}, {'label': 'nothate', 'score': 0.25647106766700745}]</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluate-toxicity" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="evaluate-toxicity"><span class="header-section-number">3.3</span> Evaluate Toxicity</h3>
+<p>To evaluate the model before and after fine-tuning/detoxification we need to set up the <a href="https://huggingface.co/spaces/evaluate-measurement/toxicity">toxicity evaluation metric</a>. The <strong>toxicity score</strong> is a decimal value between 0 and 1 where 1 is the highest toxicity.</p>
+<div class="cell" data-tags="[]" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>toxicity_evaluator <span class="op">=</span> evaluate.load(<span class="st">"toxicity"</span>, </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>                                    toxicity_model_name,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                                    module_type<span class="op">=</span><span class="st">"measurement"</span>,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                                    toxic_label<span class="op">=</span><span class="st">"hate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"620a53b98900413d8f3745edd00ba525","version_major":2,"version_minor":0}
+</script>
+</div>
+</div>
+<p>Lets try to calculate toxicity for the same sentences. It’s no surprise that the toxicity scores are the probabilities of <code>hate</code> class returned directly from the reward model.</p>
+<div class="cell" data-tags="[]" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>toxicity_score <span class="op">=</span> toxicity_evaluator.compute(predictions<span class="op">=</span>[</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    non_toxic_text</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Toxicity score for non-toxic text:"</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(toxicity_score[<span class="st">"toxicity"</span>])</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>toxicity_score <span class="op">=</span> toxicity_evaluator.compute(predictions<span class="op">=</span>[</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    toxic_text</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Toxicity score for toxic text:"</span>)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(toxicity_score[<span class="st">"toxicity"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Toxicity score for non-toxic text:
+[0.003670616541057825]
+
+Toxicity score for toxic text:
+[0.7435289621353149]</code></pre>
+</div>
+</div>
+<p>This evaluator can be used to compute the toxicity of the dialogues prepared previously. We will need to pass the test dataset (<code>dataset["test"]</code>), the same tokenizer which was used in that section, the frozen PEFT model prepared in section before, and the toxicity evaluator. It is convenient to wrap the required steps in the function <code>evaluate_toxicity</code>.</p>
+<div class="cell" data-tags="[]" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate_toxicity(model, </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>                      toxicity_evaluator, </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>                      tokenizer, </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                      dataset, </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                      num_samples):</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Preprocess the dataset and split it into train and test parts.</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="co">    - model (trl model): Model to be evaluated.</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="co">    - toxicity_evaluator (evaluate_modules toxicity metrics): Toxicity evaluator.</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="co">    - tokenizer (transformers tokenizer): Tokenizer to be used.</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="co">    - dataset (dataset): Input dataset for the evaluation.</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="co">    - num_samples (int): Maximum number of samples for the evaluation.</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="co">        </span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a><span class="co">    tuple: A tuple containing two numpy.float64 values:</span></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a><span class="co">    - mean (numpy.float64): Mean of the samples toxicity.</span></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a><span class="co">    - std (numpy.float64): Standard deviation of the samples toxicity.</span></span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>    max_new_tokens<span class="op">=</span><span class="dv">100</span></span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>    toxicities <span class="op">=</span> []</span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>    input_texts <span class="op">=</span> []</span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, sample <span class="kw">in</span> tqdm(<span class="bu">enumerate</span>(dataset)):</span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>        input_text <span class="op">=</span> sample[<span class="st">"query"</span>]</span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="op">&gt;</span> num_samples:</span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>        input_ids <span class="op">=</span> tokenizer(input_text, return_tensors<span class="op">=</span><span class="st">"pt"</span>, padding<span class="op">=</span><span class="va">True</span>).input_ids</span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a>        generation_config <span class="op">=</span> GenerationConfig(max_new_tokens<span class="op">=</span>max_new_tokens,</span>
+<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a>                                             top_k<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a>                                             top_p<span class="op">=</span><span class="fl">1.0</span>,</span>
+<span id="cb36-38"><a href="#cb36-38" aria-hidden="true" tabindex="-1"></a>                                             do_sample<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb36-39"><a href="#cb36-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-40"><a href="#cb36-40" aria-hidden="true" tabindex="-1"></a>        response_token_ids <span class="op">=</span> model.generate(input_ids<span class="op">=</span>input_ids,</span>
+<span id="cb36-41"><a href="#cb36-41" aria-hidden="true" tabindex="-1"></a>                                            generation_config<span class="op">=</span>generation_config)</span>
+<span id="cb36-42"><a href="#cb36-42" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb36-43"><a href="#cb36-43" aria-hidden="true" tabindex="-1"></a>        generated_text <span class="op">=</span> tokenizer.decode(response_token_ids[<span class="dv">0</span>], skip_special_tokens<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb36-44"><a href="#cb36-44" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb36-45"><a href="#cb36-45" aria-hidden="true" tabindex="-1"></a>        toxicity_score <span class="op">=</span> toxicity_evaluator.compute(predictions<span class="op">=</span>[(input_text <span class="op">+</span> <span class="st">" "</span> <span class="op">+</span> generated_text)])</span>
+<span id="cb36-46"><a href="#cb36-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-47"><a href="#cb36-47" aria-hidden="true" tabindex="-1"></a>        toxicities.extend(toxicity_score[<span class="st">"toxicity"</span>])</span>
+<span id="cb36-48"><a href="#cb36-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-49"><a href="#cb36-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute mean &amp; std using np.</span></span>
+<span id="cb36-50"><a href="#cb36-50" aria-hidden="true" tabindex="-1"></a>    mean <span class="op">=</span> np.mean(toxicities)</span>
+<span id="cb36-51"><a href="#cb36-51" aria-hidden="true" tabindex="-1"></a>    std <span class="op">=</span> np.std(toxicities)</span>
+<span id="cb36-52"><a href="#cb36-52" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb36-53"><a href="#cb36-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> mean, std</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And now perform the calculation of the model toxicity before fine-tuning/detoxification:</p>
+<div class="cell" data-tags="[]" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name, device_map<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>mean_before_detoxification, std_before_detoxification <span class="op">=</span> evaluate_toxicity(model<span class="op">=</span>ref_model, </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>                                                                          toxicity_evaluator<span class="op">=</span>toxicity_evaluator, </span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>                                                                          tokenizer<span class="op">=</span>tokenizer, </span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>                                                                          dataset<span class="op">=</span>dataset[<span class="st">"test"</span>], </span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>                                                                          num_samples<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'toxicity [mean, std] before detox: [</span><span class="sc">{</span>mean_before_detoxification<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>std_before_detoxification<span class="sc">}</span><span class="ss">]'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>11it [00:25,  2.33s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>toxicity [mean, std] before detox: [0.02970629831014032, 0.03363027283000358]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="perform-fine-tuning-to-detoxify-the-summaries" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="perform-fine-tuning-to-detoxify-the-summaries"><span class="header-section-number">4</span> Perform Fine-Tuning to Detoxify the Summaries</h2>
+<p>Optimize a RL policy against the reward model using Proximal Policy Optimization (PPO).</p>
+<section id="initialize-ppotrainer" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="initialize-ppotrainer"><span class="header-section-number">4.1</span> Initialize <code>PPOTrainer</code></h3>
+<p>For the <code>PPOTrainer</code> initialization, we will need a collator. Here it will be a function transforming the dictionaries in a particular way. We can define and test it:</p>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collator(data):</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">dict</span>((key, [d[key] <span class="cf">for</span> d <span class="kw">in</span> data]) <span class="cf">for</span> key <span class="kw">in</span> data[<span class="dv">0</span>])</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> [{<span class="st">"key1"</span>: <span class="st">"value1"</span>, <span class="st">"key2"</span>: <span class="st">"value2"</span>, <span class="st">"key3"</span>: <span class="st">"value3"</span>}]</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Collator input: </span><span class="sc">{</span>test_data<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Collator output: </span><span class="sc">{</span>collator(test_data)<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Collator input: [{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}]
+Collator output: {'key1': ['value1'], 'key2': ['value2'], 'key3': ['value3']}</code></pre>
+</div>
+</div>
+<p>Set up the configuration parameters. Load the <code>ppo_model</code> and the tokenizer. We will also load a frozen version of the model <code>ref_model</code>. The first model is optimized while the second model serves as a reference to calculate the KL-divergence from the starting point. This works as an additional reward signal in the PPO training to make sure the optimized model does not deviate too much from the original LLM.</p>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>learning_rate<span class="op">=</span><span class="fl">1.41e-5</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>max_ppo_epochs<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>mini_batch_size<span class="op">=</span><span class="dv">4</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>batch_size<span class="op">=</span><span class="dv">16</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> PPOConfig(</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    model_name<span class="op">=</span>model_name,    </span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>    learning_rate<span class="op">=</span>learning_rate,</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    ppo_epochs<span class="op">=</span>max_ppo_epochs,</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>    mini_batch_size<span class="op">=</span>mini_batch_size,</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span>batch_size</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>ppo_trainer <span class="op">=</span> PPOTrainer(config<span class="op">=</span>config, </span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>                         model<span class="op">=</span>ppo_model, </span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>                         ref_model<span class="op">=</span>ref_model, </span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>                         tokenizer<span class="op">=</span>tokenizer, </span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>                         dataset<span class="op">=</span>dataset[<span class="st">"train"</span>], </span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>                         data_collator<span class="op">=</span>collator)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="fine-tune-the-model" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="fine-tune-the-model"><span class="header-section-number">4.2</span> Fine-Tune the Model</h3>
+<p>The fine-tuning loop consists of the following main steps:</p>
+<ol type="1">
+<li>Get the query responses from the policy LLM (PEFT model).</li>
+<li>Get sentiments for query/responses from hate speech RoBERTa model.</li>
+<li>Optimize policy with PPO using the (query, response, reward) triplet.</li>
+</ol>
+<p>The operation is running if you see the following metrics appearing:</p>
+<ul>
+<li><code>objective/kl</code>: minimize kl divergence,</li>
+<li><code>ppo/returns/mean</code>: maximize mean returns,</li>
+<li><code>ppo/policy/advantages_mean</code>: maximize advantages.</li>
+</ul>
+<div class="cell" data-tags="[]" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># May take 20-30 mins to run this cell</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>output_min_length <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>output_max_length <span class="op">=</span> <span class="dv">400</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>output_length_sampler <span class="op">=</span> LengthSampler(output_min_length, output_max_length)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>generation_kwargs <span class="op">=</span> {</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"min_length"</span>: <span class="dv">5</span>,</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top_k"</span>: <span class="fl">0.0</span>,</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top_p"</span>: <span class="fl">1.0</span>,</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"do_sample"</span>: <span class="va">True</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>reward_kwargs <span class="op">=</span> {</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"top_k"</span>: <span class="va">None</span>, <span class="co"># Return all scores.</span></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"function_to_apply"</span>: <span class="st">"none"</span>, <span class="co"># You want the raw logits without softmax.</span></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"batch_size"</span>: <span class="dv">16</span></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>max_ppo_steps <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step, batch <span class="kw">in</span> tqdm(<span class="bu">enumerate</span>(ppo_trainer.dataloader)):</span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Break when you reach max_steps.</span></span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> step <span class="op">&gt;=</span> max_ppo_steps:</span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span>   </span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a>    prompt_tensors <span class="op">=</span> batch[<span class="st">"input_ids"</span>]</span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get response from FLAN-T5/PEFT LLM.</span></span>
+<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a>    summary_tensors <span class="op">=</span> []</span>
+<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> prompt_tensor <span class="kw">in</span> prompt_tensors:</span>
+<span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a>        max_new_tokens <span class="op">=</span> output_length_sampler()        </span>
+<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb44-34"><a href="#cb44-34" aria-hidden="true" tabindex="-1"></a>        generation_kwargs[<span class="st">"max_new_tokens"</span>] <span class="op">=</span> max_new_tokens</span>
+<span id="cb44-35"><a href="#cb44-35" aria-hidden="true" tabindex="-1"></a>        summary <span class="op">=</span> ppo_trainer.generate(prompt_tensor, <span class="op">**</span>generation_kwargs)</span>
+<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a>        summary_tensors.append(summary.squeeze()[<span class="op">-</span>max_new_tokens:])</span>
+<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb44-39"><a href="#cb44-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This needs to be called "response".</span></span>
+<span id="cb44-40"><a href="#cb44-40" aria-hidden="true" tabindex="-1"></a>    batch[<span class="st">"response"</span>] <span class="op">=</span> [tokenizer.decode(r.squeeze()) <span class="cf">for</span> r <span class="kw">in</span> summary_tensors]</span>
+<span id="cb44-41"><a href="#cb44-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-42"><a href="#cb44-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute reward outputs.</span></span>
+<span id="cb44-43"><a href="#cb44-43" aria-hidden="true" tabindex="-1"></a>    query_response_pairs <span class="op">=</span> [q <span class="op">+</span> r <span class="cf">for</span> q, r <span class="kw">in</span> <span class="bu">zip</span>(batch[<span class="st">"query"</span>], batch[<span class="st">"response"</span>])]    </span>
+<span id="cb44-44"><a href="#cb44-44" aria-hidden="true" tabindex="-1"></a>    rewards <span class="op">=</span> sentiment_pipe(query_response_pairs, <span class="op">**</span>reward_kwargs)</span>
+<span id="cb44-45"><a href="#cb44-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-46"><a href="#cb44-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># You use the `nothate` item because this is the score for the positive `nothate` class.</span></span>
+<span id="cb44-47"><a href="#cb44-47" aria-hidden="true" tabindex="-1"></a>    reward_tensors <span class="op">=</span> [torch.tensor(reward[not_hate_index][<span class="st">"score"</span>]) <span class="cf">for</span> reward <span class="kw">in</span> rewards]    </span>
+<span id="cb44-48"><a href="#cb44-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-49"><a href="#cb44-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Run PPO step.</span></span>
+<span id="cb44-50"><a href="#cb44-50" aria-hidden="true" tabindex="-1"></a>    stats <span class="op">=</span> ppo_trainer.step(prompt_tensors, summary_tensors, reward_tensors)</span>
+<span id="cb44-51"><a href="#cb44-51" aria-hidden="true" tabindex="-1"></a>    ppo_trainer.log_stats(stats, batch, reward_tensors)</span>
+<span id="cb44-52"><a href="#cb44-52" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb44-53"><a href="#cb44-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'objective/kl: </span><span class="sc">{</span>stats[<span class="st">"objective/kl"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb44-54"><a href="#cb44-54" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'ppo/returns/mean: </span><span class="sc">{</span>stats[<span class="st">"ppo/returns/mean"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb44-55"><a href="#cb44-55" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'ppo/policy/advantages_mean: </span><span class="sc">{</span>stats[<span class="st">"ppo/policy/advantages_mean"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb44-56"><a href="#cb44-56" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'-'</span>.join(<span class="st">''</span> <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>0it [00:00, ?it/s]You're using a T5TokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+1it [01:43, 103.28s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 29.314075469970703
+ppo/returns/mean: -0.6003289222717285
+ppo/policy/advantages_mean: -5.777030853693077e-09
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2it [03:26, 103.07s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 37.534847259521484
+ppo/returns/mean: -1.0223705768585205
+ppo/policy/advantages_mean: -1.4861395669640842e-08
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>3it [05:01, 99.70s/it] </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 34.685516357421875
+ppo/returns/mean: -0.8575112819671631
+ppo/policy/advantages_mean: 1.101110846946085e-08
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>4it [06:24, 93.12s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 23.096426010131836
+ppo/returns/mean: -0.35878801345825195
+ppo/policy/advantages_mean: 2.7160158566630344e-09
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>5it [07:51, 90.59s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 26.646108627319336
+ppo/returns/mean: -0.3976229429244995
+ppo/policy/advantages_mean: 1.1457839121931102e-08
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>6it [09:43, 97.93s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 33.84138870239258
+ppo/returns/mean: -0.649031400680542
+ppo/policy/advantages_mean: 2.6997275526241538e-09
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>7it [11:08, 93.86s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 25.600406646728516
+ppo/returns/mean: -0.49898040294647217
+ppo/policy/advantages_mean: 3.8727110407421605e-09
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>8it [12:31, 90.48s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 22.035078048706055
+ppo/returns/mean: -0.30794447660446167
+ppo/policy/advantages_mean: -1.0292739993644773e-08
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>9it [14:03, 90.88s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 26.587003707885742
+ppo/returns/mean: -0.5347940325737
+ppo/policy/advantages_mean: 2.1793784554802187e-09
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>10it [15:30, 93.00s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>objective/kl: 24.025217056274414
+ppo/returns/mean: -0.24646636843681335
+ppo/policy/advantages_mean: -1.2822678030488532e-08
+---------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+</div>
+</section>
+<section id="evaluate-the-model-quantitatively" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="evaluate-the-model-quantitatively"><span class="header-section-number">4.3</span> Evaluate the Model Quantitatively</h3>
+<p>Load the PPO/PEFT model back in from disk and use the test dataset split to evaluate the toxicity score of the RL-fine-tuned model.</p>
+<div class="cell" data-tags="[]" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>mean_after_detoxification, std_after_detoxification <span class="op">=</span> evaluate_toxicity(model<span class="op">=</span>ppo_model, </span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>                                                                        toxicity_evaluator<span class="op">=</span>toxicity_evaluator, </span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>                                                                        tokenizer<span class="op">=</span>tokenizer, </span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>                                                                        dataset<span class="op">=</span>dataset[<span class="st">"test"</span>], </span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>                                                                        num_samples<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'toxicity [mean, std] after detox: [</span><span class="sc">{</span>mean_after_detoxification<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>std_after_detoxification<span class="sc">}</span><span class="ss">]'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>11it [00:23,  2.10s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>toxicity [mean, std] after detox: [0.04336890734901482, 0.06578691430956127]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+</div>
+<p>And compare the toxicity scores of the reference model (before detoxification) and fine-tuned model (after detoxification).</p>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>mean_improvement <span class="op">=</span> (mean_before_detoxification <span class="op">-</span> mean_after_detoxification) <span class="op">/</span> mean_before_detoxification</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>std_improvement <span class="op">=</span> (std_before_detoxification <span class="op">-</span> std_after_detoxification) <span class="op">/</span> std_before_detoxification</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Percentage improvement of toxicity score after detoxification:'</span>)</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'mean: </span><span class="sc">{</span>mean_improvement<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%'</span>)</span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'std: </span><span class="sc">{</span>std_improvement<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Percentage improvement of toxicity score after detoxification:
+mean: -45.99%
+std: -95.62%</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluate-the-model-qualitatively" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="evaluate-the-model-qualitatively"><span class="header-section-number">4.4</span> Evaluate the Model Qualitatively</h3>
+<p>Let’s inspect some examples from the test dataset. We can compare the original <code>ref_model</code> to the fine-tuned/detoxified <code>ppo_model</code> using the toxicity evaluator.</p>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>compare_results <span class="op">=</span> {}</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>df_batch <span class="op">=</span> dataset[<span class="st">"test"</span>][<span class="dv">0</span>:batch_size]</span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>compare_results[<span class="st">"query"</span>] <span class="op">=</span> df_batch[<span class="st">"query"</span>]</span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>prompt_tensors <span class="op">=</span> df_batch[<span class="st">"input_ids"</span>]</span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>summary_tensors_ref <span class="op">=</span> []</span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>summary_tensors <span class="op">=</span> []</span>
+<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Get response from ppo and base model.</span></span>
+<span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> tqdm(<span class="bu">range</span>(batch_size)):</span>
+<span id="cb72-14"><a href="#cb72-14" aria-hidden="true" tabindex="-1"></a>    gen_len <span class="op">=</span> output_length_sampler()</span>
+<span id="cb72-15"><a href="#cb72-15" aria-hidden="true" tabindex="-1"></a>    generation_kwargs[<span class="st">"max_new_tokens"</span>] <span class="op">=</span> gen_len</span>
+<span id="cb72-16"><a href="#cb72-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb72-17"><a href="#cb72-17" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> ref_model.generate(</span>
+<span id="cb72-18"><a href="#cb72-18" aria-hidden="true" tabindex="-1"></a>        input_ids<span class="op">=</span>torch.as_tensor(prompt_tensors[i]).unsqueeze(dim<span class="op">=</span><span class="dv">0</span>).to(device), </span>
+<span id="cb72-19"><a href="#cb72-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>generation_kwargs</span>
+<span id="cb72-20"><a href="#cb72-20" aria-hidden="true" tabindex="-1"></a>    ).squeeze()[<span class="op">-</span>gen_len:]</span>
+<span id="cb72-21"><a href="#cb72-21" aria-hidden="true" tabindex="-1"></a>    summary_tensors_ref.append(summary)</span>
+<span id="cb72-22"><a href="#cb72-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-23"><a href="#cb72-23" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> ppo_model.generate(</span>
+<span id="cb72-24"><a href="#cb72-24" aria-hidden="true" tabindex="-1"></a>        input_ids<span class="op">=</span>torch.as_tensor(prompt_tensors[i]).unsqueeze(dim<span class="op">=</span><span class="dv">0</span>).to(device), </span>
+<span id="cb72-25"><a href="#cb72-25" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>generation_kwargs</span>
+<span id="cb72-26"><a href="#cb72-26" aria-hidden="true" tabindex="-1"></a>    ).squeeze()[<span class="op">-</span>gen_len:]</span>
+<span id="cb72-27"><a href="#cb72-27" aria-hidden="true" tabindex="-1"></a>    summary_tensors.append(summary)</span>
+<span id="cb72-28"><a href="#cb72-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-29"><a href="#cb72-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Decode responses.</span></span>
+<span id="cb72-30"><a href="#cb72-30" aria-hidden="true" tabindex="-1"></a>compare_results[<span class="st">"response_before"</span>] <span class="op">=</span> [tokenizer.decode(summary_tensors_ref[i]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(batch_size)]</span>
+<span id="cb72-31"><a href="#cb72-31" aria-hidden="true" tabindex="-1"></a>compare_results[<span class="st">"response_after"</span>] <span class="op">=</span> [tokenizer.decode(summary_tensors[i]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(batch_size)]</span>
+<span id="cb72-32"><a href="#cb72-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-33"><a href="#cb72-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentiment analysis of query/response pairs before/after.</span></span>
+<span id="cb72-34"><a href="#cb72-34" aria-hidden="true" tabindex="-1"></a>texts_before <span class="op">=</span> [d <span class="op">+</span> s <span class="cf">for</span> d, s <span class="kw">in</span> <span class="bu">zip</span>(compare_results[<span class="st">"query"</span>], compare_results[<span class="st">"response_before"</span>])]</span>
+<span id="cb72-35"><a href="#cb72-35" aria-hidden="true" tabindex="-1"></a>rewards_before <span class="op">=</span> sentiment_pipe(texts_before, <span class="op">**</span>reward_kwargs)</span>
+<span id="cb72-36"><a href="#cb72-36" aria-hidden="true" tabindex="-1"></a>compare_results[<span class="st">"reward_before"</span>] <span class="op">=</span> [reward[not_hate_index][<span class="st">"score"</span>] <span class="cf">for</span> reward <span class="kw">in</span> rewards_before]</span>
+<span id="cb72-37"><a href="#cb72-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-38"><a href="#cb72-38" aria-hidden="true" tabindex="-1"></a>texts_after <span class="op">=</span> [d <span class="op">+</span> s <span class="cf">for</span> d, s <span class="kw">in</span> <span class="bu">zip</span>(compare_results[<span class="st">"query"</span>], compare_results[<span class="st">"response_after"</span>])]</span>
+<span id="cb72-39"><a href="#cb72-39" aria-hidden="true" tabindex="-1"></a>rewards_after <span class="op">=</span> sentiment_pipe(texts_after, <span class="op">**</span>reward_kwargs)</span>
+<span id="cb72-40"><a href="#cb72-40" aria-hidden="true" tabindex="-1"></a>compare_results[<span class="st">"reward_after"</span>] <span class="op">=</span> [reward[not_hate_index][<span class="st">"score"</span>] <span class="cf">for</span> reward <span class="kw">in</span> rewards_after]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████| 20/20 [01:21&lt;00:00,  4.08s/it]</code></pre>
+</div>
+</div>
+<p>Store and review the results in a DataFrame</p>
+<div class="cell" data-tags="[]" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.max_colwidth'</span>, <span class="dv">500</span>)</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>df_compare_results <span class="op">=</span> pd.DataFrame(compare_results)</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>df_compare_results[<span class="st">"reward_diff"</span>] <span class="op">=</span> df_compare_results[<span class="st">'reward_after'</span>] <span class="op">-</span> df_compare_results[<span class="st">'reward_before'</span>]</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>df_compare_results_sorted <span class="op">=</span> df_compare_results.sort_values(by<span class="op">=</span>[<span class="st">'reward_diff'</span>], ascending<span class="op">=</span><span class="va">False</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>df_compare_results_sorted</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>query</th>
+      <th>response_before</th>
+      <th>response_after</th>
+      <th>reward_before</th>
+      <th>reward_after</th>
+      <th>reward_diff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Summarize the following conversation. #Person1#: It smells like an ashtray in here! #Person2#: Hi honey! What's wrong? Why do you have that look on your face? #Person1#: What's wrong? I thought we agreed that you were gonna quit smoking. #Person2#: No! I said I was going to cut down which is very different. You can't just expect me to go cold turkey overnight! #Person1#: Look, there are other ways to quit. You can try the nicotine patch, or nicotine chewing gum. We spend a fortune on cigaret...</td>
+      <td>&lt;pad&gt; Hopeless honey tells 6061# she has bad rape and #Person1# asks her to quit smoking because she doesn't have the willpower to do so. She said she'll keep going, but #Person1# tells her she will need a divorce.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# thinks #Person2# smells like an ashtray because she doesn't know how to quit smoking and is too stressed to quit. #Person1# treats the situation embarrassingly.&lt;/s&gt;</td>
+      <td>0.559593</td>
+      <td>1.392192</td>
+      <td>0.832600</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Summarize the following conversation. #Person1#: So how did you like the restaurant? #Person2#: Actually, it could have been better. #Person1#: What didn't you like about it? #Person2#: It is a new restaurant. I don't think they have their act together yet. #Person1#: What did you think about the food? #Person2#: I felt that the food was pretty mediocre. #Person1#: The service wasn't that great, either. #Person2#: I agree. The service was not good. #Person1#: Do you think that you want to tr...</td>
+      <td>&lt;pad&gt; #Person2# agrees with #Person1# about the restaurant and the food. #Person1# reckons #Person2# will not return but #Person2# isn't even considering to try again.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# shows #Person2# how the restaurant was turned down by the new owners. One of the other people says it's mediocre and they both say it's time to switch it.&lt;/s&gt;</td>
+      <td>1.883278</td>
+      <td>2.461895</td>
+      <td>0.578617</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Summarize the following conversation. #Person1#: Amanda, how do you like this peaked cap? #Person2#: Didn't you say you want to buy a top hat? #Person1#: But I think this one fits me Well. Why don't you try on the sombrero in black? #Person2#: I don't like caps at all. Summary: &lt;/s&gt;</td>
+      <td>&lt;pad&gt; Amanda chooses a peaked cap, but doesn't like the sombrero in black. #Person2# might consider a pig for Amanda.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; Amanda likes her trendy top hat, but she doesn't like caps at all. #Person1# has been trying on many hats. Amanda thinks she likes the peaked hat.&lt;/s&gt;</td>
+      <td>0.772964</td>
+      <td>1.303497</td>
+      <td>0.530534</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Summarize the following conversation. #Person1#: Hello. I want to reconfirm our flight to London. #Person2#: Yes, sir. Did you call the airline? #Person1#: Yes, I did. But I couldn't communicate with them in English. They speak only Spanish. So I need your help. #Person2#: Certainly, sir. What is the flight number and when are you leaving? #Person1#: We are taking IB 385 to London tomorrow at 1 p. m. #Person2#: Oh, I see, sir. We have the airline office inside the hotel. They have an English...</td>
+      <td>&lt;pad&gt; #Person2# gives #Person1# a number of flights from #Person1# to London by calling 35 and intervenes. #Person2# disapproves and offers to help.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; The airline will reconfirm their flight tomorrow and they dial 35. #Person1# asks our airline office about flight number and flight time.&lt;/s&gt;</td>
+      <td>1.587816</td>
+      <td>1.953090</td>
+      <td>0.365274</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Summarize the following conversation. #Person1#: Hello? #Person2#: Hello? #Person1#: Can I speak to Li Hong, please? #Person2#: Speaking. #Person1#: Hi, Li Hong. This is Alice. #Person2#: Hi, Alice. How are you? #Person1#: Not bad. Li Hong, I am sorry that I can't go to see Mrs. Brown with you tomorrow morning. My mother is ill. I must take care of her. #Person2#: I'm sorry to hear that. You'd better stay at home. After all, we can visit Mrs. Brown later #Person1#: OK. Bye - bye. #Person2#: ...</td>
+      <td>&lt;pad&gt; Alice cancels a visit to Mrs. Brown because her mother is ill, so she won't see her. Li Hong wants to stay at home.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; Alice asks Li Hong to arrange a visit to Mrs. Brown. Li Hong won't meet Alice tomorrow morning, because her mother is ill.&lt;/s&gt;</td>
+      <td>1.388402</td>
+      <td>1.736144</td>
+      <td>0.347741</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Summarize the following conversation. #Person1#: Excuse me, could you tell me how to get to the Cross Bakery building? #Person2#: The Cross Bakery building? Oh sure. You're actually walking in the opposite direction. #Person1#: Oh, you're kidding! I thought I was heading east. #Person2#: No, east is the other direction. To get to the Bakery, you need to turn around and go three blocks to Broadway. When you get to the intersection of Broadway and Elm, you hang a left. Go straight down that st...</td>
+      <td>&lt;pad&gt; #Person1# wants to know where the Cross Bakery building is. #Person1# confronts #Person2# about the cross bakery's policy and asks for #Person2#'s help.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# asks #Person2# to tell them the way to get to the Cross Bakery building. #Person2# offers him the way and leads #Person1# to the Cross bakery.&lt;/s&gt;</td>
+      <td>2.604440</td>
+      <td>2.847436</td>
+      <td>0.242996</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Summarize the following conversation. #Person1#: Oh, my God! What's this? #Person2#: What? #Person1#: Look! This window is open. #Person2#: Did you open it before we left? #Person1#: Are you kidding? It's winter. Why would I open it? #Person2#: I don't know. Wait. Is this yours? #Person1#: No! Oh, my God! Someone has broken into the house. #Person2#: It looks that way. That's probably why the door wasn't locked when we came in. #Person1#: I locked it when I left though. #Person2#: Yes, but t...</td>
+      <td>&lt;pad&gt; Allen had on a Friday night with #Person1# and #Person2# because someone broke into the house. Allen asks #Person1# why he forgot the door when they came in as it's winter. His the TV and stereo are still&lt;/s&gt;</td>
+      <td>&lt;pad&gt; Allen and #Person1# decide to open the window and looking upstairs and find the television, stereo, tech and some other items borrowed.&lt;/s&gt;</td>
+      <td>2.139749</td>
+      <td>2.336272</td>
+      <td>0.196523</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Summarize the following conversation. #Person1#: I would like to order some internet today. #Person2#: What kind would you like? #Person1#: What kind of internet is there? #Person2#: You can get DEL or dial-up. #Person1#: Which of those two is best? #Person2#: I would recommend DEL. #Person1#: So that one better? #Person2#: It's better because it doesn't tie up the phone. #Person1#: What do you mean by that? #Person2#: DEL isn't connected through your phone line, but dial-up is. #Person1#: S...</td>
+      <td>&lt;pad&gt; #Person1# wants to order some internet. #Person2# recommends Dial-up anddialog unlike #Person1#'s choice which can not use the phone afterwards.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# wants to order some dial-up internet. #Person2# recommends DEL because it doesn't tie up the phone because it doesn't tie up the phone.&lt;/s&gt;</td>
+      <td>2.343908</td>
+      <td>2.448540</td>
+      <td>0.104632</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Summarize the following conversation. #Person1#: Here is the final draft of our contract. I'm glad that we have reached an agreement on almost every term in our trade. #Person2#: Yes, it seems to me we have come quite a long way. However, let me take a close look at the final draft. #Person1#: Do you have some points to bring up? #Person2#: Well, everything we've discussed seems to be here. #Person1#: Yes, including a description of the shirts you want to purchase this time, the total amount...</td>
+      <td>&lt;pad&gt; #Person1# are sounding confident about the final draft of the contract; #Person2# goes over the details and suggests signing it right now.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# and #Person2# discuss a final draft of the contract. Afterwards, they discuss a number of points. Then #Person2# asks about all the details and offers to sign the contract right now.&lt;/s&gt;</td>
+      <td>3.151282</td>
+      <td>3.142738</td>
+      <td>-0.008543</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Summarize the following conversation. #Person1#: Where shall I register, please? #Person2#: Here. Do you have a registration card? #Person1#: Yes. Here you are. #Person2#: Please register your information here and pay for it. And I'll make a medical record for you. #Person1#: OK. How much do I need to pay for the registration? #Person2#: Please pay ten yuan for the registration. #Person1#: Here is my money. #Person2#: This is your registration card. Please don't lose it and bring it whenever...</td>
+      <td>&lt;pad&gt; #Person1# wants to register to join #Person2#'s surgery. #Person2#explains the payment, then says how to get there.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# is going to register. #Person2# asks #Person1# to pay 10 yuan for the registered information and made a medical record for #Person1#.&lt;/s&gt;</td>
+      <td>1.537484</td>
+      <td>1.517594</td>
+      <td>-0.019890</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Summarize the following conversation. #Person1#: Today more and more families have personal computers. People have wider range of choice to communicate with the outside world. #Person2#: Right. With the establishment of Internet and a lot of web companies, people are getting more and more dependent on the web. #Person1#: One of the common uses of PC is that people can buy goods through it without going out to the physical stores. #Person2#: Can you tell me how it is done? #Person1#: If a cus...</td>
+      <td>&lt;pad&gt; #Person1# is talking to #Person2# about the advantages of computers. #Person2# tells #Person1# the ways that people can, through their personal computers, buy goods without going to the physical stores.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# tells #Person2# that PCs are now making more and more families use it. #Person1# tells #Person2# how he can buy some goods without going to the physical stores.&lt;/s&gt;</td>
+      <td>2.491536</td>
+      <td>2.462914</td>
+      <td>-0.028623</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Summarize the following conversation. #Person1#: Mom, I just finished my paper. Can you proofread it before I hand it in? #Person2#: Sure, let's take a look. Sweetie, this is terrific. Your ideas are so original. #Person1#: Thanks. #Person2#: I can tell you worked hard on it. #Person1#: I really did! I started thinking about what I wanted to say three weeks ago. #Person2#: Well, it was definitely worth all the time. #Person1#: Let's just hope my teacher agrees. Summary: &lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# is submitting a paper to #Person2#'s mom. #Person2# praises #Person1#'s suggestions and congratulates her for her work and looks forward to meeting her teacher.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# expresses her admiration for the paper completed by her mother. #Person1# says the papers they worked hard on are wonderful. #Person2# praises her work.&lt;/s&gt;</td>
+      <td>2.483954</td>
+      <td>2.403249</td>
+      <td>-0.080705</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Summarize the following conversation. #Person1#: What can I do for you, madam? #Person2#: I'd like to buy a toy car for my son. #Person1#: How about this one? #Person2#: It looks nice. How much is it? #Person1#: They're three hundred dollars. #Person2#: Oh, I'm afraid it's too expensive. Can you show me something cheaper? #Person1#: OK, This one is one hundred and twenty. It's the cheapest here. #Person2#: OK, I'll take it. Here's the money. #Person1#: Thank you very much. Summary: &lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person2# wants to buy a kid car with #Person1#'s help and buys a toy car which's the cheapest in the shop. #Person1# offers some help to #Person2#.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# offers #Person2# a toy car for her son as three hundred dollars it's the cheapest here.&lt;/s&gt;</td>
+      <td>1.402219</td>
+      <td>1.249279</td>
+      <td>-0.152940</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Summarize the following conversation. #Person1#: Could you help me figure out how to look for a job? #Person2#: We have lots of options, what type of job do you need? #Person1#: I want to work in an office. #Person2#: Do you want to work part-time or full-time? #Person1#: I want to work full-time. #Person2#: We have binders with local job listings or you can make use of the computers. OK? #Person1#: I am confused a bit but I am sure that I can figure it out. #Person2#: If you make an appoint...</td>
+      <td>&lt;pad&gt; #Person1# has a very difficult job search. #Person2# tells #Person1# there is a job center to help #Person1# find the job and can help #Person1#. #Person1# wants to visit a job counselor.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# wants to work full-time in the office. #Person1# needs to work part-time but #Person2# recommends a counseling.&lt;/s&gt;</td>
+      <td>2.251136</td>
+      <td>2.094307</td>
+      <td>-0.156829</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Summarize the following conversation. #Person1#: I'd like to have this cashed, please. #Person2#: Please put you name and address here. May I see your passport? #Person1#: Yes. #Person2#: How would you like it? #Person1#: Ten hundreds and ten twenties, and the rest in small change, please. #Person2#: OK. Here you are. Summary: &lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# is getting the cashed cash for 10 hundreds and ten twenties. #Person1# says it needs to be issued in small change.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# wanted to get the card by cashing 10,000 tons for 10 hundreds and ten twenties and showing #Person1#'s passport in small change.&lt;/s&gt;</td>
+      <td>1.776725</td>
+      <td>1.562407</td>
+      <td>-0.214318</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Summarize the following conversation. #Person1#: Could you help me, Sir? My flight got in 15 minutes ago. Everyone else has picked up the luggage but mine hasn't come through. #Person2#: I'm sorry, Madam, I'll go and find out if there is any more to come. Summary: &lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1#'s flight got in 15 minutes ago but hers isn't there yet. #Person2# will check.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1#'s flight got in 15 minutes ago, but the others haven't picked up her luggage. #Person2# will try to find out if there is anything else to do.&lt;/s&gt;</td>
+      <td>2.301333</td>
+      <td>2.083318</td>
+      <td>-0.218016</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Summarize the following conversation. #Person1#: Judy, what is everybody talking about? #Person2#: Haven't you heard? Richard was fired by our manager. #Person1#: You're kidding. It can't be true. #Person2#: Believe it or not. Everybody is talking about it in the company. #Person1#: Really? I'm surprised. #Person2#: Me too. Summary: &lt;/s&gt;</td>
+      <td>&lt;pad&gt; Judy and fellow employees are talking about Richard's firing. Judy apologizes for the fact that everyone refers to him by thanking him. Judy is surprised.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; Judy is still surprised to see Richard stopped at her job. Bush was fired by his manager recently.&lt;/s&gt;</td>
+      <td>1.552441</td>
+      <td>1.268730</td>
+      <td>-0.283711</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Summarize the following conversation. #Person1#: How much are you asking for this? #Person2#: I'm offering them to you at 150 yuan a piece. Is that all right? #Person1#: Is tax already included in their price? #Person2#: Yes. Our price can't be matched. #Person1#: Would you consider a volume discount? #Person2#: If you buy 1, 000 or more, you'll get a 10 % discount. #Person1#: I'll accept your offer. Summary: &lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# and #Person2# are going to buy the bottle in bulk. The price won't be matched.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person2# is offering them to #Person1# for 150 yuan a piece for $1000 or more. #Person1# gives a 10% volume discount to #Person2#.&lt;/s&gt;</td>
+      <td>2.740679</td>
+      <td>2.307892</td>
+      <td>-0.432787</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Summarize the following conversation. #Person1#: Let's take a coffee break, shall we? #Person2#: I wish I could, but I can't. #Person1#: What keeps you so busy? You've been sitting there for hours. You've got to walk around. You just can't stay on the computer forever. #Person2#: Well, I am up to my neck in work. I've got to finish this report. Sarah needs it by noon. I don't want to be scolded if I can't finish my work by the deadline. #Person1#: I understand that, but you'd feel better if ...</td>
+      <td>&lt;pad&gt; #Person1# and #Person2# decide to take a coffee break. #Person2# has to finish a report and pass the deadline. They agree to take a break even if they can't come.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person2# misses the break in work because she can't stay on the computer forever so when she finishes her report, she needs to go to the office. They make a compromise.&lt;/s&gt;</td>
+      <td>2.008369</td>
+      <td>1.531268</td>
+      <td>-0.477101</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>Summarize the following conversation. #Person1#: I'm forming a music band. #Person2#: Do you already know how to play an instrument? #Person1#: Uh... Yeah! I'Ve told you a thousand times that I'm learning to play the drums. Now that I know how to play well, I would like to form a rock band. #Person2#: Aside from yourself, who are the other members of the band? #Person1#: We have a guy who plays guitar, and another who plays bass. Although we still haven't found anyone to be our singer. You t...</td>
+      <td>&lt;pad&gt; #Person1# is forming a band and wants exchanging musical talent. #Person2# wants to audition for the Rock Band with #Person1#'s help. But no room exists for the amplifiers, microphones and even the drums because #Person2#'s a singer.&lt;/s&gt;</td>
+      <td>&lt;pad&gt; #Person1# teaches in a music band that she wants to form and tells #Person2# she's a singer. Suddenly, #Person2# asks him for directions and hires her at a house.&lt;/s&gt;</td>
+      <td>2.577401</td>
+      <td>1.986452</td>
+      <td>-0.590948</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Looking at the reward mean/median of the generated sequences we can observe a significant difference!</p>
+</section>
+</section>
+<section id="acknowledgements" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">5</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> by DeepLearning.ai and AWS - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

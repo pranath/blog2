@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-20">
+<meta name="description" content="In this post we look at several aspects to consider when deploying a Large Language Model (LLM) into an application such as chain-of-thought reasoning, program-aided language models (PAL), the REAct framework combining reason and action, application architectures, and responsible AI.">
+
+<title>LivingDataLab - LLM Application Considerations - Part 2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - LLM Application Considerations - Part 2">
+<meta property="og:description" content="In this post we look at several aspects to consider when deploying a Large Language Model (LLM) into an application such as chain-of-thought reasoning, program-aided language models (PAL), the REAct…">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/genai4.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - LLM Application Considerations - Part 2">
+<meta name="twitter:description" content="In this post we look at several aspects to consider when deploying a Large Language Model (LLM) into an application such as chain-of-thought reasoning, program-aided language models (PAL), the REAct…">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/genai4.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">LLM Application Considerations - Part 2</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">LLM Application Considerations - Part 2</h1>
+                  <div>
+        <div class="description">
+          In this post we look at several aspects to consider when deploying a Large Language Model (LLM) into an application such as chain-of-thought reasoning, program-aided language models (PAL), the REAct framework combining reason and action, application architectures, and responsible AI.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">aws</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 20, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#helping-llms-reason-and-plan-with-chain-of-thought" id="toc-helping-llms-reason-and-plan-with-chain-of-thought" class="nav-link" data-scroll-target="#helping-llms-reason-and-plan-with-chain-of-thought"><span class="toc-section-number">2</span>  Helping LLMs reason and plan with chain-of-thought</a></li>
+  <li><a href="#program-aided-language-models-pal" id="toc-program-aided-language-models-pal" class="nav-link" data-scroll-target="#program-aided-language-models-pal"><span class="toc-section-number">3</span>  Program-aided language models (PAL)</a></li>
+  <li><a href="#react-combining-reasoning-and-action" id="toc-react-combining-reasoning-and-action" class="nav-link" data-scroll-target="#react-combining-reasoning-and-action"><span class="toc-section-number">4</span>  ReAct: Combining reasoning and action</a></li>
+  <li><a href="#react-reasoning-and-action" id="toc-react-reasoning-and-action" class="nav-link" data-scroll-target="#react-reasoning-and-action"><span class="toc-section-number">5</span>  ReAct: Reasoning and action</a></li>
+  <li><a href="#llm-application-architectures" id="toc-llm-application-architectures" class="nav-link" data-scroll-target="#llm-application-architectures"><span class="toc-section-number">6</span>  LLM application architectures</a></li>
+  <li><a href="#aws-sagemaker-jumpstart" id="toc-aws-sagemaker-jumpstart" class="nav-link" data-scroll-target="#aws-sagemaker-jumpstart"><span class="toc-section-number">7</span>  AWS Sagemaker JumpStart</a></li>
+  <li><a href="#responsible-ai" id="toc-responsible-ai" class="nav-link" data-scroll-target="#responsible-ai"><span class="toc-section-number">8</span>  Responsible AI</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">9</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In this second article in the series we will look at several aspects to consider when deploying a Large Language Model (LLM) into an application. We will look at chain-of-thought reasoning, program-aided language models (PAL), the REAct framework combining reason and action, application architectures, and responsible AI.</p>
+</section>
+<section id="helping-llms-reason-and-plan-with-chain-of-thought" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="helping-llms-reason-and-plan-with-chain-of-thought"><span class="header-section-number">2</span> Helping LLMs reason and plan with chain-of-thought</h2>
+<p>The ability of LLMs to deduce the actions that an application must take to fulfil a user request is crucial. Sadly, complicated reasoning can be difficult for LLMs, particularly for issues that need numerous steps or mathematics. Even large models that perform well on many other tasks still have these issues. Here’s one instance where an LLM finds it challenging to do the work. To calculate how many apples a café has after using some to prepare lunch and then purchasing more, you are asking the model to solve a straightforward multi-step maths problem. To aid the model’s understanding of the task through one-shot inference, your prompt offers a comparable sample problem and its answer.</p>
+<p>The model creates the completion that is displayed below after evaluating the prompt and determining that the answer is 27. As you will see if you figure out the solution, this response is untrue. Actually, there are just nine more apples in the cafeteria. The effectiveness of huge language models on reasoning problems, like the one you just saw, has been a topic of research. Getting the model to think more like a person by breaking the task down into manageable steps is one tactic that has shown some promise. By thinking more like a human, what do I mean? Here is the single-problem example from the preceding example’s request.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai235.png" width="800"></p>
+<p>Here, you must determine how many tennis balls Roger now possesses after purchasing some new ones. Here is one approach a person might take to solving this issue. Find out how many tennis balls Roger has in the beginning. After that, see that Roger purchases two cans of tennis balls. He has a total of six fresh tennis balls because each container holds three balls. Then, add the other 6 balls to the initial 5 balls to make a total of 11 balls. Finally, state the answer. The whole series of steps demonstrates the line of reasoning that was used to solve the problem. These intermediate calculations represent the thinking processes that a human may take.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai236.png" width="800"></p>
+<p>Chain of thought reasoning is the practise of asking a model to imitate a certain behaviour. It functions by incorporating many intermediate steps into any samples you use for single- or multiple-shot inference. You are effectively instructing the model on how to think through the problem in order to arrive at a solution by organising the instances in this way. The apples problem from a few slides earlier has been modified into a chain of thinking exercise. Even today, the example of Roger buying the tennis balls is utilised. However, the solution text this time includes the intermediate reasoning processes. These actions are nearly identical to those that a human would conduct.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai237.png" width="800"></p>
+<p>The model is asked to evaluate if a gold ring will sink to the bottom of a swimming pool in the following example of a straightforward physics problem. By claiming that a pair will flow since it is less thick than water, the chain of reasoning example provided here demonstrates to the model how to approach this issue. The LLM generates a completion with a similar form when you pass it a prompt like this. The model accurately determines the density of gold, which it discovered from its training set of data, and then deduces that the ring will sink as gold is significantly denser than water.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai238.png" width="800"></p>
+<p>A potent strategy that enhances your model’s capacity for problem-solving is chain of thought prompting. However, if your activity necessitates precise mathematics, like as adding up sales on an e-commerce site, computing tax, or applying a discount, the weak math skills of LLMs may still be a problem. You’ll next about a method in the following that can help you solve this issue by having your LLM communicate with a program that is considerably more adept in maths.</p>
+</section>
+<section id="program-aided-language-models-pal" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="program-aided-language-models-pal"><span class="header-section-number">3</span> Program-aided language models (PAL)</h2>
+<p>LLMs have a limited capacity to do mathematical operations including addition, subtraction, and multiplication. While you can attempt to overcome this by using chain of thought prompts, it will only go so far. Even if a model solves a problem successfully, it may still make mistakes with the individual math operations, especially when dealing with larger numbers or complicated processes. Here is the illustration of the prior case when the LLM attempts to serve as a calculator but provides the incorrect response. Keep in mind that the model is not performing any real maths at this time. It is merely attempting to guess the tokens that will most likely finish the request.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai239.png" width="800"></p>
+<p>Depending on your use case, the model getting the math wrong can have a number of detrimental effects, such as charging consumers the incorrect amount or getting the recipe’s measurements wrong. This restriction can be removed by enabling your model to communicate with other mathematically adept apps, such as a Python interpreter. Program-aided language models, or PAL for short, is one intriguing framework for this kind of LLM enhancement. This research, which was initially presented in 2022 at Carnegie Mellon University by Luyu Gao and colleagues, combines an LLM with an external code interpreter to do calculations. The process uses chain of reasoning prompting to produce Python programmes that may be run.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai240.png" width="800"></p>
+<p>An interpreter receives the generated scripts and executes them. A few sample prompts and completions are shown in the image on the right, which was taken from the study. The idea of PAL is to use the LLM to build completions that have computer code to go along with the reasoning processes. The computations required to solve the problem are then performed on this code by an interpreter. By giving examples for a single or a few brief inferences in the prompt, you can define the output format for the model. Let’s examine the organisation of these sample prompts in more detail.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai241.png" width="800"></p>
+<p>Roger’s purchase of tennis balls will serve as your ongoing one-shot example. Now, the setup ought to be recognisable. This illustrates a chain of reasoning. On the lines highlighted in blue, you can see the verbatim steps of the logic laid out there. The inclusion of lines of Python code that are displayed in pink set this prompt apart from the previous ones. Any calculative phases in the reasoning process are converted into code by these lines. In each step of reasoning, variables are declared based on the text. Either directly, as in this first line of Python code, or by computations using numbers found in the reasoning text, as in the second line of Python code.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai242.png" width="800"></p>
+<p>As you can see in the third line, the model can also be used with variables that it generates in subsequent steps. Each reasoning step’s text starts with a pound sign so that the Python interpreter can skip the line and treat it as a remark. The new issue that needs to be resolved wraps up this prompt. Finding out how many loaves of bread a bakery has left after a day of sales and after some loaves are returned from a grocery store partner is the goal in this instance. The finish produced by the LLM is visible on the right. Again, the Python code is shown in pink, and the steps in the chain of reasoning are shown in blue.</p>
+<p>As you can see, the model generates a variety of variables to keep tabs on the number of loaves produced, the number of loaves sold during certain hours of the day, and the number of loaves the grocery store returns. Then, by applying mathematical operations to these variables, the answer is determined. In order to arrive at the right total, the model correctly determines whether terms should be added or deleted.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai243.png" width="800"></p>
+<p>Let’s discuss how the PAL framework enables an LLM to communicate with an external interpreter now that you understand how to arrange examples that will instruct the LLM to create Python scripts based on its reasoning processes. You should format your prompt so that it contains one or more examples in order to be ready for inference using PAL.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai244.png" width="800"></p>
+<p>Each example should start with a query and then provide logical steps in the form of lines of Python code that address the issue. The new question you want to answer will then be added to the prompt template. You now have a PAL-formatted prompt that includes both the sample and the issue to be resolved. You will then give your LLM this combined prompt, and it will use the example in the prompt to learn how to format the output and produce a completion in the form of a Python script. Now that the script is in the hands of a Python interpreter, you can utilise it to run the code and produce an answer.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai245.png" width="800"></p>
+<p>The solution is 74 for the bakery example script you saw on the previous slide. You’ll now add the text with the correct result to the PAL-formatted question you started with, which you know because the computation was done in Python. By this time, the prompt has the appropriate response in the context. The LLM now generates a completion with the right response when you pass it the amended prompt. Given the problem’s relatively straightforward maths, it is possible that the model could have obtained the correct response simply through chain-of-thought prompting.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai246.png" width="800"></p>
+<p>But for more difficult maths, such as calculus, trigonometry, or large-number arithmetic, PAL is a potent technique that enables you to be sure that all calculations made by your application are precise and trustworthy. You could be asking how to streamline this procedure so that you don’t have to manually relay information between the interpreter and the LLM. The orchestrator you previously saw enters the picture at this point. A technical component that can control information flow and the starting of calls to external data sources or applications is the orchestrator, represented here as the yellow box.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai247.png" width="800"></p>
+<p>On the basis of the data in the LLM’s output, it can also decide what steps to take. Keep in mind that the LLM is the logic component of your application. In the end, it produces the strategy that the orchestrator will comprehend and use. The execution of Python code is the sole activity that has to be done in PAL. The LLM only needs to create the script, which the orchestrator then delivers to the external interpreter to execute, without really making a decision to run the code.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai248.png" width="800"></p>
+<p>However, the majority of real-world applications are probably more complex than the straightforward PAL architecture. The interactions with many external data sources may be necessary for your use case. You could need to manage a number of decision points, validation actions, and calls to external apps, as you saw in the example from the store-bought item. How can the LLM power a more sophisticated application? Let’s examine one tactic.</p>
+</section>
+<section id="react-combining-reasoning-and-action" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="react-combining-reasoning-and-action"><span class="header-section-number">4</span> ReAct: Combining reasoning and action</h2>
+<p>We saw how organised prompts could be used to guide an LLM in creating Python scripts to address challenging mathematical problems. To run the code and return the result to the LLM, a PAL-enabled application can link the LLM to a Python interpreter. The majority of applications will call for the LLM to handle increasingly intricate workflows, sometimes involving communications with numerous external data sources and programmes. You will learn about the ReAct framework next which LLMs can use to organise and carry out these workflows. ReAct is a prompting technique that combines action planning and chain of reasoning. In 2022, researchers from Princeton and Google suggested the framework.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai249.png" width="800"></p>
+<p>The paper creates a number of difficult prompting instances based on issues from Hot Pot QA, a benchmark for addressing multi-step questions. Fever, a benchmark that employs Wikipedia texts to check facts, and reasoning over two or more passages from Wikipedia are required for that. ReAct teaches a big language model how to think through a problem and choose actions that will bring it closer to a solution through the use of organised examples</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai250.png" width="800"></p>
+<p>The example questions begin with a question that has several phases to it. The objective in this example is to identify which of two magazines was published first. The example is followed by a trio of strings that are related to thought, action, and observation. The thought is a stage in the reasoning process that shows the model how to approach the issue and decide what course of action to pursue. The prompt in the newspaper publication example states that the model will look for both magazines to ascertain which one was published first.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai251.png" width="800"></p>
+<p>The model must choose an action from a predetermined list in order to communicate with an external application or data source. For the ReAct framework, the developers built a simple Python API to communicate with Wikipedia. The three permitted actions are lookup, which searches for a string on a Wikipedia page, search, which looks for a Wikipedia entry about a specific topic. then conclude, which the model does after deciding it has found the solution. As you can see from the preceding part, the prompt’s thought suggested conducting two searches, one for each magazine. In this case, Arthur’s magazine will be the first result of the search.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai252.png" width="800"></p>
+<p>To ensure that the model formats its completions similarly, the action is formatted using the specific square bracket syntax you see above. In order to initiate particular API activities, the Python interpreter looks for this code. The observation, which makes up the final section of the prompt template, is where the new details from the outside search are integrated into the prompt’s context. The cycle is then repeated as many times as necessary for the model to interpret the prompt and arrive at the conclusion. The second prompt specifies the launch year of Arthur’s magazine as well as the next step that must be taken to resolve the issue.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai253.png" width="800"></p>
+<p>The second step is to look for articles first written by women, and the second observation includes text stating the publication’s inception date, which in this case is 1989. All the knowledge needed to respond to the question is currently at hand. The third idea presents the precise reasoning that was utilised to establish which magazine was published first before stating the start year of the first for women. The cycle must be completed before returning the solution to the user. It’s crucial to keep in mind that the ReAct architecture restricts the LLM to a small number of actions that are specified by a set of guidelines that are prefixed to the example prompt language.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai254.png" width="800"></p>
+<p>The job is created first, instructing the model to respond to a query using the prompt structure you just carefully examined. The instructions then go into greater detail regarding what is meant by thought before stating that there are only three different sorts of action steps that can be taken. The first action is a search that looks for Wikipedia articles pertaining to the provided entity. The second action, known as a lookup, finds the following phrase that contains the given keyword. Finish is the final step in the process, returning the solution and concluding the work. When utilising LLMs to design tasks that will power applications, it is essential to specify a list of permitted actions.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai255.png" width="800"></p>
+<p>Because LLMs are so imaginative, they may suggest actions that don’t exactly correspond to things the programme can perform. The last line of the instructions informs the LLM that the prompt text will now include some examples. Let’s put everything together now to draw conclusions. The ReAct example prompt will be the first thing you see. Be aware that you might need to use more than one example and make future inferences based on the LLM you’re working with. The instructions will then be pre-pend at the start of the example, and the question you want to answer will be added at the end.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai256.png" width="800"></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai257.png" width="800"></p>
+<p>All of these fragments have now been combined into the complete prompt, which can be given to the LLM for inference. The ReAct architecture demonstrates a method for using LLMs to drive an application through action planning and reasoning. By developing examples that illustrate the choices and actions that will be made in your application, you may adapt this approach to your particular use case. Thankfully, there are frameworks being actively developed for creating applications that use language models. The LangChain framework which I have <a href="../#category=langchain">written about previously</a>, is one option that is gaining popularity, and gives you modular pieces that have the elements required to work with LLMs.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai258.png" width="800"></p>
+<p>These components contain prompt templates that you can use to structure input samples and model completions for a variety of use situations. Additionally, you can use memory to keep a record of your interactions with an LLM. Also, the framework contains pre-built tools that let you do a wide range of operations, such as calls to external datasets and other APIs. A chain is created by joining a number of these parts individually. You can use these readymade chains—which LangChain’s developers have designed and optimised for various use cases—off the shelf to quickly launch your app.</p>
+<p>Depending on the data a user gives, your application workflow may occasionally follow several different pathways. Instead of using a predetermined sequence in this situation, we’ll need the freedom to choose which activities to carry out as the user progresses through the workflow. To understand user input and choose which tool or tools to utilise to do the work, you can use another construct defined by LangChain called an agent. Agents for PAL and ReAct are presently available on LangChain, among others. Agents can be added to chains to carry out a single action or to organise and carry out a series of actions.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai259.png" width="800"></p>
+<p>Since LangChain is still under development, new features are constantly being added, such as the capability to review and rate the LLM’s workflow completions. It’s an innovative framework that can aid in quick prototyping and deployment, and it will probably play a significant role in your future arsenal of generative AI tools. The model’s capacity for sound reasoning and action planning is scale-dependent, so keep that in mind as you create applications employing LLMs.</p>
+<p>For techniques like PAL or ReAct that involve advanced prompting, larger models are typically your best option. Smaller models could have trouble comprehending the instructions in highly organised prompts, and you might need to make further adjustments to strengthen their capacity for thought and planning. Your development may be slowed by this. Instead, you might be able to utilise a large, powerful model at first to train and improve a smaller model that you can convert to later if you gather a lot of user data during distribution.</p>
+</section>
+<section id="react-reasoning-and-action" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="react-reasoning-and-action"><span class="header-section-number">5</span> ReAct: Reasoning and action</h2>
+<p>ReAct, a unique method that incorporates verbal reasoning and interactive decision-making in large language models (LLMs), is introduced in <a href="https://arxiv.org/abs/2210.03629">this study</a>. While LLMs have succeeded in understanding language and making decisions, the mix of acting and reasoning has been overlooked. Utilising their interdependence, ReAct enables LLMs to produce reasoning trajectories and task-specific actions.</p>
+<p>The method outperforms baselines in a variety of activities, addressing problems including hallucination and error propagation. Even with few context examples, ReAct beats imitation and reinforcement learning techniques in interactive decision making. By enabling individuals to differentiate between internal knowledge and external information, it not only improves performance but also interpretability, trustworthiness, and diagnosability.</p>
+<p>In summary, ReAct bridges the gap between thinking and doing in LLMs, producing outstanding outcomes for tasks requiring language reasoning and decision-making. ReAct overcame constraints and outperformed baselines by fusing reasoning traces and actions. This improved model performance also provided interpretability and trustworthiness, enabling users to comprehend the model’s decision-making process.</p>
+</section>
+<section id="llm-application-architectures" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="llm-application-architectures"><span class="header-section-number">6</span> LLM application architectures</h2>
+<p>Let’s start by putting what you’ve seen in this post together and taking a closer look at the foundational elements for developing LLM-powered applications. To build end-to-end applications solutions, you’ll need a number of essential components, beginning with the infrastructure layer. This layer offers the computation, storage, and network resources needed to host your application components and serve up your LLMs. You can do this by using your on-premises infrastructure or by using on-demand and pay-as-you-go cloud services to have it provided for you. The big language models you intend to use in your application will thereafter be included. These might include the fundamental models as well as the models you’ve customised for your particular task.</p>
+<p>The models are set up on the infrastructure that will best serve your inference requirements. Considering whether you require immediate or delayed engagement with the model. You could also need to retrieve data from other sources, such those covered in the section on retrieval enhanced creation. The user or consuming application will receive the completions from your application’s huge language model. You might need to develop a system to capture and store the outputs depending on your use case. For instance, you could increase the fixed contexts window size of your LLM by adding the ability to save user completions during a session.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai260.png" width="800"></p>
+<p>As your application develops, you can also collect user input that may be helpful for further fine-tuning, alignment, or evaluation. After that, you might need to employ extra programmes and frameworks designed for big language models so you can quickly put some of the concepts covered in this course into practise. Len Chains’ built-in libraries, for instance, can be used to construct strategies like chain of thought prompting and pow respond. Model hubs are another tool you may use to organise and exchange models for use in apps. The programme will often be consumed through some kind of user interface in the last layer, such as a website or a rest API.</p>
+<p>You’ll also include the security elements necessary for interfacing with your application in this layer. This architecture stack, at a high level, depicts the many elements to take into account for your generative AI applications. Your consumers will engage with the entire stack, whether they are actual end users that use your application or other machines that use its APIs. As you can see, when developing end-to-end generative AI systems, the model is generally only one part of the tale.</p>
+<p>After reading this article, you should have a better understanding of the crucial factors you need to take into account when creating applications employing LLMs. You learned how to fine-tune using a method known as reinforcement learning with human feedback, or RLHF, to make your models more in line with human preferences like helpfulness, harmlessness, and honesty. Given the popularity of RLHF, a lot of RL reward models and human alignment datasets are already in existence, allowing you to start aligning your models right now. In actuality, you may use RLHF as a very efficient technique to enhance the alignment of your models, lessen the toxicity of their reactions, and enable you to use your models more safely in production.</p>
+<p>You also learned crucial methods for shrinking your model through distillation, quantization, or pruning in order to optimise it for inference. By doing this, the amount of hardware resources required to support your LLMs during production is reduced. Last but not least, you investigated how structured prompts and links to external data sources and applications might help your model perform better during deployment. By using their intelligence to fuel fascinating, helpful apps, LLMs can play an incredible role as the application’s reasoning engine. It’s a very exciting moment for developers since frameworks like LangChain make it easy to quickly design, deploy, and test LLM driven applications.</p>
+</section>
+<section id="aws-sagemaker-jumpstart" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="aws-sagemaker-jumpstart"><span class="header-section-number">7</span> AWS Sagemaker JumpStart</h2>
+<p>Now that we’ve looked at the basics of developing applications utilising LLMs, let’s have a look at an AWS service called Amazon Sagemaker JumpStart that may assist you in fast going into production and scaling your operations. As you can see, constructing an LLM-powered application takes a number of parts. As a model hub, Sagemaker JumpStart enables you to swiftly deploy and use foundation models that are offered by the service into your own applications. A simple method for developing and deploying models is also offered by the JumpStart service.</p>
+<p>The infrastructure, the LLM itself, the tools and frameworks, and even an API to call the model are all covered in detail by JumpStart. JumpStart models need GPUs to be tuned and deployed, in contrast to the models you used in the laboratories. Also bear in mind that these GPUs are subject to on-demand pricing, thus before choosing the compute you want to employ, you should visit the Sagemaker pricing page. Additionally, for cost efficiency, remember to remove the Sagemaker model endpoints after use and adhere to standard practises for cost monitoring.</p>
+<p>Sagemaker JumpStart can be accessed through Sagemaker studio or the AWS console. After you click “JumpStart,” you’ll notice a variety of categories, including end-to-end solutions for various use cases and a number of foundation models for various modalities that you can quickly deploy as well as fine-tune, with the latter option showing a yes under it. Let’s examine the Flan-T5 model as an illustration.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai261.png" width="800"></p>
+<p>To reduce the amount of resources required by the lab environments, we have explicitly been employing the base variant. Depending on your needs, you can use additional Flan-T5 variations using JumpStart. Additionally, you’ll see the Hugging Face emblem here, indicating that they are genuinely coming from Hugging Face. in AWS has collaborated with Hugging Face to the point where you can deploy or tweak the model with ease in just a few clicks. You can see that I have a few possibilities if I choose Flan-T5 Base. We can first decide whether to deploy the model by specifying a few crucial factors, such as the kind and size of the instance. And for hosting the model, this instance type and size should be utilised.</p>
+<p>Remember that this deploys to a real-time persistent endpoint and that the cost will vary depending on the hosting instance you choose. And some of these might be rather huge, so keep in mind to always delete any endpoints that are not in use to save money. You’ll also see that a number of security options are selectable, enabling you to use the obtained controls to meet your own security needs. The Flan-T5 Base model will then be immediately deployed to the endpoint using the infrastructure that you select if you choose to press the “Deploy” button.</p>
+<p>You’ll see the choice to train in the second tab. This model allows for fine-tuning, so you can set up your fine-tuning jobs in the same way. First, provide the locations of your training and validation data sets. Next, choose the size of the computation that you want to use for training. You can choose the sort of compute you wish to utilise for your training job with only a simple modification to the size that compute using this drop-down. Remember once again that you are paid for the time it takes to train the model as well as the underlying computation. Therefore, we advise picking the smallest instance needed for your particular work.</p>
+<p>The ability to easily locate and alter the adjustable hyperparameters for this particular model using these drop-down menus is another plus. You’ll see a parameter type called PEFT, or parameter-efficient fine-tuning, if we scroll all the way to the bottom.</p>
+<p>Here, you may choose Lora from the dropdown menu that you previously learnt about, making it simpler to put these different strategies you studied into practise. Then you may select “Train” and continue. The training process will then begin to fine-tune this pre-trained Flan-T5 model utilising the input given for your particular task. Here is one more choice, and that is to have JumpStart create a notebook for you automatically. Consider if you would want to operate with these models programmatically rather than using the drop-down.</p>
+<p>This notebook essentially gives you access to all the code that drives the actions taken in the above discussed options. This is an option if you want to programmatically interact with JumpStart at its most basic level. JumpStart offers a tonne of materials in the form of blogs, videos, and sample notebooks in addition to serving as a model hub that comprises basic models.</p>
+</section>
+<section id="responsible-ai" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="responsible-ai"><span class="header-section-number">8</span> Responsible AI</h2>
+<p>Since LLM powered applications are still in their infancy, researchers are constantly announcing new methods or schemes to enhance performance and dependability. This article can only reflect what is now known or understood. Let’s highlight a few current research fields. As AI develops, we are all becoming more aware of the need to use technology properly.</p>
+<p>In the context of generative AI using large language models, what are some of the additional risks and issues facing responsible AI? Lets focus on these key three. Toxicology, hallucinations, and intellectual property issues.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai262.png" width="800"></p>
+<p>Thus, the word “toxicity,” which means “toxic,” suggests certain language or content that may be damaging or discriminating against some groups, particularly towards underrepresented or protected groups. So starting with the training data is one option we have. That is the foundation of all AI, as you are aware. Therefore, you may begin by organising the training data. Guardrail models can be trained to recognise and remove any unwanted information from the training data. When it comes to training data and training annotations, we also consider how much human annotation is involved.</p>
+<p>In order for those annotators to comprehend how to extract particular data or how to mark particular data, we want to ensure that we provide them adequate direction and also have a very broad group of annotators that we are educating.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai263.png" width="800"></p>
+<p>Next we have hallucinations, where the model imagines things that are either plainly false or that may even look plausible but aren’t. Due to the way that we train huge language models or just neural networks in general, this is precisely what it means in this situation with generative AI. Since we frequently don’t know what the model is actually learning, it occasionally tries to fill in the blanks left by missing data. And frequently, this results in delusions or false statements.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai264.png" width="800"></p>
+<p>As a result, one thing we can do is inform consumers about the reality of this technology and include any necessary disclaimers, letting them know that this is something to be on the lookout for. Additionally, you may add independent and trustworthy sources to big language models so you can double-check the information you receive. In order for us to always be able to go back and find out where the knowledge came from, you also want to make sure that you build mechanisms for attributing generated output to specific training data. Finally, but most importantly, we must always distinguish between the intended use case and the unanticipated use case. Because again, due that these things can happen hallucinations, we want to make sure that the user is aware and transparent about how these things operate.</p>
+<p>Next, the issue of intellectual property will undoubtedly need to be addressed because it essentially refers to how users are using the AI-generated data that is returned by these models. Additionally, it may involve using someone else’s earlier work without their permission or having copyright difficulties with previously published works and content. Therefore, it is likely that over time, a combination of not just technologies but also legislators and other legal procedures will be used to address this. Additionally, we want to include a governance mechanism to ensure that each stakeholder is taking the necessary steps to stop this from occurring in the near future.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai265.png" width="800"></p>
+<p>A novel idea called machine unlearning reduces or eliminates the influence of protected content on the outputs of generative AI. This is only one example of a highly outdated study methodology. Additionally, before displaying created content to the user, filtering or blocking approaches that match it to protected content and training data can be used to determine whether it is too similar and should be suppressed or replaced.</p>
+<p>Generally speaking, use case definition is crucial for developing LLM-based apps. The better is to be more precise and focused. When it comes to face ID systems, one instance where we truly employ cognitive AI to test and assess the resilience of a system is. In reality, we employ AI travels to produce various incarnations of a face. For instance, if I were testing a system that utilises my face to unlock my phone, I would want to test it with several variations of my face, including with long hair, short hair, glasses on, makeup applied, and makeup not applied.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai266.png" width="800"></p>
+<p>And we can accomplish this at scale using soft AI. And so, using that to verify the robustness is demonstrated by this example. Additionally, since every use case has a unique set of dangers, we want to be certain that we access them. Some may be superior or inferior. Additionally, assessing performance is genuinely a system and data-driven process. The same system you have may perform extremely well or extremely poorly when evaluated with various types of data. Additionally, we need to make sure that the AI lifecycle is iterated upon. There is never a one-time solution.</p>
+<p>We want to implement accountability at the concept stage as well as the deployment stage and monitor that input over time when developing AI, which is a continuous iterative cycle. Last but not least, we want to establish accountability standards for each stakeholder and governance regulations that cover the entire lifetime.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai267.png" width="800"></p>
+<p>Water marking and fingerprinting are two recent advances in innovation that allow us to add something that resembles a stamp or a signature to a piece of material or data so that we can always trace it back. A promising area of research, is developing models that can help identify whether content was produced using soft AI. It’s a very exciting time to be involved in AI.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">9</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> by DeepLearning.ai and AWS - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

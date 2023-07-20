@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-16">
+<meta name="description" content="Here we look at more advanced aspects of Reinforcement learning from human feedback (RLHF) in particular the reward model, use of chain-of-thought prompting and looking at the challenges LLMs face with knowledge cut-offs">
+
+<title>LivingDataLab - Reinforcement learning from human feedback (RLHF) For LLMs - Part 2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Reinforcement learning from human feedback (RLHF) For LLMs - Part 2">
+<meta property="og:description" content="Here we look at more advanced aspects of Reinforcement learning from human feedback (RLHF) in particular the reward model, use of chain-of-thought prompting and looking at the challenges LLMs face…">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/genai4.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Reinforcement learning from human feedback (RLHF) For LLMs - Part 2">
+<meta name="twitter:description" content="Here we look at more advanced aspects of Reinforcement learning from human feedback (RLHF) in particular the reward model, use of chain-of-thought prompting and looking at the challenges LLMs face…">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/genai4.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Reinforcement learning from human feedback (RLHF) For LLMs - Part 2</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Reinforcement learning from human feedback (RLHF) For LLMs - Part 2</h1>
+                  <div>
+        <div class="description">
+          Here we look at more advanced aspects of Reinforcement learning from human feedback (RLHF) in particular the reward model, use of chain-of-thought prompting and looking at the challenges LLMs face with knowledge cut-offs
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 16, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#the-reward-model" id="toc-the-reward-model" class="nav-link" data-scroll-target="#the-reward-model"><span class="toc-section-number">2</span>  The Reward model</a></li>
+  <li><a href="#fine-tuning-with-reinforcement-learning" id="toc-fine-tuning-with-reinforcement-learning" class="nav-link" data-scroll-target="#fine-tuning-with-reinforcement-learning"><span class="toc-section-number">3</span>  Fine-tuning with Reinforcement Learning</a></li>
+  <li><a href="#reward-hacking" id="toc-reward-hacking" class="nav-link" data-scroll-target="#reward-hacking"><span class="toc-section-number">4</span>  Reward hacking</a></li>
+  <li><a href="#scaling-human-feedback" id="toc-scaling-human-feedback" class="nav-link" data-scroll-target="#scaling-human-feedback"><span class="toc-section-number">5</span>  Scaling human feedback</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">6</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In an <a href="https://livingdatalab.com/posts/2023-07-15-reinforcement-learning-with-human-feedback-1.html">earlier article</a> we introduced Reinforcement learning from human feedback (RLHF) which is an important method used in modern large language models to help improve the performance and alignment of large language models.</p>
+<p>In that article we looked at:</p>
+<ul>
+<li>Describing how RLHF uses human feedback to improve the performance and alignment of large language models</li>
+<li>Explaining how data gathered from human labelers is used to train a reward model for RLHF</li>
+</ul>
+<p>In this post we will consider other aspects of Reinforcement learning, in particular we will look at:</p>
+<ul>
+<li>Defining chain-of-thought prompting and describe how it can be used to improve LLMs reasoning and planning abilities</li>
+<li>Discussing the challenges that LLMs face with knowledge cut-offs, and explain how information retrieval and augmentation techniques can overcome these challenges</li>
+</ul>
+</section>
+<section id="the-reward-model" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-reward-model"><span class="header-section-number">2</span> The Reward model</h2>
+<p>We saw in an <a href="https://livingdatalab.com/posts/2023-07-15-reinforcement-learning-with-human-feedback-1.html">earlier article</a> what we need to do to prepare our data so we are ready to train a Reward model, which is a key part of using Reinforcement learning from human feedback to better allign Large Language Models with human values.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai161.png" width="800"></p>
+<p>Everything you need to train the reward model is now ready. While getting there requires some work, after you’ve finished teaching the reward model, you won’t need to add any more people to the loop. Instead, the model will substitute for the human labeler in the HF process and will automatically select the preferred completion. This language model typically doubles as a reward model. As an illustration, consider a model that has been taught to use supervised learning techniques on pairwise comparison data that you have created based on the human labelers’ evaluation of the prompts. The reward model learns to minimise the loss sigmoid of the reward difference, r_j-r_k, while favouring the human-preferred completion y_ j for a given prompt X.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai162.png" width="800"></p>
+<p>The first choice with the label “y_j” is always the one that people favour. The reward model can be used as a binary classifier to offer a set of logics across the positive and negative classes after the model has been trained on the human rank prompt-completion pairs. The outputs of the unnormalized model that come before any activation function are called logics.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai163.png" width="800"></p>
+<p>Consider the scenario where you want to clean your LLM and the reward model needs to determine whether the completion contains hate speech. The two classes in this situation would be the positive class, which you ultimately want to optimise for, and the negative class, which you ultimately want to avoid.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai164.png" width="800"></p>
+<p>The largest value of the positive class is what you use as the reward value in LLHF. Just to remind you, if you apply a Softmax function to the logits, you will get the probabilities. The example here shows a good reward for non-toxic completion and the second example shows a bad reward being given for toxic completion. At this point, you have a powerful tool in this reward model for aligning your LLM. The next step is to explore how the reward model gets used in the reinforcement learning process to train your human-aligned LLM.</p>
+</section>
+<section id="fine-tuning-with-reinforcement-learning" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="fine-tuning-with-reinforcement-learning"><span class="header-section-number">3</span> Fine-tuning with Reinforcement Learning</h2>
+<p>Let’s put it all together and examine how to apply the reward model in reinforcement learning to update the LLM weights and create a model that is aligned with humans. Keep in mind that you should begin with a model that performs well on the task you are interested in. You’ll strive to have an instruct model with you and then shift the LLM into more human valued alignment. A prompt from your prompt dataset will be passed first. In this instance, a dog is what the LLM is told to create, and that resulted in the creation of a fluffy animal. The prompt completion pair was then delivered to the reward model along with this completion. The reward model calculates a reward value after evaluating the pair in light of the human feedback it was trained on.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai165.png" width="800"></p>
+<p>A more aligned response is represented by a larger number, like the one of 0.24 seen below. A response with less alignment would be given a lower score, such as -0.53. The reinforcement learning algorithm will then get this reward value for the prom completed pair and update the LLM’s weights to produce more aligned, higher reward answers. The RL upgraded LLM will be the name of this model’s interim version. A single iteration of the RLHF process is made up of these phases. In a manner comparable to other forms of fine tuning, these iterations run for a predetermined number of epics.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai166.png" width="800"></p>
+<p>Here, you can see that the completion produced by the RL modified LLM receives a better reward score, demonstrating that the completion is now more aligned as a result of the weight updates. If the process is going well, you’ll notice that the reward gets better with each iteration as the model creates language that is more closely in line with what people like to read.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai167.png" width="800"></p>
+<p>Until your model is in line with some evaluation criteria, you will keep going through this iterative procedure. For instance, achieving a certain level of the helpfulness you specified. Additionally, you can provide a maximum number of steps as the stopping point, like 20,000.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai168.png" width="800"></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai169.png" width="800"></p>
+<p>Let’s call the refined model at this point the human-aligned LLM. We haven’t yet talked about the precise characteristics of the reinforcement learning algorithm. This algorithm updates the LLM model weights based on the output of the reward model to enhance the reward score over time. For this step of the RLHF process, you can choose from a variety of different algorithms.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai170.png" width="800"></p>
+<p>Proximal policy optimisation, or PPO for short, is a common option. Although PPO is a rather complex algorithm, you don’t need to be conversant with all of the specifics to utilise it. However, it can be a challenging algorithm to implement, and if you’re having issues getting it to function, a deeper grasp of its internal workings can help you debug.</p>
+</section>
+<section id="reward-hacking" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="reward-hacking"><span class="header-section-number">4</span> Reward hacking</h2>
+<p>RLHF is a process for fine-tuning LLMs to match human preferences. The completions of a prompt data set are compared to some human preference metric, such helpful or not helpful, using a reward model in this process. The weights off the LLM are then updated using a reinforcement learning algorithm, in this case PPO, depending on the rewards generated by the LLM’s most recent version of completions. You’ll repeat this cycle of numerous rounds utilising a variety of prompts and adjustments to the model weights until you reach the level of alignment that you want. An LLM that is human oriented and ready for use in your application is the outcome.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai171.png" width="800"></p>
+<p>Reward hacking, where the agent learns to game the system by favouring acts that maximise the reward received even if those actions don’t properly fit with the original purpose, is an interesting issue that can arise in reinforcement learning. Reward hacking in the context of LLMs might take the form of adding words or phrases to completions that produce high scores for the metric being aligned. But that lowers the language’s overall quality. Consider the scenario where you are utilising RHF to teach and cleanse a model. A reward model that can analyse sentiment and categorise model completions as toxic or non-toxic has already been trained.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai172.png" width="800"></p>
+<p>You choose a prompt from the training data for this particular product, provide it to an LLM that receives instructions, and it produces a completion. This one is unpleasant and is likely to receive a high toxic rating because it is really negative. The PPO algorithm uses the score to adjust the model weights when the toxicity of reward model processes the completion and produces a score. RHF will adjust the LLM as you iterate to produce fewer harmful reactions. However, the strategy may stray too far from the original language model as it works to maximise the reward.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai173.png" width="800"></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai174.png" width="800"></p>
+<p>By inserting terms like “most awesome” and “most incredible” in this example, the model has begun to produce completions that, according to its learning, will result in very low toxicity scores. Very hyperbolic rhetoric is being used here. The model may potentially begin producing illogical, grammatically wrong language that just so happens to maximise the rewards; outputs like these are undoubtedly not very helpful. You can use the initial instruct LLM as a performance reference to avoid our board being hacked. We’ll refer to it as the reference model. During RHF iterations, the reference model’s weights are fixed and not modified.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai175.png" width="800"></p>
+<p>In this manner, you continuously keep a single reference model for comparison. Each prompt is given to both models during training, resulting in a completion by both the reference LLM and the updated intermediate LLM model. Now that you have both completions, you can compare them and get the Kullback-Leibler divergence, or KL divergence. A statistical indicator of how dissimilar two probability distributions are is the KL divergence. It can be used to assess how much the updated model has deviated from the reference by comparing the results from the two models.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai177.png" width="800"></p>
+<p>Many common machine learning libraries include the KL divergence algorithm, and you can use it without understanding all the underlying math. For each token that is generated across the whole lexicon, KL divergence is determined using the LLM. This may be as many as tens of thousands or even millions of tokens. However, by utilising a softmax function, you are able to significantly lower the number of possibilities from the whole vocabulary size. Remember that this technique is still fairly computationally intensive. Utilising GPUs will nearly always be advantageous.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai178.png" width="800"></p>
+<p>Once the KL divergence between the two models was determined, the acid term was included to the reward calculation. If the RL updated model deviates too far from the reference LLM and produces two different completions, it will be penalised. It should be noted that in order to calculate the KL divergence, the frozen reference LLM, and the oral updated PPO LLM, two complete copies of the LLM are now required. In this situation, you simply update a path adapter’s weights, not the entire LLM’s weights. This means that the reference model and the PPO model, which you update with trained path parameters, can both use the same underlying LLM.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai179.png" width="800"></p>
+<p>This roughly cuts in half the RAM footprint during training. The score you’ll use in this situation is the toxicity score, which measures the likelihood of a negative class—in this case, a poisonous or hostile response—assumed across all completions. This score ought to decrease if RHF is successful in reducing the toxicity of your LLM.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai180.png" width="800"></p>
+<p>Using a reward model that can evaluate poisonous language, you will first establish a baseline toxicity score for the original instruct LLM by analysing its completions from the summarization data set. Then, using the same data set, you will assess your newly human-aligned model and compare the results. In this case, Arlo HF did actually result in a lower toxicity score, indicating a more aligned and less hazardous model.</p>
+</section>
+<section id="scaling-human-feedback" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="scaling-human-feedback"><span class="header-section-number">5</span> Scaling human feedback</h2>
+<p>Although RLHF fine tuning can be performed without the requirement for human evaluation using a reward model, the trained reward model requires a significant amount of human labour to create. Large teams of labelers, often thousands of people, are typically needed to evaluate numerous prompts for the labelled data set used to train the reward model. The time and other resources needed for this activity can constitute significant constraints. Human effort becomes a scarce resource as the variety of models and use cases grows. A current field of study is how to scale human feedback.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai181.png" width="800"></p>
+<p>Scaling through model self-supervision is one solution to these constraints. One strategy for large-scale supervision is constitutional AI. Constitutional AI, a technique for training models utilising a set of rules and principles that direct the model’s behaviour, was first put forth in 2022 by researchers at Anthropic. These make up the constitution along with some sample questions. The model is then taught to evaluate itself and modify its answers in accordance with those principles. Constitutional AI can assist in addressing the unexpected outcomes of RLHF in addition to scaling feedback. For instance, depending on how the request is written, an aligned model may divulge damaging information while attempting to give the most helpful answer possible.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai182.png" width="800"></p>
+<p>Consider the scenario when you ask the model for advice on how to access your neighbor’s WiFi. Even though it is unlawful to do so, this model, which has been adjusted to prioritise helpfulness, actually informs you about an app that allows you to do so. The model can balance these conflicting interests and lessen the harm by being given a set of constitutional norms. Here are some guidelines from the study article that LLMs are asked to abide by in Constitutional AI I. For instance, you may instruct the model to select the answer that is the most beneficial, truthful, and safe.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai183.png" width="800"></p>
+<p>However, you can set some restrictions on this by asking the model to prioritise safety by determining whether its response promotes illegal, unethical, or immoral behaviour. It should be noted that you are not required to utilise the paper’s rules; instead, you are free to create your own set of rules that are best suited to your domain and use case. The Constitutional AI approach requires that you train your model over the course of two different phases. Red teaming is a technique used in the first stage of supervised learning to start off by prompting the model in ways that try to persuade it to produce bad responses. The model is then instructed to evaluate its own damaging responses in light of the constitutional principles and then change them in order to adhere to those regulations.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai184.png" width="800"></p>
+<p>When finished, use the pairs of red team prompts and the updated constitutional responses to fine-tune the model. Let’s take a look at an illustration of the creation of one of these prompt completion pairs. Now let’s get back to the WiFi hacking issue. As you already saw, this model strives to be as helpful as possible while yet responding to you negatively. The damaging completion and a set of predetermined instructions asking the model to evaluate its response are added to the prompt to help alleviate this. The model recognises the issues in its response using the guidelines provided in the Constitution. In this instance, it correctly understands that it is forbidden to access another person’s WiFi.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai185.png" width="800"></p>
+<p>The last step is to bring everything together and ask the model to create a new answer that is free of any dangerous or unlawful material. The model creates a new response that applies constitutional rules and omits any mention to the illegal software. This last constitutional response and the initial red team prompt can both be used as training data. To develop a polished NLM that is trained to produce constitutional replies, you will accumulate a data set of several cases similar to this one. Reinforcement learning is carried out in the second step of the procedure.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai186.png" width="800"></p>
+<p>This stage is comparable to RLHF, with the exception that we now use feedback produced by a model rather than input provided by humans. RLAIF, or reinforcement learning from AI feedback, is another name for this. Here, you create a collection of responses to your prompt using the refined model from the previous stage. Then you query the model to see which of the options is preferred in light of constitutional considerations.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai187.png" width="800"></p>
+<p>The outcome is a preference dataset generated by the model that you may use to train a reward model. Now that you have this reward model, you may further optimise your model using a reinforcement learning algorithm like PPO, as was previously explained. Model alignment is a crucial subject and an active field of research. The RLHF fundamentals presented in this article will enable you to follow along as the field develops.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">6</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> by DeepLearning.ai and AWS - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

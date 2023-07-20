@@ -13,6 +13,12 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-07-20-llm-application-considerations-2.html",
+      "/posts/2023-07-19-llm-application-considerations-1.html",
+      "/posts/2023-07-18-fine-tune-llm-to-detoxify-text-summaries.html",
+      "/posts/2023-07-17-proximal-policy-optimisation.html",
+      "/posts/2023-07-16-reinforcement-learning-with-human-feedback-2.html",
+      "/posts/2023-07-15-reinforcement-learning-with-human-feedback-1.html",
       "/posts/2023-07-14-finetune-generative-ai-model-summarisation.html",
       "/posts/2023-07-13-parameter-efficient-fine-tuning-of-llms.html",
       "/posts/2023-07-12-evaluating-fine-tuned-large-language-models.html",

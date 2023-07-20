@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-19">
+<meta name="description" content="In this post we look at several aspects to consider when deploying a Large Language Model (LLM) into an application such as Model optimizations, a Generative AI project lifecycle cheat sheet, and how LLM’s can be turned into useful applications using external data sources and services.">
+
+<title>LivingDataLab - LLM Application Considerations - Part 1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - LLM Application Considerations - Part 1">
+<meta property="og:description" content="In this post we  look at several aspects to consider when deploying a Large Language Model (LLM) into an application such as Model optimizations, a Generative AI project lifecycle cheat sheet, and…">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/genai3.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - LLM Application Considerations - Part 1">
+<meta name="twitter:description" content="In this post we  look at several aspects to consider when deploying a Large Language Model (LLM) into an application such as Model optimizations, a Generative AI project lifecycle cheat sheet, and…">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/genai3.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">LLM Application Considerations - Part 1</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">LLM Application Considerations - Part 1</h1>
+                  <div>
+        <div class="description">
+          In this post we look at several aspects to consider when deploying a Large Language Model (LLM) into an application such as Model optimizations, a Generative AI project lifecycle cheat sheet, and how LLM’s can be turned into useful applications using external data sources and services.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 19, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#model-optimizations-for-deployment" id="toc-model-optimizations-for-deployment" class="nav-link" data-scroll-target="#model-optimizations-for-deployment"><span class="toc-section-number">2</span>  Model optimizations for deployment</a>
+  <ul class="collapse">
+  <li><a href="#distillation" id="toc-distillation" class="nav-link" data-scroll-target="#distillation"><span class="toc-section-number">2.1</span>  Distillation</a></li>
+  <li><a href="#quantization" id="toc-quantization" class="nav-link" data-scroll-target="#quantization"><span class="toc-section-number">2.2</span>  Quantization</a></li>
+  <li><a href="#pruning" id="toc-pruning" class="nav-link" data-scroll-target="#pruning"><span class="toc-section-number">2.3</span>  Pruning</a></li>
+  </ul></li>
+  <li><a href="#generative-ai-project-lifecycle-cheat-sheet" id="toc-generative-ai-project-lifecycle-cheat-sheet" class="nav-link" data-scroll-target="#generative-ai-project-lifecycle-cheat-sheet"><span class="toc-section-number">3</span>  Generative AI Project Lifecycle Cheat Sheet</a></li>
+  <li><a href="#using-the-llm-in-applications" id="toc-using-the-llm-in-applications" class="nav-link" data-scroll-target="#using-the-llm-in-applications"><span class="toc-section-number">4</span>  Using the LLM in applications</a>
+  <ul class="collapse">
+  <li><a href="#retrieval-augmented-generation-rag" id="toc-retrieval-augmented-generation-rag" class="nav-link" data-scroll-target="#retrieval-augmented-generation-rag"><span class="toc-section-number">4.1</span>  Retrieval Augmented Generation (RAG)</a></li>
+  </ul></li>
+  <li><a href="#interacting-with-external-applications" id="toc-interacting-with-external-applications" class="nav-link" data-scroll-target="#interacting-with-external-applications"><span class="toc-section-number">5</span>  Interacting with external applications</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">6</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In this article we will look at several aspects to consider when deploying a Large Language Model (LLM) into an application. We will look at Model optimizations, a Generative AI project lifecycle cheat sheet, and how LLM’s can be turned into useful applications using external data sources and services.</p>
+</section>
+<section id="model-optimizations-for-deployment" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="model-optimizations-for-deployment"><span class="header-section-number">2</span> Model optimizations for deployment</h2>
+<p>At this stage of creating an LLM-based application, there are a number of crucial issues to ask. The first group of questions concerns the operation of your LLM during deployment. How quickly does your model need to produce completions, then? What computing budget do you have? How willing are you to sacrifice model performance in exchange for faster inference or less storage? The second series of queries relates to any additional resources that your model might require. Will your model communicate with other applications or external data? In this case, how will you access those resources? The question of how your model will be used comes later.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai205.png" width="800"></p>
+<p>What will the planned application or API interface look like where your model will be used? Let’s begin by going over several techniques that may be utilised to improve your model before putting it to use for inference. The purpose of this section is to provide you an introduction to the most significant optimisation strategies, even if we might devote several classes to this topic. With regard to computing and storage needs, as well as ensuring low latency for consuming applications, large language models create inference issues. These difficulties continue whether you deploy locally or to the cloud, and they get significantly worse when you deploy to edge devices.</p>
+<p>The size of the LLM can be decreased, which is one of the main approaches to enhance application performance. This may enable faster model loading, which lowers inference latency. The difficulty, though, lies in minimising the model’s size without sacrificing model performance. For generative models, some strategies work better than others, and accuracy and performance can be traded off. This section will teach you three techniques.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai206.png" width="800"></p>
+<p>Distillation trains a smaller model, the student model, using a larger model, the teacher model. Then, in order to save money on storage and computing, you utilise the smaller model for inference.</p>
+<p>Post training quantization changes a model’s weights to a lower precision representation, like a 16-bit floating point or eight-bit integer, similarly to quantization aware training. This lessens the memory footprint of your model. Model Pruning, the third strategy, eliminates superfluous model parameters that don’t significantly improve the performance of the model. Let’s go over each of these choices in greater depth.</p>
+<section id="distillation" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="distillation"><span class="header-section-number">2.1</span> Distillation</h3>
+<p>A method called “model distillation” focuses on training a larger teacher model to become a smaller student model. The student model picks up on the teacher model’s statistical mimicking behaviour, perhaps simply in the final prediction layer or in all of the model’s hidden layers.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai207.png" width="800"></p>
+<p>You begin by creating a smaller LLM for your student model after fine-tuning your LLM as your instructor model. The weights of the teacher model are frozen, and it is used to produce completions for your training set. Using your student model, you produce completions for the training data concurrently.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai208.png" width="800"></p>
+<p>By minimising a loss function known as the distillation loss, the knowledge distillation between the instructor and student models is accomplished. Distillation uses the probability distribution over tokens that the softmax layer of the instructor model generates to calculate this loss. On the basis of the training data, the teacher model has already been improved.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai209.png" width="800"></p>
+<p>The probability distribution will probably have little variance in tokens and closely reflect the ground truth data. Due to this, Distillation uses a clever approach by modifying the softmax function’s temperature parameter. The model produces more inventive language at higher temperatures.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai210.png" width="800"></p>
+<p>The probability distribution broadens and the peak weakens as the temperature parameter increases. You receive a set of tokens from this softer distribution that are comparable to the ground truth tokens. In the context of distillation, the predictions made by the student model are frequently referred to as soft predictions and the output of the instructor model as soft labels. On the basis of your ground truth training data, you simultaneously train the student model to produce the accurate predictions.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai211.png" width="800"></p>
+<p>Here, you use the conventional softmax function rather than changing the temperature setting. The student model outputs are referred to as the “hard predictions” and “hard labels” in distillation. The student loses out between these two. The weights of the student model are updated through back propagation using the combined distillation and student losses. The main advantage of distillation approaches is that the smaller student model, rather than the teacher model, can be employed for inference in deployment.</p>
+<p>In actuality, generative decoder model distillation is less efficient. It usually works better for encoder-only models with a lot of representation redundancy, like BERT. Be aware that while using distillation, you train a second, smaller model that will be used for inference. In no way are you diminishing the initial LLM’s model size.</p>
+</section>
+<section id="quantization" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="quantization"><span class="header-section-number">2.2</span> Quantization</h3>
+<p>Let’s look at the next model optimisation method that actually makes your LLM smaller. In an <a href="https://livingdatalab.com/posts/2023-07-07-computational-challenges-of-training-llms.html">earlier article</a>, we learned about the second technique, quantization. in particular Quantization Aware Training, or just QAT. However, we can use post training quantization, or PTQ for short, to optimise a model for deployment after it has been trained. The PTQ algorithm converts a model’s weights to a representation with less accuracy, such as an 8-bit integer or 16-bit floating point. Quantization can be performed to either the model weights or to both weights and activation layers in order to minimise the model size, memory footprint, and compute resources required for model servicing.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai212.png" width="800"></p>
+<p>In general, quantization methods that take activations into account can affect model performance more. In order to statistically represent the dynamic range of the original parameter values, quantization also necessitates an additional calibration step. There are drawbacks because quantization occasionally causes a tiny percentage loss in model assessment measures, just like with other approaches. However, the cost savings and performance improvements can frequently outweigh that reduction.</p>
+</section>
+<section id="pruning" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pruning"><span class="header-section-number">2.3</span> Pruning</h3>
+<p>Pruning is the final model optimisation method. At a high level, the objective is to decrease the size of the model for inference by removing weights that don’t significantly improve the performance of the model as a whole. These weights have values that are extremely close to or equal to zero. Be aware that while some pruning techniques need for a complete retraining of the model, others, like LoRA, fall under the category of parameter efficient fine tuning. Additionally, there are techniques that emphasise post-training pruning.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai213.png" width="800"></p>
+<p>Theoretically, this shrinks the size of the model and enhances functionality. However, in practise, if only a tiny portion of the model weights are close to zero, there might not be much of an impact on the size and performance.</p>
+<p>All three techniques — Quantization, Distillation, and Pruning — seek to shrink the size of the model while improving inference performance. By making your model deployment-ready, you can make sure that your application runs smoothly and gives users the greatest possible experience.</p>
+</section>
+</section>
+<section id="generative-ai-project-lifecycle-cheat-sheet" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="generative-ai-project-lifecycle-cheat-sheet"><span class="header-section-number">3</span> Generative AI Project Lifecycle Cheat Sheet</h2>
+<p>This cheat sheet could provide you some idea of how much time and effort will be needed for each stage of the generative AI project life cycle planning process.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai214.png" width="800"></p>
+<p>It can take a lot of work to pre-train a big language model, as we saw in earlier articles. The judgements you’ll need to make regarding the model design, the quantity of training data needed, and the level of knowledge necessary make this stage the most challenging. But keep in mind that you will often begin your development work with an established foundation model. Most likely, you can skip this step.</p>
+<p>Working with a foundation model will probably allow you to evaluate the model’s performance by prompt engineering, which needs less technical know-how and doesn’t require further model training.</p>
+<p>Next, you’ll consider prompt and fine tuning if your model isn’t performing as you require. The strategies you’ll test could range from full fine-tuning to parameter-efficient fine tuning techniques (PEFT) like LoRA or prompt tuning, depending on your use case, performance requirements, and compute budget. For this activity, some level of technical proficiency is necessary. However, since fine-tuning can be quite effective with a modest training dataset, this stage might be finished in a single day.</p>
+<p>Once you have your trained reward model, aligning your model using reinforcement learning from human feedback can be done quickly. You’ll probably find out if you can use an existing reward model for this task. However, given the time and effort required to acquire human feedback, it can take a while to train a reward model from scratch.</p>
+<p>Last but not least, optimisation approaches, usually lie somewhere in the centre in terms of complexity and effort, but they can move along quite fast if the changes to the model don’t significantly affect performance. After completing all of these stages, you should have a great LLM that has been trained, tweaked, and is ready for deployment for your particular use case.</p>
+</section>
+<section id="using-the-llm-in-applications" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="using-the-llm-in-applications"><span class="header-section-number">4</span> Using the LLM in applications</h2>
+<p>Even though the training, adjusting, and alignment methods we’ve looked at can all help you create a fantastic model for your application, there are some more general issues with large language models that training alone cannot address. Let’s look at a few instances.</p>
+<p>One problem is that a model’s internal knowledge ends at the point of pretraining. For instance, a model trained in early 2022 would likely respond with Boris Johnson if you asked it who the British Prime Minister is. To be fair to the model, it’s easy to get out of date with UK Prime Ministers given they seem to change every 3 days. This information is clearly outdated, Johnson resigned from his position in late 2022, although the model is unaware of this because it was trained before that time.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai215.png" width="800"></p>
+<p>Complex maths can be challenging for models as well. Depending on how challenging the task is, if you ask a model to act like a calculator, it might not come up with the correct answer. Here, you instruct the model to solve a division puzzle. The model provides a result that is close to the true value, but it is unreliable. Keep in mind that the LLMs don’t perform mathematical calculations. They are still only attempting to forecast the subsequent best token based on their prior experience, which makes it easy for them to guess incorrectly. Last but not least, one of the most well-known issues with LLMs is their propensity to produce text even when they are unsure of the solution to a problem.</p>
+<p>Here, you can see the model explicitly inventing a description of an inexistent plant, the Martian Dunetree. This is sometimes referred to as hallucination. The model will joyfully tell you that there is life on Mars even though there is still no proof of it. By connecting to other data sources and applications, you’ll learn about several approaches in this part that you may use to assist your LLM in resolving these problems. To connect your LLM to these external components and completely integrate everything for deployment within your application, you’ll need to put in a little more effort.</p>
+<p>Your application must control how user input is passed to the extensive language model and how completions are returned. Usually, some sort of orchestration library is used for this. This layer has the potential to enable certain potent technologies that will supplement and improve the LLM’s runtime performance. by allowing users to connect to existing APIs of other programmes or giving them access to additional data sources. Langchain is one application framework that can greatly help with this, which I have <a href="../#category=langchain">written many posts about</a> previously. Let’s begin by thinking about how to link LLMs to other data sources.</p>
+<section id="retrieval-augmented-generation-rag" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="retrieval-augmented-generation-rag"><span class="header-section-number">4.1</span> Retrieval Augmented Generation (RAG)</h3>
+<p>Retrieval Augmented Generation, also known as RAG, is a framework for creating LLM-powered systems that utilise outside data sources and applications to get over some of the drawbacks of these models. The knowledge cutoff problem can be solved and the model’s grasp of the world is updated with the use of RAG. While you could retrain the model using fresh data, doing so would quickly get highly expensive and necessitate further retraining in order to keep the model current. Giving your model access to more data at the inference stage is a more adaptable and affordable technique to get around knowledge cutoffs. RAG is helpful in any situation when you need to provide the language model access to information that it might not otherwise have.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai219.png" width="800"></p>
+<p>This might be fresh information documents that weren’t part of the initial training materials or confidential information kept in your company’s secure databases. External data can help your model produce completions that are more accurate and relevant. Let’s examine this process in more detail. Retrieval augmented generation is a framework for giving LLMs access to data they were not shown during training, rather than a specific collection of technology. There are numerous implementations available, and which one you select will depend on the specifics of your assignment and the format of the data you must use. Here, you may follow along with the implementation described in one of Facebook researchers’ earlier publications on RAG, which was first released in 2020.</p>
+<p>The Retriever model component, which comprises of a query encoder and an external data source, is the brains behind this system. The encoder converts the user’s input request into a form that can be used to query the data source after receiving it from the user. The external data in the Facebook paper is a vector store, which we’ll go into more detail about in a moment. But it might also be a CSV file, SQL database, or another type of data storage format. Together, these two components are trained to locate the external data documents that are most pertinent to the input query.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai221.png" width="800"></p>
+<p>The best single or group of documents are returned by the Retriever from the data source, and the fresh data is combined with the initial user query. The language model is then given the new enlarged prompt, and it creates a completion using the data.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai222.png" width="800"></p>
+<p>Let’s look at a more particular illustration. Consider yourself a lawyer who uses a sizable language model to aid in case discovery. You can use a Rag architecture to query a corpus of documents, such as earlier court filings. You enquire about the plaintiff in this case by giving the model the case number.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai223.png" width="800"></p>
+<p>The query encoder receives the command and encodes the data according to the format of the external documents. and then looks for a pertinent entry in the document corpus. The Retriever then integrates the new text with the old query after locating a passage of text that includes the needed information. The LLM is then given the enlarged prompt, which now includes details on the particular case of interest.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai224.png" width="800"></p>
+<p>The model creates a completion that provides the right response using the data in the context of the prompt. The use case you have seen so far is very straightforward and only provides access to one piece of information that is readily available elsewhere. But consider Rag’s capability to produce file summaries or locate particular individuals, places, or businesses within the entire corpus of legal records. The model’s usefulness for this particular use case is considerably increased by giving it access to the data in this external data source.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai225.png" width="800"></p>
+<p>Rag assists you in avoiding the issue of the model hallucinating when it doesn’t know the solution in addition to overcoming knowledge cutoffs. Several different kinds of external information sources can be integrated using RAG designs. Access to local documents, such as private wikis and expert systems, can be used to supplement huge language models. Rag can also make it possible to access the Internet and retrieve data from websites like Wikipedia. RAG may communicate with databases by encoding the user input prompt as a SQL query. A Vector Store, which includes text-based vector representations, is another significant method of data storing.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai226.png" width="800"></p>
+<p>Since language models internally generate text using vector representations of language, this data format is especially helpful for them. A quick and effective search based on similarity is made possible by vector storage. It should be noted that implementing RAG entails a bit more work than merely including text in the large language model. Starting with the size of the context window, there are a few important factors to be mindful of. The majority of text sources are too lengthy to fit into the model’s constrained context window, which is still only a few thousand tokens at most. The external data sources are instead divided into numerous pieces that can all fit within the context window. You may let packages like Langchain take care of this for you.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai227.png" width="800"></p>
+<p>Second, the data must be accessible in a way that makes it simple to find the most pertinent content. Remember that large language models produce vector representations of each token in an embedding space rather than working directly with text. By using metrics like cosine similarity, which you previously taught about, these embedding vectors enable the LLM to find words that are semantically connected to one another. Rag techniques use a broad language model to transform the small pieces of external data into embedding vectors for each. These novel data representations can be stored in vector store structures, which facilitate quick dataset searches and accurate text identification based on semantic similarity.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai228.png" width="800"></p>
+<p>An implementation of a vector store where each vector is also given a key is called a vector database. This might enable the text produced by RAG, for example, to also contain a citation to the source document. You’ve now seen how a model can overcome internal knowledge constraints with access to external data sources. You may significantly enhance your users’ experience with your application by giving them current, pertinent information and avoiding hallucinations.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai229.png" width="800"></p>
+</section>
+</section>
+<section id="interacting-with-external-applications" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="interacting-with-external-applications"><span class="header-section-number">5</span> Interacting with external applications</h2>
+<p>You saw how LLMs can interact with outside datasets in the previous section. Let’s now examine how they can communicate with outside apps. Let’s look at the connectors required to enable an app to fully handle a return request during this demonstration of one customer’s contact with ShopBot. The customer has stated in this conversation that they wish to return some genes they purchased. When the consumer responds, ShopBot prompts them for the order number.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai230.png" width="800"></p>
+<p>The order number is then searched for in the transaction database by ShopBot. A rag implementation similar to the one you saw earlier in the last video is one way it might accomplish this. Instead of retrieving data from a corpus of documents in this instance, you would probably be retrieving data through a SQL query to a back-end order database. The next step is to verify the items that will be returned when ShopBot has retrieved the customer’s order. If the customer would like to return anything other than the jeans, the bot will ask them.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai231.png" width="800"></p>
+<p>After the user responds, the bot sends a request for a return label to the company’s shipping partner. The body asks for the label using the standard Python API. The shipping label will be sent to the purchaser through email by ShopBot. Additionally, it requests their email address confirmation. When the consumer responds, the bot includes their email address in the API request to the shipper. The customer receives an email confirming receipt of the label after the API request is finished, and the dialogue ends. This little example demonstrates just one conceivable set of interactions that an LLM would be required to be effective in.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai232.png" width="800"></p>
+<p>LLMs’ utility may generally be increased beyond linguistic tasks by linking them to external applications and enabling the model to communicate with the outside world. LLMs can be used to initiate actions when given the capacity to communicate with APIs, as demonstrated by the example from the store-bought item. LLMs can link up with additional programming resources. Using a Python interpreter as an illustration, models may be made to include precise computations in their outputs. It’s crucial to keep in mind that the core of these workflows is completions and prompts. The LLM, which serves as the application’s reasoning engine, will choose the actions that the app will perform in response to user requests.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai233.png" width="800"></p>
+<p>The completions produced by the LLM must have specific crucial information in order to set off activities. For the application to know what steps to take, the model must first be able to provide a set of instructions. These guidelines must be clear and align with permitted behaviour. For instance, in the ShopBot example, the crucial steps included validating the user’s email address, asking for a shipping label, and emailing the label to the user. The completion must also be formatted so that the larger programme can understand it. This could be as straightforward as using a particular sentence style or as complicated as creating a Python script or a SQL statement.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/gai234.png" width="800"></p>
+<p>Here is an example of a SQL query that checks to see if an order is stored in the database of all orders. Finally, the model might need to gather data that enables action validation. For instance, the programme had to confirm the email address the consumer had used to place the initial order during the ShopBot chat. Any data that must be collected from the user and included in the completion in order for it to be transmitted to the programme. For each of these activities, structuring the prompts correctly is crucial since it can have a significant impact on the quality of the plan that is developed or the adherence to a specified output format.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">6</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> by DeepLearning.ai and AWS - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

@@ -10,7 +10,78 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science Blog</description>
 <generator>quarto-1.2.335</generator>
-<lastBuildDate>Thu, 13 Jul 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 19 Jul 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>LLM Application Considerations - Part 2</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-20-llm-application-considerations-2.html</link>
+  <description><![CDATA[ In this second article in the series we will look at several aspects to consider when deploying a Large Language Model (LLM) into an application. We will look at chain-of-thought reasoning, program-aided language models (PAL), the REAct framework combining reason and action, application architectures, and responsible AI. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>aws</category>
+  <guid>http://livingdatalab.com/posts/2023-07-20-llm-application-considerations-2.html</guid>
+  <pubDate>Wed, 19 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai4.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>LLM Application Considerations - Part 1</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-19-llm-application-considerations-1.html</link>
+  <description><![CDATA[ In this article we will look at several aspects to consider when deploying a Large Language Model (LLM) into an application. We will look at Model optimizations, a Generative AI project lifecycle cheat sheet, and how LLM’s can be turned into useful applications using external data sources and services. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <guid>http://livingdatalab.com/posts/2023-07-19-llm-application-considerations-1.html</guid>
+  <pubDate>Tue, 18 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai3.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Fine-Tuning FLAN-T5 with Reinforcement Learning (PPO) and PEFT to Generate Less-Toxic Summaries</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-18-fine-tune-llm-to-detoxify-text-summaries.html</link>
+  <description><![CDATA[ In this project, we will fine-tune a FLAN-T5 model to generate less toxic content with Meta AI’s hate speech reward model. The reward model is a binary classifier that predicts either “not hate” or “hate” for the given text. We will use Proximal Policy Optimization (PPO) to fine-tune and reduce the model’s toxicity. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>aws</category>
+  <category>hugging-face</category>
+  <guid>http://livingdatalab.com/posts/2023-07-18-fine-tune-llm-to-detoxify-text-summaries.html</guid>
+  <pubDate>Mon, 17 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Reinforcement learning from human feedback (RLHF) using Proximal Policy Optimisation</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-17-proximal-policy-optimisation.html</link>
+  <description><![CDATA[ In an <a href="https://livingdatalab.com/posts/2023-07-15-reinforcement-learning-with-human-feedback-1.html">earlier articles</a> we introduced Reinforcement learning from human feedback (RLHF) which is an important method used in modern large language models to help improve the performance and alignment of large language models. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-17-proximal-policy-optimisation.html</guid>
+  <pubDate>Sun, 16 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai1.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Reinforcement learning from human feedback (RLHF) For LLMs - Part 2</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-16-reinforcement-learning-with-human-feedback-2.html</link>
+  <description><![CDATA[ In an <a href="https://livingdatalab.com/posts/2023-07-15-reinforcement-learning-with-human-feedback-1.html">earlier article</a> we introduced Reinforcement learning from human feedback (RLHF) which is an important method used in modern large language models to help improve the performance and alignment of large language models. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-16-reinforcement-learning-with-human-feedback-2.html</guid>
+  <pubDate>Sat, 15 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai4.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Reinforcement learning from human feedback (RLHF) For LLMs - Part 1</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-15-reinforcement-learning-with-human-feedback-1.html</link>
+  <description><![CDATA[ In this post we will introduce Reinforcement learning from human feedback (RLHF) which is an important method used in modern large language models to help improve the performance and alignment of large language models. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <guid>http://livingdatalab.com/posts/2023-07-15-reinforcement-learning-with-human-feedback-1.html</guid>
+  <pubDate>Fri, 14 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/genai3.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Fine-Tuning a Generative AI Model for Dialogue Summarization</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -168,78 +239,6 @@
   <guid>http://livingdatalab.com/posts/2023-07-01-high-level-overview-of-the-transformer-model-the-magic-behind-AI.html</guid>
   <pubDate>Fri, 30 Jun 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/genai1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Evaluating the outputs of Large Language Model Applications for Ambiguous Criteria</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-26-evaluating-outputs-of-llm-applications-ambiguous-criteria.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-26-evaluating-outputs-of-llm-applications-ambiguous-criteria.html</guid>
-  <pubDate>Sun, 25 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Evaluating the outputs of Large Language Model Applications for Clear Criteria</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-25-evaluating-outputs-of-llm-applications-clear-criteria.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-25-evaluating-outputs-of-llm-applications-clear-criteria.html</guid>
-  <pubDate>Sat, 24 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Creating Better Chatbots using Chained Prompts and Quality Checks</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-24-creating-better-chatbots-using-chained-prompts-and-quality-checks.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-24-creating-better-chatbots-using-chained-prompts-and-quality-checks.html</guid>
-  <pubDate>Fri, 23 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Checking Outputs of Large Language Models like ChatGPT</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-23-checking-outputs-of-llms-like-chatgpt.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-23-checking-outputs-of-llms-like-chatgpt.html</guid>
-  <pubDate>Thu, 22 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Chaining Multiple Prompts together using ChatGPT for Better Task Execution</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-22-chaining-multiple-prompts-together-using-chatgpt.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-22-chaining-multiple-prompts-together-using-chatgpt.html</guid>
-  <pubDate>Wed, 21 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Using Chain of Thought Reasoning with ChatGPT</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-06-21-chain-of-thought-reasoning-with-chatgpt.html</link>
-  <description><![CDATA[ Large language models such as <a href="https://openai.com/blog/chatgpt">ChatGPT</a> can generate text responses based on a given prompt or input. Writing prompts allow users to guide the language model’s output by providing a specific context or topic for the response. This feature has many practical applications, such as generating creative writing prompts, assisting in content creation, and even aiding in customer service chatbots. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-06-21-chain-of-thought-reasoning-with-chatgpt.html</guid>
-  <pubDate>Tue, 20 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/chatgpt1.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
