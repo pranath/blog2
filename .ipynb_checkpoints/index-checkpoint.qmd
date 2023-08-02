@@ -1,5 +1,5 @@
 ---
-title: "LivingDataLab Data Science Blog"
+title: "LivingDataLab Data Science & AI Blog"
 listing:
   contents: posts
   sort: "date desc"
@@ -8,7 +8,8 @@ listing:
   sort-ui: false
   filter-ui: false
   fields: [image, date, title,  description]
-  feed: true
+  feed:
+    type: partial
   page-size: 5
 page-layout: full
 title-block-banner: true

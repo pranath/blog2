@@ -1,5 +1,5 @@
 ---
-title: "LivingDataLab Data Science Blog"
+title: "LivingDataLab Data Science & AI Blog"
 listing:
   contents: posts
   sort: "date desc"

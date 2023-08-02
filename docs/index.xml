@@ -8,9 +8,69 @@
 <title>LivingDataLab</title>
 <link>http://livingdatalab.com/index.html</link>
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
-<description>LivingDataLab Data Science Blog</description>
+<description>LivingDataLab Data Science &amp; AI Blog</description>
 <generator>quarto-1.2.335</generator>
-<lastBuildDate>Wed, 19 Jul 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 24 Jul 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Chat with Your Data using Memory and Langchain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-25-chat-with-your-data-using-memory-and-langchain.html</link>
+  <description><![CDATA[ In this article we are going to give a chatbot memory to help it better ask questions about data using langchain. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <guid>http://livingdatalab.com/posts/2023-07-25-chat-with-your-data-using-memory-and-langchain.html</guid>
+  <pubDate>Mon, 24 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain1.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Questioning and Answering over Data with LangChain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-24-question-answering-over-data-with-langchain.html</link>
+  <description><![CDATA[ In this article we look at how you can split documents, extract the relevant data, take a question, pass them both to a language model, and ask it to answer the question using Langchain. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <guid>http://livingdatalab.com/posts/2023-07-24-question-answering-over-data-with-langchain.html</guid>
+  <pubDate>Sun, 23 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Advanced Vectorstore Retrieval using LangChain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-23-retrieval-using-langchain.html</link>
+  <description><![CDATA[ In this article we look at how you can retrieve content from a vectorstore using state-of-the-art methods to ensure only the most relevant content is made available for Large Language Models. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <guid>http://livingdatalab.com/posts/2023-07-23-retrieval-using-langchain.html</guid>
+  <pubDate>Sat, 22 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain3.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Vectorstores and Embeddings with LangChain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-22-vectorstores-and-embeddings-with-langchain.html</link>
+  <description><![CDATA[ In this article we look at how to convert documents into vector stores an embeddings as an important step in making content available for Large Language Models. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <guid>http://livingdatalab.com/posts/2023-07-22-vectorstores-and-embeddings-with-langchain.html</guid>
+  <pubDate>Fri, 21 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Document Splitting with LangChain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-21-document-splitting-with-langchain.html</link>
+  <description><![CDATA[ In this article we look at how you can split documents as an important step in making content available for Large Language Models. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <guid>http://livingdatalab.com/posts/2023-07-21-document-splitting-with-langchain.html</guid>
+  <pubDate>Thu, 20 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain1.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>LLM Application Considerations - Part 2</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -183,62 +243,6 @@
   <guid>http://livingdatalab.com/posts/2023-07-06-choosing-a-pretrained-llm.html</guid>
   <pubDate>Wed, 05 Jul 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Summarising Dialogue using Generative AI</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-05-summarising-dialogue-using-generative-ai.html</link>
-  <description><![CDATA[ In this article I will perform dialogue summarization using generative AI. We will explore how the input text affects the output of the model, and perform prompt engineering to direct it towards the task we need. By comparing zero shot, one shot, and few shot inferences, we will take the first steps towards prompt engineering and see how it can enhance the generative output of Large Language Models. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>hugging-face</category>
-  <guid>http://livingdatalab.com/posts/2023-07-05-summarising-dialogue-using-generative-ai.html</guid>
-  <pubDate>Tue, 04 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>An Approach to the Generative AI Project Lifecyle</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-04-generative-ai-project-lifecycle.html</link>
-  <description><![CDATA[ Recent advances in AI such as ChatGPT have demonstrated impressive abilities for performing a wide range of tasks previously only done by humans, these are known as Large Language Models (LLM’s). However, there are so many different options and methods for building applications with these models, and these are all new methods. It can seem overhelming and not obvious how to approach building Generative AI applications. In this article, I will present a high level project architecture for building Generative AI projects that could be applied to any project, which has been proposed by DeepLearning AI and AWS in their <a href="https://www.deeplearning.ai/courses/generative-ai-with-llms/">Generative AI with Large Language Models Course</a> which I recently completed. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <guid>http://livingdatalab.com/posts/2023-07-04-generative-ai-project-lifecycle.html</guid>
-  <pubDate>Mon, 03 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai4.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Generative Configuration for Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-03-generative-config-for-large-language-models.html</link>
-  <description><![CDATA[ Recent advances in AI such as ChatGPT have demonstrated impressive abilities for performing a wide range of tasks previously only done by humans, these are known as Large Language Models (LLM’s). Once you have chosen a model, you often have some configuration options that let you control the outputs. In this article we will take a high level non-technical view of what these generative configuration options allow you to do. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <guid>http://livingdatalab.com/posts/2023-07-03-generative-config-for-large-language-models.html</guid>
-  <pubDate>Sun, 02 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>A High Level Overview of Prompting and In-Context Learning for Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-02-high-level-prompting-prompt-engineering.html</link>
-  <description><![CDATA[ Recent advances in AI such as ChatGPT have demonstrated impressive abilities for performing a wide range of tasks previously only done by humans, these are known as Large Language Models (LLM’s). One key aspect for using these LLM’s is called prompting - which is how to write text requests to get the outputs you want from these models. In <a href="../#category=natural-language-processing">previous articles</a> I’ve looked at detailed practical use cases for how to make these prompts. In this article we will take a high level non-technical view of what prompting is all about, and introduce what in-context learning is. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <guid>http://livingdatalab.com/posts/2023-07-02-high-level-prompting-prompt-engineering.html</guid>
-  <pubDate>Sat, 01 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>A High Level Overview of the Transformer Model - The Magic Behind Recent Advances in AI</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-01-high-level-overview-of-the-transformer-model-the-magic-behind-AI.html</link>
-  <description><![CDATA[ Recent advances in AI such as ChatGPT have demonstrated impressive abilities for performing a wide range of tasks previously only done by humans. The key technology used in these models is called the Transformer Model. In <a href="../#category=natural-language-processing">previous articles</a> I’ve looked at the detailed theoretical underpinnings of this model as well as practical use cases. In this article we will take a high level non-technical view of key aspects of the Transformer Model that have enabled it to make the huge advances that it has made. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <guid>http://livingdatalab.com/posts/2023-07-01-high-level-overview-of-the-transformer-model-the-magic-behind-AI.html</guid>
-  <pubDate>Fri, 30 Jun 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai1.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

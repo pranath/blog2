@@ -4,6 +4,7 @@ CNAME
 posts/.env
 posts/utils.py
 posts/products.json
+posts/docs/
 devnotes.txt
 docs/CNAME
 docs/CNAME
