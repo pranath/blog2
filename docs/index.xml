@@ -10,7 +10,20 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science &amp; AI Blog</description>
 <generator>quarto-1.2.335</generator>
-<lastBuildDate>Mon, 24 Jul 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 25 Jul 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>LLaMa-2 70B Chatbot in Hugging Face and LangChain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-07-26-generation-llm-field-guide_llama-2-70b-chat-agent.html</link>
+  <description><![CDATA[ In this article we’ll explore how we can use the open source <strong>Llama-70b-chat</strong> model in both Hugging Face transformers and LangChain. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>hugging-face</category>
+  <guid>http://livingdatalab.com/posts/2023-07-26-generation-llm-field-guide_llama-2-70b-chat-agent.html</guid>
+  <pubDate>Tue, 25 Jul 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/llama2.png" medium="image" type="image/png"/>
+</item>
 <item>
   <title>Chat with Your Data using Memory and Langchain</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -231,18 +244,6 @@
   <guid>http://livingdatalab.com/posts/2023-07-07-computational-challenges-of-training-llms.html</guid>
   <pubDate>Thu, 06 Jul 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/genai3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Choosing a Pre-Trained Large Language Model</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-06-choosing-a-pretrained-llm.html</link>
-  <description><![CDATA[ The project life cycle for generative AI was introduced in this <a href="../posts/2023-07-04-generative-ai-project-lifecycle.html">previous article</a>. There are a few tasks to complete before you can launch your generative AI app, as we saw there. Selecting a model to work with comes after you have defined your use case and chosen how the LLM will operate within your application. Working with an existing model or creating your own from scratch will be your first option. In some situations, it may be advantageous to build your own model from scratch. In most cases, though, you’ll use an existing foundation model to start the process of constructing your application. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>hugging-face</category>
-  <guid>http://livingdatalab.com/posts/2023-07-06-choosing-a-pretrained-llm.html</guid>
-  <pubDate>Wed, 05 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

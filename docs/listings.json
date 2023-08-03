@@ -13,6 +13,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-07-26-generation-llm-field-guide_llama-2-70b-chat-agent.html",
       "/posts/2023-07-25-chat-with-your-data-using-memory-and-langchain.html",
       "/posts/2023-07-24-question-answering-over-data-with-langchain.html",
       "/posts/2023-07-23-retrieval-using-langchain.html",
