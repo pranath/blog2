@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-31">
+<meta name="description" content="We will examine the integration of various LLM models in LangChain in this article">
+
+<title>LivingDataLab - Popular Large Language Models Compared</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Popular Large Language Models Compared">
+<meta property="og:description" content="We will examine the integration of various LLM models in LangChain in this article">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Popular Large Language Models Compared">
+<meta name="twitter:description" content="We will examine the integration of various LLM models in LangChain in this article">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Popular Large Language Models Compared</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Popular Large Language Models Compared</h1>
+                  <div>
+        <div class="description">
+          We will examine the integration of various LLM models in LangChain in this article
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">activeloop</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 31, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#popular-llm-models-accessible-to-langchain-via-api" id="toc-popular-llm-models-accessible-to-langchain-via-api" class="nav-link" data-scroll-target="#popular-llm-models-accessible-to-langchain-via-api"><span class="toc-section-number">2</span>  Popular LLM models accessible to LangChain via API</a>
+  <ul class="collapse">
+  <li><a href="#cohere-command" id="toc-cohere-command" class="nav-link" data-scroll-target="#cohere-command"><span class="toc-section-number">2.1</span>  Cohere Command</a></li>
+  <li><a href="#gpt-3.5" id="toc-gpt-3.5" class="nav-link" data-scroll-target="#gpt-3.5"><span class="toc-section-number">2.2</span>  GPT-3.5</a></li>
+  <li><a href="#gpt-4" id="toc-gpt-4" class="nav-link" data-scroll-target="#gpt-4"><span class="toc-section-number">2.3</span>  GPT-4</a></li>
+  <li><a href="#jurassic-2" id="toc-jurassic-2" class="nav-link" data-scroll-target="#jurassic-2"><span class="toc-section-number">2.4</span>  Jurassic-2</a></li>
+  <li><a href="#stablelm" id="toc-stablelm" class="nav-link" data-scroll-target="#stablelm"><span class="toc-section-number">2.5</span>  StableLM</a></li>
+  <li><a href="#dolly-v2-12b" id="toc-dolly-v2-12b" class="nav-link" data-scroll-target="#dolly-v2-12b"><span class="toc-section-number">2.6</span>  Dolly-v2-12B</a></li>
+  <li><a href="#gpt4all" id="toc-gpt4all" class="nav-link" data-scroll-target="#gpt4all"><span class="toc-section-number">2.7</span>  GPT4ALL</a></li>
+  </ul></li>
+  <li><a href="#llm-platforms-that-can-integrate-into-langchain" id="toc-llm-platforms-that-can-integrate-into-langchain" class="nav-link" data-scroll-target="#llm-platforms-that-can-integrate-into-langchain"><span class="toc-section-number">3</span>  LLM Platforms that can integrate into LangChain</a>
+  <ul class="collapse">
+  <li><a href="#cohere" id="toc-cohere" class="nav-link" data-scroll-target="#cohere"><span class="toc-section-number">3.1</span>  Cohere</a></li>
+  <li><a href="#openai" id="toc-openai" class="nav-link" data-scroll-target="#openai"><span class="toc-section-number">3.2</span>  OpenAI</a></li>
+  <li><a href="#hugging-face-hub" id="toc-hugging-face-hub" class="nav-link" data-scroll-target="#hugging-face-hub"><span class="toc-section-number">3.3</span>  Hugging Face Hub</a></li>
+  <li><a href="#amazon-sagemakerendpoint" id="toc-amazon-sagemakerendpoint" class="nav-link" data-scroll-target="#amazon-sagemakerendpoint"><span class="toc-section-number">3.4</span>  Amazon SageMakerEndpoint</a></li>
+  <li><a href="#hugging-face-local-pipelines" id="toc-hugging-face-local-pipelines" class="nav-link" data-scroll-target="#hugging-face-local-pipelines"><span class="toc-section-number">3.5</span>  Hugging Face Local Pipelines</a></li>
+  <li><a href="#azure-openai" id="toc-azure-openai" class="nav-link" data-scroll-target="#azure-openai"><span class="toc-section-number">3.6</span>  Azure OpenAI</a></li>
+  <li><a href="#ai21" id="toc-ai21" class="nav-link" data-scroll-target="#ai21"><span class="toc-section-number">3.7</span>  AI21</a></li>
+  <li><a href="#aleph-alpha" id="toc-aleph-alpha" class="nav-link" data-scroll-target="#aleph-alpha"><span class="toc-section-number">3.8</span>  Aleph Alpha</a></li>
+  <li><a href="#banana" id="toc-banana" class="nav-link" data-scroll-target="#banana"><span class="toc-section-number">3.9</span>  Banana</a></li>
+  <li><a href="#cerebriumai" id="toc-cerebriumai" class="nav-link" data-scroll-target="#cerebriumai"><span class="toc-section-number">3.10</span>  CerebriumAI</a></li>
+  <li><a href="#deepinfra" id="toc-deepinfra" class="nav-link" data-scroll-target="#deepinfra"><span class="toc-section-number">3.11</span>  DeepInfra</a></li>
+  <li><a href="#forefrontai" id="toc-forefrontai" class="nav-link" data-scroll-target="#forefrontai"><span class="toc-section-number">3.12</span>  ForefrontAI</a></li>
+  <li><a href="#gooseai" id="toc-gooseai" class="nav-link" data-scroll-target="#gooseai"><span class="toc-section-number">3.13</span>  GooseAI</a></li>
+  <li><a href="#llama-cpp" id="toc-llama-cpp" class="nav-link" data-scroll-target="#llama-cpp"><span class="toc-section-number">3.14</span>  Llama-cpp</a></li>
+  <li><a href="#manifest" id="toc-manifest" class="nav-link" data-scroll-target="#manifest"><span class="toc-section-number">3.15</span>  Manifest</a></li>
+  <li><a href="#modal" id="toc-modal" class="nav-link" data-scroll-target="#modal"><span class="toc-section-number">3.16</span>  Modal</a></li>
+  <li><a href="#nlp-cloud" id="toc-nlp-cloud" class="nav-link" data-scroll-target="#nlp-cloud"><span class="toc-section-number">3.17</span>  NLP Cloud</a></li>
+  <li><a href="#petals" id="toc-petals" class="nav-link" data-scroll-target="#petals"><span class="toc-section-number">3.18</span>  Petals</a></li>
+  <li><a href="#pipelineai" id="toc-pipelineai" class="nav-link" data-scroll-target="#pipelineai"><span class="toc-section-number">3.19</span>  PipelineAI</a></li>
+  <li><a href="#predictionguard" id="toc-predictionguard" class="nav-link" data-scroll-target="#predictionguard"><span class="toc-section-number">3.20</span>  PredictionGuard</a></li>
+  <li><a href="#promptlayer-openai" id="toc-promptlayer-openai" class="nav-link" data-scroll-target="#promptlayer-openai"><span class="toc-section-number">3.21</span>  PromptLayer OpenAI</a></li>
+  <li><a href="#replicate" id="toc-replicate" class="nav-link" data-scroll-target="#replicate"><span class="toc-section-number">3.22</span>  Replicate</a></li>
+  <li><a href="#runhouse" id="toc-runhouse" class="nav-link" data-scroll-target="#runhouse"><span class="toc-section-number">3.23</span>  Runhouse</a></li>
+  <li><a href="#stochasticai" id="toc-stochasticai" class="nav-link" data-scroll-target="#stochasticai"><span class="toc-section-number">3.24</span>  StochasticAI</a></li>
+  <li><a href="#writer" id="toc-writer" class="nav-link" data-scroll-target="#writer"><span class="toc-section-number">3.25</span>  Writer</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">4</span>  Conclusion</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">5</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>We will examine the integration of various LLM models in LangChain in this article. We will look at and contrast the aspects of the platforms that enable these LLM types. Some of the most well-liked pre-trained models that are publicly accessible are already supported by LangChain. We have previously covered a number of alternatives in earlier posts, including ChatGPT, GPT-4, GPT-3, and GPT4ALL.</p>
+<p>Nearly 30 connectors with well-known AI platforms are offered by this framework, including OpenAI, Cohere, Writer, and Replicate, to mention a few. Most significantly, they give you access to the Huggingface Hub API, which has more than 120K models available and is simple to integrate into your applications. There are numerous ways to use the services provided by these organisations.</p>
+<p>The payment for the API interfaces is customary. The pricing are typically based on variables like the quantity of tokens handled, as seen in OpenAI, or the amount of GPU time required for the process, as seen in Huggingface Interface or Amazon Sagemaker. The majority of these choices are quick and simple to set up. Nevertheless, it is important to remember that even though the models were developed using your valuable datasets, you do not own them. Simple pay-as-you-go access to the API is all they offer unless they are explicitly open source e.g.&nbsp;hugging face.</p>
+<p>On the other hand, it is feasible to host the models locally on your servers. You will be able to control the network and your dataset completely and only thanks to it. It is crucial to be conscious of the expenditures connected with this strategy’s hardware (a high-end GPU for low latency) and maintenance (the skills to deploy and fine-tune models). Several publicly accessible models, such LLaMA-1, are also inaccessible for commercial use - though of course the recently released LLaMA-2 is available for commerical use.</p>
+<p>Depending on factors including money, model capabilities, knowledge, and trade secrets, the best strategy differs for each use case. By providing your data to OpenAI’s API, it is simple to develop a unique fine-tuned model. If the dataset is a part of your intellectual property and cannot be shared, on the other hand, you can think about performing fine-tuning internally.</p>
+<p>Another thing to think about is the features of the various models. Its capacity to grasp languages is directly influenced by the network sizes and dataset quality. In contrast, the best solution isn’t usually a bigger model. The Ada variant of the GPT-3 has the lowest latency and is the fastest and most economical device in the collection. It is suitable for simpler jobs though, such text processing or classification. On the other hand, the most recent GPT-4 version is the biggest model to produce excellent outcomes for each task.</p>
+<p>However, because of the numerous parameters, it is the most time-consuming and expensive alternative. As a result, choosing the model based on their aptitude is equally essential. Ada may be more cost-effective for developing a conversational application, but this is not the model’s goal and will yield unsatisfactory results. (This article compares several well-known LLMs; you can read it.)</p>
+<p>The remainder of this article will introduce a number of LangChain integrations to aid in making the best decision.</p>
+</section>
+<section id="popular-llm-models-accessible-to-langchain-via-api" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="popular-llm-models-accessible-to-langchain-via-api"><span class="header-section-number">2</span> Popular LLM models accessible to LangChain via API</h2>
+<section id="cohere-command" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="cohere-command"><span class="header-section-number">2.1</span> Cohere Command</h3>
+<p>A variety of models are available through the Cohere service, including Command (command) for dialogue-like interactions, Generation (basic) for generative activities, Summarise (summarize-xlarge) for producing summaries, and more. Free, time-limited use is available for learning and prototyping. This indicates that use is cost-free up until you enter production; nevertheless, some models might cost a little more than OpenAI APIs once you do, such as $2.5 for creating 1K tokens. However, because Cohere provides increasingly tailored models for every job, this can result in a more use case-specific model having better results in subsequent tasks. It is simple to retrieve these models thanks to the LangChain’s Cohere class. Model=“MODEL_NAME&gt;”, cohere_api_key=“API_KEY&gt;”</p>
+</section>
+<section id="gpt-3.5" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="gpt-3.5"><span class="header-section-number">2.2</span> GPT-3.5</h3>
+<p>OpenAI created the language model GPT-3.5. Its turbo version, which OpenAI advises over earlier iterations, provides a less expensive way to produce human-like writing via an API reachable via OpenAI endpoints. The model can process 96 languages and is tailored for chat applications while still being effective for other generating tasks. The most affordable option from the OpenAI collection, GPT-3.5-turbo costs only $0.002 per 1000 tokens and has a context length of up to 16K tokens. Use the gpt-3.5-turbo key when initialising the ChatOpenAI or OpenAI classes to gain access to this model’s API.</p>
+</section>
+<section id="gpt-4" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="gpt-4"><span class="header-section-number">2.3</span> GPT-4</h3>
+<p>The GPT-4 model from OpenAI is a capable multimodal model with an unspecified amount of parameters or training steps. It is the newest and most powerful model that OpenAI has ever released, and thanks to its multi-modality, it can handle input from both text and images. Unfortunately, access to it requires filing an early access request via the OpenAI platform as it is not generally accessible. The model comes in two separate iterations called gpt-4 and gpt-4-32k, with context lengths of 8192 and 32768 tokens, respectively.</p>
+</section>
+<section id="jurassic-2" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="jurassic-2"><span class="header-section-number">2.4</span> Jurassic-2</h3>
+<p>The Jurassic-2 language model from AI21 comes in three sizes and several price ranges: Jumbo, Grande, and Large. Although the model sizes are private, the Jumbo version is listed in their paperwork as the most potent model. They characterise the models as being excellent at every generating task and general-purpose. Seven languages are supported by their J2 model, which may be customised using unique datasets. You can access these models by using the AI21()class and obtaining your API key from the AI21 platform.</p>
+</section>
+<section id="stablelm" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="stablelm"><span class="header-section-number">2.5</span> StableLM</h3>
+<p>Stable Diffusion created the StableLM Alpha language model, which is available via HuggingFace Hub (with the id stabilityai/stablelm-tuned-alpha-3b) to host locally or via Replicate API at a rate of $0.0002 to $0.0023 per second. There are now two sizes available: 3 billion and 7 billion parameters. The StableLM Alpha weights are accessible for commercial use and are distributed with a CC BY-SA 4.0 licence. StableLM uses a context length of 4096 tokens.</p>
+</section>
+<section id="dolly-v2-12b" class="level3" data-number="2.6">
+<h3 data-number="2.6" class="anchored" data-anchor-id="dolly-v2-12b"><span class="header-section-number">2.6</span> Dolly-v2-12B</h3>
+<p>Dolly-v2-12B is a language model developed by Databricks that may be accessible using Replicate API for the same price range as described in the previous section or HuggingFace Hub (with the id databricks/dolly-v2-3b) to host locally. It has 12 billion parameters and is accessible for commercial usage under an open source licence. Pythia-12B served as the foundation model for Dolly-v2-12B.</p>
+</section>
+<section id="gpt4all" class="level3" data-number="2.7">
+<h3 data-number="2.7" class="anchored" data-anchor-id="gpt4all"><span class="header-section-number">2.7</span> GPT4ALL</h3>
+<p>The LLaMA-1 model by meta with 7B parameters is the foundation of GPT4ALL. It is a Nomic-AI language model that may be used with GPT4ALL and Hugging Face Local Pipelines. The model is distributed under an open-source GPL 3.0 licence. However, it costs money to use it for business purposes. It is offered for use by researchers in their projects and investigations. In the previous lecture, we went through the capabilities and usage of this model.</p>
+</section>
+</section>
+<section id="llm-platforms-that-can-integrate-into-langchain" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="llm-platforms-that-can-integrate-into-langchain"><span class="header-section-number">3</span> LLM Platforms that can integrate into LangChain</h2>
+<section id="cohere" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="cohere"><span class="header-section-number">3.1</span> Cohere</h3>
+<p>Cohere is a Canadian startup that specialises in NLP models that help businesses improve human-machine interactions. With 52 billion parameters, Cohere’s Cohere xlarge model is accessible via an API. Their embedding-based fee for their API is $1 for every 1000 embeddings. The Cohere package’s installation procedure, which is necessary to access their API, is simple to follow. By building prompts with input variables and passing them to the Cohere API to generate responses, developers may easily interact with Cohere models using LangChain.</p>
+</section>
+<section id="openai" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="openai"><span class="header-section-number">3.2</span> OpenAI</h3>
+<p>One of the largest businesses specialising in extensive language models is OpenAI platform. They were the first service to bring the effectiveness of LLMs to the attention of the mainstream media by launching their conversational format, ChatGPT. Additionally, they offer a wide range of API endpoints at various price points for various NLP activities. For easy access, the LangChain library offers a variety of classes, like the ChatGPT and GPT4 classes that we have already seen in prior articles.</p>
+</section>
+<section id="hugging-face-hub" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="hugging-face-hub"><span class="header-section-number">3.3</span> Hugging Face Hub</h3>
+<p>Natural language processing (NLP) technologies, such as pre-trained language models, are developed by the company Hugging Face, which also provides a platform for creating and utilising NLP models. 20k datasets and over 120k models are hosted on the platform. They provide the Spaces service so that researchers and developers may easily build a demo and highlight the possibilities of their model. Large-scale models like StableLM by Stability AI, Dolly by DataBricks, or Camel by Writer are hosted on the platform. The models are downloaded and initialised by the HuggingFaceHub class.</p>
+<p>This opens up a wide range of models that are designed with Intel CPUs in mind. Models can be used with the aforementioned package with little to no code modification. It makes it possible for networks to benefit from Intel®’s® cutting-edge architectural designs, greatly enhancing the performance of CPU and GPU lines. For instance, the data show a 3.8 speedup when using the Intel® Xeon® 4s CPU to run the BLOOMZ model (text-to-image) in comparison to the previous version with no changes to the architecture or weights. The inference speed rate nearly doubled to 6.5 times its initial value when the aforementioned optimisation library was combined with a 4th generation Intel Xeon CPU. (online example) Two more well-known models that make use of these efficiency benefits are Whisper and GPT-J.</p>
+</section>
+<section id="amazon-sagemakerendpoint" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="amazon-sagemakerendpoint"><span class="header-section-number">3.4</span> Amazon SageMakerEndpoint</h3>
+<p>The infrastructure provided by Amazon SageMaker makes it simple for customers to host and train their machine learning models. It is an environment with great performance and low cost for testing and using large-scale models. The LangChain library offers a straightforward user interface that makes it easier to query the deployed models. Therefore, writing API codes is not required in order to access the model. The endpoint_name, which is the model’s distinctive name from SageMaker, can be used to load a model, together with credentials_profile_name, which is the name of the profile you want to use for authentication.</p>
+</section>
+<section id="hugging-face-local-pipelines" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="hugging-face-local-pipelines"><span class="header-section-number">3.5</span> Hugging Face Local Pipelines</h3>
+<p>Hugging Face Local Pipelines is a potent tool that enables users to use the HuggingFacePipeline class to execute Hugging Face models locally. The Hugging Face Model Hub is home to an incredible collection of over 120,000 models, 20,000 datasets, and 50,000 demo apps (Spaces), all of which are open source and publicly accessible. This makes it simple for people to work together and develop machine learning models.</p>
+<p>Users can either use the HuggingFaceHub class to call the hosted inference endpoints or the local pipeline wrapper to access these models. The Transformers Python package needs to be installed before continuing. Once installed, users can use the model_id, task, and any other model parameters to load the specified model. By constructing a PromptTemplate and LLMChain object and passing the input through it, the model may then be merged into an LLMChain.</p>
+</section>
+<section id="azure-openai" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="azure-openai"><span class="header-section-number">3.6</span> Azure OpenAI</h3>
+<p>The Azure platform from Microsoft enables access to OpenAI’s models as well.</p>
+</section>
+<section id="ai21" class="level3" data-number="3.7">
+<h3 data-number="3.7" class="anchored" data-anchor-id="ai21"><span class="header-section-number">3.7</span> AI21</h3>
+<p>Through their API, AI21 provides customers with access to their robust Jurassic-2 large language models. Their Jurassic-2 model, which boasts 178 billion parameters, is accessible via the API. For every 1,000 tokens, the API costs only $0.01, which is pretty affordable. The AI21 models can be readily interacted with by developers by using LangChain to create prompts that take input variables into account. Developers can benefit from their potent language processing skills with this straightforward method.</p>
+</section>
+<section id="aleph-alpha" class="level3" data-number="3.8">
+<h3 data-number="3.8" class="anchored" data-anchor-id="aleph-alpha"><span class="header-section-number">3.8</span> Aleph Alpha</h3>
+<p>The Luminous series of large language models is a product line offered by Aleph Alpha. The three models in the Luminous family—Luminous-base, Luminous-extended, and Luminous-supreme—vary in their levels of complexity and functionality. Token-based Aleph Alpha’s pricing model lists the basic prices for each model for every 1000 input tokens in the table. Each of the four Luminous models has a price per 1000 input tokens: Luminous-base costs 0.03€, Luminous-extended costs 0.045€, Luminous-supreme costs 0.175€, and Luminous-supreme-control costs 0.21875€.</p>
+</section>
+<section id="banana" class="level3" data-number="3.9">
+<h3 data-number="3.9" class="anchored" data-anchor-id="banana"><span class="header-section-number">3.9</span> Banana</h3>
+<p>Banana is a business that focuses on machine learning infrastructure and gives programmers the resources they need to create machine learning models. By installing the Banana package, which comes with an SDK for Python, one can use LangChain to communicate with Banana models. The BANANA_API_KEY and YOUR_MODEL_KEY, which can be acquired via their site, are the next two tokens needed. The YOUR_MODEL_KEY can be used to build an object after the keys have been set. Then, after making a PromptTemplate and an LLMChain object, it is feasible to include the Banana model into an LLMChain by passing the required input through it.</p>
+</section>
+<section id="cerebriumai" class="level3" data-number="3.10">
+<h3 data-number="3.10" class="anchored" data-anchor-id="cerebriumai"><span class="header-section-number">3.10</span> CerebriumAI</h3>
+<p>A great substitute for AWS Sagemaker that offers access to a number of LLM models via its API is CerebriumAI. Whisper, MT0, FlanT5, GPT-Neo, Roberta, Pygmalion, Tortoise, and GPT4All are a some of the pre-trained LLM models that are readily available. By including the endpoint URL and other pertinent characteristics like the maximum length, temperature, etc., developers establish an instance of CerebriumAI.</p>
+</section>
+<section id="deepinfra" class="level3" data-number="3.11">
+<h3 data-number="3.11" class="anchored" data-anchor-id="deepinfra"><span class="header-section-number">3.11</span> DeepInfra</h3>
+<p>DeepInfra is a distinctive API that provides a variety of LLMs, including whisper-large, gpt2, dolly-v2-12b, and distilbert-base-multilingual-cased. It utilises A100 GPUs that are tuned for inference performance and low latency, and it is connected to LangChain via API. DeepInfra’s pricing is significantly more reasonable than Replicate’s, at $0.0005/second and $0.03/minute. We are offered a one-hour free trial of serverless GPU computing with DeepInfra so that we can test out several models.</p>
+</section>
+<section id="forefrontai" class="level3" data-number="3.12">
+<h3 data-number="3.12" class="anchored" data-anchor-id="forefrontai"><span class="header-section-number">3.12</span> ForefrontAI</h3>
+<p>Users can adjust and use a variety of open-source big language models, including GPT-J, GPT-NeoX, T5, and others, using the ForefrontAI platform. The platform has several pricing tiers, including the $29/month Starter tier, which includes 5 million serverless tokens, 5 improved models, 1 user, and Discord support. Developers have access to a variety of models with ForefrontAI that may be customised to meet our unique needs.</p>
+</section>
+<section id="gooseai" class="level3" data-number="3.13">
+<h3 data-number="3.13" class="anchored" data-anchor-id="gooseai"><span class="header-section-number">3.13</span> GooseAI</h3>
+<p>GPT-Neo, Fairseq, and GPT-J are just a few of the models that are accessible through GooseAI, a fully managed NLP-as-a-Service platform. GooseAI’s pricing is determined by the usage and various model sizes. The base price for up to 25 tokens per request for the 125M model is $0.000035, plus an extra charge of $0.000001. Install the openai package and establish the Environment API Key, which can be obtained from GooseAI, in order to use GooseAI with LangChain. You can build a GooseAI instance and specify a Prompt Template for Question and Answer once you have the API key. The LLMChain can then be started, and you can supply a query to make it work.</p>
+</section>
+<section id="llama-cpp" class="level3" data-number="3.14">
+<h3 data-number="3.14" class="anchored" data-anchor-id="llama-cpp"><span class="header-section-number">3.14</span> Llama-cpp</h3>
+<p>The LangChain framework has been easily merged with Llama-cpp, a Python binding for llama.cpp. With the use of this connection, users can access a number of LLM (Large Language Model) models that Llama-cpp provides, such as LLaMA, Alpaca, GPT4All, Chinese LLaMA/Alpaca, Vigogne (French), Vicuna, Koala, OpenBuddy (Multilingual), Pygmalion 7B, and Metharme 7B. Users now have a variety of options thanks to this connection, depending on their individual requirements for language processing. Users can take advantage of the potent language models and produce humanistic and step-by-step answers to their input inquiries by integrating Llama-cpp into LangChain.</p>
+</section>
+<section id="manifest" class="level3" data-number="3.15">
+<h3 data-number="3.15" class="anchored" data-anchor-id="manifest"><span class="header-section-number">3.15</span> Manifest</h3>
+<p>With the help of the integration tool Manifest, LangChain can perform language processing tasks more effectively and with more ease. It serves as a link between local Hugging Face models and LangChain, making it simple for users to access and use these models within LangChain. Users now have better tools for doing language processing tasks because to Manifest’s smooth integration into LangChain. Users can follow the directions, which include installing the manifest-ml package and establishing the connection settings, to use Manifest within LangChain. Once linked, users can utilise LangChain and Manifest together for a complete language processing experience.</p>
+</section>
+<section id="modal" class="level3" data-number="3.16">
+<h3 data-number="3.16" class="anchored" data-anchor-id="modal"><span class="header-section-number">3.16</span> Modal</h3>
+<p>LangChain and Modal are completely connected, enhancing the processing workflow with strong cloud capabilities. Despite the fact that Modal doesn’t offer any particular language models (LLMs), it provides the architecture needed by LangChain to take use of serverless cloud computing. The advantages of on-demand access to cloud resources from Python programmes running on local PCs can be directly reaped by users by incorporating Modal into LangChain. The Modal server can be accessed by users after they install the Modal client library and create a new token. In the LangChain example, a PromptTemplate is built to format the input and a Modal LLM is instantiated using the endpoint URL. After that, LangChain does a language processing operation, such answering a question, while also executing the LLMChain with the supplied prompt.</p>
+</section>
+<section id="nlp-cloud" class="level3" data-number="3.17">
+<h3 data-number="3.17" class="anchored" data-anchor-id="nlp-cloud"><span class="header-section-number">3.17</span> NLP Cloud</h3>
+<p>For a wide range of natural language processing (NLP) operations, NLP Cloud’s seamless integration with LangChain offers a comprehensive array of high-performance pre-trained and custom models. These models can be accessed via a REST API and are created for use in the production environment. Users can easily carry out NLP tasks like answering inquiries by executing the LLMChain with the relevant prompt.</p>
+</section>
+<section id="petals" class="level3" data-number="3.18">
+<h3 data-number="3.18" class="anchored" data-anchor-id="petals"><span class="header-section-number">3.18</span> Petals</h3>
+<p>With Petals’ smooth integration with LangChain, more than 100 billion language models can be used in a decentralised architecture akin to BitTorrent. The information in this notebook explains how to integrate Petals into the LangChain workflow. Petals provides a wide variety of language models, and its connection with LangChain improves the capability of recognising and producing natural language. Petals uses a decentralised form of operation to give users strong language processing abilities in a distributed setting.</p>
+</section>
+<section id="pipelineai" class="level3" data-number="3.19">
+<h3 data-number="3.19" class="anchored" data-anchor-id="pipelineai"><span class="header-section-number">3.19</span> PipelineAI</h3>
+<p>Because PipelineAI and LangChain are fully connected, users may scale their machine learning models in the cloud. A variety of LLM (Large Language Model) models are also available via API access through PipelineAI. It consists of the models GPT-J, Stable Diffusion, ESRGAN, DALL-E, GPT-2, and GPT-Neo, each of which has unique model capabilities and parameters. Within the LangChain ecosystem, PipelineAI enables users to take use of the scalability and power of the cloud for their machine-learning workflows.</p>
+</section>
+<section id="predictionguard" class="level3" data-number="3.20">
+<h3 data-number="3.20" class="anchored" data-anchor-id="predictionguard"><span class="header-section-number">3.20</span> PredictionGuard</h3>
+<p>LangChain easily incorporates PredictionGuard, giving users a strong shell for using language models. The predictionguard and LangChain libraries must be installed before PredictionGuard can be used within the LangChain framework. For more complex operations, PredictionGuard can also be smoothly linked into LangChain’s LLMChain. PredictionGuard improves the LangChain experience by giving language model outputs an extra measure of security and control.</p>
+</section>
+<section id="promptlayer-openai" class="level3" data-number="3.21">
+<h3 data-number="3.21" class="anchored" data-anchor-id="promptlayer-openai"><span class="header-section-number">3.21</span> PromptLayer OpenAI</h3>
+<p>PredictionGuard offers users more control and administration of their GPT prompt engineering because it is completely linked into LangChain. The PromptLayer dashboard allows for the recording, tracking, and examination of OpenAI API calls by acting as a middleman between users’ code and the OpenAI Python library. Installing the ‘promptlayer’ package is necessary to use PromptLayer with OpenAI. The PromptLayer dashboard allows users to evaluate various templates and models by attaching templates to requests.</p>
+</section>
+<section id="replicate" class="level3" data-number="3.22">
+<h3 data-number="3.22" class="anchored" data-anchor-id="replicate"><span class="header-section-number">3.22</span> Replicate</h3>
+<p>Replicate offers a large selection of LLM models for diverse purposes and integrates effortlessly into LangChain. Vicuna-13b, Bark, Speaker-Transcription, Stablelm-Tuned-Alpha-7b, Kandinsky-2, and Stable-Diffusion are a few of the LLM models that Replicate provides. These models address a wide range of topics, including text-to-image creation, speaker transcription, generative audio, language production, and language modelling. Each model offers unique features and attributes, allowing users to select the model that best suits their requirements. Based on the computing power needed to execute the models, Replicate offers variable pricing choices. The deployment of unique machine learning models at scale is made simpler via replication. Users may effectively interact with these models by integrating Replicate into LangChain.</p>
+</section>
+<section id="runhouse" class="level3" data-number="3.23">
+<h3 data-number="3.23" class="anchored" data-anchor-id="runhouse"><span class="header-section-number">3.23</span> Runhouse</h3>
+<p>Runhouse offers strong remote computation and data management capabilities across various environments and users by being effortlessly integrated into LangChain. Runhouse gives you the option to employ on-demand GPUs from cloud service providers like AWS, GCP, and Azure or host models on your own GPU hardware. In LangChain, Runhouse offers a number of LLM models that can be used, including gpt2 and google/flan-t5-small. The preferred hardware configuration can be specified by users. Users can quickly build sophisticated language model workflows by fusing Runhouse with LangChain, facilitating effective model execution and collaboration across many contexts and users.</p>
+</section>
+<section id="stochasticai" class="level3" data-number="3.24">
+<h3 data-number="3.24" class="anchored" data-anchor-id="stochasticai"><span class="header-section-number">3.24</span> StochasticAI</h3>
+<p>By giving users a productive and user-friendly environment for model interaction and deployment, StochasticAI seeks to streamline the workflow of deep learning models within LangChain. It offers a simplified procedure for managing the lifecycle of Deep Learning models. The deployment of models into production is made easier by StochasticAI’s Acceleration Platform, which makes processes like model uploading, versioning, training, compression, and acceleration simple. Users may easily communicate with StochasticAI models within LangChain. StochasticAI offers the FLAN-T5, GPT-J, Stable Diffusion 1, and Stable Diffusion 2 LLM models. For a variety of language-related activities, these models provide a wide range of capabilities.</p>
+</section>
+<section id="writer" class="level3" data-number="3.25">
+<h3 data-number="3.25" class="anchored" data-anchor-id="writer"><span class="header-section-number">3.25</span> Writer</h3>
+<p>The writer is smoothly linked into LangChain, giving users a strong platform for producing material in a variety of languages. Users of LangChain may easily connect with a variety of LLM models to fulfil their language production needs thanks to Writer integration. Palmyra Small (128m), Palmyra 3B (3B), Palmyra Base (5B), Camel (5B), Palmyra Large (20B), InstructPalmyra (30B), Palmyra-R (30B), Palmyra-E (30B), and Silk Road are some of the LLM variants that Writer offers. These models provide various capacities for enhancing retrieval-augmented generation, generative pre-training, following instructions, and language comprehension.</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">4</span> Conclusion</h2>
+<p>It’s understable to have choice overload when integrating the aforementioned underlying principles. Because of this, we have described the many options in this article. Making an informed selection can be made easier with the use of this knowledge. You can choose to host the model locally or use a pay-as-you-go service, depending on your needs. While the latter may be more practical for individuals with less resources, the former will provide you total control over how the model is implemented. Whatever your preferences, it’s critical to pick the solution that best fits your requirements and financial constraints.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">5</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://learn.activeloop.ai/courses/langchain">LangChain &amp; Vector Databases in Production Course</a> by Activeloop - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

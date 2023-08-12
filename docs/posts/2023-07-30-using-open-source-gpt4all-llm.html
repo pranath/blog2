@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-07-30">
+<meta name="description" content="There are many Large Language Models many are not fully accesible - access to the weights and architecture of these models is limited, and even if one does it requires a large amount of resources to carry out any activities and building on top of these APIs is not free. Open-source models like GPT4All get over these limitations and increase everyones access to the LLMs">
+
+<title>LivingDataLab - Using the Open Source GPT4All Large Language Model</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Using the Open Source GPT4All Large Language Model">
+<meta property="og:description" content="There are many Large Language Models many are not fully accesible - access to the weights and architecture of these models is limited, and even if one does it requires a large amount of resources to…">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/langchain-deeplake3.png">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Using the Open Source GPT4All Large Language Model">
+<meta name="twitter:description" content="There are many Large Language Models many are not fully accesible - access to the weights and architecture of these models is limited, and even if one does it requires a large amount of resources to…">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/langchain-deeplake3.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Using the Open Source GPT4All Large Language Model</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Using the Open Source GPT4All Large Language Model</h1>
+                  <div>
+        <div class="description">
+          There are many Large Language Models many are not fully accesible - access to the weights and architecture of these models is limited, and even if one does it requires a large amount of resources to carry out any activities and building on top of these APIs is not free. Open-source models like GPT4All get over these limitations and increase everyones access to the LLMs
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">activeloop</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 30, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#how-gpt4all-works" id="toc-how-gpt4all-works" class="nav-link" data-scroll-target="#how-gpt4all-works"><span class="toc-section-number">2</span>  How GPT4All works</a></li>
+  <li><a href="#import-libs-setup" id="toc-import-libs-setup" class="nav-link" data-scroll-target="#import-libs-setup"><span class="toc-section-number">3</span>  Import Libs &amp; Setup</a></li>
+  <li><a href="#using-gpt4all" id="toc-using-gpt4all" class="nav-link" data-scroll-target="#using-gpt4all"><span class="toc-section-number">4</span>  Using GPT4All</a>
+  <ul class="collapse">
+  <li><a href="#convert-the-model" id="toc-convert-the-model" class="nav-link" data-scroll-target="#convert-the-model"><span class="toc-section-number">4.1</span>  Convert the Model</a></li>
+  <li><a href="#load-the-model-and-generate" id="toc-load-the-model-and-generate" class="nav-link" data-scroll-target="#load-the-model-and-generate"><span class="toc-section-number">4.2</span>  Load the Model and Generate</a></li>
+  </ul></li>
+  <li><a href="#documentation-example" id="toc-documentation-example" class="nav-link" data-scroll-target="#documentation-example"><span class="toc-section-number">5</span>  Documentation Example</a></li>
+  <li><a href="#poetic-example" id="toc-poetic-example" class="nav-link" data-scroll-target="#poetic-example"><span class="toc-section-number">6</span>  Poetic Example</a></li>
+  <li><a href="#mothers-day-example" id="toc-mothers-day-example" class="nav-link" data-scroll-target="#mothers-day-example"><span class="toc-section-number">7</span>  Mother’s day Example</a></li>
+  <li><a href="#explain-rain-example" id="toc-explain-rain-example" class="nav-link" data-scroll-target="#explain-rain-example"><span class="toc-section-number">8</span>  Explain Rain Example</a></li>
+  <li><a href="#rain-example-but-one-sentence-and-funny" id="toc-rain-example-but-one-sentence-and-funny" class="nav-link" data-scroll-target="#rain-example-but-one-sentence-and-funny"><span class="toc-section-number">9</span>  Rain Example, but one sentence and funny</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">10</span>  Conclusion</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">11</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>The OpenAI GPT-family models that we have discussed in previous articles are without a doubt effective. However, access to the weights and architecture of these models is limited, and even if one does, it requires a large amount of resources to carry out any activity. It is important to note that, according to a number of benchmarks, the most recent CPU generation from Intel® Xeon® 4s can perform language models more effectively.</p>
+<p>Furthermore, building on top of the accessible APIs is not free. The ongoing study of large language models (LLMs) may be constrained by these restrictions. The goal of the alternative open-source models (like GPT4All) is to get over these limitations and increase everyone’s access to the LLMs.</p>
+</section>
+<section id="how-gpt4all-works" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="how-gpt4all-works"><span class="header-section-number">2</span> How GPT4All works</h2>
+<p>GPT4All is trained using weights from Facebook’s LLaMA-1 model, which was made available for non-commercial use. However, because there are so many parameters (7 billion), it is difficult to operate the aforementioned design on your own computer. Two techniques were used by the authors to do efficient fine-tuning and inference. Since the fine-tuning procedure is outside the purview of this article, we will concentrate on inference.</p>
+<p>The ability to run GPT4All models on a CPU is their main appeal. The fact that modern PCs have potent Central Processing Units makes testing these models essentially free. Quantization is the name of the underlying algorithm that facilitates its implementation. In essence, it uses the GGML format to translate the pre-trained model weights to 4-bit precision. Therefore, the model represents the numbers with less bits. The use of this method has two key benefits:</p>
+<ol type="1">
+<li>Reducing Memory Usage: It makes deploying the models more efficient on low-resource devices.</li>
+<li>Faster Inference: The models will be faster during the generation process since there will be fewer computations.</li>
+</ol>
+<p>It is true that when utilising this method, we are slightly compromising quality. The choice is between having access to a model that is slightly underpowered or having none at all.</p>
+<p>By incorporating the models into its infrastructure and using libraries like “Intel® Extension for PyTorch” and “Intel® Neural Compressor,” it is possible to further improve the models and unlock the capabilities of the Intel® CPU. OneAPI Math Kernel Library (oneMKL), which delivers extremely effective and parallelized math routines, and Intel® Advanced Matrix Extensions (Intel® AMX), which optimises matrix operations, are just a couple of the accelerations that their CPUs offer.</p>
+<p>As well as Intel® Streaming SIMD Extensions (Intel® SIMD) to enable parallel data processing or Intel® AVX-512 to improve performance and speed up the calculations by expanding the CPU’s register size. Due to these developments, the 4th generation Intel® Xeon® processors are capable pieces of hardware for adjusting and inferring deep learning models in accordance with the cited benchmarks.</p>
+</section>
+<section id="import-libs-setup" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="import-libs-setup"><span class="header-section-number">3</span> Import Libs &amp; Setup</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain <span class="im">import</span> PromptTemplate, LLMChain</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.llms <span class="im">import</span> GPT4All</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.callbacks.base <span class="im">import</span> CallbackManager</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.callbacks.streaming_stdout <span class="im">import</span> StreamingStdOutCallbackHandler</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="using-gpt4all" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="using-gpt4all"><span class="header-section-number">4</span> Using GPT4All</h2>
+<section id="convert-the-model" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="convert-the-model"><span class="header-section-number">4.1</span> Convert the Model</h3>
+<p>The first step is to get the weights and convert them from the old format to the new one using a script from the LLaMAcpp source. This step is necessary for the LangChain library to recognise the checkpoint file.</p>
+<p>The weights file needs to be downloaded. The weights can be downloaded at <a href="https://the-eye.eu/public/AI/models/nomic-ai/gpt4all/">url</a> (be sure to get the one that ends in *.ggml.bin), or you can use the Python code snippet below to gradually download each piece of the file. The final folder is specified by the local_path variable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>template <span class="op">=</span> <span class="st">"""Question: </span><span class="sc">{question}</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">Answer: Let's think step by step."""</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> PromptTemplate(template<span class="op">=</span>template, input_variables<span class="op">=</span>[<span class="st">"question"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>local_path <span class="op">=</span> <span class="st">'./models/gpt4all-lora-quantized-ggml.bin'</span>  <span class="co"># replace with your desired local file path</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="68e12e6d-cf8d-4670-a4f8-a46500b28269">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>local_path <span class="op">=</span> <span class="st">'./models/gpt4all-lora-quantized-ggml.bin'</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>Path(local_path).parent.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Example model. Check https://github.com/nomic-ai/pyllamacpp for the latest models.</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://the-eye.eu/public/AI/models/nomic-ai/gpt4all/gpt4all-lora-quantized-ggml.bin'</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># url = 'http://gpt4all.io/models/ggml-gpt4all-l13b-snoozy.bin'</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># send a GET request to the URL to download the file. Stream since it's large</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url, stream<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># open the file in binary mode and write the contents of the response to it in chunks</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># This is a large file, so be prepared to wait.</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(local_path, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> chunk <span class="kw">in</span> tqdm(response.iter_content(chunk_size<span class="op">=</span><span class="dv">8192</span>)):</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> chunk:</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>            f.write(chunk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>514266it [01:37, 5285.36it/s]</code></pre>
+</div>
+</div>
+<p>Given that the file is 4GB in size, this operation can take some time. The downloaded file needs to be converted to the newest format at that point. The first step is to either fork the LLaMAcpp repository’s source code or to obtain it. (The git command must be set up on your computer.) Send the downloaded file to the convert.py script, then use a Python interpreter to run it.</p>
+<p>https://github.com/ggerganov/llama.cpp#using-gpt4all</p>
+<div class="cell" data-outputid="1666a53b-7a01-468b-c788-4ccdd0a6f4cf">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>git clone https:<span class="op">//</span>github.com<span class="op">/</span>ggerganov<span class="op">/</span>llama.cpp.git</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>cd llama.cpp <span class="op">&amp;&amp;</span> git checkout <span class="dv">2</span><span class="er">b26469</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Cloning into 'llama.cpp'...
+remote: Enumerating objects: 4187, done.
+remote: Counting objects: 100% (1748/1748), done.
+remote: Compressing objects: 100% (195/195), done.
+remote: Total 4187 (delta 1654), reused 1573 (delta 1553), pack-reused 2439
+Receiving objects: 100% (4187/4187), 3.64 MiB | 15.72 MiB/s, done.
+Resolving deltas: 100% (2836/2836), done.
+Note: switching to '2b26469'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c &lt;new-branch-name&gt;
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at 2b26469 convert.py: Support models which are stored in a single pytorch_model.bin (#1469)</code></pre>
+</div>
+</div>
+<p>It takes a few seconds to finish. The script will produce a new file with the name ggml-model-q4_0.bin in the same directory as the original, which can be used in the part that follows.</p>
+<div class="cell" data-outputid="52a43a78-3c31-432d-9692-5a4ec070c074">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>python3 llama.cpp<span class="op">/</span>convert.py .<span class="op">/</span>models<span class="op">/</span>gpt4all<span class="op">-</span>lora<span class="op">-</span>quantized<span class="op">-</span>ggml.<span class="bu">bin</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loading model file models/gpt4all-lora-quantized-ggml.bin
+Writing vocab...
+[  1/291] Writing tensor tok_embeddings.weight                  | size  32001 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[  2/291] Writing tensor norm.weight                            | size   4096           | type UnquantizedDataType(name='F32')
+[  3/291] Writing tensor output.weight                          | size  32001 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[  4/291] Writing tensor layers.0.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[  5/291] Writing tensor layers.0.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[  6/291] Writing tensor layers.0.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[  7/291] Writing tensor layers.0.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[  8/291] Writing tensor layers.0.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[  9/291] Writing tensor layers.0.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 10/291] Writing tensor layers.0.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 11/291] Writing tensor layers.0.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 12/291] Writing tensor layers.0.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 13/291] Writing tensor layers.1.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 14/291] Writing tensor layers.1.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 15/291] Writing tensor layers.1.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 16/291] Writing tensor layers.1.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 17/291] Writing tensor layers.1.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 18/291] Writing tensor layers.1.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 19/291] Writing tensor layers.1.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 20/291] Writing tensor layers.1.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 21/291] Writing tensor layers.1.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 22/291] Writing tensor layers.2.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 23/291] Writing tensor layers.2.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 24/291] Writing tensor layers.2.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 25/291] Writing tensor layers.2.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 26/291] Writing tensor layers.2.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 27/291] Writing tensor layers.2.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 28/291] Writing tensor layers.2.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 29/291] Writing tensor layers.2.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 30/291] Writing tensor layers.2.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 31/291] Writing tensor layers.3.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 32/291] Writing tensor layers.3.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 33/291] Writing tensor layers.3.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 34/291] Writing tensor layers.3.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 35/291] Writing tensor layers.3.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 36/291] Writing tensor layers.3.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 37/291] Writing tensor layers.3.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 38/291] Writing tensor layers.3.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 39/291] Writing tensor layers.3.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 40/291] Writing tensor layers.4.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 41/291] Writing tensor layers.4.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 42/291] Writing tensor layers.4.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 43/291] Writing tensor layers.4.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 44/291] Writing tensor layers.4.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 45/291] Writing tensor layers.4.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 46/291] Writing tensor layers.4.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 47/291] Writing tensor layers.4.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 48/291] Writing tensor layers.4.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 49/291] Writing tensor layers.5.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 50/291] Writing tensor layers.5.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 51/291] Writing tensor layers.5.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 52/291] Writing tensor layers.5.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 53/291] Writing tensor layers.5.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 54/291] Writing tensor layers.5.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 55/291] Writing tensor layers.5.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 56/291] Writing tensor layers.5.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 57/291] Writing tensor layers.5.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 58/291] Writing tensor layers.6.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 59/291] Writing tensor layers.6.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 60/291] Writing tensor layers.6.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 61/291] Writing tensor layers.6.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 62/291] Writing tensor layers.6.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 63/291] Writing tensor layers.6.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 64/291] Writing tensor layers.6.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 65/291] Writing tensor layers.6.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 66/291] Writing tensor layers.6.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 67/291] Writing tensor layers.7.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 68/291] Writing tensor layers.7.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 69/291] Writing tensor layers.7.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 70/291] Writing tensor layers.7.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 71/291] Writing tensor layers.7.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 72/291] Writing tensor layers.7.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 73/291] Writing tensor layers.7.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 74/291] Writing tensor layers.7.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 75/291] Writing tensor layers.7.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 76/291] Writing tensor layers.8.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 77/291] Writing tensor layers.8.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 78/291] Writing tensor layers.8.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 79/291] Writing tensor layers.8.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 80/291] Writing tensor layers.8.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 81/291] Writing tensor layers.8.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 82/291] Writing tensor layers.8.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 83/291] Writing tensor layers.8.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 84/291] Writing tensor layers.8.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 85/291] Writing tensor layers.9.attention.wq.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 86/291] Writing tensor layers.9.attention.wk.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 87/291] Writing tensor layers.9.attention.wv.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 88/291] Writing tensor layers.9.attention.wo.weight           | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 89/291] Writing tensor layers.9.attention_norm.weight         | size   4096           | type UnquantizedDataType(name='F32')
+[ 90/291] Writing tensor layers.9.feed_forward.w1.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 91/291] Writing tensor layers.9.feed_forward.w2.weight        | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 92/291] Writing tensor layers.9.feed_forward.w3.weight        | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 93/291] Writing tensor layers.9.ffn_norm.weight               | size   4096           | type UnquantizedDataType(name='F32')
+[ 94/291] Writing tensor layers.10.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 95/291] Writing tensor layers.10.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 96/291] Writing tensor layers.10.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 97/291] Writing tensor layers.10.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[ 98/291] Writing tensor layers.10.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[ 99/291] Writing tensor layers.10.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[100/291] Writing tensor layers.10.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[101/291] Writing tensor layers.10.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[102/291] Writing tensor layers.10.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[103/291] Writing tensor layers.11.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[104/291] Writing tensor layers.11.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[105/291] Writing tensor layers.11.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[106/291] Writing tensor layers.11.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[107/291] Writing tensor layers.11.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[108/291] Writing tensor layers.11.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[109/291] Writing tensor layers.11.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[110/291] Writing tensor layers.11.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[111/291] Writing tensor layers.11.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[112/291] Writing tensor layers.12.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[113/291] Writing tensor layers.12.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[114/291] Writing tensor layers.12.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[115/291] Writing tensor layers.12.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[116/291] Writing tensor layers.12.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[117/291] Writing tensor layers.12.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[118/291] Writing tensor layers.12.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[119/291] Writing tensor layers.12.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[120/291] Writing tensor layers.12.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[121/291] Writing tensor layers.13.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[122/291] Writing tensor layers.13.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[123/291] Writing tensor layers.13.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[124/291] Writing tensor layers.13.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[125/291] Writing tensor layers.13.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[126/291] Writing tensor layers.13.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[127/291] Writing tensor layers.13.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[128/291] Writing tensor layers.13.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[129/291] Writing tensor layers.13.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[130/291] Writing tensor layers.14.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[131/291] Writing tensor layers.14.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[132/291] Writing tensor layers.14.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[133/291] Writing tensor layers.14.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[134/291] Writing tensor layers.14.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[135/291] Writing tensor layers.14.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[136/291] Writing tensor layers.14.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[137/291] Writing tensor layers.14.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[138/291] Writing tensor layers.14.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[139/291] Writing tensor layers.15.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[140/291] Writing tensor layers.15.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[141/291] Writing tensor layers.15.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[142/291] Writing tensor layers.15.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[143/291] Writing tensor layers.15.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[144/291] Writing tensor layers.15.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[145/291] Writing tensor layers.15.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[146/291] Writing tensor layers.15.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[147/291] Writing tensor layers.15.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[148/291] Writing tensor layers.16.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[149/291] Writing tensor layers.16.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[150/291] Writing tensor layers.16.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[151/291] Writing tensor layers.16.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[152/291] Writing tensor layers.16.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[153/291] Writing tensor layers.16.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[154/291] Writing tensor layers.16.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[155/291] Writing tensor layers.16.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[156/291] Writing tensor layers.16.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[157/291] Writing tensor layers.17.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[158/291] Writing tensor layers.17.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[159/291] Writing tensor layers.17.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[160/291] Writing tensor layers.17.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[161/291] Writing tensor layers.17.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[162/291] Writing tensor layers.17.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[163/291] Writing tensor layers.17.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[164/291] Writing tensor layers.17.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[165/291] Writing tensor layers.17.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[166/291] Writing tensor layers.18.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[167/291] Writing tensor layers.18.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[168/291] Writing tensor layers.18.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[169/291] Writing tensor layers.18.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[170/291] Writing tensor layers.18.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[171/291] Writing tensor layers.18.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[172/291] Writing tensor layers.18.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[173/291] Writing tensor layers.18.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[174/291] Writing tensor layers.18.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[175/291] Writing tensor layers.19.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[176/291] Writing tensor layers.19.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[177/291] Writing tensor layers.19.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[178/291] Writing tensor layers.19.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[179/291] Writing tensor layers.19.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[180/291] Writing tensor layers.19.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[181/291] Writing tensor layers.19.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[182/291] Writing tensor layers.19.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[183/291] Writing tensor layers.19.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[184/291] Writing tensor layers.20.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[185/291] Writing tensor layers.20.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[186/291] Writing tensor layers.20.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[187/291] Writing tensor layers.20.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[188/291] Writing tensor layers.20.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[189/291] Writing tensor layers.20.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[190/291] Writing tensor layers.20.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[191/291] Writing tensor layers.20.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[192/291] Writing tensor layers.20.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[193/291] Writing tensor layers.21.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[194/291] Writing tensor layers.21.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[195/291] Writing tensor layers.21.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[196/291] Writing tensor layers.21.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[197/291] Writing tensor layers.21.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[198/291] Writing tensor layers.21.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[199/291] Writing tensor layers.21.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[200/291] Writing tensor layers.21.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[201/291] Writing tensor layers.21.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[202/291] Writing tensor layers.22.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[203/291] Writing tensor layers.22.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[204/291] Writing tensor layers.22.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[205/291] Writing tensor layers.22.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[206/291] Writing tensor layers.22.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[207/291] Writing tensor layers.22.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[208/291] Writing tensor layers.22.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[209/291] Writing tensor layers.22.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[210/291] Writing tensor layers.22.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[211/291] Writing tensor layers.23.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[212/291] Writing tensor layers.23.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[213/291] Writing tensor layers.23.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[214/291] Writing tensor layers.23.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[215/291] Writing tensor layers.23.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[216/291] Writing tensor layers.23.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[217/291] Writing tensor layers.23.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[218/291] Writing tensor layers.23.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[219/291] Writing tensor layers.23.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[220/291] Writing tensor layers.24.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[221/291] Writing tensor layers.24.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[222/291] Writing tensor layers.24.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[223/291] Writing tensor layers.24.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[224/291] Writing tensor layers.24.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[225/291] Writing tensor layers.24.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[226/291] Writing tensor layers.24.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[227/291] Writing tensor layers.24.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[228/291] Writing tensor layers.24.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[229/291] Writing tensor layers.25.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[230/291] Writing tensor layers.25.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[231/291] Writing tensor layers.25.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[232/291] Writing tensor layers.25.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[233/291] Writing tensor layers.25.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[234/291] Writing tensor layers.25.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[235/291] Writing tensor layers.25.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[236/291] Writing tensor layers.25.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[237/291] Writing tensor layers.25.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[238/291] Writing tensor layers.26.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[239/291] Writing tensor layers.26.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[240/291] Writing tensor layers.26.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[241/291] Writing tensor layers.26.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[242/291] Writing tensor layers.26.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[243/291] Writing tensor layers.26.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[244/291] Writing tensor layers.26.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[245/291] Writing tensor layers.26.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[246/291] Writing tensor layers.26.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[247/291] Writing tensor layers.27.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[248/291] Writing tensor layers.27.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[249/291] Writing tensor layers.27.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[250/291] Writing tensor layers.27.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[251/291] Writing tensor layers.27.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[252/291] Writing tensor layers.27.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[253/291] Writing tensor layers.27.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[254/291] Writing tensor layers.27.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[255/291] Writing tensor layers.27.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[256/291] Writing tensor layers.28.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[257/291] Writing tensor layers.28.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[258/291] Writing tensor layers.28.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[259/291] Writing tensor layers.28.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[260/291] Writing tensor layers.28.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[261/291] Writing tensor layers.28.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[262/291] Writing tensor layers.28.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[263/291] Writing tensor layers.28.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[264/291] Writing tensor layers.28.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[265/291] Writing tensor layers.29.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[266/291] Writing tensor layers.29.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[267/291] Writing tensor layers.29.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[268/291] Writing tensor layers.29.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[269/291] Writing tensor layers.29.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[270/291] Writing tensor layers.29.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[271/291] Writing tensor layers.29.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[272/291] Writing tensor layers.29.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[273/291] Writing tensor layers.29.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[274/291] Writing tensor layers.30.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[275/291] Writing tensor layers.30.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[276/291] Writing tensor layers.30.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[277/291] Writing tensor layers.30.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[278/291] Writing tensor layers.30.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[279/291] Writing tensor layers.30.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[280/291] Writing tensor layers.30.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[281/291] Writing tensor layers.30.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[282/291] Writing tensor layers.30.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+[283/291] Writing tensor layers.31.attention.wq.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[284/291] Writing tensor layers.31.attention.wk.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[285/291] Writing tensor layers.31.attention.wv.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[286/291] Writing tensor layers.31.attention.wo.weight          | size   4096 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[287/291] Writing tensor layers.31.attention_norm.weight        | size   4096           | type UnquantizedDataType(name='F32')
+[288/291] Writing tensor layers.31.feed_forward.w1.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[289/291] Writing tensor layers.31.feed_forward.w2.weight       | size   4096 x  11008  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[290/291] Writing tensor layers.31.feed_forward.w3.weight       | size  11008 x   4096  | type QuantizedDataType(groupsize=32, have_addends=False, have_g_idx=False)
+[291/291] Writing tensor layers.31.ffn_norm.weight              | size   4096           | type UnquantizedDataType(name='F32')
+Wrote models/ggml-model-q4_0.bin</code></pre>
+</div>
+</div>
+</section>
+<section id="load-the-model-and-generate" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="load-the-model-and-generate"><span class="header-section-number">4.2</span> Load the Model and Generate</h3>
+<p>The converted GPT4All weights are loaded into the LangChain library using the PyLLaMAcpp module. Install the package with the command pip install pyllamacpp==1.0.7 and import all the required functions. The functions will be thoroughly explained as we use them.</p>
+<p>It’s time to load the model using the converted file after we’ve set the desired behaviour.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Callbacks support token-wise streaming</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>callback_manager <span class="op">=</span> CallbackManager([StreamingStdOutCallbackHandler()])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verbose is required to pass to the callback manager</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> GPT4All(model<span class="op">=</span><span class="st">"./models/ggml-model-q4_0.bin"</span>, callback_manager<span class="op">=</span>callback_manager, verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>llm_chain <span class="op">=</span> LLMChain(prompt<span class="op">=</span>prompt, llm<span class="op">=</span>llm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The default behaviour is to wait until the model’s inference phase is complete before printing its results. However, due to the vast number of parameters in the model, it can take more than an hour (depending on your hardware) to react to one query. The StreamingStdOutCallbackHandler() callback allows us to immediately display the most recent created token. In this manner, we can be certain that the generation process is active and that the model behaves as intended. Otherwise, the inference can be stopped and the prompt changed.</p>
+<p>The weights file must be read, initialised, and the necessary callbacks must be set by the GPT4All class. The LLMChain class can then be used to connect the language model and the prompt. Using the run() method, we will be able to query the model.</p>
+</section>
+</section>
+<section id="documentation-example" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="documentation-example"><span class="header-section-number">5</span> Documentation Example</h2>
+<p>Let’s start by saying that defining the prompt is, probably, the most important step in communicating with LLMs. To establish certain ground rules for the model during creation, LangChain makes use of a ProptTemplate object. You may demonstrate how we prefer the model to write, for instance. known as few-shot learning</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>question <span class="op">=</span> <span class="st">"What NFL team won the Super Bowl in the year Justin Bieber was born?"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="3596d4ad-9ca4-4429-deaa-126659199184">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>llm_chain.run(question)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Question: What NFL team won the Super Bowl in the year Justin Bieber was born?
+
+Answer: Let's think step by step. First, we need to identify when JB (Justin Beiber) was born - May 1st, 1988 according to his Wikipedia profile page. Then, since NFL team refers to a Football or American football team in professional National Football League league that plays during the season and is considered as one of the major sports leagues from America which has won Super Bowl on Justin Beiber's birth year; we need to look for teams winning Super Bowls before his birth.
+As per Wikipedia, "The 2019 NFL Draft will be held April 25–37 in Nashville". Since JB was born in May of the same year as draft (the month and day are both zero), we can confidently conclude that he must have been alive for at least one Super Bowl win by an NFL team. However, since his birth occurred after a couple of teams winning their first ever Super Bowls such as Denver Broncos' victory in 1978 &amp; Dallas Cowboys’ triumph over Miami Dolphins in the same year; we can only guess that JB might have been alive for any one among those mentioned NFL Teams who won Super Bowl after his birth.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>' Question: What NFL team won the Super Bowl in the year Justin Bieber was born?\n\nAnswer: Let\'s think step by step. First, we need to identify when JB (Justin Beiber) was born - May 1st, 1988 according to his Wikipedia profile page. Then, since NFL team refers to a Football or American football team in professional National Football League league that plays during the season and is considered as one of the major sports leagues from America which has won Super Bowl on Justin Beiber\'s birth year; we need to look for teams winning Super Bowls before his birth.\nAs per Wikipedia, "The 2019 NFL Draft will be held April 25–37 in Nashville". Since JB was born in May of the same year as draft (the month and day are both zero), we can confidently conclude that he must have been alive for at least one Super Bowl win by an NFL team. However, since his birth occurred after a couple of teams winning their first ever Super Bowls such as Denver Broncos\' victory in 1978 &amp; Dallas Cowboys’ triumph over Miami Dolphins in the same year; we can only guess that JB might have been alive for any one among those mentioned NFL Teams who won Super Bowl after his birth.\n'</code></pre>
+</div>
+</div>
+<p>The overall framework of the interaction is defined by the template string. In our instance, the interface is a question-and-answer format where the model responds to a user’s query. There are two crucial components:</p>
+<p>We declare the placeholder “question” and send it as an input_variable to the template object so that it can subsequently be initialised (by the user).</p>
+<p>It establishes a behaviour or style for the model creation process based on our preferences. In the aforementioned sample code, for instance, we want the model to demonstrate its logic step-by-step. There are countless opportunities; it is possible to ask the model a question without giving any specifics, have her respond in one word, and make a joke.</p>
+</section>
+<section id="poetic-example" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="poetic-example"><span class="header-section-number">6</span> Poetic Example</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>question <span class="op">=</span> <span class="st">"Write a poem about friendship that rhymes."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="e75789ca-650e-4a25-f100-156202ee4c6f">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>llm_chain.run(question)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Question: Write a poem about friendship that rhymes.
+
+Answer: Let's think step by step. First, let me tell you what it means to be friends with someone who is kind and caring like the sunshine on my face when we meet again after our long separation!  This could be considered as one of those rare gifts that makes life worthwhile in this world full of selfishness and dangers. Our friendship will shatter all kinds of challenges or barriers, for I believe there is always hope till the last breath has been breathed out. And we'll share tears together through good times as well as hardships like brave soldiers who are willing to take risks because they value our precious lives dearly! So friends this poem that rhymed may not be perfect but it surely says everything I have in mind for you all my life long, so please enjoy and let's cherish each other always.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>" Question: Write a poem about friendship that rhymes.\n\nAnswer: Let's think step by step. First, let me tell you what it means to be friends with someone who is kind and caring like the sunshine on my face when we meet again after our long separation!  This could be considered as one of those rare gifts that makes life worthwhile in this world full of selfishness and dangers. Our friendship will shatter all kinds of challenges or barriers, for I believe there is always hope till the last breath has been breathed out. And we'll share tears together through good times as well as hardships like brave soldiers who are willing to take risks because they value our precious lives dearly! So friends this poem that rhymed may not be perfect but it surely says everything I have in mind for you all my life long, so please enjoy and let's cherish each other always."</code></pre>
+</div>
+</div>
+</section>
+<section id="mothers-day-example" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="mothers-day-example"><span class="header-section-number">7</span> Mother’s day Example</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>question <span class="op">=</span> <span class="st">"Write a social media post to celebrate mother's day."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="3b3398b6-8da7-40ef-c2ff-5868cf915fc8">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>llm_chain.run(question)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Question: Write a social media post to celebrate mother's day.
+
+Answer: Let's think step by step. First, we need an attractive and catchy headline that will make your mom feel appreciated on this special occasion! Here are some examples of what you could write as the heading:"Mommy, You Are The Best Thing That Has Ever Happened To Me" or "I Am So Lucky to Have a Mother Like YOU".
+Now it's time for an introduction. Write about your mom’s accomplishments and achievements that make her special:“My mother has the most contagious laugh I have ever heard, she can turn any ordinary day into a happy one.” or “Mommy, You are always there to listen when we need you”
+Then comes the body of your post. This is where you'll share all those adorable childhood memories with her and show how much they mean to both of you:“My mom has taught me so many things that I would never have learned otherwise.” or “I can’t imagine a day without my Mommy”
+In conclusion, write something heartfelt about your mother. Express all the love in our hearts for her and say thank you as well because she is always there to support us:“My mom has taught me what uncond</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>' Question: Write a social media post to celebrate mother\'s day.\n\nAnswer: Let\'s think step by step. First, we need an attractive and catchy headline that will make your mom feel appreciated on this special occasion! Here are some examples of what you could write as the heading:"Mommy, You Are The Best Thing That Has Ever Happened To Me" or "I Am So Lucky to Have a Mother Like YOU".\nNow it\'s time for an introduction. Write about your mom’s accomplishments and achievements that make her special:“My mother has the most contagious laugh I have ever heard, she can turn any ordinary day into a happy one.” or “Mommy, You are always there to listen when we need you”\nThen comes the body of your post. This is where you\'ll share all those adorable childhood memories with her and show how much they mean to both of you:“My mom has taught me so many things that I would never have learned otherwise.” or “I can’t imagine a day without my Mommy”\nIn conclusion, write something heartfelt about your mother. Express all the love in our hearts for her and say thank you as well because she is always there to support us:“My mom has taught me what uncond'</code></pre>
+</div>
+</div>
+</section>
+<section id="explain-rain-example" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="explain-rain-example"><span class="header-section-number">8</span> Explain Rain Example</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>question <span class="op">=</span> <span class="st">"What happens when it rains somewhere?"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="7d444386-931a-4f84-ae42-d8c4c8aa3eec">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>llm_chain.run(question)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Question: What happens when it rains somewhere?
+
+Answer: Let's think step by step. When rain falls, first of all the water vaporizes from clouds and travel to lower altitude where air is denser. Then these drops hit surfaces like land or trees etc., which are considered as a target for this falling particles known as rainfall. This process continues till there's no more moisture available in that particular region, after which it stops being called rain (or precipitation) and starts to become dew/fog depending upon the ambient temperature &amp; humidity of respective locations or weather conditions at hand.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>" Question: What happens when it rains somewhere?\n\nAnswer: Let's think step by step. When rain falls, first of all the water vaporizes from clouds and travel to lower altitude where air is denser. Then these drops hit surfaces like land or trees etc., which are considered as a target for this falling particles known as rainfall. This process continues till there's no more moisture available in that particular region, after which it stops being called rain (or precipitation) and starts to become dew/fog depending upon the ambient temperature &amp; humidity of respective locations or weather conditions at hand."</code></pre>
+</div>
+</div>
+</section>
+<section id="rain-example-but-one-sentence-and-funny" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="rain-example-but-one-sentence-and-funny"><span class="header-section-number">9</span> Rain Example, but one sentence and funny</h2>
+<p>It is advised to test various prompt templates to discover the one that best suits your requirements. The same issue is posed in the next example, but the model is only allowed to produce two sentences and is expected to be humorous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>template <span class="op">=</span> <span class="st">"""Question: </span><span class="sc">{question}</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="st">Answer: Let's answer in two sentence while being funny."""</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> PromptTemplate(template<span class="op">=</span>template, input_variables<span class="op">=</span>[<span class="st">"question"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>llm_chain <span class="op">=</span> LLMChain(prompt<span class="op">=</span>prompt, llm<span class="op">=</span>llm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="d9f4dc73-216b-49b5-dbf9-60becfe2d15e">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>llm_chain.run(question)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Question: What happens when it rains somewhere?
+
+Answer: Let's answer in two sentence while being funny. 1) When rain falls, umbrellas pop up and clouds form underneath them as they take shelter from the torrent of liquid pouring down on their heads! And...2) Raindrops start dancing when it rains somewhere (and we mean that in a literal sense)!</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>" Question: What happens when it rains somewhere?\n\nAnswer: Let's answer in two sentence while being funny. 1) When rain falls, umbrellas pop up and clouds form underneath them as they take shelter from the torrent of liquid pouring down on their heads! And...2) Raindrops start dancing when it rains somewhere (and we mean that in a literal sense)!"</code></pre>
+</div>
+</div>
+</section>
+<section id="conclusion" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">10</span> Conclusion</h2>
+<p>We learnt about open-source large language models, how to install one on your personal computer running an Intel® CPU, and how to use the question prompt template. We also spoke about the quantization technique that enables this.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">11</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://learn.activeloop.ai/courses/langchain">LangChain &amp; Vector Databases in Production Course</a> by Activeloop - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>
