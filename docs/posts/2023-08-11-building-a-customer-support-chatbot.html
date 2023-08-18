@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-08-11">
+<meta name="description" content="Here, we show how to use website material as additional context to help a chatbot efficiently reply to user queries. The code implementation uses data loaders, and stores the associated embeddings in the Deep Lake dataset, and then retrieves the documents that are most relevant to the user’s query.">
+
+<title>LivingDataLab - Building a Customer Support Question Answering Chatbot</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Building a Customer Support Question Answering Chatbot">
+<meta property="og:description" content="Here, we show how to use website material as additional context to help a chatbot efficiently reply to user queries.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Building a Customer Support Question Answering Chatbot">
+<meta name="twitter:description" content="Here, we show how to use website material as additional context to help a chatbot efficiently reply to user queries.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Building a Customer Support Question Answering Chatbot</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Building a Customer Support Question Answering Chatbot</h1>
+                  <div>
+        <div class="description">
+          Here, we show how to use website material as additional context to help a chatbot efficiently reply to user queries. The code implementation uses data loaders, and stores the associated embeddings in the Deep Lake dataset, and then retrieves the documents that are most relevant to the user’s query.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">activeloop</div>
+                <div class="quarto-category">openai</div>
+                <div class="quarto-category">retrievers</div>
+                <div class="quarto-category">vectordb</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 11, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
+  <li><a href="#having-a-knowledge-base" id="toc-having-a-knowledge-base" class="nav-link" data-scroll-target="#having-a-knowledge-base"><span class="toc-section-number">2</span>  Having a Knowledge Base</a></li>
+  <li><a href="#workflow" id="toc-workflow" class="nav-link" data-scroll-target="#workflow"><span class="toc-section-number">3</span>  Workflow</a></li>
+  <li><a href="#import-libs-setup" id="toc-import-libs-setup" class="nav-link" data-scroll-target="#import-libs-setup"><span class="toc-section-number">4</span>  Import Libs &amp; Setup</a></li>
+  <li><a href="#split-the-documents-into-chunks-and-compute-their-embeddings" id="toc-split-the-documents-into-chunks-and-compute-their-embeddings" class="nav-link" data-scroll-target="#split-the-documents-into-chunks-and-compute-their-embeddings"><span class="toc-section-number">5</span>  Split the documents into chunks and compute their embeddings</a></li>
+  <li><a href="#craft-a-prompt-for-gpt-3-using-the-suggested-strategies" id="toc-craft-a-prompt-for-gpt-3-using-the-suggested-strategies" class="nav-link" data-scroll-target="#craft-a-prompt-for-gpt-3-using-the-suggested-strategies"><span class="toc-section-number">6</span>  Craft a prompt for GPT-3 using the suggested strategies</a></li>
+  <li><a href="#utilize-the-gpt3-model-with-a-temperature-of-0-for-text-generation" id="toc-utilize-the-gpt3-model-with-a-temperature-of-0-for-text-generation" class="nav-link" data-scroll-target="#utilize-the-gpt3-model-with-a-temperature-of-0-for-text-generation"><span class="toc-section-number">7</span>  Utilize the GPT3 model with a temperature of 0 for text generation</a></li>
+  <li><a href="#issues-with-generating-answers-using-gpt-3" id="toc-issues-with-generating-answers-using-gpt-3" class="nav-link" data-scroll-target="#issues-with-generating-answers-using-gpt-3"><span class="toc-section-number">8</span>  Issues with Generating Answers using GPT-3</a></li>
+  <li><a href="#an-alternative---salescopilot-helping-support-human-customer-services" id="toc-an-alternative---salescopilot-helping-support-human-customer-services" class="nav-link" data-scroll-target="#an-alternative---salescopilot-helping-support-human-customer-services"><span class="toc-section-number">9</span>  An Alternative - SalesCopilot Helping Support Human Customer Services</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">10</span>  Conclusion</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">11</span>  Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Large language models like GPT-4 and ChatGPT have emerged as key advancements in the IT world as we observe faster technological growth. These cutting-edge models exhibit outstanding skill in content creation. They do, however, face some difficulties, including as biases and hallucinations. Despite these drawbacks, LLMs have the power to completely change the way chatbot development is done.</p>
+<p>Traditional chatbots, which are mostly intent-based, are made to react to particular user intentions. These intentions include a number of model questions and related answers. A “Restaurant Recommendations” purpose, for instance, would have sample inquiries like “Can you recommend a good Italian restaurant nearby?” or “Where can I get the best sushi in town?” with answers like “You should try the Italian restaurant”La Trattoria” nearby” or “Sushi Palace” is the best sushi restaurant in town.”</p>
+<p>When consumers engage with the chatbot, their inquiries are compared to those with the most like intent, producing the corresponding response. However, as LLMs continue to advance, chatbot development is trending towards more advanced and dynamic options that can handle a wider variety of customer enquiries with more accuracy and nuance.</p>
+</section>
+<section id="having-a-knowledge-base" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="having-a-knowledge-base"><span class="header-section-number">2</span> Having a Knowledge Base</h2>
+<p>LLMs can greatly improve chatbot functionality by linking larger intents with Knowledge Base (KB) documents rather than individual questions and replies. This method simplifies intent management and produces more personalised responses to user enquiries.</p>
+<p>The maximum prompt size in GPT3 is roughly 4,000 tokens, which is large but insufficient for combining a full knowledge base into a single prompt.</p>
+<p>Future LLMs may not have this restriction while still having text creation capabilities. However, for the time being, we must develop a solution around it.</p>
+</section>
+<section id="workflow" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="workflow"><span class="header-section-number">3</span> Workflow</h2>
+<p>The goal of this project is to create a chatbot that uses GPT3 to search for answers within documents. The experiment’s workflow is depicted in the diagram below.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/customer-support-activeloop-workflow.png" width="800"></p>
+<p>To begin, we extract some content from internet publications, divide it into little parts, compute its embeddings, and store it in Deep Lake. Then, using a user inquiry, we retrieve the most relevant chunks from Deep Lake and place them in a prompt, which will be used by the LLM to construct the final answer.</p>
+<p>It is vital to highlight that when utilising LLMs, there is always the possibility of generating hallucinations or incorrect information. Although this may not be acceptable for many customer service use cases, the chatbot can nonetheless aid operators in crafting answers that they can double-check before delivering to the user.</p>
+<p>n the next steps, we’ll explore how to manage conversations with GPT-3 and provide examples to demonstrate the effectiveness of this workflow:</p>
+</section>
+<section id="import-libs-setup" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="import-libs-setup"><span class="header-section-number">4</span> Import Libs &amp; Setup</h2>
+<p>First, set up the OPENAI_API_KEY and ACTIVELOOP_TOKEN environment variables with your API keys and tokens.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.embeddings.openai <span class="im">import</span> OpenAIEmbeddings</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.vectorstores <span class="im">import</span> DeepLake</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.text_splitter <span class="im">import</span> CharacterTextSplitter</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain <span class="im">import</span> OpenAI</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.document_loaders <span class="im">import</span> SeleniumURLLoader</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain <span class="im">import</span> PromptTemplate</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> openai</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">'../..'</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv, find_dotenv</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> load_dotenv(find_dotenv()) <span class="co"># read local .env file</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>openai.api_key  <span class="op">=</span> os.environ[<span class="st">'OPENAI_API_KEY'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>These libraries provide OpenAI embeddings, vector storage management, text splitting, and communicating with the OpenAI API. They also allow for the development of a context-aware question-answering system that incorporates retrieval and text generation.</p>
+<p>Our chatbot’s database will be made up of articles about technical challenges.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we'll use information from the following articles</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>urls <span class="op">=</span> [<span class="st">'https://beebom.com/what-is-nft-explained/'</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://beebom.com/how-delete-spotify-account/'</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://beebom.com/how-download-gif-twitter/'</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://beebom.com/how-use-chatgpt-linux-terminal/'</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://beebom.com/how-delete-spotify-account/'</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://beebom.com/how-save-instagram-story-with-music/'</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://beebom.com/how-install-pip-windows/'</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://beebom.com/how-check-disk-usage-linux/'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="split-the-documents-into-chunks-and-compute-their-embeddings" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="split-the-documents-into-chunks-and-compute-their-embeddings"><span class="header-section-number">5</span> Split the documents into chunks and compute their embeddings</h2>
+<p>We load the pages from the specified URLs and split them into 1000 parts with no overlap using the CharacterTextSplitter:</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use the selenium scraper to load the documents</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>loader <span class="op">=</span> SeleniumURLLoader(urls<span class="op">=</span>urls)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>docs_not_splitted <span class="op">=</span> loader.load()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># we split the documents into smaller chunks</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>text_splitter <span class="op">=</span> CharacterTextSplitter(chunk_size<span class="op">=</span><span class="dv">1000</span>, chunk_overlap<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>docs <span class="op">=</span> text_splitter.split_documents(docs_not_splitted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Created a chunk of size 1226, which is longer than the specified 1000</code></pre>
+</div>
+</div>
+<p>The embeddings are then computed using OpenAIEmbeddings and stored in a Deep Lake vector store in the cloud. In an ideal production scenario, we could upload an entire website or course lesson to a Deep Lake dataset, enabling search over thousands or millions of documents. Because we are using a cloud serverless Deep Lake dataset, applications running in multiple locations may easily access the same centralised dataset without the need for a vector store to be deployed on a specific machine.</p>
+<p>Now, change the following code to include your Activeloop organisation ID. It’s worth remembering that the org id is your default username.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Before executing the following code, make sure to have</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># your OpenAI key saved in the “OPENAI_API_KEY” environment variable.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>embeddings <span class="op">=</span> OpenAIEmbeddings(model<span class="op">=</span><span class="st">"text-embedding-ada-002"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># create Deep Lake dataset</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: use your organization id here. (by default, org id is your username)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>my_activeloop_org_id <span class="op">=</span> <span class="st">"pranath"</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>my_activeloop_dataset_name <span class="op">=</span> <span class="st">"langchain_course_customer_support"</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>dataset_path <span class="op">=</span> <span class="ss">f"hub://</span><span class="sc">{</span>my_activeloop_org_id<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>my_activeloop_dataset_name<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> DeepLake(dataset_path<span class="op">=</span>dataset_path, embedding_function<span class="op">=</span>embeddings)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># add documents to our Deep Lake dataset</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>db.add_documents(docs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Your Deep Lake dataset has been successfully created!</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>\</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset(path='hub://pranath/langchain_course_customer_support', tensors=['embedding', 'id', 'metadata', 'text'])
+
+  tensor      htype       shape      dtype  compression
+  -------    -------     -------    -------  ------- 
+ embedding  embedding  (146, 1536)  float32   None   
+    id        text      (146, 1)      str     None   
+ metadata     json      (146, 1)      str     None   
+   text       text      (146, 1)      str     None   </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> </code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>['52ad71cc-3c5e-11ee-bdd8-acde48001122',
+ '52ad732a-3c5e-11ee-bdd8-acde48001122',
+ '52ad738e-3c5e-11ee-bdd8-acde48001122',
+ '52ad73d4-3c5e-11ee-bdd8-acde48001122',
+ '52ad7410-3c5e-11ee-bdd8-acde48001122',
+ '52ad7456-3c5e-11ee-bdd8-acde48001122',
+ '52ad7492-3c5e-11ee-bdd8-acde48001122',
+ '52ad74ce-3c5e-11ee-bdd8-acde48001122',
+ '52ad750a-3c5e-11ee-bdd8-acde48001122',
+ '52ad7550-3c5e-11ee-bdd8-acde48001122',
+ '52ad758c-3c5e-11ee-bdd8-acde48001122',
+ '52ad75c8-3c5e-11ee-bdd8-acde48001122',
+ '52ad7604-3c5e-11ee-bdd8-acde48001122',
+ '52ad7640-3c5e-11ee-bdd8-acde48001122',
+ '52ad7686-3c5e-11ee-bdd8-acde48001122',
+ '52ad76c2-3c5e-11ee-bdd8-acde48001122',
+ '52ad76fe-3c5e-11ee-bdd8-acde48001122',
+ '52ad7744-3c5e-11ee-bdd8-acde48001122',
+ '52ad7780-3c5e-11ee-bdd8-acde48001122',
+ '52ad77bc-3c5e-11ee-bdd8-acde48001122',
+ '52ad77f8-3c5e-11ee-bdd8-acde48001122',
+ '52ad783e-3c5e-11ee-bdd8-acde48001122',
+ '52ad787a-3c5e-11ee-bdd8-acde48001122',
+ '52ad78b6-3c5e-11ee-bdd8-acde48001122',
+ '52ad78f2-3c5e-11ee-bdd8-acde48001122',
+ '52ad792e-3c5e-11ee-bdd8-acde48001122',
+ '52ad7974-3c5e-11ee-bdd8-acde48001122',
+ '52ad79b0-3c5e-11ee-bdd8-acde48001122',
+ '52ad79ec-3c5e-11ee-bdd8-acde48001122',
+ '52ad7a28-3c5e-11ee-bdd8-acde48001122',
+ '52ad7a64-3c5e-11ee-bdd8-acde48001122',
+ '52ad7aaa-3c5e-11ee-bdd8-acde48001122',
+ '52ad7ae6-3c5e-11ee-bdd8-acde48001122',
+ '52ad7b22-3c5e-11ee-bdd8-acde48001122',
+ '52ad7b5e-3c5e-11ee-bdd8-acde48001122',
+ '52ad7b9a-3c5e-11ee-bdd8-acde48001122',
+ '52ad7be0-3c5e-11ee-bdd8-acde48001122',
+ '52ad7c1c-3c5e-11ee-bdd8-acde48001122',
+ '52ad7c94-3c5e-11ee-bdd8-acde48001122',
+ '52ad7cd0-3c5e-11ee-bdd8-acde48001122',
+ '52ad7d0c-3c5e-11ee-bdd8-acde48001122',
+ '52ad7d52-3c5e-11ee-bdd8-acde48001122',
+ '52ad7d8e-3c5e-11ee-bdd8-acde48001122',
+ '52ad7dca-3c5e-11ee-bdd8-acde48001122',
+ '52ad7e10-3c5e-11ee-bdd8-acde48001122',
+ '52ad7e4c-3c5e-11ee-bdd8-acde48001122',
+ '52ad7e88-3c5e-11ee-bdd8-acde48001122',
+ '52ad7ec4-3c5e-11ee-bdd8-acde48001122',
+ '52ad7f0a-3c5e-11ee-bdd8-acde48001122',
+ '52ad7f46-3c5e-11ee-bdd8-acde48001122',
+ '52ad7f82-3c5e-11ee-bdd8-acde48001122',
+ '52ad7fbe-3c5e-11ee-bdd8-acde48001122',
+ '52ad7ffa-3c5e-11ee-bdd8-acde48001122',
+ '52ad805e-3c5e-11ee-bdd8-acde48001122',
+ '52ad809a-3c5e-11ee-bdd8-acde48001122',
+ '52ad80d6-3c5e-11ee-bdd8-acde48001122',
+ '52ad8112-3c5e-11ee-bdd8-acde48001122',
+ '52ad814e-3c5e-11ee-bdd8-acde48001122',
+ '52ad8194-3c5e-11ee-bdd8-acde48001122',
+ '52ad81d0-3c5e-11ee-bdd8-acde48001122',
+ '52ad820c-3c5e-11ee-bdd8-acde48001122',
+ '52ad8248-3c5e-11ee-bdd8-acde48001122',
+ '52ad828e-3c5e-11ee-bdd8-acde48001122',
+ '52ad82ca-3c5e-11ee-bdd8-acde48001122',
+ '52ad8306-3c5e-11ee-bdd8-acde48001122',
+ '52ad8342-3c5e-11ee-bdd8-acde48001122',
+ '52ad8388-3c5e-11ee-bdd8-acde48001122',
+ '52ad83c4-3c5e-11ee-bdd8-acde48001122',
+ '52ad8400-3c5e-11ee-bdd8-acde48001122',
+ '52ad843c-3c5e-11ee-bdd8-acde48001122',
+ '52ad8478-3c5e-11ee-bdd8-acde48001122',
+ '52ad84b4-3c5e-11ee-bdd8-acde48001122',
+ '52ad84f0-3c5e-11ee-bdd8-acde48001122',
+ '52ad852c-3c5e-11ee-bdd8-acde48001122',
+ '52ad8572-3c5e-11ee-bdd8-acde48001122',
+ '52ad85ae-3c5e-11ee-bdd8-acde48001122',
+ '52ad85ea-3c5e-11ee-bdd8-acde48001122',
+ '52ad863a-3c5e-11ee-bdd8-acde48001122',
+ '52ad8676-3c5e-11ee-bdd8-acde48001122',
+ '52ad86b2-3c5e-11ee-bdd8-acde48001122',
+ '52ad86ee-3c5e-11ee-bdd8-acde48001122',
+ '52ad873e-3c5e-11ee-bdd8-acde48001122',
+ '52ad877a-3c5e-11ee-bdd8-acde48001122',
+ '52ad87b6-3c5e-11ee-bdd8-acde48001122',
+ '52ad87f2-3c5e-11ee-bdd8-acde48001122',
+ '52ad882e-3c5e-11ee-bdd8-acde48001122',
+ '52ad8874-3c5e-11ee-bdd8-acde48001122',
+ '52ad88b0-3c5e-11ee-bdd8-acde48001122',
+ '52ad88ec-3c5e-11ee-bdd8-acde48001122',
+ '52ad8928-3c5e-11ee-bdd8-acde48001122',
+ '52ad8964-3c5e-11ee-bdd8-acde48001122',
+ '52ad89a0-3c5e-11ee-bdd8-acde48001122',
+ '52ad89dc-3c5e-11ee-bdd8-acde48001122',
+ '52ad8a18-3c5e-11ee-bdd8-acde48001122',
+ '52ad8a54-3c5e-11ee-bdd8-acde48001122',
+ '52ad8a9a-3c5e-11ee-bdd8-acde48001122',
+ '52ad8ad6-3c5e-11ee-bdd8-acde48001122',
+ '52ad8b12-3c5e-11ee-bdd8-acde48001122',
+ '52ad8b4e-3c5e-11ee-bdd8-acde48001122',
+ '52ad8b8a-3c5e-11ee-bdd8-acde48001122',
+ '52ad8bc6-3c5e-11ee-bdd8-acde48001122',
+ '52ad8c02-3c5e-11ee-bdd8-acde48001122',
+ '52ad8c3e-3c5e-11ee-bdd8-acde48001122',
+ '52ad8c7a-3c5e-11ee-bdd8-acde48001122',
+ '52ad8cb6-3c5e-11ee-bdd8-acde48001122',
+ '52ad8cf2-3c5e-11ee-bdd8-acde48001122',
+ '52ad8d2e-3c5e-11ee-bdd8-acde48001122',
+ '52ad8d6a-3c5e-11ee-bdd8-acde48001122',
+ '52ad8db0-3c5e-11ee-bdd8-acde48001122',
+ '52ad8dec-3c5e-11ee-bdd8-acde48001122',
+ '52ad8e32-3c5e-11ee-bdd8-acde48001122',
+ '52ad8e6e-3c5e-11ee-bdd8-acde48001122',
+ '52ad8eaa-3c5e-11ee-bdd8-acde48001122',
+ '52ad8ee6-3c5e-11ee-bdd8-acde48001122',
+ '52ad8f22-3c5e-11ee-bdd8-acde48001122',
+ '52ad8f5e-3c5e-11ee-bdd8-acde48001122',
+ '52ad8f9a-3c5e-11ee-bdd8-acde48001122',
+ '52ad8fd6-3c5e-11ee-bdd8-acde48001122',
+ '52ad9012-3c5e-11ee-bdd8-acde48001122',
+ '52ad904e-3c5e-11ee-bdd8-acde48001122',
+ '52ad908a-3c5e-11ee-bdd8-acde48001122',
+ '52ad90d0-3c5e-11ee-bdd8-acde48001122',
+ '52ad915c-3c5e-11ee-bdd8-acde48001122',
+ '52ad91a2-3c5e-11ee-bdd8-acde48001122',
+ '52ad91de-3c5e-11ee-bdd8-acde48001122',
+ '52ad921a-3c5e-11ee-bdd8-acde48001122',
+ '52ad9256-3c5e-11ee-bdd8-acde48001122',
+ '52ad9292-3c5e-11ee-bdd8-acde48001122',
+ '52ad92d8-3c5e-11ee-bdd8-acde48001122',
+ '52ad931e-3c5e-11ee-bdd8-acde48001122',
+ '52ad935a-3c5e-11ee-bdd8-acde48001122',
+ '52ad93a0-3c5e-11ee-bdd8-acde48001122',
+ '52ad93dc-3c5e-11ee-bdd8-acde48001122',
+ '52ad9418-3c5e-11ee-bdd8-acde48001122',
+ '52ad9454-3c5e-11ee-bdd8-acde48001122',
+ '52ad9490-3c5e-11ee-bdd8-acde48001122',
+ '52ad94d6-3c5e-11ee-bdd8-acde48001122',
+ '52ad9512-3c5e-11ee-bdd8-acde48001122',
+ '52ad954e-3c5e-11ee-bdd8-acde48001122',
+ '52ad958a-3c5e-11ee-bdd8-acde48001122',
+ '52ad95c6-3c5e-11ee-bdd8-acde48001122',
+ '52ad960c-3c5e-11ee-bdd8-acde48001122',
+ '52ad9648-3c5e-11ee-bdd8-acde48001122',
+ '52ad9684-3c5e-11ee-bdd8-acde48001122',
+ '52ad96c0-3c5e-11ee-bdd8-acde48001122',
+ '52ad96fc-3c5e-11ee-bdd8-acde48001122']</code></pre>
+</div>
+</div>
+<p>To retrieve the most similar chunks to a given query, we can use the similarity_search method of the Deep Lake vector store:</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># let's see the top relevant documents to a specific query</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"how to check disk usage in linux?"</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>docs <span class="op">=</span> db.similarity_search(query)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(docs[<span class="dv">0</span>].page_content)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Home  Tech  How to Check Disk Usage in Linux (4 Methods)
+
+How to Check Disk Usage in Linux (4 Methods)
+
+Beebom Staff
+
+Last Updated: June 19, 2023 5:14 pm
+
+There may be times when you need to download some important files or transfer some photos to your Linux system, but face a problem of insufficient disk space. You head over to your file manager to delete the large files which you no longer require, but you have no clue which of them are occupying most of your disk space. In this article, we will show some easy methods to check disk usage in Linux from both the terminal and the GUI application.
+
+Monitor Disk Usage in Linux (2023)
+
+Table of Contents
+
+Check Disk Space Using the df Command
+        
+Display Disk Usage in Human Readable FormatDisplay Disk Occupancy of a Particular Type
+
+Check Disk Usage using the du Command
+        
+Display Disk Usage in Human Readable FormatDisplay Disk Usage for a Particular DirectoryCompare Disk Usage of Two Directories</code></pre>
+</div>
+</div>
+</section>
+<section id="craft-a-prompt-for-gpt-3-using-the-suggested-strategies" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="craft-a-prompt-for-gpt-3-using-the-suggested-strategies"><span class="header-section-number">6</span> Craft a prompt for GPT-3 using the suggested strategies</h2>
+<p>We’ll develop a prompt template that combines role-prompting, Knowledge Base information, and the user’s question:</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># let's write a prompt for a customer support chatbot that</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># answer questions using information extracted from our db</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>template <span class="op">=</span> <span class="st">"""You are an exceptional customer support chatbot that gently answer questions.</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">You know the following context information.</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="sc">{chunks_formatted}</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="st">Answer to the following question from a customer. Use only information from the previous context information. Do not invent stuff.</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="st">Question: </span><span class="sc">{query}</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="st">Answer:"""</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> PromptTemplate(</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    input_variables<span class="op">=</span>[<span class="st">"chunks_formatted"</span>, <span class="st">"query"</span>],</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    template<span class="op">=</span>template,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The template establishes the chatbot’s persona as an outstanding customer support chatbot. The template accepts two variables as input: chunks_formatted, which contains pre-formatted chunks from articles, and query, which represents the customer’s question. The goal is to construct an accurate answer utilising only the available chunks while avoiding the creation of erroneous or fictional information.</p>
+</section>
+<section id="utilize-the-gpt3-model-with-a-temperature-of-0-for-text-generation" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="utilize-the-gpt3-model-with-a-temperature-of-0-for-text-generation"><span class="header-section-number">7</span> Utilize the GPT3 model with a temperature of 0 for text generation</h2>
+<p>To construct a response, we first obtain the top-k (e.g., top-3) chunks that are most comparable to the user question, format the prompt, and send it to the GPT3 model with a temperature of 0.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the full pipeline</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># user question</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"How to check disk usage in linux?"</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># retrieve relevant chunks</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>docs <span class="op">=</span> db.similarity_search(query)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>retrieved_chunks <span class="op">=</span> [doc.page_content <span class="cf">for</span> doc <span class="kw">in</span> docs]</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># format the prompt</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>chunks_formatted <span class="op">=</span> <span class="st">"</span><span class="ch">\n\n</span><span class="st">"</span>.join(retrieved_chunks)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>prompt_formatted <span class="op">=</span> prompt.<span class="bu">format</span>(chunks_formatted<span class="op">=</span>chunks_formatted, query<span class="op">=</span>query)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co"># generate answer</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(model<span class="op">=</span><span class="st">"text-davinci-003"</span>, temperature<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>answer <span class="op">=</span> llm(prompt_formatted)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(answer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> You can check disk usage in Linux using the df command or by using a GUI tool such as the GDU Disk Usage Analyzer or the Gnome Disks Tool. The df command is used to check the current disk usage and the available disk space in Linux. The syntax for the df command is: df &lt;options&gt; &lt;file_system&gt;. The options to use with the df command are: a, h, t, and x. To install the GDU Disk Usage Analyzer, use the command: sudo snap install gdu-disk-usage-analyzer. To install the Gnome Disks Tool, use the command: sudo apt-get -y install gnome-disk-utility.</code></pre>
+</div>
+</div>
+</section>
+<section id="issues-with-generating-answers-using-gpt-3" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="issues-with-generating-answers-using-gpt-3"><span class="header-section-number">8</span> Issues with Generating Answers using GPT-3</h2>
+<p>In the above scenario, the chatbot performs admirably. However, there are some cases where it may fail.</p>
+<p>Assume we ask GPT-3, “Is the Linux distribution free?” and provide context in the form of a document regarding kernel features. It may provide a response such as “Yes, the Linux distribution is free to download and use,” even if such information is not contained in the context page. False information is extremely undesirable for customer service chatbots!</p>
+<p>When the answer to the user’s question is contained inside the context, GPT-3 is less likely to generate misleading information. We cannot always rely on the semantic search stage to find the proper document because user questions are frequently brief and vague. There is always the possibility of generating erroneous information.</p>
+</section>
+<section id="an-alternative---salescopilot-helping-support-human-customer-services" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="an-alternative---salescopilot-helping-support-human-customer-services"><span class="header-section-number">9</span> An Alternative - SalesCopilot Helping Support Human Customer Services</h2>
+<p>There may be times for various reasons you choose to use humans in customer services, in these cases you may be able to use something like <a href="https://github.com/e-johnstonn/SalesCopilot">SalesCopilot</a> as described by <a href="https://www.activeloop.ai/resources/conversation-intelligence-gong-io-open-source-alternative-ai-sales-assistant/">this article</a> which looks into how LangChain, Deep Lake, and GPT-4 can be used to develop a sales assistant able to give advice to salesman, taking into considerations internal guidelines.</p>
+<p>This article goes into detail about a sales call assistant that connects you to a chatbot that understands the context of your conversation. One of SalesCopilot’s biggest features is its ability to recognise probable customer complaints and provide ideas on how to effectively handle them.</p>
+<p>The post illustrates the obstacles encountered and solutions uncovered during the project’s development. You’ll discover the two unique text-splitting approaches that failed and how these failures paved the path for an effective solution.</p>
+<p>Initially, the authors attempted to rely entirely on the LLM, but they experienced challenges with GPT-4 such as response inconsistency and sluggish response times. Second, they erroneously divided the custom knowledge base into chunks, which resulted in context misalignment and inefficient results.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/sales-copilot.png" width="800"></p>
+<p>Following these failed attempts, a more intelligent method of partitioning the knowledge base based on its structure was developed. This improvement significantly enhanced response quality and ensured stronger context grounding for LLM responses. This process is detailed, allowing you to understand how to overcome comparable issues in your own AI projects.</p>
+<p>The paper then delves into how SalesCopilot was linked with Deep Lake. This integration expanded SalesCopilot’s capabilities by collecting the most appropriate responses from a proprietary knowledge base, resulting in a dependable, efficient, and highly adjustable solution for dealing with client concerns.</p>
+</section>
+<section id="conclusion" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">10</span> Conclusion</h2>
+<p>GPT-3 is quite good at generating conversational chatbots that can answer particular queries based on the context provided in the prompt. However, because the model has a tendency to hallucinate (i.e., invent new, potentially erroneous information), it might be difficult to ensure that it generates answers simply based on the context. The intensity of erroneous information generation varies based on the use case.</p>
+<p>Finally, we used LangChain to build a context-aware question-answering system, following the code and ideas supplied. Splitting documents into chunks, computing their embeddings, constructing a retriever to discover related chunks, creating a prompt for GPT-3, and using the GPT3 model for text production were all part of the procedure. This method highlights the power of exploiting GPT-3 to build powerful and contextually correct chatbots while also emphasising the need to be cautious about the possibilities of providing fake information.</p>
+<p>Further Reading:</p>
+<p><a href="https://learnprompting.org/docs/applied_prompting/build_chatbot_from_kb">https://learnprompting.org/docs/applied_prompting/build_chatbot_from_kb</a></p>
+</section>
+<section id="acknowledgements" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">11</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://learn.activeloop.ai/courses/langchain">LangChain &amp; Vector Databases in Production Course</a> by Activeloop - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+  </div>
+</footer>
+
+
+
+</body></html>

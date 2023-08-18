@@ -10,7 +10,140 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science &amp; AI Blog</description>
 <generator>quarto-1.2.335</generator>
-<lastBuildDate>Sat, 05 Aug 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 14 Aug 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Guarding Against Undesirable LLM Outputs with the Self-Critique Chain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-15-guarding-against-bad-outputs-with-self-critque-chain.html</link>
+  <description><![CDATA[ Large language models (LLMs) can produce unpleasant results on occasion. Some well-known examples of this behaviour include hazardous or hallucinatory content. It is critical to use a technique to ensure that the model’s answers are appropriate in a production setting. Fortunately, these foundational models have the necessary knowledge to correct themselves with a gentle push in the proper direction. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-08-15-guarding-against-bad-outputs-with-self-critque-chain.html</guid>
+  <pubDate>Mon, 14 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Creating a Voice Assistant for your Knowledge Base</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-14-voice-assistant-for-your-knowledge-base.html</link>
+  <description><![CDATA[ Here we plan to build a voice assistant for a knowledge base. This post will explain how to create your own voice assistant using cutting-edge artificial intelligence tools. OpenAI’s Whisper, a sophisticated automatic speech recognition (ASR) algorithm, is used by the voice assistant. Whisper efficiently converts our vocal inputs to text. After we’ve transcribed our speech inputs into text, we’ll focus on creating voice outputs. We use Eleven Labs to accomplish this, which allows the voice assistant to reply to users in an engaging and natural manner. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-08-14-voice-assistant-for-your-knowledge-base.html</guid>
+  <pubDate>Sun, 13 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake1.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>A YouTube Video Summarizer Using Whisper and LangChain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-13-a-youtube-summariser-using-whisper-and-langchain.html</link>
+  <description><![CDATA[ We recently discussed LangChain’s strong feature called chains, which allows for the building of an end-to-end pipeline for leveraging language models. To create a user-friendly interface, chains incorporate many components such as models, prompts, memory, parsing output, and debugging. We also went over the process of creating custom pipelines by inheriting the Chain class and looked at the LLMChain as an example. That article laid the groundwork for subsequent posts, in which we will apply these concepts to a hands-on project of summarising a YouTube video. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-08-13-a-youtube-summariser-using-whisper-and-langchain.html</guid>
+  <pubDate>Sat, 12 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Chains and why they are used in Langchain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-12-chains-and-why-they-are-used-in-langchain.html</link>
+  <description><![CDATA[ Because it allows for natural language querying, prompting is regarded the most effective means of communicating with language models. We talked over prompting tactics and briefly used chains earlier. The chains will be explained in greater depth in this lesson. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-08-12-chains-and-why-they-are-used-in-langchain.html</guid>
+  <pubDate>Fri, 11 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake3.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Building a Customer Support Question Answering Chatbot</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-11-building-a-customer-support-chatbot.html</link>
+  <description><![CDATA[ Large language models like GPT-4 and ChatGPT have emerged as key advancements in the IT world as we observe faster technological growth. These cutting-edge models exhibit outstanding skill in content creation. They do, however, face some difficulties, including as biases and hallucinations. Despite these drawbacks, LLMs have the power to completely change the way chatbot development is done. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <category>retrievers</category>
+  <category>vectordb</category>
+  <guid>http://livingdatalab.com/posts/2023-08-11-building-a-customer-support-chatbot.html</guid>
+  <pubDate>Thu, 10 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Exploring Embeddings for Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-10-exploring-embeddings-for-large-language-models.html</link>
+  <description><![CDATA[ The most fascinating and useful components of machine learning are vector embeddings, which are essential to many natural language processing, recommendation, and search algorithms. You have dealt with embedding-using systems if you have used voice assistants, recommendation engines, or translators. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <category>retrievers</category>
+  <category>vectordb</category>
+  <guid>http://livingdatalab.com/posts/2023-08-10-exploring-embeddings-for-large-language-models.html</guid>
+  <pubDate>Wed, 09 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Text Splitters for Retrieval and Large Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-09-text-splitters-for-retrieval-and-large-language-models.html</link>
+  <description><![CDATA[ Large Language Models are known for producing text that looks and reads like human beings, but they may also “hallucinate” and produce information that is both accurate and illogical. It’s interesting to note that this inclination can be helpful while undertaking creative work because it produces a variety of original and inventive thoughts, opening up fresh viewpoints and promoting the creative process. This presents a problem, though, in circumstances where accuracy is crucial, including code reviews, duties involving insurance, or answers to research-related questions. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <category>retrievers</category>
+  <guid>http://livingdatalab.com/posts/2023-08-09-text-splitters-for-retrieval-and-large-language-models.html</guid>
+  <pubDate>Tue, 08 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake1.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Streamlined Data Ingestion for LLMs</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-08-streamlined-data-ingestion-for-llms.html</link>
+  <description><![CDATA[ The LangChain library provides a number of assistance classes that are intended to make it easier to load and extract data from various sources. These classes simplify managing various data formats, regardless of whether the information came from a PDF file or online content. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <category>retrievers</category>
+  <guid>http://livingdatalab.com/posts/2023-08-08-streamlined-data-ingestion-for-llms.html</guid>
+  <pubDate>Mon, 07 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Exploring The Role of LangChain’s Indexes and Retrievers</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-07-langchain-indexes-and-retreievers.html</link>
+  <description><![CDATA[ In LangChain, retrievers and indexes are essential for organising documents and obtaining relevant data for LLMs. With an emphasis on the function of indexes and retrievers, we will examine some of the benefits and drawbacks of employing document-based LLMs (i.e., LLMs that incorporate pertinent documents inside their prompts). ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>activeloop</category>
+  <category>openai</category>
+  <category>retrievers</category>
+  <guid>http://livingdatalab.com/posts/2023-08-07-langchain-indexes-and-retreievers.html</guid>
+  <pubDate>Sun, 06 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake3.png" medium="image" type="image/png"/>
+</item>
 <item>
   <title>Creating Knowledge Graphs from Textual Data and LLM’s</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -170,119 +303,6 @@
   <guid>http://livingdatalab.com/posts/2023-07-27-activeloop-deeplake-vectorstore-llms-agents.html</guid>
   <pubDate>Wed, 26 Jul 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>LLaMa-2 70B Chatbot in Hugging Face and LangChain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-26-generation-llm-field-guide_llama-2-70b-chat-agent.html</link>
-  <description><![CDATA[ In this article we’ll explore how we can use the open source <strong>Llama-70b-chat</strong> model in both Hugging Face transformers and LangChain. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>hugging-face</category>
-  <guid>http://livingdatalab.com/posts/2023-07-26-generation-llm-field-guide_llama-2-70b-chat-agent.html</guid>
-  <pubDate>Tue, 25 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/llama2.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Chat with Your Data using Memory and Langchain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-25-chat-with-your-data-using-memory-and-langchain.html</link>
-  <description><![CDATA[ In this article we are going to give a chatbot memory to help it better ask questions about data using langchain. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <guid>http://livingdatalab.com/posts/2023-07-25-chat-with-your-data-using-memory-and-langchain.html</guid>
-  <pubDate>Mon, 24 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Questioning and Answering over Data with LangChain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-24-question-answering-over-data-with-langchain.html</link>
-  <description><![CDATA[ In this article we look at how you can split documents, extract the relevant data, take a question, pass them both to a language model, and ask it to answer the question using Langchain. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>prompt-engineering</category>
-  <guid>http://livingdatalab.com/posts/2023-07-24-question-answering-over-data-with-langchain.html</guid>
-  <pubDate>Sun, 23 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Advanced Vectorstore Retrieval using LangChain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-23-retrieval-using-langchain.html</link>
-  <description><![CDATA[ In this article we look at how you can retrieve content from a vectorstore using state-of-the-art methods to ensure only the most relevant content is made available for Large Language Models. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <guid>http://livingdatalab.com/posts/2023-07-23-retrieval-using-langchain.html</guid>
-  <pubDate>Sat, 22 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Vectorstores and Embeddings with LangChain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-22-vectorstores-and-embeddings-with-langchain.html</link>
-  <description><![CDATA[ In this article we look at how to convert documents into vector stores an embeddings as an important step in making content available for Large Language Models. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <guid>http://livingdatalab.com/posts/2023-07-22-vectorstores-and-embeddings-with-langchain.html</guid>
-  <pubDate>Fri, 21 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain2.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Document Splitting with LangChain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-21-document-splitting-with-langchain.html</link>
-  <description><![CDATA[ In this article we look at how you can split documents as an important step in making content available for Large Language Models. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <guid>http://livingdatalab.com/posts/2023-07-21-document-splitting-with-langchain.html</guid>
-  <pubDate>Thu, 20 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain1.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>LLM Application Considerations - Part 2</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-20-llm-application-considerations-2.html</link>
-  <description><![CDATA[ In this second article in the series we will look at several aspects to consider when deploying a Large Language Model (LLM) into an application. We will look at chain-of-thought reasoning, program-aided language models (PAL), the REAct framework combining reason and action, application architectures, and responsible AI. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>aws</category>
-  <guid>http://livingdatalab.com/posts/2023-07-20-llm-application-considerations-2.html</guid>
-  <pubDate>Wed, 19 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai4.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>LLM Application Considerations - Part 1</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-19-llm-application-considerations-1.html</link>
-  <description><![CDATA[ In this article we will look at several aspects to consider when deploying a Large Language Model (LLM) into an application. We will look at Model optimizations, a Generative AI project lifecycle cheat sheet, and how LLM’s can be turned into useful applications using external data sources and services. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <guid>http://livingdatalab.com/posts/2023-07-19-llm-application-considerations-1.html</guid>
-  <pubDate>Tue, 18 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai3.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Fine-Tuning FLAN-T5 with Reinforcement Learning (PPO) and PEFT to Generate Less-Toxic Summaries</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-18-fine-tune-llm-to-detoxify-text-summaries.html</link>
-  <description><![CDATA[ In this project, we will fine-tune a FLAN-T5 model to generate less toxic content with Meta AI’s hate speech reward model. The reward model is a binary classifier that predicts either “not hate” or “hate” for the given text. We will use Proximal Policy Optimization (PPO) to fine-tune and reduce the model’s toxicity. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>aws</category>
-  <category>hugging-face</category>
-  <category>fine-tuning</category>
-  <guid>http://livingdatalab.com/posts/2023-07-18-fine-tune-llm-to-detoxify-text-summaries.html</guid>
-  <pubDate>Mon, 17 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/genai2.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
