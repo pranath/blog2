@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,9 +20,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -49,43 +50,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -122,7 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -143,6 +115,7 @@ ga('send', {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../css/styles.css">
@@ -170,54 +143,58 @@ ga('send', {
     <span class="navbar-title">LivingDataLab</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html">
+    <a class="nav-link" href="../index.html" rel="" target="">
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects.html" aria-current="page">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
  <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html">
+    <a class="nav-link" href="../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Predicting 10 Year Death Risk from Health Data</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Predicting 10 Year Death Risk from Health Data</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -225,7 +202,7 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">Predicting 10 Year Death Risk from Health Data</h1>
+      <h1 class="title">Predicting 10 Year Death Risk from Health Data</h1>
                   <div>
         <div class="description">
           In this project we will build a model to predict the 10-year risk of death of individuals from the NHANES I epidemiology dataset
@@ -260,50 +237,58 @@ ga('send', {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
   </div>
 </li>
       </ul>
@@ -311,6 +296,7 @@ ga('send', {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
 <!-- Begin Mailchimp Signup Form -->
@@ -351,8 +337,8 @@ ga('send', {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#import-packages" id="toc-import-packages" class="nav-link" data-scroll-target="#import-packages"><span class="toc-section-number">2</span>  Import Packages</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#import-packages" id="toc-import-packages" class="nav-link" data-scroll-target="#import-packages"><span class="header-section-number">2</span> Import Packages</a></li>
   </ul>
 </nav>
     </div>
@@ -437,141 +423,142 @@ ga('send', {
 <pre><code>X_train shape: (5147, 18)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="4">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Age</th>
-      <th>Diastolic BP</th>
-      <th>Poverty index</th>
-      <th>Race</th>
-      <th>Red blood cells</th>
-      <th>Sedimentation rate</th>
-      <th>Serum Albumin</th>
-      <th>Serum Cholesterol</th>
-      <th>Serum Iron</th>
-      <th>Serum Magnesium</th>
-      <th>Serum Protein</th>
-      <th>Sex</th>
-      <th>Systolic BP</th>
-      <th>TIBC</th>
-      <th>TS</th>
-      <th>White blood cells</th>
-      <th>BMI</th>
-      <th>Pulse pressure</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1599</th>
-      <td>43.0</td>
-      <td>84.0</td>
-      <td>637.0</td>
-      <td>1.0</td>
-      <td>49.3</td>
-      <td>10.0</td>
-      <td>5.0</td>
-      <td>253.0</td>
-      <td>134.0</td>
-      <td>1.59</td>
-      <td>7.7</td>
-      <td>1.0</td>
-      <td>NaN</td>
-      <td>490.0</td>
-      <td>27.3</td>
-      <td>9.1</td>
-      <td>25.803007</td>
-      <td>34.0</td>
-    </tr>
-    <tr>
-      <th>2794</th>
-      <td>72.0</td>
-      <td>96.0</td>
-      <td>154.0</td>
-      <td>2.0</td>
-      <td>43.4</td>
-      <td>23.0</td>
-      <td>4.3</td>
-      <td>265.0</td>
-      <td>106.0</td>
-      <td>1.66</td>
-      <td>6.8</td>
-      <td>2.0</td>
-      <td>208.0</td>
-      <td>301.0</td>
-      <td>35.2</td>
-      <td>6.0</td>
-      <td>33.394319</td>
-      <td>112.0</td>
-    </tr>
-    <tr>
-      <th>1182</th>
-      <td>54.0</td>
-      <td>78.0</td>
-      <td>205.0</td>
-      <td>1.0</td>
-      <td>43.8</td>
-      <td>12.0</td>
-      <td>4.2</td>
-      <td>206.0</td>
-      <td>180.0</td>
-      <td>1.67</td>
-      <td>6.6</td>
-      <td>2.0</td>
-      <td>NaN</td>
-      <td>363.0</td>
-      <td>49.6</td>
-      <td>5.9</td>
-      <td>20.278410</td>
-      <td>34.0</td>
-    </tr>
-    <tr>
-      <th>6915</th>
-      <td>59.0</td>
-      <td>90.0</td>
-      <td>417.0</td>
-      <td>1.0</td>
-      <td>43.4</td>
-      <td>9.0</td>
-      <td>4.5</td>
-      <td>327.0</td>
-      <td>114.0</td>
-      <td>1.65</td>
-      <td>7.6</td>
-      <td>2.0</td>
-      <td>NaN</td>
-      <td>347.0</td>
-      <td>32.9</td>
-      <td>6.1</td>
-      <td>32.917744</td>
-      <td>78.0</td>
-    </tr>
-    <tr>
-      <th>500</th>
-      <td>34.0</td>
-      <td>80.0</td>
-      <td>385.0</td>
-      <td>1.0</td>
-      <td>77.7</td>
-      <td>9.0</td>
-      <td>4.1</td>
-      <td>197.0</td>
-      <td>64.0</td>
-      <td>1.74</td>
-      <td>7.3</td>
-      <td>2.0</td>
-      <td>NaN</td>
-      <td>376.0</td>
-      <td>17.0</td>
-      <td>8.2</td>
-      <td>30.743489</td>
-      <td>30.0</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th">Diastolic BP</th>
+<th data-quarto-table-cell-role="th">Poverty index</th>
+<th data-quarto-table-cell-role="th">Race</th>
+<th data-quarto-table-cell-role="th">Red blood cells</th>
+<th data-quarto-table-cell-role="th">Sedimentation rate</th>
+<th data-quarto-table-cell-role="th">Serum Albumin</th>
+<th data-quarto-table-cell-role="th">Serum Cholesterol</th>
+<th data-quarto-table-cell-role="th">Serum Iron</th>
+<th data-quarto-table-cell-role="th">Serum Magnesium</th>
+<th data-quarto-table-cell-role="th">Serum Protein</th>
+<th data-quarto-table-cell-role="th">Sex</th>
+<th data-quarto-table-cell-role="th">Systolic BP</th>
+<th data-quarto-table-cell-role="th">TIBC</th>
+<th data-quarto-table-cell-role="th">TS</th>
+<th data-quarto-table-cell-role="th">White blood cells</th>
+<th data-quarto-table-cell-role="th">BMI</th>
+<th data-quarto-table-cell-role="th">Pulse pressure</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1599</td>
+<td>43.0</td>
+<td>84.0</td>
+<td>637.0</td>
+<td>1.0</td>
+<td>49.3</td>
+<td>10.0</td>
+<td>5.0</td>
+<td>253.0</td>
+<td>134.0</td>
+<td>1.59</td>
+<td>7.7</td>
+<td>1.0</td>
+<td>NaN</td>
+<td>490.0</td>
+<td>27.3</td>
+<td>9.1</td>
+<td>25.803007</td>
+<td>34.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2794</td>
+<td>72.0</td>
+<td>96.0</td>
+<td>154.0</td>
+<td>2.0</td>
+<td>43.4</td>
+<td>23.0</td>
+<td>4.3</td>
+<td>265.0</td>
+<td>106.0</td>
+<td>1.66</td>
+<td>6.8</td>
+<td>2.0</td>
+<td>208.0</td>
+<td>301.0</td>
+<td>35.2</td>
+<td>6.0</td>
+<td>33.394319</td>
+<td>112.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1182</td>
+<td>54.0</td>
+<td>78.0</td>
+<td>205.0</td>
+<td>1.0</td>
+<td>43.8</td>
+<td>12.0</td>
+<td>4.2</td>
+<td>206.0</td>
+<td>180.0</td>
+<td>1.67</td>
+<td>6.6</td>
+<td>2.0</td>
+<td>NaN</td>
+<td>363.0</td>
+<td>49.6</td>
+<td>5.9</td>
+<td>20.278410</td>
+<td>34.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6915</td>
+<td>59.0</td>
+<td>90.0</td>
+<td>417.0</td>
+<td>1.0</td>
+<td>43.4</td>
+<td>9.0</td>
+<td>4.5</td>
+<td>327.0</td>
+<td>114.0</td>
+<td>1.65</td>
+<td>7.6</td>
+<td>2.0</td>
+<td>NaN</td>
+<td>347.0</td>
+<td>32.9</td>
+<td>6.1</td>
+<td>32.917744</td>
+<td>78.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">500</td>
+<td>34.0</td>
+<td>80.0</td>
+<td>385.0</td>
+<td>1.0</td>
+<td>77.7</td>
+<td>9.0</td>
+<td>4.1</td>
+<td>197.0</td>
+<td>64.0</td>
+<td>1.74</td>
+<td>7.3</td>
+<td>2.0</td>
+<td>NaN</td>
+<td>376.0</td>
+<td>17.0</td>
+<td>8.2</td>
+<td>30.743489</td>
+<td>30.0</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -698,141 +685,142 @@ Fraction of rows missing from X_test:  0.0
 <pre><code>X_train_dropped shape: (1551, 18)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="14">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Age</th>
-      <th>Diastolic BP</th>
-      <th>Poverty index</th>
-      <th>Race</th>
-      <th>Red blood cells</th>
-      <th>Sedimentation rate</th>
-      <th>Serum Albumin</th>
-      <th>Serum Cholesterol</th>
-      <th>Serum Iron</th>
-      <th>Serum Magnesium</th>
-      <th>Serum Protein</th>
-      <th>Sex</th>
-      <th>Systolic BP</th>
-      <th>TIBC</th>
-      <th>TS</th>
-      <th>White blood cells</th>
-      <th>BMI</th>
-      <th>Pulse pressure</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>2794</th>
-      <td>72.0</td>
-      <td>96.0</td>
-      <td>154.0</td>
-      <td>2.0</td>
-      <td>43.4</td>
-      <td>23.0</td>
-      <td>4.3</td>
-      <td>265.0</td>
-      <td>106.0</td>
-      <td>1.66</td>
-      <td>6.8</td>
-      <td>2.0</td>
-      <td>208.0</td>
-      <td>301.0</td>
-      <td>35.2</td>
-      <td>6.0</td>
-      <td>33.394319</td>
-      <td>112.0</td>
-    </tr>
-    <tr>
-      <th>5856</th>
-      <td>67.0</td>
-      <td>94.0</td>
-      <td>114.0</td>
-      <td>1.0</td>
-      <td>43.8</td>
-      <td>12.0</td>
-      <td>3.7</td>
-      <td>178.0</td>
-      <td>73.0</td>
-      <td>1.85</td>
-      <td>7.0</td>
-      <td>1.0</td>
-      <td>140.0</td>
-      <td>311.0</td>
-      <td>23.5</td>
-      <td>4.3</td>
-      <td>17.481227</td>
-      <td>46.0</td>
-    </tr>
-    <tr>
-      <th>9374</th>
-      <td>68.0</td>
-      <td>80.0</td>
-      <td>201.0</td>
-      <td>1.0</td>
-      <td>46.2</td>
-      <td>20.0</td>
-      <td>4.1</td>
-      <td>223.0</td>
-      <td>204.0</td>
-      <td>1.54</td>
-      <td>7.2</td>
-      <td>1.0</td>
-      <td>140.0</td>
-      <td>275.0</td>
-      <td>74.2</td>
-      <td>17.2</td>
-      <td>20.690581</td>
-      <td>60.0</td>
-    </tr>
-    <tr>
-      <th>8819</th>
-      <td>68.0</td>
-      <td>80.0</td>
-      <td>651.0</td>
-      <td>1.0</td>
-      <td>47.7</td>
-      <td>16.0</td>
-      <td>4.3</td>
-      <td>178.0</td>
-      <td>168.0</td>
-      <td>1.97</td>
-      <td>7.3</td>
-      <td>1.0</td>
-      <td>102.0</td>
-      <td>339.0</td>
-      <td>49.6</td>
-      <td>10.2</td>
-      <td>27.719091</td>
-      <td>22.0</td>
-    </tr>
-    <tr>
-      <th>7331</th>
-      <td>73.0</td>
-      <td>88.0</td>
-      <td>68.0</td>
-      <td>2.0</td>
-      <td>42.1</td>
-      <td>19.0</td>
-      <td>3.6</td>
-      <td>215.0</td>
-      <td>64.0</td>
-      <td>1.59</td>
-      <td>5.7</td>
-      <td>2.0</td>
-      <td>190.0</td>
-      <td>334.0</td>
-      <td>19.2</td>
-      <td>6.6</td>
-      <td>31.880432</td>
-      <td>102.0</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th">Diastolic BP</th>
+<th data-quarto-table-cell-role="th">Poverty index</th>
+<th data-quarto-table-cell-role="th">Race</th>
+<th data-quarto-table-cell-role="th">Red blood cells</th>
+<th data-quarto-table-cell-role="th">Sedimentation rate</th>
+<th data-quarto-table-cell-role="th">Serum Albumin</th>
+<th data-quarto-table-cell-role="th">Serum Cholesterol</th>
+<th data-quarto-table-cell-role="th">Serum Iron</th>
+<th data-quarto-table-cell-role="th">Serum Magnesium</th>
+<th data-quarto-table-cell-role="th">Serum Protein</th>
+<th data-quarto-table-cell-role="th">Sex</th>
+<th data-quarto-table-cell-role="th">Systolic BP</th>
+<th data-quarto-table-cell-role="th">TIBC</th>
+<th data-quarto-table-cell-role="th">TS</th>
+<th data-quarto-table-cell-role="th">White blood cells</th>
+<th data-quarto-table-cell-role="th">BMI</th>
+<th data-quarto-table-cell-role="th">Pulse pressure</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2794</td>
+<td>72.0</td>
+<td>96.0</td>
+<td>154.0</td>
+<td>2.0</td>
+<td>43.4</td>
+<td>23.0</td>
+<td>4.3</td>
+<td>265.0</td>
+<td>106.0</td>
+<td>1.66</td>
+<td>6.8</td>
+<td>2.0</td>
+<td>208.0</td>
+<td>301.0</td>
+<td>35.2</td>
+<td>6.0</td>
+<td>33.394319</td>
+<td>112.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5856</td>
+<td>67.0</td>
+<td>94.0</td>
+<td>114.0</td>
+<td>1.0</td>
+<td>43.8</td>
+<td>12.0</td>
+<td>3.7</td>
+<td>178.0</td>
+<td>73.0</td>
+<td>1.85</td>
+<td>7.0</td>
+<td>1.0</td>
+<td>140.0</td>
+<td>311.0</td>
+<td>23.5</td>
+<td>4.3</td>
+<td>17.481227</td>
+<td>46.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">9374</td>
+<td>68.0</td>
+<td>80.0</td>
+<td>201.0</td>
+<td>1.0</td>
+<td>46.2</td>
+<td>20.0</td>
+<td>4.1</td>
+<td>223.0</td>
+<td>204.0</td>
+<td>1.54</td>
+<td>7.2</td>
+<td>1.0</td>
+<td>140.0</td>
+<td>275.0</td>
+<td>74.2</td>
+<td>17.2</td>
+<td>20.690581</td>
+<td>60.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8819</td>
+<td>68.0</td>
+<td>80.0</td>
+<td>651.0</td>
+<td>1.0</td>
+<td>47.7</td>
+<td>16.0</td>
+<td>4.3</td>
+<td>178.0</td>
+<td>168.0</td>
+<td>1.97</td>
+<td>7.3</td>
+<td>1.0</td>
+<td>102.0</td>
+<td>339.0</td>
+<td>49.6</td>
+<td>10.2</td>
+<td>27.719091</td>
+<td>22.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7331</td>
+<td>73.0</td>
+<td>88.0</td>
+<td>68.0</td>
+<td>2.0</td>
+<td>42.1</td>
+<td>19.0</td>
+<td>3.6</td>
+<td>215.0</td>
+<td>64.0</td>
+<td>1.59</td>
+<td>5.7</td>
+<td>2.0</td>
+<td>190.0</td>
+<td>334.0</td>
+<td>19.2</td>
+<td>6.6</td>
+<td>31.880432</td>
+<td>102.0</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1493,147 +1481,148 @@ C-Index (multivariate feature imputation): 0.5447162828947368</code></pre>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>X_test_risk <span class="op">=</span> X_test_risk.sort_values(by<span class="op">=</span><span class="st">'risk'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>X_test_risk.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="36">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Age</th>
-      <th>Diastolic BP</th>
-      <th>Poverty index</th>
-      <th>Race</th>
-      <th>Red blood cells</th>
-      <th>Sedimentation rate</th>
-      <th>Serum Albumin</th>
-      <th>Serum Cholesterol</th>
-      <th>Serum Iron</th>
-      <th>Serum Magnesium</th>
-      <th>Serum Protein</th>
-      <th>Sex</th>
-      <th>Systolic BP</th>
-      <th>TIBC</th>
-      <th>TS</th>
-      <th>White blood cells</th>
-      <th>BMI</th>
-      <th>Pulse pressure</th>
-      <th>risk</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>5493</th>
-      <td>67.0</td>
-      <td>80.0</td>
-      <td>30.0</td>
-      <td>1.0</td>
-      <td>77.7</td>
-      <td>59.0</td>
-      <td>3.4</td>
-      <td>231.0</td>
-      <td>36.0</td>
-      <td>1.40</td>
-      <td>6.3</td>
-      <td>1.0</td>
-      <td>170.0</td>
-      <td>202.0</td>
-      <td>17.8</td>
-      <td>8.4</td>
-      <td>17.029470</td>
-      <td>90.0</td>
-      <td>0.619022</td>
-    </tr>
-    <tr>
-      <th>1017</th>
-      <td>65.0</td>
-      <td>98.0</td>
-      <td>16.0</td>
-      <td>1.0</td>
-      <td>49.4</td>
-      <td>30.0</td>
-      <td>3.4</td>
-      <td>124.0</td>
-      <td>129.0</td>
-      <td>1.59</td>
-      <td>7.7</td>
-      <td>1.0</td>
-      <td>184.0</td>
-      <td>293.0</td>
-      <td>44.0</td>
-      <td>5.9</td>
-      <td>30.858853</td>
-      <td>86.0</td>
-      <td>0.545443</td>
-    </tr>
-    <tr>
-      <th>2050</th>
-      <td>66.0</td>
-      <td>100.0</td>
-      <td>69.0</td>
-      <td>2.0</td>
-      <td>42.9</td>
-      <td>47.0</td>
-      <td>3.8</td>
-      <td>233.0</td>
-      <td>170.0</td>
-      <td>1.42</td>
-      <td>8.6</td>
-      <td>1.0</td>
-      <td>180.0</td>
-      <td>411.0</td>
-      <td>41.4</td>
-      <td>7.2</td>
-      <td>22.129498</td>
-      <td>80.0</td>
-      <td>0.527768</td>
-    </tr>
-    <tr>
-      <th>6337</th>
-      <td>69.0</td>
-      <td>80.0</td>
-      <td>233.0</td>
-      <td>1.0</td>
-      <td>77.7</td>
-      <td>48.0</td>
-      <td>4.2</td>
-      <td>159.0</td>
-      <td>87.0</td>
-      <td>1.81</td>
-      <td>6.9</td>
-      <td>1.0</td>
-      <td>146.0</td>
-      <td>291.0</td>
-      <td>29.9</td>
-      <td>15.2</td>
-      <td>17.931276</td>
-      <td>66.0</td>
-      <td>0.526019</td>
-    </tr>
-    <tr>
-      <th>2608</th>
-      <td>71.0</td>
-      <td>80.0</td>
-      <td>104.0</td>
-      <td>1.0</td>
-      <td>43.8</td>
-      <td>23.0</td>
-      <td>4.0</td>
-      <td>201.0</td>
-      <td>119.0</td>
-      <td>1.60</td>
-      <td>7.0</td>
-      <td>1.0</td>
-      <td>166.0</td>
-      <td>311.0</td>
-      <td>38.3</td>
-      <td>6.3</td>
-      <td>17.760766</td>
-      <td>86.0</td>
-      <td>0.525624</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th">Diastolic BP</th>
+<th data-quarto-table-cell-role="th">Poverty index</th>
+<th data-quarto-table-cell-role="th">Race</th>
+<th data-quarto-table-cell-role="th">Red blood cells</th>
+<th data-quarto-table-cell-role="th">Sedimentation rate</th>
+<th data-quarto-table-cell-role="th">Serum Albumin</th>
+<th data-quarto-table-cell-role="th">Serum Cholesterol</th>
+<th data-quarto-table-cell-role="th">Serum Iron</th>
+<th data-quarto-table-cell-role="th">Serum Magnesium</th>
+<th data-quarto-table-cell-role="th">Serum Protein</th>
+<th data-quarto-table-cell-role="th">Sex</th>
+<th data-quarto-table-cell-role="th">Systolic BP</th>
+<th data-quarto-table-cell-role="th">TIBC</th>
+<th data-quarto-table-cell-role="th">TS</th>
+<th data-quarto-table-cell-role="th">White blood cells</th>
+<th data-quarto-table-cell-role="th">BMI</th>
+<th data-quarto-table-cell-role="th">Pulse pressure</th>
+<th data-quarto-table-cell-role="th">risk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5493</td>
+<td>67.0</td>
+<td>80.0</td>
+<td>30.0</td>
+<td>1.0</td>
+<td>77.7</td>
+<td>59.0</td>
+<td>3.4</td>
+<td>231.0</td>
+<td>36.0</td>
+<td>1.40</td>
+<td>6.3</td>
+<td>1.0</td>
+<td>170.0</td>
+<td>202.0</td>
+<td>17.8</td>
+<td>8.4</td>
+<td>17.029470</td>
+<td>90.0</td>
+<td>0.619022</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1017</td>
+<td>65.0</td>
+<td>98.0</td>
+<td>16.0</td>
+<td>1.0</td>
+<td>49.4</td>
+<td>30.0</td>
+<td>3.4</td>
+<td>124.0</td>
+<td>129.0</td>
+<td>1.59</td>
+<td>7.7</td>
+<td>1.0</td>
+<td>184.0</td>
+<td>293.0</td>
+<td>44.0</td>
+<td>5.9</td>
+<td>30.858853</td>
+<td>86.0</td>
+<td>0.545443</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2050</td>
+<td>66.0</td>
+<td>100.0</td>
+<td>69.0</td>
+<td>2.0</td>
+<td>42.9</td>
+<td>47.0</td>
+<td>3.8</td>
+<td>233.0</td>
+<td>170.0</td>
+<td>1.42</td>
+<td>8.6</td>
+<td>1.0</td>
+<td>180.0</td>
+<td>411.0</td>
+<td>41.4</td>
+<td>7.2</td>
+<td>22.129498</td>
+<td>80.0</td>
+<td>0.527768</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6337</td>
+<td>69.0</td>
+<td>80.0</td>
+<td>233.0</td>
+<td>1.0</td>
+<td>77.7</td>
+<td>48.0</td>
+<td>4.2</td>
+<td>159.0</td>
+<td>87.0</td>
+<td>1.81</td>
+<td>6.9</td>
+<td>1.0</td>
+<td>146.0</td>
+<td>291.0</td>
+<td>29.9</td>
+<td>15.2</td>
+<td>17.931276</td>
+<td>66.0</td>
+<td>0.526019</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2608</td>
+<td>71.0</td>
+<td>80.0</td>
+<td>104.0</td>
+<td>1.0</td>
+<td>43.8</td>
+<td>23.0</td>
+<td>4.0</td>
+<td>201.0</td>
+<td>119.0</td>
+<td>1.60</td>
+<td>7.0</td>
+<td>1.0</td>
+<td>166.0</td>
+<td>311.0</td>
+<td>38.3</td>
+<td>6.3</td>
+<td>17.760766</td>
+<td>86.0</td>
+<td>0.525624</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1731,9 +1720,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1798,6 +1801,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1836,12 +1925,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
-    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -1854,7 +1943,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

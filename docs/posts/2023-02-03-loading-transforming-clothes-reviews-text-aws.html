@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,9 +20,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -49,43 +50,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -122,7 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -169,54 +141,58 @@ ga('send', {
     <span class="navbar-title">LivingDataLab</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html">
+    <a class="nav-link" href="../index.html" rel="" target="">
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects.html" aria-current="page">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
  <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html">
+    <a class="nav-link" href="../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Loading &amp; Transforming Clothing Reviews Text Data with AWS</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Loading &amp; Transforming Clothing Reviews Text Data with AWS</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -224,7 +200,7 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">Loading &amp; Transforming Clothing Reviews Text Data with AWS</h1>
+      <h1 class="title">Loading &amp; Transforming Clothing Reviews Text Data with AWS</h1>
                   <div>
         <div class="description">
           In this project we will explore text reviews for clothing products using tools from the cloud data science service AWS Sagemaker to load and visualise the data and to gain key insights from it.
@@ -261,50 +237,58 @@ ga('send', {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
   </div>
 </li>
       </ul>
@@ -312,6 +296,7 @@ ga('send', {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
 <!-- Begin Mailchimp Signup Form -->
@@ -352,38 +337,38 @@ ga('send', {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#aws-cloud-services-for-data-science" id="toc-aws-cloud-services-for-data-science" class="nav-link" data-scroll-target="#aws-cloud-services-for-data-science"><span class="toc-section-number">2</span>  AWS &amp; Cloud Services for Data Science</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#aws-cloud-services-for-data-science" id="toc-aws-cloud-services-for-data-science" class="nav-link" data-scroll-target="#aws-cloud-services-for-data-science"><span class="header-section-number">2</span> AWS &amp; Cloud Services for Data Science</a>
   <ul class="collapse">
-  <li><a href="#why-use-the-cloud-for-data-science" id="toc-why-use-the-cloud-for-data-science" class="nav-link" data-scroll-target="#why-use-the-cloud-for-data-science"><span class="toc-section-number">2.1</span>  Why use the Cloud for Data Science ?</a></li>
-  <li><a href="#using-aws-for-cloud-data-science" id="toc-using-aws-for-cloud-data-science" class="nav-link" data-scroll-target="#using-aws-for-cloud-data-science"><span class="toc-section-number">2.2</span>  Using AWS for Cloud Data Science</a></li>
+  <li><a href="#why-use-the-cloud-for-data-science" id="toc-why-use-the-cloud-for-data-science" class="nav-link" data-scroll-target="#why-use-the-cloud-for-data-science"><span class="header-section-number">2.1</span> Why use the Cloud for Data Science ?</a></li>
+  <li><a href="#using-aws-for-cloud-data-science" id="toc-using-aws-for-cloud-data-science" class="nav-link" data-scroll-target="#using-aws-for-cloud-data-science"><span class="header-section-number">2.2</span> Using AWS for Cloud Data Science</a></li>
   </ul></li>
-  <li><a href="#ingest-and-transform-dataset" id="toc-ingest-and-transform-dataset" class="nav-link" data-scroll-target="#ingest-and-transform-dataset"><span class="toc-section-number">3</span>  Ingest and transform Dataset</a>
+  <li><a href="#ingest-and-transform-dataset" id="toc-ingest-and-transform-dataset" class="nav-link" data-scroll-target="#ingest-and-transform-dataset"><span class="header-section-number">3</span> Ingest and transform Dataset</a>
   <ul class="collapse">
-  <li><a href="#list-the-dataset-files-in-the-public-s3-bucket" id="toc-list-the-dataset-files-in-the-public-s3-bucket" class="nav-link" data-scroll-target="#list-the-dataset-files-in-the-public-s3-bucket"><span class="toc-section-number">3.1</span>  List the dataset files in the public S3 bucket</a></li>
-  <li><a href="#copy-the-data-locally-to-the-notebook" id="toc-copy-the-data-locally-to-the-notebook" class="nav-link" data-scroll-target="#copy-the-data-locally-to-the-notebook"><span class="toc-section-number">3.2</span>  Copy the data locally to the notebook</a></li>
-  <li><a href="#transform-the-data" id="toc-transform-the-data" class="nav-link" data-scroll-target="#transform-the-data"><span class="toc-section-number">3.3</span>  Transform the data</a></li>
-  <li><a href="#write-the-data-to-a-csv-file" id="toc-write-the-data-to-a-csv-file" class="nav-link" data-scroll-target="#write-the-data-to-a-csv-file"><span class="toc-section-number">3.4</span>  Write the data to a CSV file</a></li>
+  <li><a href="#list-the-dataset-files-in-the-public-s3-bucket" id="toc-list-the-dataset-files-in-the-public-s3-bucket" class="nav-link" data-scroll-target="#list-the-dataset-files-in-the-public-s3-bucket"><span class="header-section-number">3.1</span> List the dataset files in the public S3 bucket</a></li>
+  <li><a href="#copy-the-data-locally-to-the-notebook" id="toc-copy-the-data-locally-to-the-notebook" class="nav-link" data-scroll-target="#copy-the-data-locally-to-the-notebook"><span class="header-section-number">3.2</span> Copy the data locally to the notebook</a></li>
+  <li><a href="#transform-the-data" id="toc-transform-the-data" class="nav-link" data-scroll-target="#transform-the-data"><span class="header-section-number">3.3</span> Transform the data</a></li>
+  <li><a href="#write-the-data-to-a-csv-file" id="toc-write-the-data-to-a-csv-file" class="nav-link" data-scroll-target="#write-the-data-to-a-csv-file"><span class="header-section-number">3.4</span> Write the data to a CSV file</a></li>
   </ul></li>
-  <li><a href="#register-the-public-dataset-for-querying-and-visualizing" id="toc-register-the-public-dataset-for-querying-and-visualizing" class="nav-link" data-scroll-target="#register-the-public-dataset-for-querying-and-visualizing"><span class="toc-section-number">4</span>  Register the public dataset for querying and visualizing</a>
+  <li><a href="#register-the-public-dataset-for-querying-and-visualizing" id="toc-register-the-public-dataset-for-querying-and-visualizing" class="nav-link" data-scroll-target="#register-the-public-dataset-for-querying-and-visualizing"><span class="header-section-number">4</span> Register the public dataset for querying and visualizing</a>
   <ul class="collapse">
-  <li><a href="#register-s3-dataset-files-as-a-table-for-querying" id="toc-register-s3-dataset-files-as-a-table-for-querying" class="nav-link" data-scroll-target="#register-s3-dataset-files-as-a-table-for-querying"><span class="toc-section-number">4.1</span>  Register S3 dataset files as a table for querying</a></li>
-  <li><a href="#create-aws-glue-catalog-database" id="toc-create-aws-glue-catalog-database" class="nav-link" data-scroll-target="#create-aws-glue-catalog-database"><span class="toc-section-number">4.2</span>  Create AWS Glue Catalog database</a></li>
-  <li><a href="#register-csv-data-with-aws-glue-catalog" id="toc-register-csv-data-with-aws-glue-catalog" class="nav-link" data-scroll-target="#register-csv-data-with-aws-glue-catalog"><span class="toc-section-number">4.3</span>  Register CSV data with AWS Glue Catalog</a></li>
-  <li><a href="#create-default-s3-bucket-for-amazon-athena" id="toc-create-default-s3-bucket-for-amazon-athena" class="nav-link" data-scroll-target="#create-default-s3-bucket-for-amazon-athena"><span class="toc-section-number">4.4</span>  Create default S3 bucket for Amazon Athena</a></li>
+  <li><a href="#register-s3-dataset-files-as-a-table-for-querying" id="toc-register-s3-dataset-files-as-a-table-for-querying" class="nav-link" data-scroll-target="#register-s3-dataset-files-as-a-table-for-querying"><span class="header-section-number">4.1</span> Register S3 dataset files as a table for querying</a></li>
+  <li><a href="#create-aws-glue-catalog-database" id="toc-create-aws-glue-catalog-database" class="nav-link" data-scroll-target="#create-aws-glue-catalog-database"><span class="header-section-number">4.2</span> Create AWS Glue Catalog database</a></li>
+  <li><a href="#register-csv-data-with-aws-glue-catalog" id="toc-register-csv-data-with-aws-glue-catalog" class="nav-link" data-scroll-target="#register-csv-data-with-aws-glue-catalog"><span class="header-section-number">4.3</span> Register CSV data with AWS Glue Catalog</a></li>
+  <li><a href="#create-default-s3-bucket-for-amazon-athena" id="toc-create-default-s3-bucket-for-amazon-athena" class="nav-link" data-scroll-target="#create-default-s3-bucket-for-amazon-athena"><span class="header-section-number">4.4</span> Create default S3 bucket for Amazon Athena</a></li>
   </ul></li>
-  <li><a href="#visualising-the-data-and-answering-questions" id="toc-visualising-the-data-and-answering-questions" class="nav-link" data-scroll-target="#visualising-the-data-and-answering-questions"><span class="toc-section-number">5</span>  Visualising the Data and Answering Questions</a>
+  <li><a href="#visualising-the-data-and-answering-questions" id="toc-visualising-the-data-and-answering-questions" class="nav-link" data-scroll-target="#visualising-the-data-and-answering-questions"><span class="header-section-number">5</span> Visualising the Data and Answering Questions</a>
   <ul class="collapse">
-  <li><a href="#preparation-for-data-visualization" id="toc-preparation-for-data-visualization" class="nav-link" data-scroll-target="#preparation-for-data-visualization"><span class="toc-section-number">5.1</span>  Preparation for data visualization</a></li>
-  <li><a href="#plotting-key-stats-using-bar-charts" id="toc-plotting-key-stats-using-bar-charts" class="nav-link" data-scroll-target="#plotting-key-stats-using-bar-charts"><span class="toc-section-number">5.2</span>  Plotting key stats using bar charts</a></li>
-  <li><a href="#how-many-reviews-per-sentiment" id="toc-how-many-reviews-per-sentiment" class="nav-link" data-scroll-target="#how-many-reviews-per-sentiment"><span class="toc-section-number">5.3</span>  How many reviews per sentiment?</a></li>
-  <li><a href="#calculate-total-number-of-reviews-per-product-category" id="toc-calculate-total-number-of-reviews-per-product-category" class="nav-link" data-scroll-target="#calculate-total-number-of-reviews-per-product-category"><span class="toc-section-number">5.4</span>  Calculate total number of reviews per product category</a></li>
-  <li><a href="#which-product-categories-are-highest-rated-by-average-sentiment" id="toc-which-product-categories-are-highest-rated-by-average-sentiment" class="nav-link" data-scroll-target="#which-product-categories-are-highest-rated-by-average-sentiment"><span class="toc-section-number">5.5</span>  Which product categories are highest rated by average sentiment?</a></li>
-  <li><a href="#which-product-categories-have-the-most-reviews" id="toc-which-product-categories-have-the-most-reviews" class="nav-link" data-scroll-target="#which-product-categories-have-the-most-reviews"><span class="toc-section-number">5.6</span>  Which product categories have the most reviews?</a></li>
-  <li><a href="#what-is-the-breakdown-of-sentiments-per-product-category" id="toc-what-is-the-breakdown-of-sentiments-per-product-category" class="nav-link" data-scroll-target="#what-is-the-breakdown-of-sentiments-per-product-category"><span class="toc-section-number">5.7</span>  What is the breakdown of sentiments per product category?</a></li>
-  <li><a href="#analyze-the-distribution-of-review-word-counts" id="toc-analyze-the-distribution-of-review-word-counts" class="nav-link" data-scroll-target="#analyze-the-distribution-of-review-word-counts"><span class="toc-section-number">5.8</span>  Analyze the distribution of review word counts</a></li>
+  <li><a href="#preparation-for-data-visualization" id="toc-preparation-for-data-visualization" class="nav-link" data-scroll-target="#preparation-for-data-visualization"><span class="header-section-number">5.1</span> Preparation for data visualization</a></li>
+  <li><a href="#plotting-key-stats-using-bar-charts" id="toc-plotting-key-stats-using-bar-charts" class="nav-link" data-scroll-target="#plotting-key-stats-using-bar-charts"><span class="header-section-number">5.2</span> Plotting key stats using bar charts</a></li>
+  <li><a href="#how-many-reviews-per-sentiment" id="toc-how-many-reviews-per-sentiment" class="nav-link" data-scroll-target="#how-many-reviews-per-sentiment"><span class="header-section-number">5.3</span> How many reviews per sentiment?</a></li>
+  <li><a href="#calculate-total-number-of-reviews-per-product-category" id="toc-calculate-total-number-of-reviews-per-product-category" class="nav-link" data-scroll-target="#calculate-total-number-of-reviews-per-product-category"><span class="header-section-number">5.4</span> Calculate total number of reviews per product category</a></li>
+  <li><a href="#which-product-categories-are-highest-rated-by-average-sentiment" id="toc-which-product-categories-are-highest-rated-by-average-sentiment" class="nav-link" data-scroll-target="#which-product-categories-are-highest-rated-by-average-sentiment"><span class="header-section-number">5.5</span> Which product categories are highest rated by average sentiment?</a></li>
+  <li><a href="#which-product-categories-have-the-most-reviews" id="toc-which-product-categories-have-the-most-reviews" class="nav-link" data-scroll-target="#which-product-categories-have-the-most-reviews"><span class="header-section-number">5.6</span> Which product categories have the most reviews?</a></li>
+  <li><a href="#what-is-the-breakdown-of-sentiments-per-product-category" id="toc-what-is-the-breakdown-of-sentiments-per-product-category" class="nav-link" data-scroll-target="#what-is-the-breakdown-of-sentiments-per-product-category"><span class="header-section-number">5.7</span> What is the breakdown of sentiments per product category?</a></li>
+  <li><a href="#analyze-the-distribution-of-review-word-counts" id="toc-analyze-the-distribution-of-review-word-counts" class="nav-link" data-scroll-target="#analyze-the-distribution-of-review-word-counts"><span class="header-section-number">5.8</span> Analyze the distribution of review word counts</a></li>
   </ul></li>
-  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">6</span>  Acknowledgements</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">6</span> Acknowledgements</a></li>
   </ul>
 </nav>
     </div>
@@ -470,171 +455,172 @@ ga('send', {
 <div class="cell" data-outputid="1b21b49f-2b92-4ea0-c812-b982550de7fe">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Clothing ID</th>
-      <th>Age</th>
-      <th>Title</th>
-      <th>Review Text</th>
-      <th>Rating</th>
-      <th>Recommended IND</th>
-      <th>Positive Feedback Count</th>
-      <th>Division Name</th>
-      <th>Department Name</th>
-      <th>Class Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>847</td>
-      <td>33</td>
-      <td>Cute, crisp shirt</td>
-      <td>If this product was in petite  i would get the...</td>
-      <td>4</td>
-      <td>1</td>
-      <td>2</td>
-      <td>General</td>
-      <td>Tops</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1080</td>
-      <td>34</td>
-      <td>NaN</td>
-      <td>Love this dress!  it's sooo pretty.  i happene...</td>
-      <td>5</td>
-      <td>1</td>
-      <td>4</td>
-      <td>General</td>
-      <td>Dresses</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1077</td>
-      <td>60</td>
-      <td>Some major design flaws</td>
-      <td>I had such high hopes for this dress and reall...</td>
-      <td>3</td>
-      <td>0</td>
-      <td>0</td>
-      <td>General</td>
-      <td>Dresses</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1049</td>
-      <td>50</td>
-      <td>My favorite buy!</td>
-      <td>I love  love  love this jumpsuit. it's fun  fl...</td>
-      <td>5</td>
-      <td>1</td>
-      <td>0</td>
-      <td>General Petite</td>
-      <td>Bottoms</td>
-      <td>Pants</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>847</td>
-      <td>47</td>
-      <td>Flattering shirt</td>
-      <td>This shirt is very flattering to all due to th...</td>
-      <td>5</td>
-      <td>1</td>
-      <td>6</td>
-      <td>General</td>
-      <td>Tops</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>23481</th>
-      <td>1104</td>
-      <td>34</td>
-      <td>Great dress for many occasions</td>
-      <td>I was very happy to snag this dress at such a ...</td>
-      <td>5</td>
-      <td>1</td>
-      <td>0</td>
-      <td>General Petite</td>
-      <td>Dresses</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>23482</th>
-      <td>862</td>
-      <td>48</td>
-      <td>Wish it was made of cotton</td>
-      <td>It reminds me of maternity clothes. soft  stre...</td>
-      <td>3</td>
-      <td>1</td>
-      <td>0</td>
-      <td>General Petite</td>
-      <td>Tops</td>
-      <td>Knits</td>
-    </tr>
-    <tr>
-      <th>23483</th>
-      <td>1104</td>
-      <td>31</td>
-      <td>Cute, but see through</td>
-      <td>This fit well  but the top was very see throug...</td>
-      <td>3</td>
-      <td>0</td>
-      <td>1</td>
-      <td>General Petite</td>
-      <td>Dresses</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>23484</th>
-      <td>1084</td>
-      <td>28</td>
-      <td>Very cute dress, perfect for summer parties an...</td>
-      <td>I bought this dress for a wedding i have this ...</td>
-      <td>3</td>
-      <td>1</td>
-      <td>2</td>
-      <td>General</td>
-      <td>Dresses</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>23485</th>
-      <td>1104</td>
-      <td>52</td>
-      <td>Please make more like this one!</td>
-      <td>This dress in a lovely platinum is feminine an...</td>
-      <td>5</td>
-      <td>1</td>
-      <td>22</td>
-      <td>General Petite</td>
-      <td>Dresses</td>
-      <td>Dresses</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Clothing ID</th>
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th">Title</th>
+<th data-quarto-table-cell-role="th">Review Text</th>
+<th data-quarto-table-cell-role="th">Rating</th>
+<th data-quarto-table-cell-role="th">Recommended IND</th>
+<th data-quarto-table-cell-role="th">Positive Feedback Count</th>
+<th data-quarto-table-cell-role="th">Division Name</th>
+<th data-quarto-table-cell-role="th">Department Name</th>
+<th data-quarto-table-cell-role="th">Class Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>847</td>
+<td>33</td>
+<td>Cute, crisp shirt</td>
+<td>If this product was in petite i would get the...</td>
+<td>4</td>
+<td>1</td>
+<td>2</td>
+<td>General</td>
+<td>Tops</td>
+<td>Blouses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1080</td>
+<td>34</td>
+<td>NaN</td>
+<td>Love this dress! it's sooo pretty. i happene...</td>
+<td>5</td>
+<td>1</td>
+<td>4</td>
+<td>General</td>
+<td>Dresses</td>
+<td>Dresses</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1077</td>
+<td>60</td>
+<td>Some major design flaws</td>
+<td>I had such high hopes for this dress and reall...</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>General</td>
+<td>Dresses</td>
+<td>Dresses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1049</td>
+<td>50</td>
+<td>My favorite buy!</td>
+<td>I love love love this jumpsuit. it's fun fl...</td>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+<td>General Petite</td>
+<td>Bottoms</td>
+<td>Pants</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>847</td>
+<td>47</td>
+<td>Flattering shirt</td>
+<td>This shirt is very flattering to all due to th...</td>
+<td>5</td>
+<td>1</td>
+<td>6</td>
+<td>General</td>
+<td>Tops</td>
+<td>Blouses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23481</td>
+<td>1104</td>
+<td>34</td>
+<td>Great dress for many occasions</td>
+<td>I was very happy to snag this dress at such a ...</td>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+<td>General Petite</td>
+<td>Dresses</td>
+<td>Dresses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23482</td>
+<td>862</td>
+<td>48</td>
+<td>Wish it was made of cotton</td>
+<td>It reminds me of maternity clothes. soft stre...</td>
+<td>3</td>
+<td>1</td>
+<td>0</td>
+<td>General Petite</td>
+<td>Tops</td>
+<td>Knits</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23483</td>
+<td>1104</td>
+<td>31</td>
+<td>Cute, but see through</td>
+<td>This fit well but the top was very see throug...</td>
+<td>3</td>
+<td>0</td>
+<td>1</td>
+<td>General Petite</td>
+<td>Dresses</td>
+<td>Dresses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23484</td>
+<td>1084</td>
+<td>28</td>
+<td>Very cute dress, perfect for summer parties an...</td>
+<td>I bought this dress for a wedding i have this ...</td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>General</td>
+<td>Dresses</td>
+<td>Dresses</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23485</td>
+<td>1104</td>
+<td>52</td>
+<td>Please make more like this one!</td>
+<td>This dress in a lovely platinum is feminine an...</td>
+<td>5</td>
+<td>1</td>
+<td>22</td>
+<td>General Petite</td>
+<td>Dresses</td>
+<td>Dresses</td>
+</tr>
+</tbody>
 </table>
+
 <p>23486 rows × 10 columns</p>
 </div>
 </div>
@@ -688,87 +674,88 @@ ga('send', {
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># preview the results</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_transformed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>sentiment</th>
-      <th>review_body</th>
-      <th>product_category</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>If this product was in petite  i would get the...</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>Love this dress!  it's sooo pretty.  i happene...</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0</td>
-      <td>I had such high hopes for this dress and reall...</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>I love  love  love this jumpsuit. it's fun  fl...</td>
-      <td>Pants</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1</td>
-      <td>This shirt is very flattering to all due to th...</td>
-      <td>Blouses</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>23481</th>
-      <td>1</td>
-      <td>I was very happy to snag this dress at such a ...</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>23482</th>
-      <td>0</td>
-      <td>It reminds me of maternity clothes. soft  stre...</td>
-      <td>Knits</td>
-    </tr>
-    <tr>
-      <th>23483</th>
-      <td>0</td>
-      <td>This fit well  but the top was very see throug...</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>23484</th>
-      <td>0</td>
-      <td>I bought this dress for a wedding i have this ...</td>
-      <td>Dresses</td>
-    </tr>
-    <tr>
-      <th>23485</th>
-      <td>1</td>
-      <td>This dress in a lovely platinum is feminine an...</td>
-      <td>Dresses</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sentiment</th>
+<th data-quarto-table-cell-role="th">review_body</th>
+<th data-quarto-table-cell-role="th">product_category</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>If this product was in petite i would get the...</td>
+<td>Blouses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>Love this dress! it's sooo pretty. i happene...</td>
+<td>Dresses</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0</td>
+<td>I had such high hopes for this dress and reall...</td>
+<td>Dresses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1</td>
+<td>I love love love this jumpsuit. it's fun fl...</td>
+<td>Pants</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1</td>
+<td>This shirt is very flattering to all due to th...</td>
+<td>Blouses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23481</td>
+<td>1</td>
+<td>I was very happy to snag this dress at such a ...</td>
+<td>Dresses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23482</td>
+<td>0</td>
+<td>It reminds me of maternity clothes. soft stre...</td>
+<td>Knits</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23483</td>
+<td>0</td>
+<td>This fit well but the top was very see throug...</td>
+<td>Dresses</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23484</td>
+<td>0</td>
+<td>I bought this dress for a wedding i have this ...</td>
+<td>Dresses</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23485</td>
+<td>1</td>
+<td>This dress in a lovely platinum is feminine an...</td>
+<td>Dresses</td>
+</tr>
+</tbody>
 </table>
+
 <p>22626 rows × 3 columns</p>
 </div>
 </div>
@@ -889,43 +876,44 @@ Account ID: &lt;bound method Session.account_id of &lt;sagemaker.session.Session
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                         table<span class="op">=</span><span class="st">'reviews'</span>)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="25">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Column Name</th>
-      <th>Type</th>
-      <th>Partition</th>
-      <th>Comment</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>sentiment</td>
-      <td>int</td>
-      <td>False</td>
-      <td></td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>review_body</td>
-      <td>string</td>
-      <td>False</td>
-      <td></td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>product_category</td>
-      <td>string</td>
-      <td>False</td>
-      <td></td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Column Name</th>
+<th data-quarto-table-cell-role="th">Type</th>
+<th data-quarto-table-cell-role="th">Partition</th>
+<th data-quarto-table-cell-role="th">Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>sentiment</td>
+<td>int</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>review_body</td>
+<td>string</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>product_category</td>
+<td>string</td>
+<td>False</td>
+<td></td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1088,110 +1076,111 @@ ORDER BY count_sentiment DESC
 Wall time: 3.27 s</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="34">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>product_category</th>
-      <th>count_sentiment</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Dresses</td>
-      <td>6145</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Knits</td>
-      <td>4626</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Blouses</td>
-      <td>2983</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sweaters</td>
-      <td>1380</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Pants</td>
-      <td>1350</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>Jeans</td>
-      <td>1104</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>Fine gauge</td>
-      <td>1059</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Skirts</td>
-      <td>903</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Jackets</td>
-      <td>683</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>Lounge</td>
-      <td>669</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>Swim</td>
-      <td>332</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>Outerwear</td>
-      <td>319</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>Shorts</td>
-      <td>304</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>Sleep</td>
-      <td>214</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>Legwear</td>
-      <td>158</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>Intimates</td>
-      <td>147</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>Layering</td>
-      <td>132</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>Trend</td>
-      <td>118</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">product_category</th>
+<th data-quarto-table-cell-role="th">count_sentiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Dresses</td>
+<td>6145</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Knits</td>
+<td>4626</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Blouses</td>
+<td>2983</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Sweaters</td>
+<td>1380</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Pants</td>
+<td>1350</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Jeans</td>
+<td>1104</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Fine gauge</td>
+<td>1059</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Skirts</td>
+<td>903</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>Jackets</td>
+<td>683</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>Lounge</td>
+<td>669</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>Swim</td>
+<td>332</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>Outerwear</td>
+<td>319</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>Shorts</td>
+<td>304</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>Sleep</td>
+<td>214</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>Legwear</td>
+<td>158</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>Intimates</td>
+<td>147</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>Layering</td>
+<td>132</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>Trend</td>
+<td>118</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1233,110 +1222,111 @@ Wall time: 3.74 s</code></pre>
 <div class="cell" data-outputid="8b91eb80-2228-4cdb-9cb4-f49430d5665c">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>df_avg_by_category</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="38">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>product_category</th>
-      <th>avg_sentiment</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Layering</td>
-      <td>0.780303</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Jeans</td>
-      <td>0.746377</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Lounge</td>
-      <td>0.745889</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sleep</td>
-      <td>0.710280</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Shorts</td>
-      <td>0.707237</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>Pants</td>
-      <td>0.705185</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>Intimates</td>
-      <td>0.700680</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Jackets</td>
-      <td>0.699854</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Skirts</td>
-      <td>0.696567</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>Legwear</td>
-      <td>0.696203</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>Fine gauge</td>
-      <td>0.692162</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>Outerwear</td>
-      <td>0.683386</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>Knits</td>
-      <td>0.653913</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>Swim</td>
-      <td>0.644578</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>Dresses</td>
-      <td>0.643287</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>Sweaters</td>
-      <td>0.641304</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>Blouses</td>
-      <td>0.641301</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>Trend</td>
-      <td>0.483051</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">product_category</th>
+<th data-quarto-table-cell-role="th">avg_sentiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Layering</td>
+<td>0.780303</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Jeans</td>
+<td>0.746377</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Lounge</td>
+<td>0.745889</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Sleep</td>
+<td>0.710280</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Shorts</td>
+<td>0.707237</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Pants</td>
+<td>0.705185</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Intimates</td>
+<td>0.700680</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Jackets</td>
+<td>0.699854</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>Skirts</td>
+<td>0.696567</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>Legwear</td>
+<td>0.696203</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>Fine gauge</td>
+<td>0.692162</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>Outerwear</td>
+<td>0.683386</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>Knits</td>
+<td>0.653913</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>Swim</td>
+<td>0.644578</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>Dresses</td>
+<td>0.643287</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>Sweaters</td>
+<td>0.641304</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>Blouses</td>
+<td>0.641301</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>Trend</td>
+<td>0.483051</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1554,129 +1544,130 @@ Wall time: 3.56 s</code></pre>
 <span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>df_distribution_pct.columns<span class="op">=</span>[<span class="st">'1'</span>, <span class="st">'0'</span>, <span class="st">'-1'</span>]</span>
 <span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>df_distribution_pct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="54">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>1</th>
-      <th>0</th>
-      <th>-1</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Blouses</th>
-      <td>75.628562</td>
-      <td>12.872947</td>
-      <td>11.498491</td>
-    </tr>
-    <tr>
-      <th>Dresses</th>
-      <td>75.410903</td>
-      <td>13.506916</td>
-      <td>11.082181</td>
-    </tr>
-    <tr>
-      <th>Fine gauge</th>
-      <td>79.036827</td>
-      <td>11.142587</td>
-      <td>9.820585</td>
-    </tr>
-    <tr>
-      <th>Intimates</th>
-      <td>79.591837</td>
-      <td>10.884354</td>
-      <td>9.523810</td>
-    </tr>
-    <tr>
-      <th>Jackets</th>
-      <td>80.527086</td>
-      <td>8.931186</td>
-      <td>10.541728</td>
-    </tr>
-    <tr>
-      <th>Jeans</th>
-      <td>82.336957</td>
-      <td>9.963768</td>
-      <td>7.699275</td>
-    </tr>
-    <tr>
-      <th>Knits</th>
-      <td>76.156507</td>
-      <td>13.078253</td>
-      <td>10.765240</td>
-    </tr>
-    <tr>
-      <th>Layering</th>
-      <td>85.606061</td>
-      <td>6.818182</td>
-      <td>7.575758</td>
-    </tr>
-    <tr>
-      <th>Legwear</th>
-      <td>79.746835</td>
-      <td>10.126582</td>
-      <td>10.126582</td>
-    </tr>
-    <tr>
-      <th>Lounge</th>
-      <td>81.464873</td>
-      <td>11.659193</td>
-      <td>6.875934</td>
-    </tr>
-    <tr>
-      <th>Outerwear</th>
-      <td>79.623824</td>
-      <td>9.090909</td>
-      <td>11.285266</td>
-    </tr>
-    <tr>
-      <th>Pants</th>
-      <td>79.555556</td>
-      <td>11.407407</td>
-      <td>9.037037</td>
-    </tr>
-    <tr>
-      <th>Shorts</th>
-      <td>78.947368</td>
-      <td>12.828947</td>
-      <td>8.223684</td>
-    </tr>
-    <tr>
-      <th>Skirts</th>
-      <td>79.069767</td>
-      <td>11.517165</td>
-      <td>9.413068</td>
-    </tr>
-    <tr>
-      <th>Sleep</th>
-      <td>81.775701</td>
-      <td>7.476636</td>
-      <td>10.747664</td>
-    </tr>
-    <tr>
-      <th>Sweaters</th>
-      <td>75.072464</td>
-      <td>13.985507</td>
-      <td>10.942029</td>
-    </tr>
-    <tr>
-      <th>Swim</th>
-      <td>75.903614</td>
-      <td>12.650602</td>
-      <td>11.445783</td>
-    </tr>
-    <tr>
-      <th>Trend</th>
-      <td>66.101695</td>
-      <td>16.101695</td>
-      <td>17.796610</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">1</th>
+<th data-quarto-table-cell-role="th">0</th>
+<th data-quarto-table-cell-role="th">-1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Blouses</td>
+<td>75.628562</td>
+<td>12.872947</td>
+<td>11.498491</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Dresses</td>
+<td>75.410903</td>
+<td>13.506916</td>
+<td>11.082181</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Fine gauge</td>
+<td>79.036827</td>
+<td>11.142587</td>
+<td>9.820585</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Intimates</td>
+<td>79.591837</td>
+<td>10.884354</td>
+<td>9.523810</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Jackets</td>
+<td>80.527086</td>
+<td>8.931186</td>
+<td>10.541728</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Jeans</td>
+<td>82.336957</td>
+<td>9.963768</td>
+<td>7.699275</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Knits</td>
+<td>76.156507</td>
+<td>13.078253</td>
+<td>10.765240</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Layering</td>
+<td>85.606061</td>
+<td>6.818182</td>
+<td>7.575758</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Legwear</td>
+<td>79.746835</td>
+<td>10.126582</td>
+<td>10.126582</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Lounge</td>
+<td>81.464873</td>
+<td>11.659193</td>
+<td>6.875934</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Outerwear</td>
+<td>79.623824</td>
+<td>9.090909</td>
+<td>11.285266</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pants</td>
+<td>79.555556</td>
+<td>11.407407</td>
+<td>9.037037</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Shorts</td>
+<td>78.947368</td>
+<td>12.828947</td>
+<td>8.223684</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Skirts</td>
+<td>79.069767</td>
+<td>11.517165</td>
+<td>9.413068</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Sleep</td>
+<td>81.775701</td>
+<td>7.476636</td>
+<td>10.747664</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Sweaters</td>
+<td>75.072464</td>
+<td>13.985507</td>
+<td>10.942029</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Swim</td>
+<td>75.903614</td>
+<td>12.650602</td>
+<td>11.445783</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Trend</td>
+<td>66.101695</td>
+<td>16.101695</td>
+<td>17.796610</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1842,9 +1833,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1909,6 +1914,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1947,12 +2038,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
-    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -1965,7 +2056,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

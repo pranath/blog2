@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,9 +20,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -49,43 +50,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -122,7 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -169,54 +141,58 @@ ga('send', {
     <span class="navbar-title">LivingDataLab</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html">
+    <a class="nav-link" href="../index.html" rel="" target="">
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects.html" aria-current="page">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
  <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html">
+    <a class="nav-link" href="../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Pneumonia Detection From Chest X-Rays</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Pneumonia Detection From Chest X-Rays</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -224,7 +200,7 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">Pneumonia Detection From Chest X-Rays</h1>
+      <h1 class="title">Pneumonia Detection From Chest X-Rays</h1>
                   <div>
         <div class="description">
           In this project, I will analyze data from the NIH Chest X-ray 2D Medical image dataset and train a deep learning model to classify a given chest x-ray for the presence or absence of pneumonia.
@@ -260,50 +236,58 @@ ga('send', {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
   </div>
 </li>
       </ul>
@@ -311,6 +295,7 @@ ga('send', {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
 <!-- Begin Mailchimp Signup Form -->
@@ -351,16 +336,16 @@ ga('send', {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#load-view-and-clean-dataset" id="toc-load-view-and-clean-dataset" class="nav-link" data-scroll-target="#load-view-and-clean-dataset"><span class="toc-section-number">2</span>  Load, view and clean dataset</a></li>
-  <li><a href="#split-data-into-training-and-testing-sets" id="toc-split-data-into-training-and-testing-sets" class="nav-link" data-scroll-target="#split-data-into-training-and-testing-sets"><span class="toc-section-number">3</span>  Split data into training and testing sets</a></li>
-  <li><a href="#model-building-training" id="toc-model-building-training" class="nav-link" data-scroll-target="#model-building-training"><span class="toc-section-number">4</span>  Model building &amp; training</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#load-view-and-clean-dataset" id="toc-load-view-and-clean-dataset" class="nav-link" data-scroll-target="#load-view-and-clean-dataset"><span class="header-section-number">2</span> Load, view and clean dataset</a></li>
+  <li><a href="#split-data-into-training-and-testing-sets" id="toc-split-data-into-training-and-testing-sets" class="nav-link" data-scroll-target="#split-data-into-training-and-testing-sets"><span class="header-section-number">3</span> Split data into training and testing sets</a></li>
+  <li><a href="#model-building-training" id="toc-model-building-training" class="nav-link" data-scroll-target="#model-building-training"><span class="header-section-number">4</span> Model building &amp; training</a>
   <ul class="collapse">
-  <li><a href="#image-augmentation" id="toc-image-augmentation" class="nav-link" data-scroll-target="#image-augmentation"><span class="toc-section-number">4.1</span>  Image Augmentation</a></li>
-  <li><a href="#build-model" id="toc-build-model" class="nav-link" data-scroll-target="#build-model"><span class="toc-section-number">4.2</span>  Build model</a></li>
-  <li><a href="#train-model" id="toc-train-model" class="nav-link" data-scroll-target="#train-model"><span class="toc-section-number">4.3</span>  Train model</a></li>
+  <li><a href="#image-augmentation" id="toc-image-augmentation" class="nav-link" data-scroll-target="#image-augmentation"><span class="header-section-number">4.1</span> Image Augmentation</a></li>
+  <li><a href="#build-model" id="toc-build-model" class="nav-link" data-scroll-target="#build-model"><span class="header-section-number">4.2</span> Build model</a></li>
+  <li><a href="#train-model" id="toc-train-model" class="nav-link" data-scroll-target="#train-model"><span class="header-section-number">4.3</span> Train model</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">5</span>  Conclusion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">5</span> Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -402,79 +387,80 @@ ga('send', {
 <pre><code>Scans found: 112120 , Total Headers 112120</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Image Index</th>
-      <th>Finding Labels</th>
-      <th>Follow-up #</th>
-      <th>Patient ID</th>
-      <th>Patient Age</th>
-      <th>Patient Gender</th>
-      <th>View Position</th>
-      <th>OriginalImage[Width</th>
-      <th>Height]</th>
-      <th>OriginalImagePixelSpacing[x</th>
-      <th>y]</th>
-      <th>Unnamed: 11</th>
-      <th>path</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>54694</th>
-      <td>00013684_000.png</td>
-      <td>No Finding</td>
-      <td>0</td>
-      <td>13684</td>
-      <td>64</td>
-      <td>M</td>
-      <td>PA</td>
-      <td>2992</td>
-      <td>2991</td>
-      <td>0.143</td>
-      <td>0.143</td>
-      <td>NaN</td>
-      <td>/data/images_006/images/00013684_000.png</td>
-    </tr>
-    <tr>
-      <th>61239</th>
-      <td>00015102_000.png</td>
-      <td>No Finding</td>
-      <td>0</td>
-      <td>15102</td>
-      <td>48</td>
-      <td>F</td>
-      <td>PA</td>
-      <td>2446</td>
-      <td>2991</td>
-      <td>0.143</td>
-      <td>0.143</td>
-      <td>NaN</td>
-      <td>/data/images_007/images/00015102_000.png</td>
-    </tr>
-    <tr>
-      <th>102440</th>
-      <td>00027295_002.png</td>
-      <td>No Finding</td>
-      <td>2</td>
-      <td>27295</td>
-      <td>47</td>
-      <td>M</td>
-      <td>PA</td>
-      <td>2992</td>
-      <td>2991</td>
-      <td>0.143</td>
-      <td>0.143</td>
-      <td>NaN</td>
-      <td>/data/images_011/images/00027295_002.png</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Image Index</th>
+<th data-quarto-table-cell-role="th">Finding Labels</th>
+<th data-quarto-table-cell-role="th">Follow-up #</th>
+<th data-quarto-table-cell-role="th">Patient ID</th>
+<th data-quarto-table-cell-role="th">Patient Age</th>
+<th data-quarto-table-cell-role="th">Patient Gender</th>
+<th data-quarto-table-cell-role="th">View Position</th>
+<th data-quarto-table-cell-role="th">OriginalImage[Width</th>
+<th data-quarto-table-cell-role="th">Height]</th>
+<th data-quarto-table-cell-role="th">OriginalImagePixelSpacing[x</th>
+<th data-quarto-table-cell-role="th">y]</th>
+<th data-quarto-table-cell-role="th">Unnamed: 11</th>
+<th data-quarto-table-cell-role="th">path</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">54694</td>
+<td>00013684_000.png</td>
+<td>No Finding</td>
+<td>0</td>
+<td>13684</td>
+<td>64</td>
+<td>M</td>
+<td>PA</td>
+<td>2992</td>
+<td>2991</td>
+<td>0.143</td>
+<td>0.143</td>
+<td>NaN</td>
+<td>/data/images_006/images/00013684_000.png</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">61239</td>
+<td>00015102_000.png</td>
+<td>No Finding</td>
+<td>0</td>
+<td>15102</td>
+<td>48</td>
+<td>F</td>
+<td>PA</td>
+<td>2446</td>
+<td>2991</td>
+<td>0.143</td>
+<td>0.143</td>
+<td>NaN</td>
+<td>/data/images_007/images/00015102_000.png</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">102440</td>
+<td>00027295_002.png</td>
+<td>No Finding</td>
+<td>2</td>
+<td>27295</td>
+<td>47</td>
+<td>M</td>
+<td>PA</td>
+<td>2992</td>
+<td>2991</td>
+<td>0.143</td>
+<td>0.143</td>
+<td>NaN</td>
+<td>/data/images_011/images/00027295_002.png</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -484,114 +470,115 @@ ga('send', {
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>all_xray_df <span class="op">=</span> all_xray_df[all_xray_df[<span class="st">'Patient Age'</span>] <span class="op">&lt;</span> <span class="dv">120</span>]</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>all_xray_df.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Follow-up #</th>
-      <th>Patient ID</th>
-      <th>Patient Age</th>
-      <th>OriginalImage[Width</th>
-      <th>Height]</th>
-      <th>OriginalImagePixelSpacing[x</th>
-      <th>y]</th>
-      <th>Unnamed: 11</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>count</th>
-      <td>112104.000000</td>
-      <td>112104.000000</td>
-      <td>112104.000000</td>
-      <td>112104.000000</td>
-      <td>112104.000000</td>
-      <td>112104.000000</td>
-      <td>112104.000000</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>mean</th>
-      <td>8.574172</td>
-      <td>14345.720724</td>
-      <td>46.872574</td>
-      <td>2646.035253</td>
-      <td>2486.393153</td>
-      <td>0.155651</td>
-      <td>0.155651</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>std</th>
-      <td>15.406734</td>
-      <td>8403.980520</td>
-      <td>16.598152</td>
-      <td>341.243771</td>
-      <td>401.270806</td>
-      <td>0.016174</td>
-      <td>0.016174</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>min</th>
-      <td>0.000000</td>
-      <td>1.000000</td>
-      <td>1.000000</td>
-      <td>1143.000000</td>
-      <td>966.000000</td>
-      <td>0.115000</td>
-      <td>0.115000</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>25%</th>
-      <td>0.000000</td>
-      <td>7308.000000</td>
-      <td>35.000000</td>
-      <td>2500.000000</td>
-      <td>2048.000000</td>
-      <td>0.143000</td>
-      <td>0.143000</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>50%</th>
-      <td>3.000000</td>
-      <td>13993.000000</td>
-      <td>49.000000</td>
-      <td>2518.000000</td>
-      <td>2544.000000</td>
-      <td>0.143000</td>
-      <td>0.143000</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>75%</th>
-      <td>10.000000</td>
-      <td>20673.000000</td>
-      <td>59.000000</td>
-      <td>2992.000000</td>
-      <td>2991.000000</td>
-      <td>0.168000</td>
-      <td>0.168000</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>max</th>
-      <td>183.000000</td>
-      <td>30805.000000</td>
-      <td>95.000000</td>
-      <td>3827.000000</td>
-      <td>4715.000000</td>
-      <td>0.198800</td>
-      <td>0.198800</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Follow-up #</th>
+<th data-quarto-table-cell-role="th">Patient ID</th>
+<th data-quarto-table-cell-role="th">Patient Age</th>
+<th data-quarto-table-cell-role="th">OriginalImage[Width</th>
+<th data-quarto-table-cell-role="th">Height]</th>
+<th data-quarto-table-cell-role="th">OriginalImagePixelSpacing[x</th>
+<th data-quarto-table-cell-role="th">y]</th>
+<th data-quarto-table-cell-role="th">Unnamed: 11</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>112104.000000</td>
+<td>112104.000000</td>
+<td>112104.000000</td>
+<td>112104.000000</td>
+<td>112104.000000</td>
+<td>112104.000000</td>
+<td>112104.000000</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>8.574172</td>
+<td>14345.720724</td>
+<td>46.872574</td>
+<td>2646.035253</td>
+<td>2486.393153</td>
+<td>0.155651</td>
+<td>0.155651</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>15.406734</td>
+<td>8403.980520</td>
+<td>16.598152</td>
+<td>341.243771</td>
+<td>401.270806</td>
+<td>0.016174</td>
+<td>0.016174</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>0.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1143.000000</td>
+<td>966.000000</td>
+<td>0.115000</td>
+<td>0.115000</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>0.000000</td>
+<td>7308.000000</td>
+<td>35.000000</td>
+<td>2500.000000</td>
+<td>2048.000000</td>
+<td>0.143000</td>
+<td>0.143000</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>3.000000</td>
+<td>13993.000000</td>
+<td>49.000000</td>
+<td>2518.000000</td>
+<td>2544.000000</td>
+<td>0.143000</td>
+<td>0.143000</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>10.000000</td>
+<td>20673.000000</td>
+<td>59.000000</td>
+<td>2992.000000</td>
+<td>2991.000000</td>
+<td>0.168000</td>
+<td>0.168000</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>183.000000</td>
+<td>30805.000000</td>
+<td>95.000000</td>
+<td>3827.000000</td>
+<td>4715.000000</td>
+<td>0.198800</td>
+<td>0.198800</td>
+<td>NaN</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -612,111 +599,112 @@ ga('send', {
 <pre><code>All Labels (15): ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Effusion', 'Emphysema', 'Fibrosis', 'Hernia', 'Infiltration', 'Mass', 'No Finding', 'Nodule', 'Pleural_Thickening', 'Pneumonia', 'Pneumothorax']</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="4">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Image Index</th>
-      <th>Finding Labels</th>
-      <th>Follow-up #</th>
-      <th>Patient ID</th>
-      <th>Patient Age</th>
-      <th>Patient Gender</th>
-      <th>View Position</th>
-      <th>OriginalImage[Width</th>
-      <th>Height]</th>
-      <th>OriginalImagePixelSpacing[x</th>
-      <th>...</th>
-      <th>Emphysema</th>
-      <th>Fibrosis</th>
-      <th>Hernia</th>
-      <th>Infiltration</th>
-      <th>Mass</th>
-      <th>No Finding</th>
-      <th>Nodule</th>
-      <th>Pleural_Thickening</th>
-      <th>Pneumonia</th>
-      <th>Pneumothorax</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>43672</th>
-      <td>00011246_000.png</td>
-      <td>No Finding</td>
-      <td>0</td>
-      <td>11246</td>
-      <td>40</td>
-      <td>M</td>
-      <td>PA</td>
-      <td>2992</td>
-      <td>2991</td>
-      <td>0.143</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>60931</th>
-      <td>00015040_001.png</td>
-      <td>Atelectasis|Effusion</td>
-      <td>1</td>
-      <td>15040</td>
-      <td>48</td>
-      <td>F</td>
-      <td>AP</td>
-      <td>2500</td>
-      <td>2048</td>
-      <td>0.168</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>25642</th>
-      <td>00006741_001.png</td>
-      <td>No Finding</td>
-      <td>1</td>
-      <td>6741</td>
-      <td>54</td>
-      <td>F</td>
-      <td>PA</td>
-      <td>2992</td>
-      <td>2991</td>
-      <td>0.143</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Image Index</th>
+<th data-quarto-table-cell-role="th">Finding Labels</th>
+<th data-quarto-table-cell-role="th">Follow-up #</th>
+<th data-quarto-table-cell-role="th">Patient ID</th>
+<th data-quarto-table-cell-role="th">Patient Age</th>
+<th data-quarto-table-cell-role="th">Patient Gender</th>
+<th data-quarto-table-cell-role="th">View Position</th>
+<th data-quarto-table-cell-role="th">OriginalImage[Width</th>
+<th data-quarto-table-cell-role="th">Height]</th>
+<th data-quarto-table-cell-role="th">OriginalImagePixelSpacing[x</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Emphysema</th>
+<th data-quarto-table-cell-role="th">Fibrosis</th>
+<th data-quarto-table-cell-role="th">Hernia</th>
+<th data-quarto-table-cell-role="th">Infiltration</th>
+<th data-quarto-table-cell-role="th">Mass</th>
+<th data-quarto-table-cell-role="th">No Finding</th>
+<th data-quarto-table-cell-role="th">Nodule</th>
+<th data-quarto-table-cell-role="th">Pleural_Thickening</th>
+<th data-quarto-table-cell-role="th">Pneumonia</th>
+<th data-quarto-table-cell-role="th">Pneumothorax</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">43672</td>
+<td>00011246_000.png</td>
+<td>No Finding</td>
+<td>0</td>
+<td>11246</td>
+<td>40</td>
+<td>M</td>
+<td>PA</td>
+<td>2992</td>
+<td>2991</td>
+<td>0.143</td>
+<td>...</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">60931</td>
+<td>00015040_001.png</td>
+<td>Atelectasis|Effusion</td>
+<td>1</td>
+<td>15040</td>
+<td>48</td>
+<td>F</td>
+<td>AP</td>
+<td>2500</td>
+<td>2048</td>
+<td>0.168</td>
+<td>...</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25642</td>
+<td>00006741_001.png</td>
+<td>No Finding</td>
+<td>1</td>
+<td>6741</td>
+<td>54</td>
+<td>F</td>
+<td>PA</td>
+<td>2992</td>
+<td>2991</td>
+<td>0.143</td>
+<td>...</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
 </table>
+
 <p>3 rows × 28 columns</p>
 </div>
 </div>
@@ -728,159 +716,160 @@ ga('send', {
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>all_xray_df[<span class="st">'pneumonia_class'</span>] <span class="op">=</span> np.where(all_xray_df[<span class="st">'Pneumonia'</span>]<span class="op">==</span><span class="dv">1</span>, <span class="st">'Pneumonia'</span>, <span class="st">'No Pneumonia'</span>)</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>all_xray_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Image Index</th>
-      <th>Finding Labels</th>
-      <th>Follow-up #</th>
-      <th>Patient ID</th>
-      <th>Patient Age</th>
-      <th>Patient Gender</th>
-      <th>View Position</th>
-      <th>OriginalImage[Width</th>
-      <th>Height]</th>
-      <th>OriginalImagePixelSpacing[x</th>
-      <th>...</th>
-      <th>Fibrosis</th>
-      <th>Hernia</th>
-      <th>Infiltration</th>
-      <th>Mass</th>
-      <th>No Finding</th>
-      <th>Nodule</th>
-      <th>Pleural_Thickening</th>
-      <th>Pneumonia</th>
-      <th>Pneumothorax</th>
-      <th>pneumonia_class</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>00000001_000.png</td>
-      <td>Cardiomegaly</td>
-      <td>0</td>
-      <td>1</td>
-      <td>58</td>
-      <td>M</td>
-      <td>PA</td>
-      <td>2682</td>
-      <td>2749</td>
-      <td>0.143</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>No Pneumonia</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>00000001_001.png</td>
-      <td>Cardiomegaly|Emphysema</td>
-      <td>1</td>
-      <td>1</td>
-      <td>58</td>
-      <td>M</td>
-      <td>PA</td>
-      <td>2894</td>
-      <td>2729</td>
-      <td>0.143</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>No Pneumonia</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>00000001_002.png</td>
-      <td>Cardiomegaly|Effusion</td>
-      <td>2</td>
-      <td>1</td>
-      <td>58</td>
-      <td>M</td>
-      <td>PA</td>
-      <td>2500</td>
-      <td>2048</td>
-      <td>0.168</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>No Pneumonia</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>00000002_000.png</td>
-      <td>No Finding</td>
-      <td>0</td>
-      <td>2</td>
-      <td>81</td>
-      <td>M</td>
-      <td>PA</td>
-      <td>2500</td>
-      <td>2048</td>
-      <td>0.171</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>No Pneumonia</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>00000003_000.png</td>
-      <td>Hernia</td>
-      <td>0</td>
-      <td>3</td>
-      <td>81</td>
-      <td>F</td>
-      <td>PA</td>
-      <td>2582</td>
-      <td>2991</td>
-      <td>0.143</td>
-      <td>...</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>No Pneumonia</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Image Index</th>
+<th data-quarto-table-cell-role="th">Finding Labels</th>
+<th data-quarto-table-cell-role="th">Follow-up #</th>
+<th data-quarto-table-cell-role="th">Patient ID</th>
+<th data-quarto-table-cell-role="th">Patient Age</th>
+<th data-quarto-table-cell-role="th">Patient Gender</th>
+<th data-quarto-table-cell-role="th">View Position</th>
+<th data-quarto-table-cell-role="th">OriginalImage[Width</th>
+<th data-quarto-table-cell-role="th">Height]</th>
+<th data-quarto-table-cell-role="th">OriginalImagePixelSpacing[x</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Fibrosis</th>
+<th data-quarto-table-cell-role="th">Hernia</th>
+<th data-quarto-table-cell-role="th">Infiltration</th>
+<th data-quarto-table-cell-role="th">Mass</th>
+<th data-quarto-table-cell-role="th">No Finding</th>
+<th data-quarto-table-cell-role="th">Nodule</th>
+<th data-quarto-table-cell-role="th">Pleural_Thickening</th>
+<th data-quarto-table-cell-role="th">Pneumonia</th>
+<th data-quarto-table-cell-role="th">Pneumothorax</th>
+<th data-quarto-table-cell-role="th">pneumonia_class</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>00000001_000.png</td>
+<td>Cardiomegaly</td>
+<td>0</td>
+<td>1</td>
+<td>58</td>
+<td>M</td>
+<td>PA</td>
+<td>2682</td>
+<td>2749</td>
+<td>0.143</td>
+<td>...</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>No Pneumonia</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>00000001_001.png</td>
+<td>Cardiomegaly|Emphysema</td>
+<td>1</td>
+<td>1</td>
+<td>58</td>
+<td>M</td>
+<td>PA</td>
+<td>2894</td>
+<td>2729</td>
+<td>0.143</td>
+<td>...</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>No Pneumonia</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>00000001_002.png</td>
+<td>Cardiomegaly|Effusion</td>
+<td>2</td>
+<td>1</td>
+<td>58</td>
+<td>M</td>
+<td>PA</td>
+<td>2500</td>
+<td>2048</td>
+<td>0.168</td>
+<td>...</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>No Pneumonia</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>00000002_000.png</td>
+<td>No Finding</td>
+<td>0</td>
+<td>2</td>
+<td>81</td>
+<td>M</td>
+<td>PA</td>
+<td>2500</td>
+<td>2048</td>
+<td>0.171</td>
+<td>...</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>No Pneumonia</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>00000003_000.png</td>
+<td>Hernia</td>
+<td>0</td>
+<td>3</td>
+<td>81</td>
+<td>F</td>
+<td>PA</td>
+<td>2582</td>
+<td>2991</td>
+<td>0.143</td>
+<td>...</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>No Pneumonia</td>
+</tr>
+</tbody>
 </table>
+
 <p>5 rows × 29 columns</p>
 </div>
 </div>
@@ -1957,9 +1946,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -2024,6 +2027,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -2062,12 +2151,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
-    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -2080,7 +2169,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

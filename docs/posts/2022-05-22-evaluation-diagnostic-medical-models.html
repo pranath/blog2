@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,9 +20,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -49,43 +50,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -122,7 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -143,15 +115,16 @@ ga('send', {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../css/styles.css">
 <meta property="og:title" content="LivingDataLab - Evaluating Healthcare Diagnostic Models">
-<meta property="og:description" content="In this project we will be working with the results of the X-ray classification model for diseases we developed in the previous article, and evaluate the model performance on each of these classes…">
+<meta property="og:description" content="In this project we will be working with the results of the X-ray classification model for diseases we developed in the previous article, and evaluate the model performance on each of these classes using various classification metrics.">
 <meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/ai_health.jpg">
 <meta property="og:site-name" content="LivingDataLab">
 <meta name="twitter:title" content="LivingDataLab - Evaluating Healthcare Diagnostic Models">
-<meta name="twitter:description" content="In this project we will be working with the results of the X-ray classification model for diseases we developed in the previous article, and evaluate the model performance on each of these classes…">
+<meta name="twitter:description" content="In this project we will be working with the results of the X-ray classification model for diseases we developed in the previous article, and evaluate the model performance on each of these classes using various classification metrics.">
 <meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/ai_health.jpg">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -170,54 +143,58 @@ ga('send', {
     <span class="navbar-title">LivingDataLab</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html">
+    <a class="nav-link" href="../index.html" rel="" target="">
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects.html" aria-current="page">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
  <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html">
+    <a class="nav-link" href="../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Evaluating Healthcare Diagnostic Models</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Evaluating Healthcare Diagnostic Models</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -225,7 +202,7 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">Evaluating Healthcare Diagnostic Models</h1>
+      <h1 class="title">Evaluating Healthcare Diagnostic Models</h1>
                   <div>
         <div class="description">
           In this project we will be working with the results of the X-ray classification model for diseases we developed in the previous article, and evaluate the model performance on each of these classes using various classification metrics.
@@ -261,50 +238,58 @@ ga('send', {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
   </div>
 </li>
       </ul>
@@ -312,6 +297,7 @@ ga('send', {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
 <!-- Begin Mailchimp Signup Form -->
@@ -352,21 +338,21 @@ ga('send', {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview"><span class="toc-section-number">2</span>  Overview</a></li>
-  <li><a href="#metrics" id="toc-metrics" class="nav-link" data-scroll-target="#metrics"><span class="toc-section-number">3</span>  Metrics</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview"><span class="header-section-number">2</span> Overview</a></li>
+  <li><a href="#metrics" id="toc-metrics" class="nav-link" data-scroll-target="#metrics"><span class="header-section-number">3</span> Metrics</a>
   <ul class="collapse">
-  <li><a href="#true-positives-false-positives-true-negatives-and-false-negatives" id="toc-true-positives-false-positives-true-negatives-and-false-negatives" class="nav-link" data-scroll-target="#true-positives-false-positives-true-negatives-and-false-negatives"><span class="toc-section-number">3.1</span>  True Positives, False Positives, True Negatives and False Negatives</a></li>
-  <li><a href="#accuracy" id="toc-accuracy" class="nav-link" data-scroll-target="#accuracy"><span class="toc-section-number">3.2</span>  Accuracy</a></li>
-  <li><a href="#prevalence" id="toc-prevalence" class="nav-link" data-scroll-target="#prevalence"><span class="toc-section-number">3.3</span>  Prevalence</a></li>
-  <li><a href="#sensitivity-and-specificity" id="toc-sensitivity-and-specificity" class="nav-link" data-scroll-target="#sensitivity-and-specificity"><span class="toc-section-number">3.4</span>  Sensitivity and Specificity</a></li>
-  <li><a href="#roc-curve" id="toc-roc-curve" class="nav-link" data-scroll-target="#roc-curve"><span class="toc-section-number">3.5</span>  ROC Curve</a></li>
+  <li><a href="#true-positives-false-positives-true-negatives-and-false-negatives" id="toc-true-positives-false-positives-true-negatives-and-false-negatives" class="nav-link" data-scroll-target="#true-positives-false-positives-true-negatives-and-false-negatives"><span class="header-section-number">3.1</span> True Positives, False Positives, True Negatives and False Negatives</a></li>
+  <li><a href="#accuracy" id="toc-accuracy" class="nav-link" data-scroll-target="#accuracy"><span class="header-section-number">3.2</span> Accuracy</a></li>
+  <li><a href="#prevalence" id="toc-prevalence" class="nav-link" data-scroll-target="#prevalence"><span class="header-section-number">3.3</span> Prevalence</a></li>
+  <li><a href="#sensitivity-and-specificity" id="toc-sensitivity-and-specificity" class="nav-link" data-scroll-target="#sensitivity-and-specificity"><span class="header-section-number">3.4</span> Sensitivity and Specificity</a></li>
+  <li><a href="#roc-curve" id="toc-roc-curve" class="nav-link" data-scroll-target="#roc-curve"><span class="header-section-number">3.5</span> ROC Curve</a></li>
   </ul></li>
-  <li><a href="#confidence-intervals" id="toc-confidence-intervals" class="nav-link" data-scroll-target="#confidence-intervals"><span class="toc-section-number">4</span>  Confidence Intervals</a></li>
-  <li><a href="#precision-recall-curve" id="toc-precision-recall-curve" class="nav-link" data-scroll-target="#precision-recall-curve"><span class="toc-section-number">5</span>  Precision-Recall Curve</a></li>
-  <li><a href="#f1-score" id="toc-f1-score" class="nav-link" data-scroll-target="#f1-score"><span class="toc-section-number">6</span>  F1 Score</a></li>
-  <li><a href="#calibration" id="toc-calibration" class="nav-link" data-scroll-target="#calibration"><span class="toc-section-number">7</span>  Calibration</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">8</span>  Conclusion</a></li>
+  <li><a href="#confidence-intervals" id="toc-confidence-intervals" class="nav-link" data-scroll-target="#confidence-intervals"><span class="header-section-number">4</span> Confidence Intervals</a></li>
+  <li><a href="#precision-recall-curve" id="toc-precision-recall-curve" class="nav-link" data-scroll-target="#precision-recall-curve"><span class="header-section-number">5</span> Precision-Recall Curve</a></li>
+  <li><a href="#f1-score" id="toc-f1-score" class="nav-link" data-scroll-target="#f1-score"><span class="header-section-number">6</span> F1 Score</a></li>
+  <li><a href="#calibration" id="toc-calibration" class="nav-link" data-scroll-target="#calibration"><span class="header-section-number">7</span> Calibration</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">8</span> Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -427,159 +413,160 @@ ga('send', {
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># let's take a peek at our dataset</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>valid_results[np.concatenate([class_labels, pred_labels])].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Cardiomegaly</th>
-      <th>Emphysema</th>
-      <th>Effusion</th>
-      <th>Hernia</th>
-      <th>Infiltration</th>
-      <th>Mass</th>
-      <th>Nodule</th>
-      <th>Atelectasis</th>
-      <th>Pneumothorax</th>
-      <th>Pleural_Thickening</th>
-      <th>...</th>
-      <th>Infiltration_pred</th>
-      <th>Mass_pred</th>
-      <th>Nodule_pred</th>
-      <th>Atelectasis_pred</th>
-      <th>Pneumothorax_pred</th>
-      <th>Pleural_Thickening_pred</th>
-      <th>Pneumonia_pred</th>
-      <th>Fibrosis_pred</th>
-      <th>Edema_pred</th>
-      <th>Consolidation_pred</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>...</td>
-      <td>0.256020</td>
-      <td>0.266928</td>
-      <td>0.312440</td>
-      <td>0.460342</td>
-      <td>0.079453</td>
-      <td>0.271495</td>
-      <td>0.276861</td>
-      <td>0.398799</td>
-      <td>0.015867</td>
-      <td>0.156320</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>...</td>
-      <td>0.382199</td>
-      <td>0.176825</td>
-      <td>0.465807</td>
-      <td>0.489424</td>
-      <td>0.084595</td>
-      <td>0.377318</td>
-      <td>0.363582</td>
-      <td>0.638024</td>
-      <td>0.025948</td>
-      <td>0.144419</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>...</td>
-      <td>0.427727</td>
-      <td>0.115513</td>
-      <td>0.249030</td>
-      <td>0.035105</td>
-      <td>0.238761</td>
-      <td>0.167095</td>
-      <td>0.166389</td>
-      <td>0.262463</td>
-      <td>0.007758</td>
-      <td>0.125790</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>...</td>
-      <td>0.158596</td>
-      <td>0.259460</td>
-      <td>0.334870</td>
-      <td>0.266489</td>
-      <td>0.073371</td>
-      <td>0.229834</td>
-      <td>0.191281</td>
-      <td>0.344348</td>
-      <td>0.008559</td>
-      <td>0.119153</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>...</td>
-      <td>0.536762</td>
-      <td>0.198797</td>
-      <td>0.273110</td>
-      <td>0.186771</td>
-      <td>0.242122</td>
-      <td>0.309786</td>
-      <td>0.411771</td>
-      <td>0.244666</td>
-      <td>0.126930</td>
-      <td>0.342409</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Cardiomegaly</th>
+<th data-quarto-table-cell-role="th">Emphysema</th>
+<th data-quarto-table-cell-role="th">Effusion</th>
+<th data-quarto-table-cell-role="th">Hernia</th>
+<th data-quarto-table-cell-role="th">Infiltration</th>
+<th data-quarto-table-cell-role="th">Mass</th>
+<th data-quarto-table-cell-role="th">Nodule</th>
+<th data-quarto-table-cell-role="th">Atelectasis</th>
+<th data-quarto-table-cell-role="th">Pneumothorax</th>
+<th data-quarto-table-cell-role="th">Pleural_Thickening</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Infiltration_pred</th>
+<th data-quarto-table-cell-role="th">Mass_pred</th>
+<th data-quarto-table-cell-role="th">Nodule_pred</th>
+<th data-quarto-table-cell-role="th">Atelectasis_pred</th>
+<th data-quarto-table-cell-role="th">Pneumothorax_pred</th>
+<th data-quarto-table-cell-role="th">Pleural_Thickening_pred</th>
+<th data-quarto-table-cell-role="th">Pneumonia_pred</th>
+<th data-quarto-table-cell-role="th">Fibrosis_pred</th>
+<th data-quarto-table-cell-role="th">Edema_pred</th>
+<th data-quarto-table-cell-role="th">Consolidation_pred</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>0.256020</td>
+<td>0.266928</td>
+<td>0.312440</td>
+<td>0.460342</td>
+<td>0.079453</td>
+<td>0.271495</td>
+<td>0.276861</td>
+<td>0.398799</td>
+<td>0.015867</td>
+<td>0.156320</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>0.382199</td>
+<td>0.176825</td>
+<td>0.465807</td>
+<td>0.489424</td>
+<td>0.084595</td>
+<td>0.377318</td>
+<td>0.363582</td>
+<td>0.638024</td>
+<td>0.025948</td>
+<td>0.144419</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>0.427727</td>
+<td>0.115513</td>
+<td>0.249030</td>
+<td>0.035105</td>
+<td>0.238761</td>
+<td>0.167095</td>
+<td>0.166389</td>
+<td>0.262463</td>
+<td>0.007758</td>
+<td>0.125790</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>0.158596</td>
+<td>0.259460</td>
+<td>0.334870</td>
+<td>0.266489</td>
+<td>0.073371</td>
+<td>0.229834</td>
+<td>0.191281</td>
+<td>0.344348</td>
+<td>0.008559</td>
+<td>0.119153</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>0.536762</td>
+<td>0.198797</td>
+<td>0.273110</td>
+<td>0.186771</td>
+<td>0.242122</td>
+<td>0.309786</td>
+<td>0.411771</td>
+<td>0.244666</td>
+<td>0.126930</td>
+<td>0.342409</td>
+</tr>
+</tbody>
 </table>
+
 <p>5 rows × 28 columns</p>
 </div>
 </div>
@@ -696,105 +683,106 @@ ga('send', {
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Test functions </span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>get_tp_tn_fp_fn_test(true_positives, true_negatives, false_positives, false_negatives)    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>y_test</th>
-      <th>preds_test</th>
-      <th>category</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>0.8</td>
-      <td>TP</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>0.7</td>
-      <td>TP</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0</td>
-      <td>0.4</td>
-      <td>TN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0</td>
-      <td>0.3</td>
-      <td>TN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0</td>
-      <td>0.2</td>
-      <td>TN</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>0</td>
-      <td>0.5</td>
-      <td>FP</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>0</td>
-      <td>0.6</td>
-      <td>FP</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>0</td>
-      <td>0.7</td>
-      <td>FP</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>0</td>
-      <td>0.8</td>
-      <td>FP</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>1</td>
-      <td>0.1</td>
-      <td>FN</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>1</td>
-      <td>0.2</td>
-      <td>FN</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>1</td>
-      <td>0.3</td>
-      <td>FN</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>1</td>
-      <td>0.4</td>
-      <td>FN</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>1</td>
-      <td>0.0</td>
-      <td>FN</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">y_test</th>
+<th data-quarto-table-cell-role="th">preds_test</th>
+<th data-quarto-table-cell-role="th">category</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>0.8</td>
+<td>TP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>0.7</td>
+<td>TP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0</td>
+<td>0.4</td>
+<td>TN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0</td>
+<td>0.3</td>
+<td>TN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0</td>
+<td>0.2</td>
+<td>TN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>0</td>
+<td>0.5</td>
+<td>FP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>0</td>
+<td>0.6</td>
+<td>FP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>0</td>
+<td>0.7</td>
+<td>FP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>0</td>
+<td>0.8</td>
+<td>FP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>1</td>
+<td>0.1</td>
+<td>FN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>1</td>
+<td>0.2</td>
+<td>FN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>1</td>
+<td>0.3</td>
+<td>FN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>1</td>
+<td>0.4</td>
+<td>FN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>1</td>
+<td>0.0</td>
+<td>FN</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -826,271 +814,272 @@ ga('send', {
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Add these to a table for each disease</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>util.get_performance_metrics(y, pred, class_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>TP</th>
-      <th>TN</th>
-      <th>FP</th>
-      <th>FN</th>
-      <th>Accuracy</th>
-      <th>Prevalence</th>
-      <th>Sensitivity</th>
-      <th>Specificity</th>
-      <th>PPV</th>
-      <th>NPV</th>
-      <th>AUC</th>
-      <th>F1</th>
-      <th>Threshold</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Cardiomegaly</th>
-      <td>16</td>
-      <td>814</td>
-      <td>169</td>
-      <td>1</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Emphysema</th>
-      <td>20</td>
-      <td>869</td>
-      <td>103</td>
-      <td>8</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Effusion</th>
-      <td>99</td>
-      <td>690</td>
-      <td>196</td>
-      <td>15</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Hernia</th>
-      <td>1</td>
-      <td>743</td>
-      <td>255</td>
-      <td>1</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Infiltration</th>
-      <td>114</td>
-      <td>543</td>
-      <td>265</td>
-      <td>78</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Mass</th>
-      <td>40</td>
-      <td>789</td>
-      <td>158</td>
-      <td>13</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Nodule</th>
-      <td>28</td>
-      <td>731</td>
-      <td>220</td>
-      <td>21</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Atelectasis</th>
-      <td>64</td>
-      <td>657</td>
-      <td>249</td>
-      <td>30</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumothorax</th>
-      <td>24</td>
-      <td>785</td>
-      <td>183</td>
-      <td>8</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pleural_Thickening</th>
-      <td>24</td>
-      <td>713</td>
-      <td>259</td>
-      <td>4</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumonia</th>
-      <td>14</td>
-      <td>661</td>
-      <td>320</td>
-      <td>5</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Fibrosis</th>
-      <td>10</td>
-      <td>725</td>
-      <td>261</td>
-      <td>4</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Edema</th>
-      <td>15</td>
-      <td>767</td>
-      <td>213</td>
-      <td>5</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Consolidation</th>
-      <td>36</td>
-      <td>658</td>
-      <td>297</td>
-      <td>9</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TP</th>
+<th data-quarto-table-cell-role="th">TN</th>
+<th data-quarto-table-cell-role="th">FP</th>
+<th data-quarto-table-cell-role="th">FN</th>
+<th data-quarto-table-cell-role="th">Accuracy</th>
+<th data-quarto-table-cell-role="th">Prevalence</th>
+<th data-quarto-table-cell-role="th">Sensitivity</th>
+<th data-quarto-table-cell-role="th">Specificity</th>
+<th data-quarto-table-cell-role="th">PPV</th>
+<th data-quarto-table-cell-role="th">NPV</th>
+<th data-quarto-table-cell-role="th">AUC</th>
+<th data-quarto-table-cell-role="th">F1</th>
+<th data-quarto-table-cell-role="th">Threshold</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cardiomegaly</td>
+<td>16</td>
+<td>814</td>
+<td>169</td>
+<td>1</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Emphysema</td>
+<td>20</td>
+<td>869</td>
+<td>103</td>
+<td>8</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Effusion</td>
+<td>99</td>
+<td>690</td>
+<td>196</td>
+<td>15</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Hernia</td>
+<td>1</td>
+<td>743</td>
+<td>255</td>
+<td>1</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Infiltration</td>
+<td>114</td>
+<td>543</td>
+<td>265</td>
+<td>78</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Mass</td>
+<td>40</td>
+<td>789</td>
+<td>158</td>
+<td>13</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nodule</td>
+<td>28</td>
+<td>731</td>
+<td>220</td>
+<td>21</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Atelectasis</td>
+<td>64</td>
+<td>657</td>
+<td>249</td>
+<td>30</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumothorax</td>
+<td>24</td>
+<td>785</td>
+<td>183</td>
+<td>8</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pleural_Thickening</td>
+<td>24</td>
+<td>713</td>
+<td>259</td>
+<td>4</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumonia</td>
+<td>14</td>
+<td>661</td>
+<td>320</td>
+<td>5</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Fibrosis</td>
+<td>10</td>
+<td>725</td>
+<td>261</td>
+<td>4</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Edema</td>
+<td>15</td>
+<td>767</td>
+<td>213</td>
+<td>5</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Consolidation</td>
+<td>36</td>
+<td>658</td>
+<td>297</td>
+<td>9</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1157,271 +1146,272 @@ Computed Accuracy: 0.6
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>util.get_performance_metrics(y, pred, class_labels, acc<span class="op">=</span>get_accuracy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>TP</th>
-      <th>TN</th>
-      <th>FP</th>
-      <th>FN</th>
-      <th>Accuracy</th>
-      <th>Prevalence</th>
-      <th>Sensitivity</th>
-      <th>Specificity</th>
-      <th>PPV</th>
-      <th>NPV</th>
-      <th>AUC</th>
-      <th>F1</th>
-      <th>Threshold</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Cardiomegaly</th>
-      <td>16</td>
-      <td>814</td>
-      <td>169</td>
-      <td>1</td>
-      <td>0.83</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Emphysema</th>
-      <td>20</td>
-      <td>869</td>
-      <td>103</td>
-      <td>8</td>
-      <td>0.889</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Effusion</th>
-      <td>99</td>
-      <td>690</td>
-      <td>196</td>
-      <td>15</td>
-      <td>0.789</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Hernia</th>
-      <td>1</td>
-      <td>743</td>
-      <td>255</td>
-      <td>1</td>
-      <td>0.744</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Infiltration</th>
-      <td>114</td>
-      <td>543</td>
-      <td>265</td>
-      <td>78</td>
-      <td>0.657</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Mass</th>
-      <td>40</td>
-      <td>789</td>
-      <td>158</td>
-      <td>13</td>
-      <td>0.829</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Nodule</th>
-      <td>28</td>
-      <td>731</td>
-      <td>220</td>
-      <td>21</td>
-      <td>0.759</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Atelectasis</th>
-      <td>64</td>
-      <td>657</td>
-      <td>249</td>
-      <td>30</td>
-      <td>0.721</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumothorax</th>
-      <td>24</td>
-      <td>785</td>
-      <td>183</td>
-      <td>8</td>
-      <td>0.809</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pleural_Thickening</th>
-      <td>24</td>
-      <td>713</td>
-      <td>259</td>
-      <td>4</td>
-      <td>0.737</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumonia</th>
-      <td>14</td>
-      <td>661</td>
-      <td>320</td>
-      <td>5</td>
-      <td>0.675</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Fibrosis</th>
-      <td>10</td>
-      <td>725</td>
-      <td>261</td>
-      <td>4</td>
-      <td>0.735</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Edema</th>
-      <td>15</td>
-      <td>767</td>
-      <td>213</td>
-      <td>5</td>
-      <td>0.782</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Consolidation</th>
-      <td>36</td>
-      <td>658</td>
-      <td>297</td>
-      <td>9</td>
-      <td>0.694</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TP</th>
+<th data-quarto-table-cell-role="th">TN</th>
+<th data-quarto-table-cell-role="th">FP</th>
+<th data-quarto-table-cell-role="th">FN</th>
+<th data-quarto-table-cell-role="th">Accuracy</th>
+<th data-quarto-table-cell-role="th">Prevalence</th>
+<th data-quarto-table-cell-role="th">Sensitivity</th>
+<th data-quarto-table-cell-role="th">Specificity</th>
+<th data-quarto-table-cell-role="th">PPV</th>
+<th data-quarto-table-cell-role="th">NPV</th>
+<th data-quarto-table-cell-role="th">AUC</th>
+<th data-quarto-table-cell-role="th">F1</th>
+<th data-quarto-table-cell-role="th">Threshold</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cardiomegaly</td>
+<td>16</td>
+<td>814</td>
+<td>169</td>
+<td>1</td>
+<td>0.83</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Emphysema</td>
+<td>20</td>
+<td>869</td>
+<td>103</td>
+<td>8</td>
+<td>0.889</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Effusion</td>
+<td>99</td>
+<td>690</td>
+<td>196</td>
+<td>15</td>
+<td>0.789</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Hernia</td>
+<td>1</td>
+<td>743</td>
+<td>255</td>
+<td>1</td>
+<td>0.744</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Infiltration</td>
+<td>114</td>
+<td>543</td>
+<td>265</td>
+<td>78</td>
+<td>0.657</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Mass</td>
+<td>40</td>
+<td>789</td>
+<td>158</td>
+<td>13</td>
+<td>0.829</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nodule</td>
+<td>28</td>
+<td>731</td>
+<td>220</td>
+<td>21</td>
+<td>0.759</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Atelectasis</td>
+<td>64</td>
+<td>657</td>
+<td>249</td>
+<td>30</td>
+<td>0.721</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumothorax</td>
+<td>24</td>
+<td>785</td>
+<td>183</td>
+<td>8</td>
+<td>0.809</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pleural_Thickening</td>
+<td>24</td>
+<td>713</td>
+<td>259</td>
+<td>4</td>
+<td>0.737</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumonia</td>
+<td>14</td>
+<td>661</td>
+<td>320</td>
+<td>5</td>
+<td>0.675</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Fibrosis</td>
+<td>10</td>
+<td>725</td>
+<td>261</td>
+<td>4</td>
+<td>0.735</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Edema</td>
+<td>15</td>
+<td>767</td>
+<td>213</td>
+<td>5</td>
+<td>0.782</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Consolidation</td>
+<td>36</td>
+<td>658</td>
+<td>297</td>
+<td>9</td>
+<td>0.694</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1490,271 +1480,272 @@ Computed Prevalence:  0.4
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate this for each disease</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>util.get_performance_metrics(y, pred, class_labels, acc<span class="op">=</span>get_accuracy, prevalence<span class="op">=</span>get_prevalence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="21">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>TP</th>
-      <th>TN</th>
-      <th>FP</th>
-      <th>FN</th>
-      <th>Accuracy</th>
-      <th>Prevalence</th>
-      <th>Sensitivity</th>
-      <th>Specificity</th>
-      <th>PPV</th>
-      <th>NPV</th>
-      <th>AUC</th>
-      <th>F1</th>
-      <th>Threshold</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Cardiomegaly</th>
-      <td>16</td>
-      <td>814</td>
-      <td>169</td>
-      <td>1</td>
-      <td>0.83</td>
-      <td>0.017</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Emphysema</th>
-      <td>20</td>
-      <td>869</td>
-      <td>103</td>
-      <td>8</td>
-      <td>0.889</td>
-      <td>0.028</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Effusion</th>
-      <td>99</td>
-      <td>690</td>
-      <td>196</td>
-      <td>15</td>
-      <td>0.789</td>
-      <td>0.114</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Hernia</th>
-      <td>1</td>
-      <td>743</td>
-      <td>255</td>
-      <td>1</td>
-      <td>0.744</td>
-      <td>0.002</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Infiltration</th>
-      <td>114</td>
-      <td>543</td>
-      <td>265</td>
-      <td>78</td>
-      <td>0.657</td>
-      <td>0.192</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Mass</th>
-      <td>40</td>
-      <td>789</td>
-      <td>158</td>
-      <td>13</td>
-      <td>0.829</td>
-      <td>0.053</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Nodule</th>
-      <td>28</td>
-      <td>731</td>
-      <td>220</td>
-      <td>21</td>
-      <td>0.759</td>
-      <td>0.049</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Atelectasis</th>
-      <td>64</td>
-      <td>657</td>
-      <td>249</td>
-      <td>30</td>
-      <td>0.721</td>
-      <td>0.094</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumothorax</th>
-      <td>24</td>
-      <td>785</td>
-      <td>183</td>
-      <td>8</td>
-      <td>0.809</td>
-      <td>0.032</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pleural_Thickening</th>
-      <td>24</td>
-      <td>713</td>
-      <td>259</td>
-      <td>4</td>
-      <td>0.737</td>
-      <td>0.028</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumonia</th>
-      <td>14</td>
-      <td>661</td>
-      <td>320</td>
-      <td>5</td>
-      <td>0.675</td>
-      <td>0.019</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Fibrosis</th>
-      <td>10</td>
-      <td>725</td>
-      <td>261</td>
-      <td>4</td>
-      <td>0.735</td>
-      <td>0.014</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Edema</th>
-      <td>15</td>
-      <td>767</td>
-      <td>213</td>
-      <td>5</td>
-      <td>0.782</td>
-      <td>0.02</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Consolidation</th>
-      <td>36</td>
-      <td>658</td>
-      <td>297</td>
-      <td>9</td>
-      <td>0.694</td>
-      <td>0.045</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TP</th>
+<th data-quarto-table-cell-role="th">TN</th>
+<th data-quarto-table-cell-role="th">FP</th>
+<th data-quarto-table-cell-role="th">FN</th>
+<th data-quarto-table-cell-role="th">Accuracy</th>
+<th data-quarto-table-cell-role="th">Prevalence</th>
+<th data-quarto-table-cell-role="th">Sensitivity</th>
+<th data-quarto-table-cell-role="th">Specificity</th>
+<th data-quarto-table-cell-role="th">PPV</th>
+<th data-quarto-table-cell-role="th">NPV</th>
+<th data-quarto-table-cell-role="th">AUC</th>
+<th data-quarto-table-cell-role="th">F1</th>
+<th data-quarto-table-cell-role="th">Threshold</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cardiomegaly</td>
+<td>16</td>
+<td>814</td>
+<td>169</td>
+<td>1</td>
+<td>0.83</td>
+<td>0.017</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Emphysema</td>
+<td>20</td>
+<td>869</td>
+<td>103</td>
+<td>8</td>
+<td>0.889</td>
+<td>0.028</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Effusion</td>
+<td>99</td>
+<td>690</td>
+<td>196</td>
+<td>15</td>
+<td>0.789</td>
+<td>0.114</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Hernia</td>
+<td>1</td>
+<td>743</td>
+<td>255</td>
+<td>1</td>
+<td>0.744</td>
+<td>0.002</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Infiltration</td>
+<td>114</td>
+<td>543</td>
+<td>265</td>
+<td>78</td>
+<td>0.657</td>
+<td>0.192</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Mass</td>
+<td>40</td>
+<td>789</td>
+<td>158</td>
+<td>13</td>
+<td>0.829</td>
+<td>0.053</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nodule</td>
+<td>28</td>
+<td>731</td>
+<td>220</td>
+<td>21</td>
+<td>0.759</td>
+<td>0.049</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Atelectasis</td>
+<td>64</td>
+<td>657</td>
+<td>249</td>
+<td>30</td>
+<td>0.721</td>
+<td>0.094</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumothorax</td>
+<td>24</td>
+<td>785</td>
+<td>183</td>
+<td>8</td>
+<td>0.809</td>
+<td>0.032</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pleural_Thickening</td>
+<td>24</td>
+<td>713</td>
+<td>259</td>
+<td>4</td>
+<td>0.737</td>
+<td>0.028</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumonia</td>
+<td>14</td>
+<td>661</td>
+<td>320</td>
+<td>5</td>
+<td>0.675</td>
+<td>0.019</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Fibrosis</td>
+<td>10</td>
+<td>725</td>
+<td>261</td>
+<td>4</td>
+<td>0.735</td>
+<td>0.014</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Edema</td>
+<td>15</td>
+<td>767</td>
+<td>213</td>
+<td>5</td>
+<td>0.782</td>
+<td>0.02</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Consolidation</td>
+<td>36</td>
+<td>658</td>
+<td>297</td>
+<td>9</td>
+<td>0.694</td>
+<td>0.045</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1850,271 +1841,272 @@ Computed Specificity:  0.5
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>util.get_performance_metrics(y, pred, class_labels, acc<span class="op">=</span>get_accuracy, prevalence<span class="op">=</span>get_prevalence, </span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                        sens<span class="op">=</span>get_sensitivity, spec<span class="op">=</span>get_specificity)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="24">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>TP</th>
-      <th>TN</th>
-      <th>FP</th>
-      <th>FN</th>
-      <th>Accuracy</th>
-      <th>Prevalence</th>
-      <th>Sensitivity</th>
-      <th>Specificity</th>
-      <th>PPV</th>
-      <th>NPV</th>
-      <th>AUC</th>
-      <th>F1</th>
-      <th>Threshold</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Cardiomegaly</th>
-      <td>16</td>
-      <td>814</td>
-      <td>169</td>
-      <td>1</td>
-      <td>0.83</td>
-      <td>0.017</td>
-      <td>0.941</td>
-      <td>0.828</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Emphysema</th>
-      <td>20</td>
-      <td>869</td>
-      <td>103</td>
-      <td>8</td>
-      <td>0.889</td>
-      <td>0.028</td>
-      <td>0.714</td>
-      <td>0.894</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Effusion</th>
-      <td>99</td>
-      <td>690</td>
-      <td>196</td>
-      <td>15</td>
-      <td>0.789</td>
-      <td>0.114</td>
-      <td>0.868</td>
-      <td>0.779</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Hernia</th>
-      <td>1</td>
-      <td>743</td>
-      <td>255</td>
-      <td>1</td>
-      <td>0.744</td>
-      <td>0.002</td>
-      <td>0.5</td>
-      <td>0.744</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Infiltration</th>
-      <td>114</td>
-      <td>543</td>
-      <td>265</td>
-      <td>78</td>
-      <td>0.657</td>
-      <td>0.192</td>
-      <td>0.594</td>
-      <td>0.672</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Mass</th>
-      <td>40</td>
-      <td>789</td>
-      <td>158</td>
-      <td>13</td>
-      <td>0.829</td>
-      <td>0.053</td>
-      <td>0.755</td>
-      <td>0.833</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Nodule</th>
-      <td>28</td>
-      <td>731</td>
-      <td>220</td>
-      <td>21</td>
-      <td>0.759</td>
-      <td>0.049</td>
-      <td>0.571</td>
-      <td>0.769</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Atelectasis</th>
-      <td>64</td>
-      <td>657</td>
-      <td>249</td>
-      <td>30</td>
-      <td>0.721</td>
-      <td>0.094</td>
-      <td>0.681</td>
-      <td>0.725</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumothorax</th>
-      <td>24</td>
-      <td>785</td>
-      <td>183</td>
-      <td>8</td>
-      <td>0.809</td>
-      <td>0.032</td>
-      <td>0.75</td>
-      <td>0.811</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pleural_Thickening</th>
-      <td>24</td>
-      <td>713</td>
-      <td>259</td>
-      <td>4</td>
-      <td>0.737</td>
-      <td>0.028</td>
-      <td>0.857</td>
-      <td>0.734</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumonia</th>
-      <td>14</td>
-      <td>661</td>
-      <td>320</td>
-      <td>5</td>
-      <td>0.675</td>
-      <td>0.019</td>
-      <td>0.737</td>
-      <td>0.674</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Fibrosis</th>
-      <td>10</td>
-      <td>725</td>
-      <td>261</td>
-      <td>4</td>
-      <td>0.735</td>
-      <td>0.014</td>
-      <td>0.714</td>
-      <td>0.735</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Edema</th>
-      <td>15</td>
-      <td>767</td>
-      <td>213</td>
-      <td>5</td>
-      <td>0.782</td>
-      <td>0.02</td>
-      <td>0.75</td>
-      <td>0.783</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Consolidation</th>
-      <td>36</td>
-      <td>658</td>
-      <td>297</td>
-      <td>9</td>
-      <td>0.694</td>
-      <td>0.045</td>
-      <td>0.8</td>
-      <td>0.689</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TP</th>
+<th data-quarto-table-cell-role="th">TN</th>
+<th data-quarto-table-cell-role="th">FP</th>
+<th data-quarto-table-cell-role="th">FN</th>
+<th data-quarto-table-cell-role="th">Accuracy</th>
+<th data-quarto-table-cell-role="th">Prevalence</th>
+<th data-quarto-table-cell-role="th">Sensitivity</th>
+<th data-quarto-table-cell-role="th">Specificity</th>
+<th data-quarto-table-cell-role="th">PPV</th>
+<th data-quarto-table-cell-role="th">NPV</th>
+<th data-quarto-table-cell-role="th">AUC</th>
+<th data-quarto-table-cell-role="th">F1</th>
+<th data-quarto-table-cell-role="th">Threshold</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cardiomegaly</td>
+<td>16</td>
+<td>814</td>
+<td>169</td>
+<td>1</td>
+<td>0.83</td>
+<td>0.017</td>
+<td>0.941</td>
+<td>0.828</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Emphysema</td>
+<td>20</td>
+<td>869</td>
+<td>103</td>
+<td>8</td>
+<td>0.889</td>
+<td>0.028</td>
+<td>0.714</td>
+<td>0.894</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Effusion</td>
+<td>99</td>
+<td>690</td>
+<td>196</td>
+<td>15</td>
+<td>0.789</td>
+<td>0.114</td>
+<td>0.868</td>
+<td>0.779</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Hernia</td>
+<td>1</td>
+<td>743</td>
+<td>255</td>
+<td>1</td>
+<td>0.744</td>
+<td>0.002</td>
+<td>0.5</td>
+<td>0.744</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Infiltration</td>
+<td>114</td>
+<td>543</td>
+<td>265</td>
+<td>78</td>
+<td>0.657</td>
+<td>0.192</td>
+<td>0.594</td>
+<td>0.672</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Mass</td>
+<td>40</td>
+<td>789</td>
+<td>158</td>
+<td>13</td>
+<td>0.829</td>
+<td>0.053</td>
+<td>0.755</td>
+<td>0.833</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nodule</td>
+<td>28</td>
+<td>731</td>
+<td>220</td>
+<td>21</td>
+<td>0.759</td>
+<td>0.049</td>
+<td>0.571</td>
+<td>0.769</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Atelectasis</td>
+<td>64</td>
+<td>657</td>
+<td>249</td>
+<td>30</td>
+<td>0.721</td>
+<td>0.094</td>
+<td>0.681</td>
+<td>0.725</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumothorax</td>
+<td>24</td>
+<td>785</td>
+<td>183</td>
+<td>8</td>
+<td>0.809</td>
+<td>0.032</td>
+<td>0.75</td>
+<td>0.811</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pleural_Thickening</td>
+<td>24</td>
+<td>713</td>
+<td>259</td>
+<td>4</td>
+<td>0.737</td>
+<td>0.028</td>
+<td>0.857</td>
+<td>0.734</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumonia</td>
+<td>14</td>
+<td>661</td>
+<td>320</td>
+<td>5</td>
+<td>0.675</td>
+<td>0.019</td>
+<td>0.737</td>
+<td>0.674</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Fibrosis</td>
+<td>10</td>
+<td>725</td>
+<td>261</td>
+<td>4</td>
+<td>0.735</td>
+<td>0.014</td>
+<td>0.714</td>
+<td>0.735</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Edema</td>
+<td>15</td>
+<td>767</td>
+<td>213</td>
+<td>5</td>
+<td>0.782</td>
+<td>0.02</td>
+<td>0.75</td>
+<td>0.783</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Consolidation</td>
+<td>36</td>
+<td>658</td>
+<td>297</td>
+<td>9</td>
+<td>0.694</td>
+<td>0.045</td>
+<td>0.8</td>
+<td>0.689</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -2212,271 +2204,272 @@ Computed NPV:      0.5
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>util.get_performance_metrics(y, pred, class_labels, acc<span class="op">=</span>get_accuracy, prevalence<span class="op">=</span>get_prevalence, </span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                        sens<span class="op">=</span>get_sensitivity, spec<span class="op">=</span>get_specificity, ppv<span class="op">=</span>get_ppv, npv<span class="op">=</span>get_npv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="27">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>TP</th>
-      <th>TN</th>
-      <th>FP</th>
-      <th>FN</th>
-      <th>Accuracy</th>
-      <th>Prevalence</th>
-      <th>Sensitivity</th>
-      <th>Specificity</th>
-      <th>PPV</th>
-      <th>NPV</th>
-      <th>AUC</th>
-      <th>F1</th>
-      <th>Threshold</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Cardiomegaly</th>
-      <td>16</td>
-      <td>814</td>
-      <td>169</td>
-      <td>1</td>
-      <td>0.83</td>
-      <td>0.017</td>
-      <td>0.941</td>
-      <td>0.828</td>
-      <td>0.086</td>
-      <td>0.999</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Emphysema</th>
-      <td>20</td>
-      <td>869</td>
-      <td>103</td>
-      <td>8</td>
-      <td>0.889</td>
-      <td>0.028</td>
-      <td>0.714</td>
-      <td>0.894</td>
-      <td>0.163</td>
-      <td>0.991</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Effusion</th>
-      <td>99</td>
-      <td>690</td>
-      <td>196</td>
-      <td>15</td>
-      <td>0.789</td>
-      <td>0.114</td>
-      <td>0.868</td>
-      <td>0.779</td>
-      <td>0.336</td>
-      <td>0.979</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Hernia</th>
-      <td>1</td>
-      <td>743</td>
-      <td>255</td>
-      <td>1</td>
-      <td>0.744</td>
-      <td>0.002</td>
-      <td>0.5</td>
-      <td>0.744</td>
-      <td>0.004</td>
-      <td>0.999</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Infiltration</th>
-      <td>114</td>
-      <td>543</td>
-      <td>265</td>
-      <td>78</td>
-      <td>0.657</td>
-      <td>0.192</td>
-      <td>0.594</td>
-      <td>0.672</td>
-      <td>0.301</td>
-      <td>0.874</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Mass</th>
-      <td>40</td>
-      <td>789</td>
-      <td>158</td>
-      <td>13</td>
-      <td>0.829</td>
-      <td>0.053</td>
-      <td>0.755</td>
-      <td>0.833</td>
-      <td>0.202</td>
-      <td>0.984</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Nodule</th>
-      <td>28</td>
-      <td>731</td>
-      <td>220</td>
-      <td>21</td>
-      <td>0.759</td>
-      <td>0.049</td>
-      <td>0.571</td>
-      <td>0.769</td>
-      <td>0.113</td>
-      <td>0.972</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Atelectasis</th>
-      <td>64</td>
-      <td>657</td>
-      <td>249</td>
-      <td>30</td>
-      <td>0.721</td>
-      <td>0.094</td>
-      <td>0.681</td>
-      <td>0.725</td>
-      <td>0.204</td>
-      <td>0.956</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumothorax</th>
-      <td>24</td>
-      <td>785</td>
-      <td>183</td>
-      <td>8</td>
-      <td>0.809</td>
-      <td>0.032</td>
-      <td>0.75</td>
-      <td>0.811</td>
-      <td>0.116</td>
-      <td>0.99</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pleural_Thickening</th>
-      <td>24</td>
-      <td>713</td>
-      <td>259</td>
-      <td>4</td>
-      <td>0.737</td>
-      <td>0.028</td>
-      <td>0.857</td>
-      <td>0.734</td>
-      <td>0.085</td>
-      <td>0.994</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumonia</th>
-      <td>14</td>
-      <td>661</td>
-      <td>320</td>
-      <td>5</td>
-      <td>0.675</td>
-      <td>0.019</td>
-      <td>0.737</td>
-      <td>0.674</td>
-      <td>0.042</td>
-      <td>0.992</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Fibrosis</th>
-      <td>10</td>
-      <td>725</td>
-      <td>261</td>
-      <td>4</td>
-      <td>0.735</td>
-      <td>0.014</td>
-      <td>0.714</td>
-      <td>0.735</td>
-      <td>0.037</td>
-      <td>0.995</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Edema</th>
-      <td>15</td>
-      <td>767</td>
-      <td>213</td>
-      <td>5</td>
-      <td>0.782</td>
-      <td>0.02</td>
-      <td>0.75</td>
-      <td>0.783</td>
-      <td>0.066</td>
-      <td>0.994</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Consolidation</th>
-      <td>36</td>
-      <td>658</td>
-      <td>297</td>
-      <td>9</td>
-      <td>0.694</td>
-      <td>0.045</td>
-      <td>0.8</td>
-      <td>0.689</td>
-      <td>0.108</td>
-      <td>0.987</td>
-      <td>Not Defined</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TP</th>
+<th data-quarto-table-cell-role="th">TN</th>
+<th data-quarto-table-cell-role="th">FP</th>
+<th data-quarto-table-cell-role="th">FN</th>
+<th data-quarto-table-cell-role="th">Accuracy</th>
+<th data-quarto-table-cell-role="th">Prevalence</th>
+<th data-quarto-table-cell-role="th">Sensitivity</th>
+<th data-quarto-table-cell-role="th">Specificity</th>
+<th data-quarto-table-cell-role="th">PPV</th>
+<th data-quarto-table-cell-role="th">NPV</th>
+<th data-quarto-table-cell-role="th">AUC</th>
+<th data-quarto-table-cell-role="th">F1</th>
+<th data-quarto-table-cell-role="th">Threshold</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cardiomegaly</td>
+<td>16</td>
+<td>814</td>
+<td>169</td>
+<td>1</td>
+<td>0.83</td>
+<td>0.017</td>
+<td>0.941</td>
+<td>0.828</td>
+<td>0.086</td>
+<td>0.999</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Emphysema</td>
+<td>20</td>
+<td>869</td>
+<td>103</td>
+<td>8</td>
+<td>0.889</td>
+<td>0.028</td>
+<td>0.714</td>
+<td>0.894</td>
+<td>0.163</td>
+<td>0.991</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Effusion</td>
+<td>99</td>
+<td>690</td>
+<td>196</td>
+<td>15</td>
+<td>0.789</td>
+<td>0.114</td>
+<td>0.868</td>
+<td>0.779</td>
+<td>0.336</td>
+<td>0.979</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Hernia</td>
+<td>1</td>
+<td>743</td>
+<td>255</td>
+<td>1</td>
+<td>0.744</td>
+<td>0.002</td>
+<td>0.5</td>
+<td>0.744</td>
+<td>0.004</td>
+<td>0.999</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Infiltration</td>
+<td>114</td>
+<td>543</td>
+<td>265</td>
+<td>78</td>
+<td>0.657</td>
+<td>0.192</td>
+<td>0.594</td>
+<td>0.672</td>
+<td>0.301</td>
+<td>0.874</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Mass</td>
+<td>40</td>
+<td>789</td>
+<td>158</td>
+<td>13</td>
+<td>0.829</td>
+<td>0.053</td>
+<td>0.755</td>
+<td>0.833</td>
+<td>0.202</td>
+<td>0.984</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nodule</td>
+<td>28</td>
+<td>731</td>
+<td>220</td>
+<td>21</td>
+<td>0.759</td>
+<td>0.049</td>
+<td>0.571</td>
+<td>0.769</td>
+<td>0.113</td>
+<td>0.972</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Atelectasis</td>
+<td>64</td>
+<td>657</td>
+<td>249</td>
+<td>30</td>
+<td>0.721</td>
+<td>0.094</td>
+<td>0.681</td>
+<td>0.725</td>
+<td>0.204</td>
+<td>0.956</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumothorax</td>
+<td>24</td>
+<td>785</td>
+<td>183</td>
+<td>8</td>
+<td>0.809</td>
+<td>0.032</td>
+<td>0.75</td>
+<td>0.811</td>
+<td>0.116</td>
+<td>0.99</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pleural_Thickening</td>
+<td>24</td>
+<td>713</td>
+<td>259</td>
+<td>4</td>
+<td>0.737</td>
+<td>0.028</td>
+<td>0.857</td>
+<td>0.734</td>
+<td>0.085</td>
+<td>0.994</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumonia</td>
+<td>14</td>
+<td>661</td>
+<td>320</td>
+<td>5</td>
+<td>0.675</td>
+<td>0.019</td>
+<td>0.737</td>
+<td>0.674</td>
+<td>0.042</td>
+<td>0.992</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Fibrosis</td>
+<td>10</td>
+<td>725</td>
+<td>261</td>
+<td>4</td>
+<td>0.735</td>
+<td>0.014</td>
+<td>0.714</td>
+<td>0.735</td>
+<td>0.037</td>
+<td>0.995</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Edema</td>
+<td>15</td>
+<td>767</td>
+<td>213</td>
+<td>5</td>
+<td>0.782</td>
+<td>0.02</td>
+<td>0.75</td>
+<td>0.783</td>
+<td>0.066</td>
+<td>0.994</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Consolidation</td>
+<td>36</td>
+<td>658</td>
+<td>297</td>
+<td>9</td>
+<td>0.694</td>
+<td>0.045</td>
+<td>0.8</td>
+<td>0.689</td>
+<td>0.108</td>
+<td>0.987</td>
+<td>Not Defined</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -2504,271 +2497,272 @@ Computed NPV:      0.5
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>util.get_performance_metrics(y, pred, class_labels, acc<span class="op">=</span>get_accuracy, prevalence<span class="op">=</span>get_prevalence, </span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                        sens<span class="op">=</span>get_sensitivity, spec<span class="op">=</span>get_specificity, ppv<span class="op">=</span>get_ppv, npv<span class="op">=</span>get_npv, auc<span class="op">=</span>roc_auc_score)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="29">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>TP</th>
-      <th>TN</th>
-      <th>FP</th>
-      <th>FN</th>
-      <th>Accuracy</th>
-      <th>Prevalence</th>
-      <th>Sensitivity</th>
-      <th>Specificity</th>
-      <th>PPV</th>
-      <th>NPV</th>
-      <th>AUC</th>
-      <th>F1</th>
-      <th>Threshold</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Cardiomegaly</th>
-      <td>16</td>
-      <td>814</td>
-      <td>169</td>
-      <td>1</td>
-      <td>0.83</td>
-      <td>0.017</td>
-      <td>0.941</td>
-      <td>0.828</td>
-      <td>0.086</td>
-      <td>0.999</td>
-      <td>0.933</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Emphysema</th>
-      <td>20</td>
-      <td>869</td>
-      <td>103</td>
-      <td>8</td>
-      <td>0.889</td>
-      <td>0.028</td>
-      <td>0.714</td>
-      <td>0.894</td>
-      <td>0.163</td>
-      <td>0.991</td>
-      <td>0.935</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Effusion</th>
-      <td>99</td>
-      <td>690</td>
-      <td>196</td>
-      <td>15</td>
-      <td>0.789</td>
-      <td>0.114</td>
-      <td>0.868</td>
-      <td>0.779</td>
-      <td>0.336</td>
-      <td>0.979</td>
-      <td>0.891</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Hernia</th>
-      <td>1</td>
-      <td>743</td>
-      <td>255</td>
-      <td>1</td>
-      <td>0.744</td>
-      <td>0.002</td>
-      <td>0.5</td>
-      <td>0.744</td>
-      <td>0.004</td>
-      <td>0.999</td>
-      <td>0.644</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Infiltration</th>
-      <td>114</td>
-      <td>543</td>
-      <td>265</td>
-      <td>78</td>
-      <td>0.657</td>
-      <td>0.192</td>
-      <td>0.594</td>
-      <td>0.672</td>
-      <td>0.301</td>
-      <td>0.874</td>
-      <td>0.696</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Mass</th>
-      <td>40</td>
-      <td>789</td>
-      <td>158</td>
-      <td>13</td>
-      <td>0.829</td>
-      <td>0.053</td>
-      <td>0.755</td>
-      <td>0.833</td>
-      <td>0.202</td>
-      <td>0.984</td>
-      <td>0.888</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Nodule</th>
-      <td>28</td>
-      <td>731</td>
-      <td>220</td>
-      <td>21</td>
-      <td>0.759</td>
-      <td>0.049</td>
-      <td>0.571</td>
-      <td>0.769</td>
-      <td>0.113</td>
-      <td>0.972</td>
-      <td>0.745</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Atelectasis</th>
-      <td>64</td>
-      <td>657</td>
-      <td>249</td>
-      <td>30</td>
-      <td>0.721</td>
-      <td>0.094</td>
-      <td>0.681</td>
-      <td>0.725</td>
-      <td>0.204</td>
-      <td>0.956</td>
-      <td>0.781</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumothorax</th>
-      <td>24</td>
-      <td>785</td>
-      <td>183</td>
-      <td>8</td>
-      <td>0.809</td>
-      <td>0.032</td>
-      <td>0.75</td>
-      <td>0.811</td>
-      <td>0.116</td>
-      <td>0.99</td>
-      <td>0.826</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pleural_Thickening</th>
-      <td>24</td>
-      <td>713</td>
-      <td>259</td>
-      <td>4</td>
-      <td>0.737</td>
-      <td>0.028</td>
-      <td>0.857</td>
-      <td>0.734</td>
-      <td>0.085</td>
-      <td>0.994</td>
-      <td>0.868</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumonia</th>
-      <td>14</td>
-      <td>661</td>
-      <td>320</td>
-      <td>5</td>
-      <td>0.675</td>
-      <td>0.019</td>
-      <td>0.737</td>
-      <td>0.674</td>
-      <td>0.042</td>
-      <td>0.992</td>
-      <td>0.762</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Fibrosis</th>
-      <td>10</td>
-      <td>725</td>
-      <td>261</td>
-      <td>4</td>
-      <td>0.735</td>
-      <td>0.014</td>
-      <td>0.714</td>
-      <td>0.735</td>
-      <td>0.037</td>
-      <td>0.995</td>
-      <td>0.801</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Edema</th>
-      <td>15</td>
-      <td>767</td>
-      <td>213</td>
-      <td>5</td>
-      <td>0.782</td>
-      <td>0.02</td>
-      <td>0.75</td>
-      <td>0.783</td>
-      <td>0.066</td>
-      <td>0.994</td>
-      <td>0.856</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Consolidation</th>
-      <td>36</td>
-      <td>658</td>
-      <td>297</td>
-      <td>9</td>
-      <td>0.694</td>
-      <td>0.045</td>
-      <td>0.8</td>
-      <td>0.689</td>
-      <td>0.108</td>
-      <td>0.987</td>
-      <td>0.799</td>
-      <td>Not Defined</td>
-      <td>0.5</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TP</th>
+<th data-quarto-table-cell-role="th">TN</th>
+<th data-quarto-table-cell-role="th">FP</th>
+<th data-quarto-table-cell-role="th">FN</th>
+<th data-quarto-table-cell-role="th">Accuracy</th>
+<th data-quarto-table-cell-role="th">Prevalence</th>
+<th data-quarto-table-cell-role="th">Sensitivity</th>
+<th data-quarto-table-cell-role="th">Specificity</th>
+<th data-quarto-table-cell-role="th">PPV</th>
+<th data-quarto-table-cell-role="th">NPV</th>
+<th data-quarto-table-cell-role="th">AUC</th>
+<th data-quarto-table-cell-role="th">F1</th>
+<th data-quarto-table-cell-role="th">Threshold</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cardiomegaly</td>
+<td>16</td>
+<td>814</td>
+<td>169</td>
+<td>1</td>
+<td>0.83</td>
+<td>0.017</td>
+<td>0.941</td>
+<td>0.828</td>
+<td>0.086</td>
+<td>0.999</td>
+<td>0.933</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Emphysema</td>
+<td>20</td>
+<td>869</td>
+<td>103</td>
+<td>8</td>
+<td>0.889</td>
+<td>0.028</td>
+<td>0.714</td>
+<td>0.894</td>
+<td>0.163</td>
+<td>0.991</td>
+<td>0.935</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Effusion</td>
+<td>99</td>
+<td>690</td>
+<td>196</td>
+<td>15</td>
+<td>0.789</td>
+<td>0.114</td>
+<td>0.868</td>
+<td>0.779</td>
+<td>0.336</td>
+<td>0.979</td>
+<td>0.891</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Hernia</td>
+<td>1</td>
+<td>743</td>
+<td>255</td>
+<td>1</td>
+<td>0.744</td>
+<td>0.002</td>
+<td>0.5</td>
+<td>0.744</td>
+<td>0.004</td>
+<td>0.999</td>
+<td>0.644</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Infiltration</td>
+<td>114</td>
+<td>543</td>
+<td>265</td>
+<td>78</td>
+<td>0.657</td>
+<td>0.192</td>
+<td>0.594</td>
+<td>0.672</td>
+<td>0.301</td>
+<td>0.874</td>
+<td>0.696</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Mass</td>
+<td>40</td>
+<td>789</td>
+<td>158</td>
+<td>13</td>
+<td>0.829</td>
+<td>0.053</td>
+<td>0.755</td>
+<td>0.833</td>
+<td>0.202</td>
+<td>0.984</td>
+<td>0.888</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nodule</td>
+<td>28</td>
+<td>731</td>
+<td>220</td>
+<td>21</td>
+<td>0.759</td>
+<td>0.049</td>
+<td>0.571</td>
+<td>0.769</td>
+<td>0.113</td>
+<td>0.972</td>
+<td>0.745</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Atelectasis</td>
+<td>64</td>
+<td>657</td>
+<td>249</td>
+<td>30</td>
+<td>0.721</td>
+<td>0.094</td>
+<td>0.681</td>
+<td>0.725</td>
+<td>0.204</td>
+<td>0.956</td>
+<td>0.781</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumothorax</td>
+<td>24</td>
+<td>785</td>
+<td>183</td>
+<td>8</td>
+<td>0.809</td>
+<td>0.032</td>
+<td>0.75</td>
+<td>0.811</td>
+<td>0.116</td>
+<td>0.99</td>
+<td>0.826</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pleural_Thickening</td>
+<td>24</td>
+<td>713</td>
+<td>259</td>
+<td>4</td>
+<td>0.737</td>
+<td>0.028</td>
+<td>0.857</td>
+<td>0.734</td>
+<td>0.085</td>
+<td>0.994</td>
+<td>0.868</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumonia</td>
+<td>14</td>
+<td>661</td>
+<td>320</td>
+<td>5</td>
+<td>0.675</td>
+<td>0.019</td>
+<td>0.737</td>
+<td>0.674</td>
+<td>0.042</td>
+<td>0.992</td>
+<td>0.762</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Fibrosis</td>
+<td>10</td>
+<td>725</td>
+<td>261</td>
+<td>4</td>
+<td>0.735</td>
+<td>0.014</td>
+<td>0.714</td>
+<td>0.735</td>
+<td>0.037</td>
+<td>0.995</td>
+<td>0.801</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Edema</td>
+<td>15</td>
+<td>767</td>
+<td>213</td>
+<td>5</td>
+<td>0.782</td>
+<td>0.02</td>
+<td>0.75</td>
+<td>0.783</td>
+<td>0.066</td>
+<td>0.994</td>
+<td>0.856</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Consolidation</td>
+<td>36</td>
+<td>658</td>
+<td>297</td>
+<td>9</td>
+<td>0.694</td>
+<td>0.045</td>
+<td>0.8</td>
+<td>0.689</td>
+<td>0.108</td>
+<td>0.987</td>
+<td>0.799</td>
+<td>Not Defined</td>
+<td>0.5</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -2811,75 +2805,76 @@ Computed NPV:      0.5
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>util.print_confidence_intervals(class_labels, statistics)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="31">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Mean AUC (CI 5%-95%)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Cardiomegaly</th>
-      <td>0.93 (0.90-0.96)</td>
-    </tr>
-    <tr>
-      <th>Emphysema</th>
-      <td>0.93 (0.91-0.96)</td>
-    </tr>
-    <tr>
-      <th>Effusion</th>
-      <td>0.89 (0.87-0.91)</td>
-    </tr>
-    <tr>
-      <th>Hernia</th>
-      <td>0.62 (0.29-0.98)</td>
-    </tr>
-    <tr>
-      <th>Infiltration</th>
-      <td>0.70 (0.66-0.74)</td>
-    </tr>
-    <tr>
-      <th>Mass</th>
-      <td>0.89 (0.85-0.92)</td>
-    </tr>
-    <tr>
-      <th>Nodule</th>
-      <td>0.75 (0.69-0.80)</td>
-    </tr>
-    <tr>
-      <th>Atelectasis</th>
-      <td>0.79 (0.75-0.83)</td>
-    </tr>
-    <tr>
-      <th>Pneumothorax</th>
-      <td>0.83 (0.76-0.90)</td>
-    </tr>
-    <tr>
-      <th>Pleural_Thickening</th>
-      <td>0.87 (0.82-0.91)</td>
-    </tr>
-    <tr>
-      <th>Pneumonia</th>
-      <td>0.77 (0.68-0.84)</td>
-    </tr>
-    <tr>
-      <th>Fibrosis</th>
-      <td>0.80 (0.73-0.86)</td>
-    </tr>
-    <tr>
-      <th>Edema</th>
-      <td>0.86 (0.82-0.89)</td>
-    </tr>
-    <tr>
-      <th>Consolidation</th>
-      <td>0.80 (0.74-0.86)</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Mean AUC (CI 5%-95%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cardiomegaly</td>
+<td>0.93 (0.90-0.96)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Emphysema</td>
+<td>0.93 (0.91-0.96)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Effusion</td>
+<td>0.89 (0.87-0.91)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Hernia</td>
+<td>0.62 (0.29-0.98)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Infiltration</td>
+<td>0.70 (0.66-0.74)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Mass</td>
+<td>0.89 (0.85-0.92)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nodule</td>
+<td>0.75 (0.69-0.80)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Atelectasis</td>
+<td>0.79 (0.75-0.83)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumothorax</td>
+<td>0.83 (0.76-0.90)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pleural_Thickening</td>
+<td>0.87 (0.82-0.91)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumonia</td>
+<td>0.77 (0.68-0.84)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Fibrosis</td>
+<td>0.80 (0.73-0.86)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Edema</td>
+<td>0.86 (0.82-0.89)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Consolidation</td>
+<td>0.80 (0.74-0.86)</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -2909,271 +2904,272 @@ Computed NPV:      0.5
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>util.get_performance_metrics(y, pred, class_labels, acc<span class="op">=</span>get_accuracy, prevalence<span class="op">=</span>get_prevalence, </span>
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                        sens<span class="op">=</span>get_sensitivity, spec<span class="op">=</span>get_specificity, ppv<span class="op">=</span>get_ppv, npv<span class="op">=</span>get_npv, auc<span class="op">=</span>roc_auc_score,f1<span class="op">=</span>f1_score)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="33">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>TP</th>
-      <th>TN</th>
-      <th>FP</th>
-      <th>FN</th>
-      <th>Accuracy</th>
-      <th>Prevalence</th>
-      <th>Sensitivity</th>
-      <th>Specificity</th>
-      <th>PPV</th>
-      <th>NPV</th>
-      <th>AUC</th>
-      <th>F1</th>
-      <th>Threshold</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Cardiomegaly</th>
-      <td>16</td>
-      <td>814</td>
-      <td>169</td>
-      <td>1</td>
-      <td>0.83</td>
-      <td>0.017</td>
-      <td>0.941</td>
-      <td>0.828</td>
-      <td>0.086</td>
-      <td>0.999</td>
-      <td>0.933</td>
-      <td>0.158</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Emphysema</th>
-      <td>20</td>
-      <td>869</td>
-      <td>103</td>
-      <td>8</td>
-      <td>0.889</td>
-      <td>0.028</td>
-      <td>0.714</td>
-      <td>0.894</td>
-      <td>0.163</td>
-      <td>0.991</td>
-      <td>0.935</td>
-      <td>0.265</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Effusion</th>
-      <td>99</td>
-      <td>690</td>
-      <td>196</td>
-      <td>15</td>
-      <td>0.789</td>
-      <td>0.114</td>
-      <td>0.868</td>
-      <td>0.779</td>
-      <td>0.336</td>
-      <td>0.979</td>
-      <td>0.891</td>
-      <td>0.484</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Hernia</th>
-      <td>1</td>
-      <td>743</td>
-      <td>255</td>
-      <td>1</td>
-      <td>0.744</td>
-      <td>0.002</td>
-      <td>0.5</td>
-      <td>0.744</td>
-      <td>0.004</td>
-      <td>0.999</td>
-      <td>0.644</td>
-      <td>0.008</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Infiltration</th>
-      <td>114</td>
-      <td>543</td>
-      <td>265</td>
-      <td>78</td>
-      <td>0.657</td>
-      <td>0.192</td>
-      <td>0.594</td>
-      <td>0.672</td>
-      <td>0.301</td>
-      <td>0.874</td>
-      <td>0.696</td>
-      <td>0.399</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Mass</th>
-      <td>40</td>
-      <td>789</td>
-      <td>158</td>
-      <td>13</td>
-      <td>0.829</td>
-      <td>0.053</td>
-      <td>0.755</td>
-      <td>0.833</td>
-      <td>0.202</td>
-      <td>0.984</td>
-      <td>0.888</td>
-      <td>0.319</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Nodule</th>
-      <td>28</td>
-      <td>731</td>
-      <td>220</td>
-      <td>21</td>
-      <td>0.759</td>
-      <td>0.049</td>
-      <td>0.571</td>
-      <td>0.769</td>
-      <td>0.113</td>
-      <td>0.972</td>
-      <td>0.745</td>
-      <td>0.189</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Atelectasis</th>
-      <td>64</td>
-      <td>657</td>
-      <td>249</td>
-      <td>30</td>
-      <td>0.721</td>
-      <td>0.094</td>
-      <td>0.681</td>
-      <td>0.725</td>
-      <td>0.204</td>
-      <td>0.956</td>
-      <td>0.781</td>
-      <td>0.314</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumothorax</th>
-      <td>24</td>
-      <td>785</td>
-      <td>183</td>
-      <td>8</td>
-      <td>0.809</td>
-      <td>0.032</td>
-      <td>0.75</td>
-      <td>0.811</td>
-      <td>0.116</td>
-      <td>0.99</td>
-      <td>0.826</td>
-      <td>0.201</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pleural_Thickening</th>
-      <td>24</td>
-      <td>713</td>
-      <td>259</td>
-      <td>4</td>
-      <td>0.737</td>
-      <td>0.028</td>
-      <td>0.857</td>
-      <td>0.734</td>
-      <td>0.085</td>
-      <td>0.994</td>
-      <td>0.868</td>
-      <td>0.154</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Pneumonia</th>
-      <td>14</td>
-      <td>661</td>
-      <td>320</td>
-      <td>5</td>
-      <td>0.675</td>
-      <td>0.019</td>
-      <td>0.737</td>
-      <td>0.674</td>
-      <td>0.042</td>
-      <td>0.992</td>
-      <td>0.762</td>
-      <td>0.079</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Fibrosis</th>
-      <td>10</td>
-      <td>725</td>
-      <td>261</td>
-      <td>4</td>
-      <td>0.735</td>
-      <td>0.014</td>
-      <td>0.714</td>
-      <td>0.735</td>
-      <td>0.037</td>
-      <td>0.995</td>
-      <td>0.801</td>
-      <td>0.07</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Edema</th>
-      <td>15</td>
-      <td>767</td>
-      <td>213</td>
-      <td>5</td>
-      <td>0.782</td>
-      <td>0.02</td>
-      <td>0.75</td>
-      <td>0.783</td>
-      <td>0.066</td>
-      <td>0.994</td>
-      <td>0.856</td>
-      <td>0.121</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>Consolidation</th>
-      <td>36</td>
-      <td>658</td>
-      <td>297</td>
-      <td>9</td>
-      <td>0.694</td>
-      <td>0.045</td>
-      <td>0.8</td>
-      <td>0.689</td>
-      <td>0.108</td>
-      <td>0.987</td>
-      <td>0.799</td>
-      <td>0.19</td>
-      <td>0.5</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TP</th>
+<th data-quarto-table-cell-role="th">TN</th>
+<th data-quarto-table-cell-role="th">FP</th>
+<th data-quarto-table-cell-role="th">FN</th>
+<th data-quarto-table-cell-role="th">Accuracy</th>
+<th data-quarto-table-cell-role="th">Prevalence</th>
+<th data-quarto-table-cell-role="th">Sensitivity</th>
+<th data-quarto-table-cell-role="th">Specificity</th>
+<th data-quarto-table-cell-role="th">PPV</th>
+<th data-quarto-table-cell-role="th">NPV</th>
+<th data-quarto-table-cell-role="th">AUC</th>
+<th data-quarto-table-cell-role="th">F1</th>
+<th data-quarto-table-cell-role="th">Threshold</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cardiomegaly</td>
+<td>16</td>
+<td>814</td>
+<td>169</td>
+<td>1</td>
+<td>0.83</td>
+<td>0.017</td>
+<td>0.941</td>
+<td>0.828</td>
+<td>0.086</td>
+<td>0.999</td>
+<td>0.933</td>
+<td>0.158</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Emphysema</td>
+<td>20</td>
+<td>869</td>
+<td>103</td>
+<td>8</td>
+<td>0.889</td>
+<td>0.028</td>
+<td>0.714</td>
+<td>0.894</td>
+<td>0.163</td>
+<td>0.991</td>
+<td>0.935</td>
+<td>0.265</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Effusion</td>
+<td>99</td>
+<td>690</td>
+<td>196</td>
+<td>15</td>
+<td>0.789</td>
+<td>0.114</td>
+<td>0.868</td>
+<td>0.779</td>
+<td>0.336</td>
+<td>0.979</td>
+<td>0.891</td>
+<td>0.484</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Hernia</td>
+<td>1</td>
+<td>743</td>
+<td>255</td>
+<td>1</td>
+<td>0.744</td>
+<td>0.002</td>
+<td>0.5</td>
+<td>0.744</td>
+<td>0.004</td>
+<td>0.999</td>
+<td>0.644</td>
+<td>0.008</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Infiltration</td>
+<td>114</td>
+<td>543</td>
+<td>265</td>
+<td>78</td>
+<td>0.657</td>
+<td>0.192</td>
+<td>0.594</td>
+<td>0.672</td>
+<td>0.301</td>
+<td>0.874</td>
+<td>0.696</td>
+<td>0.399</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Mass</td>
+<td>40</td>
+<td>789</td>
+<td>158</td>
+<td>13</td>
+<td>0.829</td>
+<td>0.053</td>
+<td>0.755</td>
+<td>0.833</td>
+<td>0.202</td>
+<td>0.984</td>
+<td>0.888</td>
+<td>0.319</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nodule</td>
+<td>28</td>
+<td>731</td>
+<td>220</td>
+<td>21</td>
+<td>0.759</td>
+<td>0.049</td>
+<td>0.571</td>
+<td>0.769</td>
+<td>0.113</td>
+<td>0.972</td>
+<td>0.745</td>
+<td>0.189</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Atelectasis</td>
+<td>64</td>
+<td>657</td>
+<td>249</td>
+<td>30</td>
+<td>0.721</td>
+<td>0.094</td>
+<td>0.681</td>
+<td>0.725</td>
+<td>0.204</td>
+<td>0.956</td>
+<td>0.781</td>
+<td>0.314</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumothorax</td>
+<td>24</td>
+<td>785</td>
+<td>183</td>
+<td>8</td>
+<td>0.809</td>
+<td>0.032</td>
+<td>0.75</td>
+<td>0.811</td>
+<td>0.116</td>
+<td>0.99</td>
+<td>0.826</td>
+<td>0.201</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Pleural_Thickening</td>
+<td>24</td>
+<td>713</td>
+<td>259</td>
+<td>4</td>
+<td>0.737</td>
+<td>0.028</td>
+<td>0.857</td>
+<td>0.734</td>
+<td>0.085</td>
+<td>0.994</td>
+<td>0.868</td>
+<td>0.154</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pneumonia</td>
+<td>14</td>
+<td>661</td>
+<td>320</td>
+<td>5</td>
+<td>0.675</td>
+<td>0.019</td>
+<td>0.737</td>
+<td>0.674</td>
+<td>0.042</td>
+<td>0.992</td>
+<td>0.762</td>
+<td>0.079</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Fibrosis</td>
+<td>10</td>
+<td>725</td>
+<td>261</td>
+<td>4</td>
+<td>0.735</td>
+<td>0.014</td>
+<td>0.714</td>
+<td>0.735</td>
+<td>0.037</td>
+<td>0.995</td>
+<td>0.801</td>
+<td>0.07</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Edema</td>
+<td>15</td>
+<td>767</td>
+<td>213</td>
+<td>5</td>
+<td>0.782</td>
+<td>0.02</td>
+<td>0.75</td>
+<td>0.783</td>
+<td>0.066</td>
+<td>0.994</td>
+<td>0.856</td>
+<td>0.121</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Consolidation</td>
+<td>36</td>
+<td>658</td>
+<td>297</td>
+<td>9</td>
+<td>0.694</td>
+<td>0.045</td>
+<td>0.8</td>
+<td>0.689</td>
+<td>0.108</td>
+<td>0.987</td>
+<td>0.799</td>
+<td>0.19</td>
+<td>0.5</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -3294,9 +3290,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -3361,6 +3371,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -3399,12 +3495,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
-    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -3417,7 +3513,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

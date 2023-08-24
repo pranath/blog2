@@ -1,0 +1,260 @@
+{
+ "cells": [
+  {
+   "cell_type": "raw",
+   "id": "fcb8c0d6-bc49-4941-9a0d-e411e28e19a0",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "date: '2023-08-24'\n",
+    "categories:\n",
+    " - natural-language-processing\n",
+    " - deep-learning\n",
+    " - langchain\n",
+    " - activeloop\n",
+    " - openai\n",
+    "title: Building a Custom Document Retrieval Tool with Deep Lake and LangChain\n",
+    "description: This post will lead you through the process of building an effective document retrieval system geared to extract relevant information from a service's FAQs\n",
+    "image: https://github.com/pranath/blog/raw/master/images/langchain-deeplake3.png\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a4b23bf8-4945-4601-a27d-5d48ba4ff308",
+   "metadata": {},
+   "source": [
+    "## Introduction\n",
+    "\n",
+    "This post will lead you through the process of building an effective document retrieval system geared to extract relevant information from a service's FAQs. The purpose of this system is to give consumers with relevant information as quickly as possible by retrieving relevant papers that explain a company's operations.\n",
+    "\n",
+    "Users may find it difficult to go through many sources or FAQs. In this case, our retrieval system comes into play, delivering succinct, exact, and speedy answers to these inquiries, saving users time and effort.\n",
+    "\n",
+    "## Workflow\n",
+    "\n",
+    "1. Installing Deep Lake: Deep Lake is a vector storage database designed for efficiently storing and searching high-dimensional vectors. In our situation, we're utilising Deep Lake to store document embeddings and the text that goes with them.\n",
+    "2. Document storage in Deep Lake: Once Deep Lake is up and running, we'll build embeddings for our documents. We're utilising OpenAI's model to create these embeddings in our procedure. The model is fed the text of each document, and the output is a high-dimensional vector encoding the semantic content of the text. Deep Lake then stores the embeddings and their associated documents. This will create our vector database, which will be ready for queries.\n",
+    "3. Developing the retrieval tool: We will now use Langchain to develop a bespoke tool that will interface with Deep Lake. This tool is just a function that takes a query as input and outputs the most similar Deep Lake documents. To locate the most similar documents, the tool first computes the query's embedding using the same model that we used to find the documents. Then, using this query embedding, it queries Deep Lake, and Deep Lake provides the documents whose embeddings are most comparable to the query embedding.\n",
+    "4. Using the tool with an agent: Finally, we will utilise our custom tool with a Langchain agent. When the agent receives a question, it utilises the tool to retrieve relevant Deep Lake documents, after which it uses its language model to construct an answer based on these documents.\n",
+    "\n",
+    "## Import Libs & Setup"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "194e2635-c746-4275-bc88-9840c966e26b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "os.environ[\"OPENAI_API_KEY\"] = \"<INSERT_YOUR_OPENAI_API_KEY>\"\n",
+    "os.environ[\"ACTIVELOOP_TOKEN\"] = \"<INSERT_YOUR_ACTIVELOOP_TOKEN>\""
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "275fa73a-8c69-471b-9921-4af37bbc5952",
+   "metadata": {},
+   "source": [
+    "## Setting up Deep Lake\n",
+    "\n",
+    "Next, we'll set up a Deep Lake vector database and add some documents to it. The hub path for a Deep Lake dataset is in the format hub://<org_id>/<dataset_name>. Remember to install the required packages with the following command: pip install langchain==0.0.208 deeplake openai tiktoken."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "92409458-1941-4202-8198-07e47bc92443",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# We'll use an embedding model to compute the embeddings of our documents\n",
+    "from langchain.embeddings.openai import OpenAIEmbeddings\n",
+    "from langchain.vectorstores import DeepLake\n",
+    "\n",
+    "# instantiate embedding model\n",
+    "embeddings = OpenAIEmbeddings(model=\"text-embedding-ada-002\")\n",
+    "\n",
+    "# create Deep Lake dataset\n",
+    "# We'll store the documents and their embeddings in the deep lake vector db\n",
+    "# TODO: use your organization id here. (by default, org id is your username)\n",
+    "my_activeloop_org_id = \"<YOUR-ACTIVELOOP-ORG-ID>\"\n",
+    "my_activeloop_dataset_name = \"langchain_course_custom_tool\"\n",
+    "dataset_path = f\"hub://{my_activeloop_org_id}/{my_activeloop_dataset_name}\"\n",
+    "db = DeepLake(dataset_path=dataset_path, embedding_function=embeddings)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a5143af5-2ba3-454e-a299-0439cbe34ee8",
+   "metadata": {},
+   "source": [
+    "ou should now be able to visualize your dataset on the Activeloop website.\n",
+    "\n",
+    "## Storing documents in Deep Lake\n",
+    "\n",
+    "We can then add some FAQs related to PayPal as our knowledge base."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9c24e1fe-7d5e-47a3-8a2b-1e5f70f4df6e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# add faqs to the dataset\n",
+    "faqs = [\n",
+    "    \"What is PayPal?\\nPayPal is a digital wallet that follows you wherever you go. Pay any way you want. Link your credit cards to your PayPal Digital wallet, and when you want to pay, simply log in with your username and password and pick which one you want to use.\",\n",
+    "    \"Why should I use PayPal?\\nIt's Fast! We will help you pay in just a few clicks. Enter your email address and password, and you're pretty much done! It's Simple! There's no need to run around searching for your wallet. Better yet, you don't need to type in your financial details again and again when making a purchase online. We make it simple for you to pay with just your email address and password.\",\n",
+    "    \"Is it secure?\\nPayPal is the safer way to pay because we keep your financial information private. It isn't shared with anyone else when you shop, so you don't have to worry about paying businesses and people you don't know. On top of that, we've got your back. If your eligible purchase doesn't arrive or doesn't match its description, we will refund you the full purchase price plus shipping costs with PayPal's Buyer Protection program.\",\n",
+    "    \"Where can I use PayPal?\\nThere are millions of places you can use PayPal worldwide. In addition to online stores, there are many charities that use PayPal to raise money. Find a list of charities you can donate to here. Additionally, you can send funds internationally to anyone almost anywhere in the world with PayPal. All you need is their email address. Sending payments abroad has never been easier.\",\n",
+    "    \"Do I need a balance in my account to use it?\\nYou do not need to have any balance in your account to use PayPal. Similar to a physical wallet, when you are making a purchase, you can choose to pay for your items with any of the credit cards that are attached to your account. There is no need to pre-fund your account.\"\n",
+    "]\n",
+    "db.add_texts(faqs)\n",
+    "\n",
+    "# Get the retriever object from the deep lake db object\n",
+    "retriever = db.as_retriever()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6ea910bd-e608-4130-a458-380a5695c23c",
+   "metadata": {},
+   "source": [
+    "## Creating the retrieval tool\n",
+    "\n",
+    "Now, we’ll construct the custom tool function that will retrieve the relevant documents from the Deep Lake database:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "174dbaae-0d44-45b2-be3b-848faa8d4f78",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from langchain.agents import tool\n",
+    "\n",
+    "# We define some variables that will be used inside our custom tool\n",
+    "# We're creating a custom tool that looks for relevant documents in our deep lake db\n",
+    "CUSTOM_TOOL_N_DOCS = 3 # number of retrieved docs from deep lake to consider\n",
+    "CUSTOM_TOOL_DOCS_SEPARATOR =\"\\n\\n\" # how to join together the retrieved docs to form a single string\n",
+    "\n",
+    "# We use the tool decorator to wrap a function that will become our custom tool\n",
+    "# Note that the tool has a single string as input and returns a single string as output\n",
+    "# The name of the function will be the name of our custom tool\n",
+    "# The docstring of the function will be the description of our custom tool\n",
+    "# The description is used by the agent to decide whether to use the tool for a specific query\n",
+    "@tool\n",
+    "def retrieve_n_docs_tool(query: str) -> str:\n",
+    "    \"\"\" Searches for relevant documents that may contain the answer to the query.\"\"\"\n",
+    "    docs = retriever.get_relevant_documents(query)[:CUSTOM_TOOL_N_DOCS]\n",
+    "    texts = [doc.page_content for doc in docs]\n",
+    "    texts_merged = CUSTOM_TOOL_DOCS_SEPARATOR.join(texts)\n",
+    "    return texts_merged"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "21308d5c-9f07-4982-8740-a07038a3fc68",
+   "metadata": {},
+   "source": [
+    "Our retrieve_n_docs_tool function was created with a specific goal in mind: to search for and retrieve suitable documents based on a provided query. It takes a single string input, which is the user's inquiry or query, and outputs a single string output.\n",
+    "\n",
+    "Our function uses the retriever object's get_relevant_documents method to find the relevant documents. This method searches for and produces a list of the most relevant documents based on the query. However, we only require a subset of the papers it discovers. We only want the best. This is when the [: CUSTOM_TOOL_N_DOCS] slice enters the picture. It enables us to select the top CUSTOM_TOOL_N_DOCS number of documents from the list, where CUSTOM_TOOL_N_DOCS is a predefined constant indicating the number of documents to examine. In this situation, we mentioned three documents. \n",
+    "\n",
+    "We want to extract the text from each of our top docs now that we have them. We accomplish this by iterating over each document in our list, docs, and extracting the page_content or text from each item. As a consequence, a list of the top three relevant document texts is generated. Next, we'll use the.join(texts) method to combine these distinct texts from a list into a single string. Finally, our function produces texts_merged, which is a single string containing the united texts from the required documents. The @tool decorator transforms the function into a bespoke tool. \n",
+    "\n",
+    "## Using the tool in conjunction with an agent\n",
+    "\n",
+    "We can now start the agent that will use our custom tool."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5c80bbf8-ec23-4a6f-9f15-45f084be0526",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Load a LLM to create an agent using our custom tool\n",
+    "from langchain.llms import OpenAI\n",
+    "# Classes for initializing the agent that will use the custom tool\n",
+    "from langchain.agents import initialize_agent, AgentType\n",
+    "\n",
+    "# Let's create an agent that uses our custom tool\n",
+    "# We set verbose=True to check if the agent is using the tool for generating the final answer\n",
+    "llm = OpenAI(model=\"text-davinci-003\", temperature=0)\n",
+    "agent = initialize_agent([retrieve_n_docs_tool], llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "86b6ba57-d2a7-4270-81f2-c138cf137d43",
+   "metadata": {},
+   "source": [
+    "The initialize_agent function takes in three parameters: a list of the custom tools, the language learning model, and the type of agent. We're using the OpenAI LLM and specifying the agent type as ZERO_SHOT_REACT_DESCRIPTION. With verbose=True we can check if the agent is using the tool when generating the final answer.\n",
+    "\n",
+    "Once the agent has been set up, it can be queried:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4488619a-e2ef-4da0-914c-7e154e0c7cd7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "response = agent.run(\"Are my info kept private when I shop with Paypal?\")\n",
+    "print(response)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "938156b3-7ce0-4bee-99fd-9b75d80ca14b",
+   "metadata": {},
+   "source": [
+    "## Conclusion\n",
+    "\n",
+    "The project demonstrates the ability of artificial intelligence in knowledge retrieval and understanding by specifically using a custom tool to offer accurate and contextual responses to user questions. \n",
+    "\n",
+    "This experiment addresses the issue of retrieving appropriate and efficient information. Rather than manually searching through a huge number of documents or frequently asked questions to obtain the information they require, the user can just ask a query and receive an appropriate response. This has the potential to significantly improve user experience, particularly for customer support services or any platform that relies on providing accurate information quickly.\n",
+    "\n",
+    "## Acknowledgements\n",
+    "\n",
+    "I'd like to express my thanks to the wonderful [LangChain & Vector Databases in Production Course](https://learn.activeloop.ai/courses/langchain) by Activeloop - which i completed, and acknowledge the use of some images and other materials from the course in this article."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0cf1e1e9-97ec-4e2d-a181-30a502f661d3",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

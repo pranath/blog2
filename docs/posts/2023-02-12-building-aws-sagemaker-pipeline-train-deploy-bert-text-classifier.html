@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,9 +20,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -49,43 +50,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -122,7 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -146,11 +118,11 @@ ga('send', {
 
 <link rel="stylesheet" href="../css/styles.css">
 <meta property="og:title" content="LivingDataLab - Building an AWS SageMaker Pipeline for a BERT Based text classifier">
-<meta property="og:description" content="In this project we train and deploy a BERT Based text classifier using AWS Sagemaker pipelines, and describe how this can help with MLOPS to provide the most efficient path to production for…">
+<meta property="og:description" content="In this project we train and deploy a BERT Based text classifier using AWS Sagemaker pipelines, and describe how this can help with MLOPS to provide the most efficient path to production for training deploying and maintaining machine learning models at scale in production.">
 <meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/aws3.png">
 <meta property="og:site-name" content="LivingDataLab">
 <meta name="twitter:title" content="LivingDataLab - Building an AWS SageMaker Pipeline for a BERT Based text classifier">
-<meta name="twitter:description" content="In this project we train and deploy a BERT Based text classifier using AWS Sagemaker pipelines, and describe how this can help with MLOPS to provide the most efficient path to production for…">
+<meta name="twitter:description" content="In this project we train and deploy a BERT Based text classifier using AWS Sagemaker pipelines, and describe how this can help with MLOPS to provide the most efficient path to production for training deploying and maintaining machine learning models at scale in production.">
 <meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/aws3.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -169,54 +141,58 @@ ga('send', {
     <span class="navbar-title">LivingDataLab</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html">
+    <a class="nav-link" href="../index.html" rel="" target="">
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects.html" aria-current="page">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
  <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html">
+    <a class="nav-link" href="../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Building an AWS SageMaker Pipeline for a BERT Based text classifier</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Building an AWS SageMaker Pipeline for a BERT Based text classifier</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -224,7 +200,7 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">Building an AWS SageMaker Pipeline for a BERT Based text classifier</h1>
+      <h1 class="title">Building an AWS SageMaker Pipeline for a BERT Based text classifier</h1>
                   <div>
         <div class="description">
           In this project we train and deploy a BERT Based text classifier using AWS Sagemaker pipelines, and describe how this can help with MLOPS to provide the most efficient path to production for training deploying and maintaining machine learning models at scale in production.
@@ -262,50 +238,58 @@ ga('send', {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
   </div>
 </li>
       </ul>
@@ -313,6 +297,7 @@ ga('send', {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
 <!-- Begin Mailchimp Signup Form -->
@@ -353,55 +338,55 @@ ga('send', {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#what-are-mlops" id="toc-what-are-mlops" class="nav-link" data-scroll-target="#what-are-mlops"><span class="toc-section-number">2</span>  What are MLOPS ?</a></li>
-  <li><a href="#aws-pipelines-terminology" id="toc-aws-pipelines-terminology" class="nav-link" data-scroll-target="#aws-pipelines-terminology"><span class="toc-section-number">3</span>  AWS Pipelines Terminology</a></li>
-  <li><a href="#creating-a-bert-pipeline" id="toc-creating-a-bert-pipeline" class="nav-link" data-scroll-target="#creating-a-bert-pipeline"><span class="toc-section-number">4</span>  Creating a BERT Pipeline</a></li>
-  <li><a href="#configure-the-dataset-and-processing-step" id="toc-configure-the-dataset-and-processing-step" class="nav-link" data-scroll-target="#configure-the-dataset-and-processing-step"><span class="toc-section-number">5</span>  Configure the dataset and processing step</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#what-are-mlops" id="toc-what-are-mlops" class="nav-link" data-scroll-target="#what-are-mlops"><span class="header-section-number">2</span> What are MLOPS ?</a></li>
+  <li><a href="#aws-pipelines-terminology" id="toc-aws-pipelines-terminology" class="nav-link" data-scroll-target="#aws-pipelines-terminology"><span class="header-section-number">3</span> AWS Pipelines Terminology</a></li>
+  <li><a href="#creating-a-bert-pipeline" id="toc-creating-a-bert-pipeline" class="nav-link" data-scroll-target="#creating-a-bert-pipeline"><span class="header-section-number">4</span> Creating a BERT Pipeline</a></li>
+  <li><a href="#configure-the-dataset-and-processing-step" id="toc-configure-the-dataset-and-processing-step" class="nav-link" data-scroll-target="#configure-the-dataset-and-processing-step"><span class="header-section-number">5</span> Configure the dataset and processing step</a>
   <ul class="collapse">
-  <li><a href="#configure-s3-path-for-raw-input-data" id="toc-configure-s3-path-for-raw-input-data" class="nav-link" data-scroll-target="#configure-s3-path-for-raw-input-data"><span class="toc-section-number">5.1</span>  Configure S3 path for raw input data</a></li>
-  <li><a href="#configure-processing-step" id="toc-configure-processing-step" class="nav-link" data-scroll-target="#configure-processing-step"><span class="toc-section-number">5.2</span>  Configure processing step</a></li>
+  <li><a href="#configure-s3-path-for-raw-input-data" id="toc-configure-s3-path-for-raw-input-data" class="nav-link" data-scroll-target="#configure-s3-path-for-raw-input-data"><span class="header-section-number">5.1</span> Configure S3 path for raw input data</a></li>
+  <li><a href="#configure-processing-step" id="toc-configure-processing-step" class="nav-link" data-scroll-target="#configure-processing-step"><span class="header-section-number">5.2</span> Configure processing step</a></li>
   </ul></li>
-  <li><a href="#configure-training-step" id="toc-configure-training-step" class="nav-link" data-scroll-target="#configure-training-step"><span class="toc-section-number">6</span>  Configure training step</a>
+  <li><a href="#configure-training-step" id="toc-configure-training-step" class="nav-link" data-scroll-target="#configure-training-step"><span class="header-section-number">6</span> Configure training step</a>
   <ul class="collapse">
-  <li><a href="#define-parameters" id="toc-define-parameters" class="nav-link" data-scroll-target="#define-parameters"><span class="toc-section-number">6.1</span>  Define parameters</a></li>
-  <li><a href="#configure-hyper-parameters" id="toc-configure-hyper-parameters" class="nav-link" data-scroll-target="#configure-hyper-parameters"><span class="toc-section-number">6.2</span>  Configure hyper-parameters</a></li>
-  <li><a href="#configure-model-evaluation-metrics" id="toc-configure-model-evaluation-metrics" class="nav-link" data-scroll-target="#configure-model-evaluation-metrics"><span class="toc-section-number">6.3</span>  Configure model-evaluation metrics</a></li>
-  <li><a href="#configure-the-pytorchestimator" id="toc-configure-the-pytorchestimator" class="nav-link" data-scroll-target="#configure-the-pytorchestimator"><span class="toc-section-number">6.4</span>  Configure the <code>PyTorchEstimator</code></a></li>
-  <li><a href="#setup-pipeline-step-caching" id="toc-setup-pipeline-step-caching" class="nav-link" data-scroll-target="#setup-pipeline-step-caching"><span class="toc-section-number">6.5</span>  Setup pipeline step caching</a></li>
-  <li><a href="#configure-the-trainingstep" id="toc-configure-the-trainingstep" class="nav-link" data-scroll-target="#configure-the-trainingstep"><span class="toc-section-number">6.6</span>  Configure the <code>TrainingStep</code></a></li>
+  <li><a href="#define-parameters" id="toc-define-parameters" class="nav-link" data-scroll-target="#define-parameters"><span class="header-section-number">6.1</span> Define parameters</a></li>
+  <li><a href="#configure-hyper-parameters" id="toc-configure-hyper-parameters" class="nav-link" data-scroll-target="#configure-hyper-parameters"><span class="header-section-number">6.2</span> Configure hyper-parameters</a></li>
+  <li><a href="#configure-model-evaluation-metrics" id="toc-configure-model-evaluation-metrics" class="nav-link" data-scroll-target="#configure-model-evaluation-metrics"><span class="header-section-number">6.3</span> Configure model-evaluation metrics</a></li>
+  <li><a href="#configure-the-pytorchestimator" id="toc-configure-the-pytorchestimator" class="nav-link" data-scroll-target="#configure-the-pytorchestimator"><span class="header-section-number">6.4</span> Configure the <code>PyTorchEstimator</code></a></li>
+  <li><a href="#setup-pipeline-step-caching" id="toc-setup-pipeline-step-caching" class="nav-link" data-scroll-target="#setup-pipeline-step-caching"><span class="header-section-number">6.5</span> Setup pipeline step caching</a></li>
+  <li><a href="#configure-the-trainingstep" id="toc-configure-the-trainingstep" class="nav-link" data-scroll-target="#configure-the-trainingstep"><span class="header-section-number">6.6</span> Configure the <code>TrainingStep</code></a></li>
   </ul></li>
-  <li><a href="#configure-model-evaluation-step" id="toc-configure-model-evaluation-step" class="nav-link" data-scroll-target="#configure-model-evaluation-step"><span class="toc-section-number">7</span>  Configure model-evaluation step</a></li>
-  <li><a href="#configure-and-register-model-step" id="toc-configure-and-register-model-step" class="nav-link" data-scroll-target="#configure-and-register-model-step"><span class="toc-section-number">8</span>  Configure and register model step</a>
+  <li><a href="#configure-model-evaluation-step" id="toc-configure-model-evaluation-step" class="nav-link" data-scroll-target="#configure-model-evaluation-step"><span class="header-section-number">7</span> Configure model-evaluation step</a></li>
+  <li><a href="#configure-and-register-model-step" id="toc-configure-and-register-model-step" class="nav-link" data-scroll-target="#configure-and-register-model-step"><span class="header-section-number">8</span> Configure and register model step</a>
   <ul class="collapse">
-  <li><a href="#configure-the-model-for-deployment" id="toc-configure-the-model-for-deployment" class="nav-link" data-scroll-target="#configure-the-model-for-deployment"><span class="toc-section-number">8.1</span>  Configure the model for deployment</a></li>
-  <li><a href="#register-the-model-for-deployment" id="toc-register-the-model-for-deployment" class="nav-link" data-scroll-target="#register-the-model-for-deployment"><span class="toc-section-number">8.2</span>  Register the model for deployment</a></li>
+  <li><a href="#configure-the-model-for-deployment" id="toc-configure-the-model-for-deployment" class="nav-link" data-scroll-target="#configure-the-model-for-deployment"><span class="header-section-number">8.1</span> Configure the model for deployment</a></li>
+  <li><a href="#register-the-model-for-deployment" id="toc-register-the-model-for-deployment" class="nav-link" data-scroll-target="#register-the-model-for-deployment"><span class="header-section-number">8.2</span> Register the model for deployment</a></li>
   </ul></li>
-  <li><a href="#create-model-for-deployment-step" id="toc-create-model-for-deployment-step" class="nav-link" data-scroll-target="#create-model-for-deployment-step"><span class="toc-section-number">9</span>  Create model for deployment step</a></li>
-  <li><a href="#check-accuracy-condition-step" id="toc-check-accuracy-condition-step" class="nav-link" data-scroll-target="#check-accuracy-condition-step"><span class="toc-section-number">10</span>  Check accuracy condition step</a></li>
-  <li><a href="#create-pipeline" id="toc-create-pipeline" class="nav-link" data-scroll-target="#create-pipeline"><span class="toc-section-number">11</span>  Create pipeline</a>
+  <li><a href="#create-model-for-deployment-step" id="toc-create-model-for-deployment-step" class="nav-link" data-scroll-target="#create-model-for-deployment-step"><span class="header-section-number">9</span> Create model for deployment step</a></li>
+  <li><a href="#check-accuracy-condition-step" id="toc-check-accuracy-condition-step" class="nav-link" data-scroll-target="#check-accuracy-condition-step"><span class="header-section-number">10</span> Check accuracy condition step</a></li>
+  <li><a href="#create-pipeline" id="toc-create-pipeline" class="nav-link" data-scroll-target="#create-pipeline"><span class="header-section-number">11</span> Create pipeline</a>
   <ul class="collapse">
-  <li><a href="#define-a-pipeline-of-parameters-steps-and-conditions" id="toc-define-a-pipeline-of-parameters-steps-and-conditions" class="nav-link" data-scroll-target="#define-a-pipeline-of-parameters-steps-and-conditions"><span class="toc-section-number">11.1</span>  Define a pipeline of parameters, steps, and conditions</a></li>
-  <li><a href="#start-pipeline" id="toc-start-pipeline" class="nav-link" data-scroll-target="#start-pipeline"><span class="toc-section-number">11.2</span>  Start Pipeline</a></li>
-  <li><a href="#wait-for-pipeline-execution" id="toc-wait-for-pipeline-execution" class="nav-link" data-scroll-target="#wait-for-pipeline-execution"><span class="toc-section-number">11.3</span>  Wait for pipeline execution</a></li>
-  <li><a href="#describe-completed-pipeline" id="toc-describe-completed-pipeline" class="nav-link" data-scroll-target="#describe-completed-pipeline"><span class="toc-section-number">11.4</span>  Describe completed pipeline</a></li>
-  <li><a href="#wait-for-the-pipeline-to-complete" id="toc-wait-for-the-pipeline-to-complete" class="nav-link" data-scroll-target="#wait-for-the-pipeline-to-complete"><span class="toc-section-number">11.5</span>  Wait for the pipeline to complete</a></li>
+  <li><a href="#define-a-pipeline-of-parameters-steps-and-conditions" id="toc-define-a-pipeline-of-parameters-steps-and-conditions" class="nav-link" data-scroll-target="#define-a-pipeline-of-parameters-steps-and-conditions"><span class="header-section-number">11.1</span> Define a pipeline of parameters, steps, and conditions</a></li>
+  <li><a href="#start-pipeline" id="toc-start-pipeline" class="nav-link" data-scroll-target="#start-pipeline"><span class="header-section-number">11.2</span> Start Pipeline</a></li>
+  <li><a href="#wait-for-pipeline-execution" id="toc-wait-for-pipeline-execution" class="nav-link" data-scroll-target="#wait-for-pipeline-execution"><span class="header-section-number">11.3</span> Wait for pipeline execution</a></li>
+  <li><a href="#describe-completed-pipeline" id="toc-describe-completed-pipeline" class="nav-link" data-scroll-target="#describe-completed-pipeline"><span class="header-section-number">11.4</span> Describe completed pipeline</a></li>
+  <li><a href="#wait-for-the-pipeline-to-complete" id="toc-wait-for-the-pipeline-to-complete" class="nav-link" data-scroll-target="#wait-for-the-pipeline-to-complete"><span class="header-section-number">11.5</span> Wait for the pipeline to complete</a></li>
   </ul></li>
-  <li><a href="#evaluate-the-model" id="toc-evaluate-the-model" class="nav-link" data-scroll-target="#evaluate-the-model"><span class="toc-section-number">12</span>  Evaluate the model</a>
+  <li><a href="#evaluate-the-model" id="toc-evaluate-the-model" class="nav-link" data-scroll-target="#evaluate-the-model"><span class="header-section-number">12</span> Evaluate the model</a>
   <ul class="collapse">
-  <li><a href="#describe-evaluation-metrics" id="toc-describe-evaluation-metrics" class="nav-link" data-scroll-target="#describe-evaluation-metrics"><span class="toc-section-number">12.1</span>  Describe evaluation metrics</a></li>
-  <li><a href="#review-the-evaluation-report" id="toc-review-the-evaluation-report" class="nav-link" data-scroll-target="#review-the-evaluation-report"><span class="toc-section-number">12.2</span>  Review the evaluation report</a></li>
-  <li><a href="#list-pipeline-artifacts" id="toc-list-pipeline-artifacts" class="nav-link" data-scroll-target="#list-pipeline-artifacts"><span class="toc-section-number">12.3</span>  List pipeline artifacts</a></li>
+  <li><a href="#describe-evaluation-metrics" id="toc-describe-evaluation-metrics" class="nav-link" data-scroll-target="#describe-evaluation-metrics"><span class="header-section-number">12.1</span> Describe evaluation metrics</a></li>
+  <li><a href="#review-the-evaluation-report" id="toc-review-the-evaluation-report" class="nav-link" data-scroll-target="#review-the-evaluation-report"><span class="header-section-number">12.2</span> Review the evaluation report</a></li>
+  <li><a href="#list-pipeline-artifacts" id="toc-list-pipeline-artifacts" class="nav-link" data-scroll-target="#list-pipeline-artifacts"><span class="header-section-number">12.3</span> List pipeline artifacts</a></li>
   </ul></li>
-  <li><a href="#deploy-and-test-the-model" id="toc-deploy-and-test-the-model" class="nav-link" data-scroll-target="#deploy-and-test-the-model"><span class="toc-section-number">13</span>  Deploy and test the model</a>
+  <li><a href="#deploy-and-test-the-model" id="toc-deploy-and-test-the-model" class="nav-link" data-scroll-target="#deploy-and-test-the-model"><span class="header-section-number">13</span> Deploy and test the model</a>
   <ul class="collapse">
-  <li><a href="#approve-trained-model" id="toc-approve-trained-model" class="nav-link" data-scroll-target="#approve-trained-model"><span class="toc-section-number">13.1</span>  Approve trained model</a></li>
-  <li><a href="#deploy-model" id="toc-deploy-model" class="nav-link" data-scroll-target="#deploy-model"><span class="toc-section-number">13.2</span>  Deploy model</a></li>
-  <li><a href="#create-endpoint-from-registry" id="toc-create-endpoint-from-registry" class="nav-link" data-scroll-target="#create-endpoint-from-registry"><span class="toc-section-number">13.3</span>  Create endpoint from registry</a></li>
-  <li><a href="#test-model" id="toc-test-model" class="nav-link" data-scroll-target="#test-model"><span class="toc-section-number">13.4</span>  Test model</a></li>
-  <li><a href="#sagemaker-studio-extensions" id="toc-sagemaker-studio-extensions" class="nav-link" data-scroll-target="#sagemaker-studio-extensions"><span class="toc-section-number">13.5</span>  SageMaker Studio extensions</a></li>
+  <li><a href="#approve-trained-model" id="toc-approve-trained-model" class="nav-link" data-scroll-target="#approve-trained-model"><span class="header-section-number">13.1</span> Approve trained model</a></li>
+  <li><a href="#deploy-model" id="toc-deploy-model" class="nav-link" data-scroll-target="#deploy-model"><span class="header-section-number">13.2</span> Deploy model</a></li>
+  <li><a href="#create-endpoint-from-registry" id="toc-create-endpoint-from-registry" class="nav-link" data-scroll-target="#create-endpoint-from-registry"><span class="header-section-number">13.3</span> Create endpoint from registry</a></li>
+  <li><a href="#test-model" id="toc-test-model" class="nav-link" data-scroll-target="#test-model"><span class="header-section-number">13.4</span> Test model</a></li>
+  <li><a href="#sagemaker-studio-extensions" id="toc-sagemaker-studio-extensions" class="nav-link" data-scroll-target="#sagemaker-studio-extensions"><span class="header-section-number">13.5</span> SageMaker Studio extensions</a></li>
   </ul></li>
-  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="toc-section-number">14</span>  Acknowledgements</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">14</span> Acknowledgements</a></li>
   </ul>
 </nav>
     </div>
@@ -1840,229 +1825,33 @@ Training job Name: pipelines-h4inlmq7fqwk-Train-nYXyWGwBe5</code></pre>
  'StartTime': datetime.datetime(2023, 2, 12, 13, 37, 42, 570000, tzinfo=tzlocal()),
  'StepName': 'Processing',
  'StepStatus': 'Succeeded'}
-Processing job name: pipelines-h4inlmq7fqwk-processing-mwnbfz07z3</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-
-<div>
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Name/Source</th>
-      <th>Direction</th>
-      <th>Type</th>
-      <th>Association Type</th>
-      <th>Lineage Type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>s3://...-13-37-36-257/input/code/prepare_data.py</td>
-      <td>Input</td>
-      <td>DataSet</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>s3://dlai-practical-data-science/data/raw/</td>
-      <td>Input</td>
-      <td>DataSet</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>68331...om/sagemaker-scikit-learn:0.23-1-cpu-py3</td>
-      <td>Input</td>
-      <td>Image</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>s3://...02-12-13-32-20-378/output/sentiment-test</td>
-      <td>Output</td>
-      <td>DataSet</td>
-      <td>Produced</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>s3://...13-32-20-378/output/sentiment-validation</td>
-      <td>Output</td>
-      <td>DataSet</td>
-      <td>Produced</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>s3://...2-12-13-32-20-378/output/sentiment-train</td>
-      <td>Output</td>
-      <td>DataSet</td>
-      <td>Produced</td>
-      <td>artifact</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{'AttemptCount': 0,
+Processing job name: pipelines-h4inlmq7fqwk-processing-mwnbfz07z3
+{'AttemptCount': 0,
  'EndTime': datetime.datetime(2023, 2, 12, 14, 4, 49, 838000, tzinfo=tzlocal()),
  'Metadata': {'TrainingJob': {'Arn': 'arn:aws:sagemaker:us-east-1:912822595625:training-job/pipelines-h4inlmq7fqwk-Train-nYXyWGwBe5'}},
  'StartTime': datetime.datetime(2023, 2, 12, 13, 48, 54, 641000, tzinfo=tzlocal()),
  'StepName': 'Train',
  'StepStatus': 'Succeeded'}
-Training job name: pipelines-h4inlmq7fqwk-Train-nYXyWGwBe5</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-
-<div>
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Name/Source</th>
-      <th>Direction</th>
-      <th>Type</th>
-      <th>Association Type</th>
-      <th>Lineage Type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>s3://...13-32-20-378/output/sentiment-validation</td>
-      <td>Input</td>
-      <td>DataSet</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>s3://...2-12-13-32-20-378/output/sentiment-train</td>
-      <td>Input</td>
-      <td>DataSet</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>76310...onaws.com/pytorch-training:1.6.0-cpu-py3</td>
-      <td>Input</td>
-      <td>Image</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>s3://...qwk-Train-nYXyWGwBe5/output/model.tar.gz</td>
-      <td>Output</td>
-      <td>Model</td>
-      <td>Produced</td>
-      <td>artifact</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{'AttemptCount': 0,
+Training job name: pipelines-h4inlmq7fqwk-Train-nYXyWGwBe5
+{'AttemptCount': 0,
  'EndTime': datetime.datetime(2023, 2, 12, 14, 10, 48, 729000, tzinfo=tzlocal()),
  'Metadata': {'ProcessingJob': {'Arn': 'arn:aws:sagemaker:us-east-1:912822595625:processing-job/pipelines-h4inlmq7fqwk-evaluatemodel-uqvunnu2ks'}},
  'StartTime': datetime.datetime(2023, 2, 12, 14, 4, 50, 615000, tzinfo=tzlocal()),
  'StepName': 'EvaluateModel',
- 'StepStatus': 'Succeeded'}</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-
-<div>
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Name/Source</th>
-      <th>Direction</th>
-      <th>Type</th>
-      <th>Association Type</th>
-      <th>Lineage Type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>s3://...640/input/code/evaluate_model_metrics.py</td>
-      <td>Input</td>
-      <td>DataSet</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>s3://...02-12-13-32-20-378/output/sentiment-test</td>
-      <td>Input</td>
-      <td>DataSet</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>s3://...qwk-Train-nYXyWGwBe5/output/model.tar.gz</td>
-      <td>Input</td>
-      <td>Model</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>68331...om/sagemaker-scikit-learn:0.23-1-cpu-py3</td>
-      <td>Input</td>
-      <td>Image</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>s3://...n-2023-02-12-13-35-32-414/output/metrics</td>
-      <td>Output</td>
-      <td>DataSet</td>
-      <td>Produced</td>
-      <td>artifact</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{'AttemptCount': 0,
+ 'StepStatus': 'Succeeded'}
+{'AttemptCount': 0,
  'EndTime': datetime.datetime(2023, 2, 12, 14, 10, 50, 320000, tzinfo=tzlocal()),
  'Metadata': {'Condition': {'Outcome': 'True'}},
  'StartTime': datetime.datetime(2023, 2, 12, 14, 10, 49, 585000, tzinfo=tzlocal()),
  'StepName': 'AccuracyCondition',
- 'StepStatus': 'Succeeded'}</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre><code>None</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{'AttemptCount': 0,
+ 'StepStatus': 'Succeeded'}
+{'AttemptCount': 0,
  'EndTime': datetime.datetime(2023, 2, 12, 14, 10, 52, 545000, tzinfo=tzlocal()),
  'Metadata': {'Model': {'Arn': 'arn:aws:sagemaker:us-east-1:912822595625:model/pipelines-h4inlmq7fqwk-createmodel-tu0lobcfq6'}},
  'StartTime': datetime.datetime(2023, 2, 12, 14, 10, 51, 78000, tzinfo=tzlocal()),
  'StepName': 'CreateModel',
- 'StepStatus': 'Succeeded'}</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre><code>None</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{'AttemptCount': 0,
+ 'StepStatus': 'Succeeded'}
+{'AttemptCount': 0,
  'EndTime': datetime.datetime(2023, 2, 12, 14, 10, 52, 324000, tzinfo=tzlocal()),
  'Metadata': {'RegisterModel': {'Arn': 'arn:aws:sagemaker:us-east-1:912822595625:model-package/bert-reviews-1676208665/1'}},
  'StartTime': datetime.datetime(2023, 2, 12, 14, 10, 51, 78000, tzinfo=tzlocal()),
@@ -2070,55 +1859,245 @@ Training job name: pipelines-h4inlmq7fqwk-Train-nYXyWGwBe5</code></pre>
  'StepStatus': 'Succeeded'}</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Name/Source</th>
-      <th>Direction</th>
-      <th>Type</th>
-      <th>Association Type</th>
-      <th>Lineage Type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>s3://...qwk-Train-nYXyWGwBe5/output/model.tar.gz</td>
-      <td>Input</td>
-      <td>Model</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>76310...aws.com/pytorch-inference:1.6.0-cpu-py36</td>
-      <td>Input</td>
-      <td>Image</td>
-      <td>ContributedTo</td>
-      <td>artifact</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>bert-reviews-1676208665-1-PendingManualApprova...</td>
-      <td>Input</td>
-      <td>Approval</td>
-      <td>ContributedTo</td>
-      <td>action</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>BERT-Reviews-1676208665-1676211052-aws-model-p...</td>
-      <td>Output</td>
-      <td>ModelGroup</td>
-      <td>AssociatedWith</td>
-      <td>context</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Name/Source</th>
+<th data-quarto-table-cell-role="th">Direction</th>
+<th data-quarto-table-cell-role="th">Type</th>
+<th data-quarto-table-cell-role="th">Association Type</th>
+<th data-quarto-table-cell-role="th">Lineage Type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>s3://...-13-37-36-257/input/code/prepare_data.py</td>
+<td>Input</td>
+<td>DataSet</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>s3://dlai-practical-data-science/data/raw/</td>
+<td>Input</td>
+<td>DataSet</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>68331...om/sagemaker-scikit-learn:0.23-1-cpu-py3</td>
+<td>Input</td>
+<td>Image</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>s3://...02-12-13-32-20-378/output/sentiment-test</td>
+<td>Output</td>
+<td>DataSet</td>
+<td>Produced</td>
+<td>artifact</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>s3://...13-32-20-378/output/sentiment-validation</td>
+<td>Output</td>
+<td>DataSet</td>
+<td>Produced</td>
+<td>artifact</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>s3://...2-12-13-32-20-378/output/sentiment-train</td>
+<td>Output</td>
+<td>DataSet</td>
+<td>Produced</td>
+<td>artifact</td>
+</tr>
+</tbody>
 </table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Name/Source</th>
+<th data-quarto-table-cell-role="th">Direction</th>
+<th data-quarto-table-cell-role="th">Type</th>
+<th data-quarto-table-cell-role="th">Association Type</th>
+<th data-quarto-table-cell-role="th">Lineage Type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>s3://...13-32-20-378/output/sentiment-validation</td>
+<td>Input</td>
+<td>DataSet</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>s3://...2-12-13-32-20-378/output/sentiment-train</td>
+<td>Input</td>
+<td>DataSet</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>76310...onaws.com/pytorch-training:1.6.0-cpu-py3</td>
+<td>Input</td>
+<td>Image</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>s3://...qwk-Train-nYXyWGwBe5/output/model.tar.gz</td>
+<td>Output</td>
+<td>Model</td>
+<td>Produced</td>
+<td>artifact</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Name/Source</th>
+<th data-quarto-table-cell-role="th">Direction</th>
+<th data-quarto-table-cell-role="th">Type</th>
+<th data-quarto-table-cell-role="th">Association Type</th>
+<th data-quarto-table-cell-role="th">Lineage Type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>s3://...640/input/code/evaluate_model_metrics.py</td>
+<td>Input</td>
+<td>DataSet</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>s3://...02-12-13-32-20-378/output/sentiment-test</td>
+<td>Input</td>
+<td>DataSet</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>s3://...qwk-Train-nYXyWGwBe5/output/model.tar.gz</td>
+<td>Input</td>
+<td>Model</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>68331...om/sagemaker-scikit-learn:0.23-1-cpu-py3</td>
+<td>Input</td>
+<td>Image</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>s3://...n-2023-02-12-13-35-32-414/output/metrics</td>
+<td>Output</td>
+<td>DataSet</td>
+<td>Produced</td>
+<td>artifact</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>None</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>None</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Name/Source</th>
+<th data-quarto-table-cell-role="th">Direction</th>
+<th data-quarto-table-cell-role="th">Type</th>
+<th data-quarto-table-cell-role="th">Association Type</th>
+<th data-quarto-table-cell-role="th">Lineage Type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>s3://...qwk-Train-nYXyWGwBe5/output/model.tar.gz</td>
+<td>Input</td>
+<td>Model</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>76310...aws.com/pytorch-inference:1.6.0-cpu-py36</td>
+<td>Input</td>
+<td>Image</td>
+<td>ContributedTo</td>
+<td>artifact</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>bert-reviews-1676208665-1-PendingManualApprova...</td>
+<td>Input</td>
+<td>Approval</td>
+<td>ContributedTo</td>
+<td>action</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>BERT-Reviews-1676208665-1676211052-aws-model-p...</td>
+<td>Output</td>
+<td>ModelGroup</td>
+<td>AssociatedWith</td>
+<td>context</td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
 </div>
@@ -2132,11 +2111,11 @@ Training job name: pipelines-h4inlmq7fqwk-Train-nYXyWGwBe5</code></pre>
 <p>We can approve the model using the SageMaker Studio UI or programmatically as shown below.</p>
 <p>Get the model package ARN.</p>
 <div class="cell" data-outputid="b5a1f02f-625f-43b6-9c17-18972e1ca6b1">
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> execution_step <span class="kw">in</span> execution.list_steps():</span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> execution_step[<span class="st">'StepName'</span>] <span class="op">==</span> <span class="st">'RegisterModel'</span>:</span>
-<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>        model_package_arn <span class="op">=</span> execution_step[<span class="st">'Metadata'</span>][<span class="st">'RegisterModel'</span>][<span class="st">'Arn'</span>]</span>
-<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
-<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model_package_arn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> execution_step <span class="kw">in</span> execution.list_steps():</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> execution_step[<span class="st">'StepName'</span>] <span class="op">==</span> <span class="st">'RegisterModel'</span>:</span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>        model_package_arn <span class="op">=</span> execution_step[<span class="st">'Metadata'</span>][<span class="st">'RegisterModel'</span>][<span class="st">'Arn'</span>]</span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model_package_arn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>arn:aws:sagemaker:us-east-1:912822595625:model-package/bert-reviews-1676208665/1</code></pre>
 </div>
@@ -2144,12 +2123,12 @@ Training job name: pipelines-h4inlmq7fqwk-Train-nYXyWGwBe5</code></pre>
 <p>Update the model package with the <code>Approved</code> status to prepare for deployment.</p>
 <p>The model must be <code>Approved</code> before it can be deployed.</p>
 <div class="cell" data-outputid="49ae389d-3b0b-4529-b77c-09f035f94b9c">
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>model_package_update_response <span class="op">=</span> sm.update_model_package(</span>
-<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>    ModelPackageArn<span class="op">=</span>model_package_arn,</span>
-<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>    ModelApprovalStatus<span class="op">=</span><span class="st">"Approved"</span>,</span>
-<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>pprint(model_package_update_response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>model_package_update_response <span class="op">=</span> sm.update_model_package(</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>    ModelPackageArn<span class="op">=</span>model_package_arn,</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>    ModelApprovalStatus<span class="op">=</span><span class="st">"Approved"</span>,</span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>pprint(model_package_update_response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{'ModelPackageArn': 'arn:aws:sagemaker:us-east-1:912822595625:model-package/bert-reviews-1676208665/1',
  'ResponseMetadata': {'HTTPHeaders': {'content-length': '102',
@@ -2166,15 +2145,15 @@ Training job name: pipelines-h4inlmq7fqwk-Train-nYXyWGwBe5</code></pre>
 <h3 data-number="13.2" class="anchored" data-anchor-id="deploy-model"><span class="header-section-number">13.2</span> Deploy model</h3>
 <p>Get the model ARN and the model name from it.</p>
 <div class="cell" data-outputid="4a79b3a9-63ca-4182-dfed-063d0827cb1b">
-<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> execution_step <span class="kw">in</span> execution.list_steps():</span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(execution_step[<span class="st">'StepName'</span>])</span>
-<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> execution_step[<span class="st">'StepName'</span>] <span class="op">==</span> <span class="st">'CreateModel'</span>:</span>
-<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>        model_arn <span class="op">=</span> execution_step[<span class="st">'Metadata'</span>][<span class="st">'Model'</span>][<span class="st">'Arn'</span>]</span>
-<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
-<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model_arn)</span>
-<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb98-8"><a href="#cb98-8" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> model_arn.split(<span class="st">'/'</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb98-9"><a href="#cb98-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> execution_step <span class="kw">in</span> execution.list_steps():</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(execution_step[<span class="st">'StepName'</span>])</span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> execution_step[<span class="st">'StepName'</span>] <span class="op">==</span> <span class="st">'CreateModel'</span>:</span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>        model_arn <span class="op">=</span> execution_step[<span class="st">'Metadata'</span>][<span class="st">'Model'</span>][<span class="st">'Arn'</span>]</span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model_arn)</span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> model_arn.split(<span class="st">'/'</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>RegisterModel
 CreateModel
@@ -2187,53 +2166,53 @@ pipelines-h4inlmq7fqwk-createmodel-tu0lobcfq6</code></pre>
 <h3 data-number="13.3" class="anchored" data-anchor-id="create-endpoint-from-registry"><span class="header-section-number">13.3</span> Create endpoint from registry</h3>
 <p>Configure the endpoint.</p>
 <div class="cell" data-outputid="8d65d1cc-8ed2-4682-8eae-52ad417070e9">
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>endpoint_config_name <span class="op">=</span> <span class="st">'bert-model-epc-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(endpoint_config_name)</span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>create_endpoint_config_response <span class="op">=</span> sm.create_endpoint_config(</span>
-<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>    EndpointConfigName <span class="op">=</span> endpoint_config_name,</span>
-<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a>    ProductionVariants<span class="op">=</span>[{</span>
-<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'InstanceType'</span>:<span class="st">'ml.m5.xlarge'</span>,</span>
-<span id="cb100-8"><a href="#cb100-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'InitialVariantWeight'</span>:<span class="dv">1</span>,</span>
-<span id="cb100-9"><a href="#cb100-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">'InitialInstanceCount'</span>:<span class="dv">1</span>,</span>
-<span id="cb100-10"><a href="#cb100-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'ModelName'</span>: model_name,</span>
-<span id="cb100-11"><a href="#cb100-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'VariantName'</span>:<span class="st">'AllTraffic'</span>}])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>endpoint_config_name <span class="op">=</span> <span class="st">'bert-model-epc-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(endpoint_config_name)</span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>create_endpoint_config_response <span class="op">=</span> sm.create_endpoint_config(</span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>    EndpointConfigName <span class="op">=</span> endpoint_config_name,</span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>    ProductionVariants<span class="op">=</span>[{</span>
+<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'InstanceType'</span>:<span class="st">'ml.m5.xlarge'</span>,</span>
+<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'InitialVariantWeight'</span>:<span class="dv">1</span>,</span>
+<span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">'InitialInstanceCount'</span>:<span class="dv">1</span>,</span>
+<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'ModelName'</span>: model_name,</span>
+<span id="cb95-11"><a href="#cb95-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'VariantName'</span>:<span class="st">'AllTraffic'</span>}])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>bert-model-epc-1676208665</code></pre>
 </div>
 </div>
 <p>Create the endpoint.</p>
 <div class="cell" data-outputid="8e6c05ae-6a88-4e71-fc09-307995983c70">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>pipeline_endpoint_name <span class="op">=</span> <span class="st">'bert-model-ep-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
-<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"EndpointName=</span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(pipeline_endpoint_name))</span>
-<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>create_endpoint_response <span class="op">=</span> sm.create_endpoint(</span>
-<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>    EndpointName<span class="op">=</span>pipeline_endpoint_name,</span>
-<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>    EndpointConfigName<span class="op">=</span>endpoint_config_name)</span>
-<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(create_endpoint_response[<span class="st">'EndpointArn'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>pipeline_endpoint_name <span class="op">=</span> <span class="st">'bert-model-ep-</span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(timestamp)</span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"EndpointName=</span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(pipeline_endpoint_name))</span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>create_endpoint_response <span class="op">=</span> sm.create_endpoint(</span>
+<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>    EndpointName<span class="op">=</span>pipeline_endpoint_name,</span>
+<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>    EndpointConfigName<span class="op">=</span>endpoint_config_name)</span>
+<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(create_endpoint_response[<span class="st">'EndpointArn'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>EndpointName=bert-model-ep-1676208665
 arn:aws:sagemaker:us-east-1:912822595625:endpoint/bert-model-ep-1676208665</code></pre>
 </div>
 </div>
 <div class="cell" data-outputid="816fc01f-bff8-404c-fe80-f4d416405b6a">
-<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
-<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
-<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>: </span>
-<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>        waiter <span class="op">=</span> sm.get_waiter(<span class="st">'endpoint_in_service'</span>)</span>
-<span id="cb104-6"><a href="#cb104-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Waiting for endpoint to be in `InService`...'</span>)</span>
-<span id="cb104-7"><a href="#cb104-7" aria-hidden="true" tabindex="-1"></a>        waiter.wait(EndpointName<span class="op">=</span>pipeline_endpoint_name)</span>
-<span id="cb104-8"><a href="#cb104-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span><span class="op">;</span></span>
-<span id="cb104-9"><a href="#cb104-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
-<span id="cb104-10"><a href="#cb104-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Waiting for endpoint...'</span>)</span>
-<span id="cb104-11"><a href="#cb104-11" aria-hidden="true" tabindex="-1"></a>        endpoint_status <span class="op">=</span> sm.describe_endpoint(EndpointName<span class="op">=</span>pipeline_endpoint_name)[<span class="st">'EndpointStatus'</span>]</span>
-<span id="cb104-12"><a href="#cb104-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Endpoint status: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(endpoint_status))</span>
-<span id="cb104-13"><a href="#cb104-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> endpoint_status <span class="op">==</span> <span class="st">'Failed'</span>:</span>
-<span id="cb104-14"><a href="#cb104-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
-<span id="cb104-15"><a href="#cb104-15" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">30</span>)</span>
-<span id="cb104-16"><a href="#cb104-16" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb104-17"><a href="#cb104-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Endpoint deployed.'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>: </span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>        waiter <span class="op">=</span> sm.get_waiter(<span class="st">'endpoint_in_service'</span>)</span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Waiting for endpoint to be in `InService`...'</span>)</span>
+<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>        waiter.wait(EndpointName<span class="op">=</span>pipeline_endpoint_name)</span>
+<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
+<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Waiting for endpoint...'</span>)</span>
+<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a>        endpoint_status <span class="op">=</span> sm.describe_endpoint(EndpointName<span class="op">=</span>pipeline_endpoint_name)[<span class="st">'EndpointStatus'</span>]</span>
+<span id="cb99-12"><a href="#cb99-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Endpoint status: </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(endpoint_status))</span>
+<span id="cb99-13"><a href="#cb99-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> endpoint_status <span class="op">==</span> <span class="st">'Failed'</span>:</span>
+<span id="cb99-14"><a href="#cb99-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb99-15"><a href="#cb99-15" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">30</span>)</span>
+<span id="cb99-16"><a href="#cb99-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb99-17"><a href="#cb99-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Endpoint deployed.'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Waiting for endpoint to be in `InService`...
 Endpoint deployed.
@@ -2246,27 +2225,27 @@ Wall time: 4min 31s</code></pre>
 <h3 data-number="13.4" class="anchored" data-anchor-id="test-model"><span class="header-section-number">13.4</span> Test model</h3>
 <p>Let’s predict the <code>sentiment</code> with <code>review_body</code> samples and review the result:</p>
 <div class="cell" data-outputid="09f68f38-d201-44c0-a111-5ff2b2b7da19">
-<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.predictor <span class="im">import</span> Predictor</span>
-<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.serializers <span class="im">import</span> JSONLinesSerializer</span>
-<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.deserializers <span class="im">import</span> JSONLinesDeserializer</span>
-<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> [</span>
-<span id="cb106-6"><a href="#cb106-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"I love this product!"</span>]},</span>
-<span id="cb106-7"><a href="#cb106-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"OK, but not great."</span>]},</span>
-<span id="cb106-8"><a href="#cb106-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"This is not the right product."</span>]},</span>
-<span id="cb106-9"><a href="#cb106-9" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb106-10"><a href="#cb106-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb106-11"><a href="#cb106-11" aria-hidden="true" tabindex="-1"></a>predictor <span class="op">=</span> Predictor(</span>
-<span id="cb106-12"><a href="#cb106-12" aria-hidden="true" tabindex="-1"></a>    endpoint_name<span class="op">=</span>pipeline_endpoint_name,</span>
-<span id="cb106-13"><a href="#cb106-13" aria-hidden="true" tabindex="-1"></a>    serializer<span class="op">=</span>JSONLinesSerializer(),</span>
-<span id="cb106-14"><a href="#cb106-14" aria-hidden="true" tabindex="-1"></a>    deserializer<span class="op">=</span>JSONLinesDeserializer(),</span>
-<span id="cb106-15"><a href="#cb106-15" aria-hidden="true" tabindex="-1"></a>    sagemaker_session<span class="op">=</span>sess</span>
-<span id="cb106-16"><a href="#cb106-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb106-17"><a href="#cb106-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb106-18"><a href="#cb106-18" aria-hidden="true" tabindex="-1"></a>predicted_classes <span class="op">=</span> predictor.predict(inputs)</span>
-<span id="cb106-19"><a href="#cb106-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb106-20"><a href="#cb106-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> predicted_class <span class="kw">in</span> predicted_classes:</span>
-<span id="cb106-21"><a href="#cb106-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Predicted class </span><span class="sc">{}</span><span class="st"> with probability </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(predicted_class[<span class="st">'predicted_label'</span>], predicted_class[<span class="st">'probability'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.predictor <span class="im">import</span> Predictor</span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.serializers <span class="im">import</span> JSONLinesSerializer</span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sagemaker.deserializers <span class="im">import</span> JSONLinesDeserializer</span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> [</span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"I love this product!"</span>]},</span>
+<span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"OK, but not great."</span>]},</span>
+<span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"features"</span>: [<span class="st">"This is not the right product."</span>]},</span>
+<span id="cb101-9"><a href="#cb101-9" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb101-10"><a href="#cb101-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-11"><a href="#cb101-11" aria-hidden="true" tabindex="-1"></a>predictor <span class="op">=</span> Predictor(</span>
+<span id="cb101-12"><a href="#cb101-12" aria-hidden="true" tabindex="-1"></a>    endpoint_name<span class="op">=</span>pipeline_endpoint_name,</span>
+<span id="cb101-13"><a href="#cb101-13" aria-hidden="true" tabindex="-1"></a>    serializer<span class="op">=</span>JSONLinesSerializer(),</span>
+<span id="cb101-14"><a href="#cb101-14" aria-hidden="true" tabindex="-1"></a>    deserializer<span class="op">=</span>JSONLinesDeserializer(),</span>
+<span id="cb101-15"><a href="#cb101-15" aria-hidden="true" tabindex="-1"></a>    sagemaker_session<span class="op">=</span>sess</span>
+<span id="cb101-16"><a href="#cb101-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb101-17"><a href="#cb101-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-18"><a href="#cb101-18" aria-hidden="true" tabindex="-1"></a>predicted_classes <span class="op">=</span> predictor.predict(inputs)</span>
+<span id="cb101-19"><a href="#cb101-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-20"><a href="#cb101-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> predicted_class <span class="kw">in</span> predicted_classes:</span>
+<span id="cb101-21"><a href="#cb101-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Predicted class </span><span class="sc">{}</span><span class="st"> with probability </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(predicted_class[<span class="st">'predicted_label'</span>], predicted_class[<span class="st">'probability'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Predicted class 1 with probability 0.9203698635101318
 Predicted class 0 with probability 0.44024962186813354
@@ -2337,9 +2316,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -2404,6 +2397,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -2442,12 +2521,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
-    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -2460,7 +2539,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

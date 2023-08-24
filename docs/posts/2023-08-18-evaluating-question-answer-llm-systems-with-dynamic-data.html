@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-08-18">
+<meta name="description" content="In many real-world settings, the proper answer to a question may alter over time. For example, if you’re designing a Q&amp;A system on top of a database or that connects to an API, the underlying data may be updated regularly. Instead of storing labels directly as values, we’ll utilise references to overcome this issue in this post using Langsmith where our labels will be references to look up the relevant values.">
+
+<title>LivingDataLab - Evaluating Question and Answer Systems with Dynamic Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Evaluating Question and Answer Systems with Dynamic Data">
+<meta property="og:description" content="In many real-world settings, the proper answer to a question may alter over time. For example, if you’re designing a Q&amp;A system on top of a database or that connects to an API, the underlying data may be updated regularly. Instead of storing labels directly as values, we’ll utilise references to overcome this issue in this post using Langsmith where our labels will be references to look up the relevant values.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/ai-eval3.png">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Evaluating Question and Answer Systems with Dynamic Data">
+<meta name="twitter:description" content="In many real-world settings, the proper answer to a question may alter over time. For example, if you’re designing a Q&amp;A system on top of a database or that connects to an API, the underlying data may be updated regularly. Instead of storing labels directly as values, we’ll utilise references to overcome this issue in this post using Langsmith where our labels will be references to look up the relevant values.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/ai-eval3.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Evaluating Question and Answer Systems with Dynamic Data</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Evaluating Question and Answer Systems with Dynamic Data</h1>
+                  <div>
+        <div class="description">
+          In many real-world settings, the proper answer to a question may alter over time. For example, if you’re designing a Q&amp;A system on top of a database or that connects to an API, the underlying data may be updated regularly. Instead of storing labels directly as values, we’ll utilise references to overcome this issue in this post using Langsmith where our labels will be references to look up the relevant values.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">openai</div>
+                <div class="quarto-category">llm-evaluation</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 18, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<p>subscribe.html</p>
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link active" data-scroll-target="#prerequisites"><span class="header-section-number">1</span> Prerequisites</a></li>
+  <li><a href="#create-a-dataset" id="toc-create-a-dataset" class="nav-link" data-scroll-target="#create-a-dataset"><span class="header-section-number">2</span> Create a dataset</a></li>
+  <li><a href="#define-qa-system" id="toc-define-qa-system" class="nav-link" data-scroll-target="#define-qa-system"><span class="header-section-number">3</span> Define Q&amp;A system</a></li>
+  <li><a href="#run-evaluation" id="toc-run-evaluation" class="nav-link" data-scroll-target="#run-evaluation"><span class="header-section-number">4</span> Run Evaluation</a></li>
+  <li><a href="#re-evaluate-later-in-time." id="toc-re-evaluate-later-in-time." class="nav-link" data-scroll-target="#re-evaluate-later-in-time."><span class="header-section-number">5</span> Re-evaluate later in time.</a>
+  <ul class="collapse">
+  <li><a href="#review-the-results" id="toc-review-the-results" class="nav-link" data-scroll-target="#review-the-results"><span class="header-section-number">5.1</span> Review the results</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">6</span> Conclusion</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">7</span> Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>In many real-world settings, the correct answer to a question may alter over time. For example, if you’re designing a Q&amp;A system on top of a database or that connects to an API, the underlying data may be updated regularly. In such instances, you should still measure the correctness of your system, but you should do so in a method that compensates for these changes.</p>
+<p>In an <a href="2023-08-16-langsmith-for-llm-application-evaluation.html">earlier article</a> we introduced Langsmith and how it can help with LLM-based application evaluation.</p>
+<p>In the following post, we will handle this issue using Langsmith and the age-old software practise of indirection. Rather than storing labels as values, we will use them as <em>references</em> to look for the correct values. In this example, our labels will be queries that the custom evaluator can use to retrieve the ground truth answer and compare it to the model’s predictions.</p>
+<p>The article will walk you through the following steps:</p>
+<ol type="1">
+<li>Create a dataset of questions and corresponding code snippets to fetch the answers.</li>
+<li>Define your Q&amp;A system.</li>
+<li>Run evaluation using LangSmith with a custom evaluator.</li>
+<li>Re-test the system over time.</li>
+</ol>
+<blockquote class="blockquote">
+<p>Quick note: We are using a CSV file to simulate a real data source. This is not a real scenario and is meant to be illustrative.</p>
+</blockquote>
+<section id="prerequisites" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="prerequisites"><span class="header-section-number">1</span> Prerequisites</h2>
+<p>This post uses OpenAI for the model and LangChain to compose the chain. To make sure the tracing and evals are set up for <a href="https://smith.langchain.com">LangSmith</a>, please configure your API Key appropriately.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %env LANGCHAIN_API_KEY=&lt;YOUR_API_KEY&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Install the required packages. We will use the latest version of langchain and use pandas as an example of a data store.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %pip install -U "langchain[openai]" &gt; /dev/null</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># %pip install pandas &gt; /dev/null</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># %env OPENAI_API_KEY=&lt;YOUR-API-KEY&gt;```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-a-dataset" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="create-a-dataset"><span class="header-section-number">2</span> Create a dataset</h2>
+<p>We will be using the Titanic dataset from <a href="https://raw.githubusercontent.com/jorisvandenbossche/pandas-tutorial/master/data/titanic.csv">here</a> for our example. This dataset contains information about Titanic passengers and their outcomes.</p>
+<p>To begin, create a set of questions and accompanying references that demonstrate how to obtain the proper answer from the data. For the purposes of this lesson, we will utilise Python code snippets, but the strategy may be applied to any other type of indirection, such as storing API requests or search arguments.</p>
+<p>Our evaluator will consult the sources to determine the correct response.</p>
+<div class="cell" data-tags="[]" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>questions <span class="op">=</span> [</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"How many passengers were on the Titanic?"</span>, <span class="st">"len(df)"</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"How many passengers survived?"</span>, <span class="st">"df['Survived'].sum()"</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"What was the average age of the passengers?"</span>, <span class="st">"df['Age'].mean()"</span>),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"How many male and female passengers were there?"</span>, <span class="st">"df['Sex'].value_counts()"</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"What was the average fare paid for the tickets?"</span>, <span class="st">"df['Fare'].mean()"</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"How many passengers were in each class?"</span>, <span class="st">"df['Pclass'].value_counts()"</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"What was the survival rate for each gender?"</span>, <span class="st">"df.groupby('Sex')['Survived'].mean()"</span>),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"What was the survival rate for each class?"</span>, <span class="st">"df.groupby('Pclass')['Survived'].mean()"</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Which port had the most passengers embark from?"</span>, <span class="st">"df['Embarked'].value_counts().idxmax()"</span>),</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"How many children under the age of 18 survived?"</span>, <span class="st">"df[df['Age'] &lt; 18]['Survived'].sum()"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, create the dataset. You can use the LangSmith SDK to do so. Create the dataset and upload each example. Saving the dataset to LangSmith lets us reuse and relate test runs over time.</p>
+<div class="cell" data-tags="[]" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langsmith <span class="im">import</span> Client</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> Client()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>dataset_name <span class="op">=</span> <span class="st">"Dynamic Titanic CSV"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> client.create_dataset(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span>dataset_name, description<span class="op">=</span><span class="st">"Test QA over CSV"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> example <span class="kw">in</span> questions:</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    client.create_example(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        inputs<span class="op">=</span>{<span class="st">"question"</span>: example[<span class="dv">0</span>]},</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        outputs<span class="op">=</span>{<span class="st">"code"</span>: example[<span class="dv">1</span>]},</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        dataset_id<span class="op">=</span>dataset.<span class="bu">id</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="define-qa-system" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="define-qa-system"><span class="header-section-number">3</span> Define Q&amp;A system</h2>
+<p>Now that the dataset has been produced, we can define our question answering system. For this project, we’ll use LangChain’s off-the-shelf pandas dataframe agent.</p>
+<p>Load the Titanic data into a dataframe first, and then write a constructor for our agent.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>titanic_path <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/jorisvandenbossche/pandas-tutorial/master/data/titanic.csv"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(titanic_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> partial</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.prompts <span class="im">import</span> ChatPromptTemplate</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_pandas_dataframe_agent</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> ChatOpenAI(model<span class="op">=</span><span class="st">"gpt-4"</span>, temperature<span class="op">=</span><span class="fl">0.0</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>create_chain <span class="op">=</span> partial(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    create_pandas_dataframe_agent,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    llm<span class="op">=</span>llm,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example run</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>create_chain().invoke({<span class="st">"input"</span>: <span class="st">"How many passengers were on the Titanic?"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>{'input': 'How many passengers were on the Titanic?',
+ 'output': 'There were 891 passengers on the Titanic.'}</code></pre>
+</div>
+</div>
+</section>
+<section id="run-evaluation" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="run-evaluation"><span class="header-section-number">4</span> Run Evaluation</h2>
+<p>Now it’s time to define our custom evaluator. In this case we will inherit from the <a href="https://api.python.langchain.com/en/latest/evaluation/langchain.evaluation.criteria.eval_chain.LabeledCriteriaEvalChain.html#langchain.evaluation.criteria.eval_chain.LabeledCritewriaEvalChain">LabeledCriteriaEvalChain</a> class. This evaluator takes the input, prediction, and reference label and passes them to an llm to predict whether the prediction satisfies the provided criteria, conditioned on the reference label.</p>
+<p>Our custom evaluator will make one small change to this evaluator by dereferencing the label to inject the correct value. We do this by overwriting the <code>_get_eval_input</code> method. Then the LLM will see the fresh reference value.</p>
+<blockquote class="blockquote">
+<p>Reminder: We are using a CSV file to simulate a real data source here and doing an unsafe eval on to query the data source. In a real scenario it would be better to do a safe get request or something similar.</p>
+</blockquote>
+<div class="cell" data-tags="[]" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langsmith <span class="im">import</span> Client</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.smith <span class="im">import</span> RunEvalConfig, run_on_dataset</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Optional</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.evaluation.criteria.eval_chain <span class="im">import</span> LabeledCriteriaEvalChain</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CustomCriteriaEvalChain(LabeledCriteriaEvalChain):</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _get_eval_input(</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        prediction: <span class="bu">str</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        reference: Optional[<span class="bu">str</span>],</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">input</span>: Optional[<span class="bu">str</span>],</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The parent class validates the reference is present and combines into</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># a dictionary for the llm chain.</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        raw <span class="op">=</span> <span class="bu">super</span>()._get_eval_input(prediction, reference, <span class="bu">input</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Warning - this evaluates the code you've saved as labels in the dataset.</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Be sure that the code is correct, and refrain from executing in an</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># untrusted environment or when connected to a production server.</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        raw[<span class="st">"reference"</span>] <span class="op">=</span> <span class="bu">eval</span>(raw[<span class="st">"reference"</span>])</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> raw</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> Client()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>eval_config <span class="op">=</span> RunEvalConfig(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    custom_evaluators<span class="op">=</span>[</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        CustomCriteriaEvalChain.from_llm(criteria<span class="op">=</span><span class="st">"correctness"</span>, llm<span class="op">=</span>ChatOpenAI(model<span class="op">=</span><span class="st">"gpt-4"</span>, temperature<span class="op">=</span><span class="fl">0.0</span>)),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>chain_results <span class="op">=</span> run_on_dataset(</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    client,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span>dataset_name,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    llm_or_chain_factory<span class="op">=</span>create_chain,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    evaluation<span class="op">=</span>eval_config,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This agent doesn't support concurrent runs yet.</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    concurrency_level<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>View the evaluation results for project 'e1a16797963742018b9625ef311371ee-AgentExecutor' at:
+https://smith.langchain.com/projects/p/718eb48c-0af7-43cb-a125-198a5658616d?eval=true</code></pre>
+</div>
+</div>
+<p>With that evalution running, you can navigate to the linked project and review the agent’s predictions and feedback scores.</p>
+</section>
+<section id="re-evaluate-later-in-time." class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="re-evaluate-later-in-time."><span class="header-section-number">5</span> Re-evaluate later in time.</h2>
+<p>It’s safe to conclude that the Titanic dataset hasn’t changed in the last few minutes, but in your case, fresh data is very certainly arriving all the time. We can reuse the old dataset as long as the method of accessing that information hasn’t changed.</p>
+<p>Let’s assume that additional folks boarded by duplicating some rows and rearranging some statistics. The agent will then be re-run on the new dataset.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_doubled <span class="op">=</span> pd.concat([df, df], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_doubled[<span class="st">'Age'</span>] <span class="op">=</span> df_doubled[<span class="st">'Age'</span>].sample(frac<span class="op">=</span><span class="dv">1</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>df_doubled[<span class="st">'Sex'</span>] <span class="op">=</span> df_doubled[<span class="st">'Sex'</span>].sample(frac<span class="op">=</span><span class="dv">1</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df_doubled</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-tags="[]" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>create_chain_2 <span class="op">=</span> partial(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    create_pandas_dataframe_agent,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    llm<span class="op">=</span>llm,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-tags="[]" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>chain_results <span class="op">=</span> run_on_dataset(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    client,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span>dataset_name,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    llm_or_chain_factory<span class="op">=</span>create_chain_2,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    evaluation<span class="op">=</span>eval_config,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    concurrency_level<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>View the evaluation results for project 'c1d72bd05c6342dba7b9c52d883ae995-AgentExecutor' at:
+https://smith.langchain.com/projects/p/42482672-3517-4460-ab8d-5f380273f1f5?eval=true</code></pre>
+</div>
+</div>
+<section id="review-the-results" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="review-the-results"><span class="header-section-number">5.1</span> Review the results</h3>
+<p>You can see the results now that we’ve tested twice on the “changing” data source. If you go to the “dataset” page and click on the “examples” tab, you can view the predictions for each test run by clicking through different examples.</p>
+<p>The view of the individual dataset rows is shown below. We can edit the example or examine all predictions from different test runs on that example by clicking on a row. Let’s choose one.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith15.png" width="800"></p>
+<p>In this example, we choose the row with the question “How many male and female passengers were there?” The predictions for each test run are shown in a table of linked rows at the bottom of the page. When you call ‘run_on_dataset’, these are automatically associated.</p>
+<p>If you look closely at the predictions, you’ll notice that they’re all different. The agency initially projected 577 male and 314 female passengers. It then forecasted 1154 male and 628 female passengers for the second test run.</p>
+<p>However, both test runs were marked as “correct”. The values in the data source changed, but the mechanism for retrieving the answer did not.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith16.png" width="800"></p>
+<p>But how can you be certain that the “correct” grade is accurate? Now is a good moment to double-check the run trace of your custom evaluator to ensure that it is functioning properly. You can view the evaluation trace by directly clicking on the arrows on the “correctness” chips in the table. Otherwise, you can navigate to the run, then to the feedback tab, and then to your custom evaluator’s trace for that example. Screenshots of the retrieved values for each of the preceding runs are shown below.</p>
+<p>You can see that the “reference” key contains the dereferenced value from the data source. You can see that it matches the predictions from the runs above! The first one shows 577 male and 314 female passengers.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith17.png" width="800"></p>
+<p>And, after updating the dataframe, the evaluator returned the accurate result of 1154 male and 628 female travellers, which matches the forecasts from the previous runs!</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith18.png" width="800"></p>
+<p>Seems to be working well!</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">6</span> Conclusion</h2>
+<p>In this post, we examined a Q&amp;A system that was linked to a developing data repository. We accomplished so by employing a custom evaluator that dynamically retrieves the answer based on a static reference (in this case, a code snippet).</p>
+<p>This is only one solution to the challenge of evaluating Q&amp;A systems when the underlying data source changes. This approach is straightforward and immediately tests the accuracy of your system end-to-end using current data. It can be useful if you wish to monitor your performance on a regular basis.</p>
+<p>It is less reliable if your purpose is to compare two different prompts or models because the underlying data may differ. Depending on how you dereference the labels, prudence and correct permissioning are also required.</p>
+<p>Other options to evaluate your system in this scenario include:</p>
+<ul>
+<li>Freezing or mocking the data source(s) used for evaluation. You can then invest in hand-labeling periodically to make sure the data is still reprentative of the production environment.</li>
+<li>Testing the query generation capability of your agent directly and evaluate the equivalence of the queries. This is less “end-to-end”, but it depending on how you compare, you’d avoid any potential issues caused by unsafe dereferencing.</li>
+</ul>
+</section>
+<section id="acknowledgements" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://github.com/langchain-ai/langsmith-cookbook/">Langsmith Cookbook Repo</a> and acknowledge the use of some images and other materials from this project in writing this article.</p>
+
+
+</section>
+
+<p>subscribe.html</p></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>

@@ -13,6 +13,10 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-08-19-comparing-question-answer-llm-system-outputs.html",
+      "/posts/2023-08-18-evaluating-question-answer-llm-systems-with-dynamic-data.html",
+      "/posts/2023-08-17-measuring-accuracy-of-a-question-answering-system.html",
+      "/posts/2023-08-16-langsmith-for-llm-application-evaluation.html",
       "/posts/2023-08-15-guarding-against-bad-outputs-with-self-critque-chain.html",
       "/posts/2023-08-14-voice-assistant-for-your-knowledge-base.html",
       "/posts/2023-08-13-a-youtube-summariser-using-whisper-and-langchain.html",

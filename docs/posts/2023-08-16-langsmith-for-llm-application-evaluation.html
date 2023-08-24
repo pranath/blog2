@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-08-16">
+<meta name="description" content="Developing LLM based applications is now possible using libraries such as Langchain, but taking these applications into production can involve many challenges such as evaluation &amp; monitoring. Langsmith is a new tool that can help with these challenges of taking LLMs into production.">
+
+<title>LivingDataLab - Langsmith for LLM Application Evaluation &amp; Monitoring</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Langsmith for LLM Application Evaluation &amp; Monitoring">
+<meta property="og:description" content="Developing LLM based applications is now possible using libraries such as Langchain, but taking these applications into production can involve many challenges such as evaluation &amp; monitoring. Langsmith is a new tool that can help with these challenges of taking LLMs into production.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/ai-eval1.png">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Langsmith for LLM Application Evaluation &amp; Monitoring">
+<meta name="twitter:description" content="Developing LLM based applications is now possible using libraries such as Langchain, but taking these applications into production can involve many challenges such as evaluation &amp; monitoring. Langsmith is a new tool that can help with these challenges of taking LLMs into production.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/ai-eval1.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Langsmith for LLM Application Evaluation &amp; Monitoring</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Langsmith for LLM Application Evaluation &amp; Monitoring</h1>
+                  <div>
+        <div class="description">
+          Developing LLM based applications is now possible using libraries such as Langchain, but taking these applications into production can involve many challenges such as evaluation &amp; monitoring. Langsmith is a new tool that can help with these challenges of taking LLMs into production.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">openai</div>
+                <div class="quarto-category">llm-evaluation</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 16, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#langsmith-overview" id="toc-langsmith-overview" class="nav-link" data-scroll-target="#langsmith-overview"><span class="header-section-number">2</span> Langsmith Overview</a>
+  <ul class="collapse">
+  <li><a href="#debugging" id="toc-debugging" class="nav-link" data-scroll-target="#debugging"><span class="header-section-number">2.1</span> Debugging</a></li>
+  <li><a href="#collecting-examples" id="toc-collecting-examples" class="nav-link" data-scroll-target="#collecting-examples"><span class="header-section-number">2.2</span> Collecting examples</a></li>
+  <li><a href="#testing-evaluation" id="toc-testing-evaluation" class="nav-link" data-scroll-target="#testing-evaluation"><span class="header-section-number">2.3</span> Testing &amp; evaluation</a></li>
+  <li><a href="#monitoring" id="toc-monitoring" class="nav-link" data-scroll-target="#monitoring"><span class="header-section-number">2.4</span> Monitoring</a></li>
+  <li><a href="#exporting-datasets" id="toc-exporting-datasets" class="nav-link" data-scroll-target="#exporting-datasets"><span class="header-section-number">2.5</span> Exporting datasets</a></li>
+  </ul></li>
+  <li><a href="#import-libs-setup" id="toc-import-libs-setup" class="nav-link" data-scroll-target="#import-libs-setup"><span class="header-section-number">3</span> Import Libs &amp; Setup</a></li>
+  <li><a href="#using-langsmith-to-log-run-information" id="toc-using-langsmith-to-log-run-information" class="nav-link" data-scroll-target="#using-langsmith-to-log-run-information"><span class="header-section-number">4</span> Using Langsmith to Log Run Information</a></li>
+  <li><a href="#evaluate-another-agent-implementation" id="toc-evaluate-another-agent-implementation" class="nav-link" data-scroll-target="#evaluate-another-agent-implementation"><span class="header-section-number">5</span> Evaluate another agent implementation</a>
+  <ul class="collapse">
+  <li><a href="#create-a-langsmith-dataset" id="toc-create-a-langsmith-dataset" class="nav-link" data-scroll-target="#create-a-langsmith-dataset"><span class="header-section-number">5.1</span> Create a LangSmith dataset</a></li>
+  <li><a href="#initialize-a-new-agent-to-benchmark" id="toc-initialize-a-new-agent-to-benchmark" class="nav-link" data-scroll-target="#initialize-a-new-agent-to-benchmark"><span class="header-section-number">5.2</span> Initialize a new agent to benchmark</a></li>
+  <li><a href="#configure-evaluation" id="toc-configure-evaluation" class="nav-link" data-scroll-target="#configure-evaluation"><span class="header-section-number">5.3</span> Configure evaluation</a></li>
+  <li><a href="#run-the-agent-and-evaluators" id="toc-run-the-agent-and-evaluators" class="nav-link" data-scroll-target="#run-the-agent-and-evaluators"><span class="header-section-number">5.4</span> Run the agent and evaluators</a></li>
+  <li><a href="#review-the-test-results" id="toc-review-the-test-results" class="nav-link" data-scroll-target="#review-the-test-results"><span class="header-section-number">5.5</span> Review the test results</a></li>
+  </ul></li>
+  <li><a href="#exporting-datasets-and-runs" id="toc-exporting-datasets-and-runs" class="nav-link" data-scroll-target="#exporting-datasets-and-runs"><span class="header-section-number">6</span> Exporting datasets and runs</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">7</span> Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>LangChain simplifies the development of LLM apps and Agents. However, getting LLM applications into production can be tricky. To produce a high-quality result, you will most likely need to heavily customise and iterate on your prompts, chains, and other components.</p>
+<p>LangSmith is a unified platform that supports debugging, testing, and monitoring of your LLM applications.</p>
+<p>In particular it can help with the following:</p>
+<ul>
+<li>Debug a new chain, agent, or collection of tools quickly.</li>
+<li>Visualise and utilise components (chains, llms, retrievers, etc.)</li>
+<li>Evaluate multiple prompts and LLMs for a single component - Run a given chain several times over a dataset to ensure it consistently meets a quality bar</li>
+<li>Capture use traces and generate insights using LLMs or analytics pipelines</li>
+</ul>
+</section>
+<section id="langsmith-overview" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="langsmith-overview"><span class="header-section-number">2</span> Langsmith Overview</h2>
+<section id="debugging" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="debugging"><span class="header-section-number">2.1</span> Debugging</h3>
+<p>It can be difficult to debug LLMs, chains, and agents. LangSmith assists in resolving the following issues:</p>
+<section id="what-was-the-exact-input-to-the-llm" class="level4">
+<h4 class="anchored" data-anchor-id="what-was-the-exact-input-to-the-llm">What was the exact input to the LLM?</h4>
+<p>LLM calls are frequently difficult and non-deterministic. The inputs/outputs may appear simple because they are technically string string (or chat messages chat message), but this can be misleading because the input string is typically produced from a combination of user input and auxiliary functions.</p>
+<p>The majority of inputs to an LLM call are a combination of a set template and input variables. These input variables could be generated directly by user input or by an auxiliary function (such as retrieval). These input variables will have been transformed to a string format by the time they enter the LLM, but they are not always naturally expressed as a string. It is critical to have visibility into the final string entering the LLM.</p>
+<p>This is also true, to a lesser extent, of the output of an LLM. The output of an LLM is frequently a string, but that string may have some structure (json, yaml) that is meant to be processed into a structured form. Understanding the actual result can help determine whether different parsing is required.</p>
+<p>LangSmith visualises the specific inputs and outputs of all LLM calls so that you can readily comprehend them.</p>
+</section>
+<section id="if-i-edit-the-prompt-how-does-that-affect-the-output" class="level4">
+<h4 class="anchored" data-anchor-id="if-i-edit-the-prompt-how-does-that-affect-the-output">If I edit the prompt, how does that affect the output?</h4>
+<p>So you see a poor output and go into LangSmith to investigate. You locate the erroneous LLM call and are now inspecting the actual input. What if you want to experiment with modifying a word or phrase to see what happens?</p>
+<p>When evaluating an LLM call, you may visit this playground by clicking the Open in Playground button. Here, you can adjust the prompt and re-run it to see how the output changes - as many times as you need!</p>
+<p>Currently, this feature supports only OpenAI and Anthropic models and works for LLM and Chat Model calls</p>
+</section>
+<section id="what-is-the-exact-sequence-of-events" class="level4">
+<h4 class="anchored" data-anchor-id="what-is-the-exact-sequence-of-events">What is the exact sequence of events?</h4>
+<p>It can be difficult to understand what is going on under the hood of complex chains and agents. What kinds of calls are being made? What is the order? What are each call’s inputs and outputs?</p>
+<p>LangSmith’s built-in tracing tool provides a visual representation of these sequences. This tool is quite useful for comprehending complex and extensive chains and agents. It can shed light on the sequencing of calls and how they interact in chains. It helps visualise the precise sequence for a given run for agents when the sequence of calls is non-deterministic – something that is impossible to anticipate ahead of time.</p>
+</section>
+<section id="why-did-my-chain-take-much-longer-than-expected" class="level4">
+<h4 class="anchored" data-anchor-id="why-did-my-chain-take-much-longer-than-expected">Why did my chain take much longer than expected?</h4>
+<p>If a chain takes longer than intended, you must determine the root cause. LangSmith identifies and potentially eliminates the slowest components by tracking the latency of each step.</p>
+</section>
+<section id="what-was-the-total-number-of-tokens-used" class="level4">
+<h4 class="anchored" data-anchor-id="what-was-the-total-number-of-tokens-used">What was the total number of tokens used?</h4>
+<p>Developing and prototyping LLM apps can be costly. LangSmith keeps track of a chain’s total token usage as well as the token usage of each step. This makes identifying potentially costly elements of the chain simple.</p>
+</section>
+<section id="debugging-collaboratively" class="level4">
+<h4 class="anchored" data-anchor-id="debugging-collaboratively">Debugging collaboratively</h4>
+<p>Sharing a defective chain with a coworker for debugging was previously difficult when done locally. We’ve introduced a “Share” button to LangSmith, which makes the chain and LLM runs available to anyone with the shared URL.</p>
+</section>
+</section>
+<section id="collecting-examples" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="collecting-examples"><span class="header-section-number">2.2</span> Collecting examples</h3>
+<p>The majority of the time, we go to debug because something awful or unexpected has happened in our programme. These failures provide crucial information. We can test future chain versions against these known vulnerabilities by identifying how our chain can fail and monitoring these failures.</p>
+<p>Why is this so powerful? When developing LLM apps, it is typical to begin without any form of dataset. This is one of the benefits of LLMs. They are fantastic zero-shot learners, allowing you to get started as quickly as possible. But this can also be a burden, as you’re blindly adjusting the prompt. You don’t have any examples to compare your modifications against.</p>
+<p>LangSmith solves this issue by having a “Add to Dataset” button for each run, making it simple to add input/output samples from a selected dataset. Before adding the example to the dataset, you can change it to include the desired result, which is very useful for poor examples.</p>
+<p>This functionality is available at every level of a layered chain, allowing you to add examples for an end-to-end chain, an intermediary chain (such as an LLM Chain), or the LLM or Chat Model.</p>
+<p>End-to-end chain examples are good for evaluating the overall flow, whereas single, modular LLM Chain or LLM/Chat Model examples are good for testing the simplest and most directly modifiable components.</p>
+</section>
+<section id="testing-evaluation" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="testing-evaluation"><span class="header-section-number">2.3</span> Testing &amp; evaluation</h3>
+<p>Initially, we perform the majority of our evaluations manually and ad hoc. We experiment with various inputs to see what happens. But, at some time, our application will be running well, and we will want to be more stringent about testing updates. We can make use of a dataset that we created along the route. Alternatively, we may spend some time manually building a small dataset. LangSmith makes dataset uploading easier in these instances.</p>
+<p>How can we utilise a dataset to test modifications to a prompt or chain after we get it? The simplest method is to run the chain over the data points and visualise the results. Despite technological developments, there is still no replacement for inspecting outputs by hand. Currently, the chain must be executed client-side over the data points. The LangSmith client makes it simple to download a dataset and then run a chain over it, logging the results to a new project linked to the dataset. You can then go over them. Langsmith it simple to assign feedback to runs and label them as correct or incorrect directly in the web app, and aggregate data for each test project are displayed.</p>
+<p>Langsmith provided a set of evaluators to the open-source LangChain library to make evaluating these runs easier. When a test run is started, certain evaluators are provided, and the results are evaluated once the test run is over. To be honest, most of these evaluators aren’t flawless. We do not recommend blindly trusting them. However, we believe they are beneficial for directing your attention to cases that you should look at. This becomes especially useful as the quantity of data points grows and it becomes impossible to examine each one individually.</p>
+</section>
+<section id="monitoring" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="monitoring"><span class="header-section-number">2.4</span> Monitoring</h3>
+<p>After all of this, your app may be ready to go into production. LangSmith can be used to monitor your programme in the same way as it can be used to debug it. All traces can be logged, latency and token consumption data can be viewed, and individual issues may be troubleshooted as they emerge. String tags or key-value metadata can be supplied to each run, allowing you to attach correlation ids or AB test variants and filter runs accordingly.</p>
+<p>Langsmith has made it easy to programmatically associate feedback with runs. This implies that if your app has a thumbs up/down button, you may use it to send feedback to LangSmith. This can be used to track performance over time and identify underperforming data points, which can then be added to a dataset for future testing – similar to how debug mode works.</p>
+<p>In the LangSmith documentation, they presented various examples of deriving insights from logged runs. In addition to leading you through the process of executing this assignment yourself, we will also show you examples of interfacing with third parties for this reason.</p>
+</section>
+<section id="exporting-datasets" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="exporting-datasets"><span class="header-section-number">2.5</span> Exporting datasets</h3>
+<p>LangSmith simplifies the process of curating datasets. These, however, are not only valuable within LangSmith; they can also be exported for usage in other settings. Exporting for usage in OpenAI Evals or fine-tuning, such as using FireworksAI, are notable applications. This also ensures one does’nt become too tied-in on this platform, as you can export the datasets created.</p>
+</section>
+</section>
+<section id="import-libs-setup" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="import-libs-setup"><span class="header-section-number">3</span> Import Libs &amp; Setup</h2>
+<p>To use Langsmith you first need to <a href="https://smith.langchain.com/">create an account</a> which is free - but at time of writing is in beta development so it might take some time to get an account (I had to wait a couple of weeks).</p>
+<p>To begin, set your environment variables to instruct LangChain to log traces. Set the LANGCHAIN_TRACING_V2 environment variable to true to accomplish this. Set the LANGCHAIN_PROJECT environment variable to instruct LangChain which project to log to (if not set, runs will be recorded to the default project). If the project does not exist, this will create it for you. The LANGCHAIN_ENDPOINT and LANGCHAIN_API_KEY environment variables must also be configured.</p>
+<p>Please see the <a href="https://docs.smith.langchain.com/">LangSmith documentation</a> for more information on different methods of configuring tracing.</p>
+<p>To run this project, you must set the OPENAI_API_KEY and SERPAPI_API_KEY environment variables.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> uuid <span class="im">import</span> uuid4</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>OPENAI_API_KEY <span class="op">=</span> os.getenv(<span class="st">"OPENAI_API_KEY"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>unique_id <span class="op">=</span> uuid4().<span class="bu">hex</span>[<span class="dv">0</span>:<span class="dv">8</span>]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"LANGCHAIN_TRACING_V2"</span>] <span class="op">=</span> <span class="st">"true"</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"LANGCHAIN_PROJECT"</span>] <span class="op">=</span> <span class="ss">f"Tracing Test Walkthrough - </span><span class="sc">{</span>unique_id<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"LANGCHAIN_ENDPOINT"</span>] <span class="op">=</span> <span class="st">"https://api.smith.langchain.com"</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"LANGCHAIN_API_KEY"</span>] <span class="op">=</span> os.getenv(<span class="st">"LANGCHAIN_API_KEY"</span>)  <span class="co"># Update to your API key</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Used by the agent in this tutorial</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"OPENAI_API_KEY"</span>] <span class="op">=</span> os.getenv(<span class="st">"OPENAI_API_KEY"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"SERPAPI_API_KEY"</span>] <span class="op">=</span> os.getenv(<span class="st">"SERPAPI_API_KEY"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="using-langsmith-to-log-run-information" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="using-langsmith-to-log-run-information"><span class="header-section-number">4</span> Using Langsmith to Log Run Information</h2>
+<p>We are going to use a simple example of using an Agent to answer a few questions, and we want to log the outputs in Langsmith.</p>
+<p>First we need to create the langsmith client to interact with the API</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langsmith <span class="im">import</span> Client</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> Client()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Following that, we build a LangChain component and log runs to the platform. In this example, we will develop a ReAct-style agent that has access to the tools Search and Calculator. LangSmith works with any LangChain component (LLMs, Chat Models, Tools, Retrievers, and Agents are all supported).</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> AgentType, initialize_agent, load_tools</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> ChatOpenAI(temperature<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>tools <span class="op">=</span> load_tools([<span class="st">"serpapi"</span>, <span class="st">"llm-math"</span>], llm<span class="op">=</span>llm)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>agent <span class="op">=</span> initialize_agent(</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    tools, llm, agent<span class="op">=</span>AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose<span class="op">=</span><span class="va">False</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We are running the agent concurrently on multiple inputs to reduce latency. Runs get logged to LangSmith in the background so execution latency is unaffected.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> [</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"How many people live in canada as of 2023?"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"who is dua lipa's boyfriend? what is his age raised to the .43 power?"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"what is dua lipa's boyfriend age raised to the .43 power?"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"how far is it from paris to boston in miles"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"what was the total number of points scored in the 2023 super bowl? what is that number raised to the .23 power?"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"what was the total number of points scored in the 2023 super bowl raised to the .23 power?"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"how many more points were scored in the 2023 super bowl than in the 2022 super bowl?"</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"what is 153 raised to .1312 power?"</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"who is kendall jenner's boyfriend? what is his height (in inches) raised to .13 power?"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"what is 1213 divided by 4345?"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> arun(agent, input_example):</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="cf">await</span> agent.arun(input_example)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The agent sometimes makes mistakes! These will be captured by the tracing.</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> e</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> input_example <span class="kw">in</span> inputs:</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    results.append(arun(agent, input_example))</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.callbacks.tracers.langchain <span class="im">import</span> wait_for_all_tracers</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Logs are submitted in a background thread to avoid blocking execution.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of this tutorial, we want to make sure</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># they've been submitted before moving on. This is also</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># useful for serverless deployments.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>wait_for_all_tracers()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Our agent traces should show up in the Projects section of Langsmith, as we can see below in the drill through screenshots.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith1.png" width="800"></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith2.png" width="800"></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith3.png" width="800"></p>
+</section>
+<section id="evaluate-another-agent-implementation" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="evaluate-another-agent-implementation"><span class="header-section-number">5</span> Evaluate another agent implementation</h2>
+<p>LangSmith allows you to test and assess your LLM apps in addition to logging runs.</p>
+<p>We will use LangSmith in this part to construct a benchmark dataset and run AI-assisted assessors on an agent. We will accomplish this in a few steps:</p>
+<ol type="1">
+<li>Make a dataset from previously ran inputs and outputs.</li>
+<li>Create a new agent for benchmarking.</li>
+<li>Set up evaluators to grade the output of an agent.</li>
+<li>Run the agent through the dataset and assess the outcomes</li>
+</ol>
+<section id="create-a-langsmith-dataset" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="create-a-langsmith-dataset"><span class="header-section-number">5.1</span> Create a LangSmith dataset</h3>
+<p>The LangSmith client is used to construct a dataset from the agent runs you just logged above. These will be used subsequently to assess the performance of a new agent. This is basically recording the inputs and results of the runs to a dataset as examples. A dataset is a collection of samples, which are simply input-output pairs that you may use to test your application.</p>
+<p>Please keep in mind that this is a simple walkthrough example. In practise, you should test the outputs before adding them to a benchmark dataset to be used to evaluate other agents.</p>
+<p>Please see the LangSmith documentation for additional information about datasets.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dataset_name <span class="op">=</span> <span class="ss">f"calculator-example-dataset-</span><span class="sc">{</span>unique_id<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> client.create_dataset(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    dataset_name, description<span class="op">=</span><span class="st">"A calculator example dataset"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>runs <span class="op">=</span> client.list_runs(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    project_name<span class="op">=</span>os.environ[<span class="st">"LANGCHAIN_PROJECT"</span>],</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    execution_order<span class="op">=</span><span class="dv">1</span>,  <span class="co"># Only return the top-level runs</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    error<span class="op">=</span><span class="va">False</span>,  <span class="co"># Only runs that succeed</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> run <span class="kw">in</span> runs:</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    client.create_example(inputs<span class="op">=</span>run.inputs, outputs<span class="op">=</span>run.outputs, dataset_id<span class="op">=</span>dataset.<span class="bu">id</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="initialize-a-new-agent-to-benchmark" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="initialize-a-new-agent-to-benchmark"><span class="header-section-number">5.2</span> Initialize a new agent to benchmark</h3>
+<p>Any LLM, chain, or agent can be evaluated. Because chains might have memory, we will give a chain_factory (aka a constructor) function to each call to initialise it. In this scenario, we’ll put OpenAI’s function calling endpoints to the test.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> AgentType, initialize_agent, load_tools</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> ChatOpenAI(model<span class="op">=</span><span class="st">"gpt-3.5-turbo-0613"</span>, temperature<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>tools <span class="op">=</span> load_tools([<span class="st">"serpapi"</span>, <span class="st">"llm-math"</span>], llm<span class="op">=</span>llm)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Since chains can be stateful (e.g. they can have memory), we provide</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># a way to initialize a new chain for each row in the dataset. This is done</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># by passing in a factory function that returns a new chain for each row.</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> agent_factory():</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> initialize_agent(tools, llm, agent<span class="op">=</span>AgentType.OPENAI_FUNCTIONS, verbose<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># If your chain is NOT stateful, your factory can return the object directly</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># to improve runtime performance. For example:</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># chain_factory = lambda: agent</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="configure-evaluation" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="configure-evaluation"><span class="header-section-number">5.3</span> Configure evaluation</h3>
+<p>Manually comparing chain results in the UI is effective, but time consuming. To analyse the performance of your component, you can use automated metrics and AI-assisted feedback.</p>
+<p>In the following sections, we will develop several pre-implemented run evaluators that do the following:</p>
+<ul>
+<li>Contrast results with ground truth labels. (You did this using the debug outputs mentioned above.)</li>
+<li>Using embedding distance, assess semantic (dis)similarity.</li>
+<li>In a reference, evaluate ‘aspects’ of the agent’s response.-free method employing custom criteria</li>
+</ul>
+<p>Please see the LangSmith documentation for a more in-depth discussion of how to choose an acceptable evaluator for your use case and how to develop your own custom evaluators.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.evaluation <span class="im">import</span> EvaluatorType</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.smith <span class="im">import</span> RunEvalConfig</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>evaluation_config <span class="op">=</span> RunEvalConfig(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Evaluators can either be an evaluator type (e.g., "qa", "criteria", "embedding_distance", etc.) or a configuration for that evaluator</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    evaluators<span class="op">=</span>[</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Measures whether a QA response is "Correct", based on a reference answer</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># You can also select via the raw string "qa"</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        EvaluatorType.QA,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Measure the embedding distance between the output and the reference answer</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Equivalent to: EvalConfig.EmbeddingDistance(embeddings=OpenAIEmbeddings())</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        EvaluatorType.EMBEDDING_DISTANCE,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Grade whether the output satisfies the stated criteria. You can select a default one such as "helpfulness" or provide your own.</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        RunEvalConfig.LabeledCriteria(<span class="st">"helpfulness"</span>),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Both the Criteria and LabeledCriteria evaluators can be configured with a dictionary of custom criteria.</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        RunEvalConfig.Criteria(</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>            {</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>                <span class="st">"fifth-grader-score"</span>: <span class="st">"Do you have to be smarter than a fifth grader to answer this question?"</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># You can add custom StringEvaluator or RunEvaluator objects here as well, which will automatically be</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># applied to each prediction. Check out the docs for examples.</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    custom_evaluators<span class="op">=</span>[],</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="run-the-agent-and-evaluators" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="run-the-agent-and-evaluators"><span class="header-section-number">5.4</span> Run the agent and evaluators</h3>
+<p>To evaluate your model, use the <a href="https://api.python.langchain.com/en/latest/smith/langchain.smith.evaluation.runner_utils.arun_on_dataset.html#langchain.smith.evaluation.runner_utils.arun_on_dataset">arun_on_dataset</a> (or synchronous <a href="https://api.python.langchain.com/en/latest/smith/langchain.smith.evaluation.runner_utils.run_on_dataset.html#langchain.smith.evaluation.runner_utils.run_on_dataset">run_on_dataset</a>) function. This will result in:</p>
+<ol type="1">
+<li>Retrieve an example row from the provided dataset.</li>
+<li>Execute your llm or chain on each of the examples.</li>
+<li>To create automated feedback, apply evaluators to the resultant run traces and accompanying reference instances.</li>
+</ol>
+<p>The outcomes will be displayed in the LangSmith app.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.smith <span class="im">import</span> (</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    arun_on_dataset,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    run_on_dataset,  <span class="co"># Available if your chain doesn't support async calls.</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>chain_results <span class="op">=</span> <span class="cf">await</span> arun_on_dataset(</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    client<span class="op">=</span>client,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span>dataset_name,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    llm_or_chain_factory<span class="op">=</span>agent_factory,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    evaluation<span class="op">=</span>evaluation_config,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    tags<span class="op">=</span>[<span class="st">"testing-notebook"</span>],  <span class="co"># Optional, adds a tag to the resulting chain runs</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Sometimes, the agent will error due to parsing issues, incompatible tool inputs, etc.</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co"># These are logged as warnings here and captured as errors in the tracing UI.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>View the evaluation results for project '0eadab4e465c49ad874acc2bce4007e5-AgentExecutor' at:
+https://smith.langchain.com/projects/p/5cbabd18-19f5-4153-a2aa-b329b3ca3da6?eval=true
+Processed examples: 1Processed examples: 2Processed examples: 6Processed examples: 9</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Chain failed for example 05d50196-3735-4510-a4b0-ef91248e32cd. Error: LLMMathChain._evaluate("
+age_of_Dua_Lipa_boyfriend ** 0.43
+") raised error: 'age_of_Dua_Lipa_boyfriend'. Please try again with a valid numerical expression
+Chain failed for example bd1d5389-b01f-4cac-9600-260c78f99e47. Error: LLMMathChain._evaluate("
+age ** 0.43
+") raised error: 'age'. Please try again with a valid numerical expression
+Chain failed for example 5262e85a-3ee9-442d-86e8-dc4cce55267c. Error: Too many arguments to single-input tool Calculator. Args: ['height ^ 0.13', {'height': 70}]</code></pre>
+</div>
+</div>
+</section>
+<section id="review-the-test-results" class="level3" data-number="5.5">
+<h3 data-number="5.5" class="anchored" data-anchor-id="review-the-test-results"><span class="header-section-number">5.5</span> Review the test results</h3>
+<p>You may see the test results tracing UI below by going to the “Datasets &amp; Testing” page, picking the “calculator-example-dataset-*” dataset, clicking on the Test Runs tab, and inspecting the runs in the appropriate project.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith4.png" width="800"></p>
+<p>This will display the fresh runs as well as the feedback logged from the specified evaluators. Runs that fail will not receive feedback.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith5.png" width="800"></p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith6.png" width="800"></p>
+</section>
+</section>
+<section id="exporting-datasets-and-runs" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="exporting-datasets-and-runs"><span class="header-section-number">6</span> Exporting datasets and runs</h2>
+<p>LangSmith’s online interface allows you to instantly export data to common formats such as CSV or JSONL. The client can also be used to retrieve runs for additional analysis, storage in your own database, or sharing with others. Let’s get the evaluation run’s run traces.</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>runs <span class="op">=</span> <span class="bu">list</span>(client.list_runs(dataset_name<span class="op">=</span>dataset_name))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>runs[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>Run(id=UUID('5a09233f-8a51-4ec8-a1ea-096caf45469b'), name='AgentExecutor', start_time=datetime.datetime(2023, 8, 21, 17, 48, 49, 539515), run_type='chain', end_time=datetime.datetime(2023, 8, 21, 17, 48, 54, 191896), extra={'runtime': {'library': 'langchain', 'runtime': 'python', 'platform': 'macOS-10.16-x86_64-i386-64bit', 'sdk_version': '0.0.25', 'library_version': '0.0.270', 'runtime_version': '3.9.13', 'langchain_version': '0.0.270'}, 'total_tokens': 512, 'prompt_tokens': 451, 'completion_tokens': 61}, error=None, serialized=None, events=[{'name': 'start', 'time': '2023-08-21T17:48:49.539515'}, {'name': 'end', 'time': '2023-08-21T17:48:54.191896'}], inputs={'input': 'what is 1213 divided by 4345?'}, outputs={'output': '1213 divided by 4345 is approximately 0.2792.'}, reference_example_id=UUID('8459f7e6-55e4-43cf-8999-86d48dea2635'), parent_run_id=None, tags=['testing-notebook', 'openai-functions'], execution_order=1, session_id=UUID('5cbabd18-19f5-4153-a2aa-b329b3ca3da6'), child_run_ids=[UUID('74380efc-3a56-48f8-bd07-d21e5cde23cb'), UUID('d4799bc4-47ae-4474-b524-ff202239befe'), UUID('0b30cbd9-2c61-4302-bf52-5a2762158a23'), UUID('25c15cf9-354e-411c-898c-8ee99c249e8d'), UUID('0fdae1e0-919e-45db-8d01-6e22348e1f8c'), UUID('71627b18-91c9-4655-a832-978fbc775b0a')], child_runs=None, feedback_stats={'correctness': {'n': 1, 'avg': 1.0, 'mode': 1}, 'helpfulness': {'n': 1, 'avg': 1.0, 'mode': 1}, 'fifth-grader-score': {'n': 1, 'avg': 0.0, 'mode': 0}, 'embedding_cosine_distance': {'n': 1, 'avg': 0.1442128576232, 'mode': 0.1442128576232}}, app_path='/projects/p/5cbabd18-19f5-4153-a2aa-b329b3ca3da6/r/5a09233f-8a51-4ec8-a1ea-096caf45469b')</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>client.read_project(project_id<span class="op">=</span>runs[<span class="dv">0</span>].session_id).feedback_stats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>{'correctness': {'n': 6, 'avg': 0.8333333333333334, 'mode': 1},
+ 'helpfulness': {'n': 6, 'avg': 1.0, 'mode': 1},
+ 'fifth-grader-score': {'n': 6, 'avg': 0.6666666666666666, 'mode': 1},
+ 'embedding_cosine_distance': {'n': 6, 'avg': 0.09463849470261249, 'mode': 0}}</code></pre>
+</div>
+</div>
+<p>So in this post, we have introduced Langsmith and succesfully traced and evaluated an agent using it.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://docs.smith.langchain.com/">Langsmith Documentation</a> and acknowledge the use of some images and other materials from the documentation in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>

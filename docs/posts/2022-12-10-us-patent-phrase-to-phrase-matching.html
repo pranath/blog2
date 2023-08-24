@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,9 +20,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -49,43 +50,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -122,7 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -170,54 +142,58 @@ ga('send', {
     <span class="navbar-title">LivingDataLab</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html">
+    <a class="nav-link" href="../index.html" rel="" target="">
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects.html" aria-current="page">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
  <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html">
+    <a class="nav-link" href="../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">US Patent Phrase to Phrase Matching</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">US Patent Phrase to Phrase Matching</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -225,7 +201,7 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">US Patent Phrase to Phrase Matching</h1>
+      <h1 class="title">US Patent Phrase to Phrase Matching</h1>
                   <div>
         <div class="description">
           In this project I will create a model that can associate short text phrases with the correct US patent classification.
@@ -264,50 +240,58 @@ ga('send', {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
   </div>
 </li>
       </ul>
@@ -315,6 +299,7 @@ ga('send', {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
 <!-- Begin Mailchimp Signup Form -->
@@ -355,14 +340,14 @@ ga('send', {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#import-libraries" id="toc-import-libraries" class="nav-link" data-scroll-target="#import-libraries"><span class="toc-section-number">2</span>  Import Libraries</a></li>
-  <li><a href="#the-project-us-patent-phrase-to-phrase-matching" id="toc-the-project-us-patent-phrase-to-phrase-matching" class="nav-link" data-scroll-target="#the-project-us-patent-phrase-to-phrase-matching"><span class="toc-section-number">3</span>  The Project: US Patent Phrase to Phrase Matching</a></li>
-  <li><a href="#get-data" id="toc-get-data" class="nav-link" data-scroll-target="#get-data"><span class="toc-section-number">4</span>  Get Data</a></li>
-  <li><a href="#text-data-transformation" id="toc-text-data-transformation" class="nav-link" data-scroll-target="#text-data-transformation"><span class="toc-section-number">5</span>  Text Data Transformation</a></li>
-  <li><a href="#test-and-validation-sets" id="toc-test-and-validation-sets" class="nav-link" data-scroll-target="#test-and-validation-sets"><span class="toc-section-number">6</span>  Test and Validation Sets</a></li>
-  <li><a href="#model-training" id="toc-model-training" class="nav-link" data-scroll-target="#model-training"><span class="toc-section-number">7</span>  Model Training</a></li>
-  <li><a href="#generate-predictions-for-us-patent-phrases" id="toc-generate-predictions-for-us-patent-phrases" class="nav-link" data-scroll-target="#generate-predictions-for-us-patent-phrases"><span class="toc-section-number">8</span>  Generate Predictions for US Patent Phrases</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#import-libraries" id="toc-import-libraries" class="nav-link" data-scroll-target="#import-libraries"><span class="header-section-number">2</span> Import Libraries</a></li>
+  <li><a href="#the-project-us-patent-phrase-to-phrase-matching" id="toc-the-project-us-patent-phrase-to-phrase-matching" class="nav-link" data-scroll-target="#the-project-us-patent-phrase-to-phrase-matching"><span class="header-section-number">3</span> The Project: US Patent Phrase to Phrase Matching</a></li>
+  <li><a href="#get-data" id="toc-get-data" class="nav-link" data-scroll-target="#get-data"><span class="header-section-number">4</span> Get Data</a></li>
+  <li><a href="#text-data-transformation" id="toc-text-data-transformation" class="nav-link" data-scroll-target="#text-data-transformation"><span class="header-section-number">5</span> Text Data Transformation</a></li>
+  <li><a href="#test-and-validation-sets" id="toc-test-and-validation-sets" class="nav-link" data-scroll-target="#test-and-validation-sets"><span class="header-section-number">6</span> Test and Validation Sets</a></li>
+  <li><a href="#model-training" id="toc-model-training" class="nav-link" data-scroll-target="#model-training"><span class="header-section-number">7</span> Model Training</a></li>
+  <li><a href="#generate-predictions-for-us-patent-phrases" id="toc-generate-predictions-for-us-patent-phrases" class="nav-link" data-scroll-target="#generate-predictions-for-us-patent-phrases"><span class="header-section-number">8</span> Generate Predictions for US Patent Phrases</a></li>
   </ul>
 </nav>
     </div>
@@ -422,65 +407,67 @@ sample_data  test.csv           us-patent-phrase-to-phrase-matching.zip</code></
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 
-
   <div id="df-7e51c032-e3c5-4f81-9307-d87a69cb2e0c">
     <div class="colab-df-container">
       <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>id</th>
-      <th>anchor</th>
-      <th>target</th>
-      <th>context</th>
-      <th>score</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>37d61fd2272659b1</td>
-      <td>abatement</td>
-      <td>abatement of pollution</td>
-      <td>A47</td>
-      <td>0.50</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>7b9652b17b68b7a4</td>
-      <td>abatement</td>
-      <td>act of abating</td>
-      <td>A47</td>
-      <td>0.75</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>36d72442aefd8232</td>
-      <td>abatement</td>
-      <td>active catalyst</td>
-      <td>A47</td>
-      <td>0.25</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>5296b0c19e1ce60e</td>
-      <td>abatement</td>
-      <td>eliminating process</td>
-      <td>A47</td>
-      <td>0.50</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>54c1e3b9184cb5b6</td>
-      <td>abatement</td>
-      <td>forest region</td>
-      <td>A47</td>
-      <td>0.00</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">anchor</th>
+<th data-quarto-table-cell-role="th">target</th>
+<th data-quarto-table-cell-role="th">context</th>
+<th data-quarto-table-cell-role="th">score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>37d61fd2272659b1</td>
+<td>abatement</td>
+<td>abatement of pollution</td>
+<td>A47</td>
+<td>0.50</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>7b9652b17b68b7a4</td>
+<td>abatement</td>
+<td>act of abating</td>
+<td>A47</td>
+<td>0.75</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>36d72442aefd8232</td>
+<td>abatement</td>
+<td>active catalyst</td>
+<td>A47</td>
+<td>0.25</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>5296b0c19e1ce60e</td>
+<td>abatement</td>
+<td>eliminating process</td>
+<td>A47</td>
+<td>0.50</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>54c1e3b9184cb5b6</td>
+<td>abatement</td>
+<td>forest region</td>
+<td>A47</td>
+<td>0.00</td>
+</tr>
+</tbody>
 </table>
+
+
 </div>
       <button class="colab-df-convert" onclick="convertToInteractive('df-7e51c032-e3c5-4f81-9307-d87a69cb2e0c')" title="Convert this dataframe to an interactive table." style="display:none;">
         
@@ -571,52 +558,54 @@ sample_data  test.csv           us-patent-phrase-to-phrase-matching.zip</code></
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df.describe(include<span class="op">=</span><span class="st">'object'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 
-
   <div id="df-ebd58c4d-8058-424e-91f1-9e8e5711d66a">
     <div class="colab-df-container">
       <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>id</th>
-      <th>anchor</th>
-      <th>target</th>
-      <th>context</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>count</th>
-      <td>36473</td>
-      <td>36473</td>
-      <td>36473</td>
-      <td>36473</td>
-    </tr>
-    <tr>
-      <th>unique</th>
-      <td>36473</td>
-      <td>733</td>
-      <td>29340</td>
-      <td>106</td>
-    </tr>
-    <tr>
-      <th>top</th>
-      <td>37d61fd2272659b1</td>
-      <td>component composite coating</td>
-      <td>composition</td>
-      <td>H01</td>
-    </tr>
-    <tr>
-      <th>freq</th>
-      <td>1</td>
-      <td>152</td>
-      <td>24</td>
-      <td>2186</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">anchor</th>
+<th data-quarto-table-cell-role="th">target</th>
+<th data-quarto-table-cell-role="th">context</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>36473</td>
+<td>36473</td>
+<td>36473</td>
+<td>36473</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">unique</td>
+<td>36473</td>
+<td>733</td>
+<td>29340</td>
+<td>106</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">top</td>
+<td>37d61fd2272659b1</td>
+<td>component composite coating</td>
+<td>composition</td>
+<td>H01</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">freq</td>
+<td>1</td>
+<td>152</td>
+<td>24</td>
+<td>2186</td>
+</tr>
+</tbody>
 </table>
+
+
 </div>
       <button class="colab-df-convert" onclick="convertToInteractive('df-ebd58c4d-8058-424e-91f1-9e8e5711d66a')" title="Convert this dataframe to an interactive table." style="display:none;">
         
@@ -738,17 +727,17 @@ Name: input, dtype: object</code></pre>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>tokz <span class="op">=</span> AutoTokenizer.from_pretrained(model_nm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"6583b3bf366d4e2abef054d6c06120a9","version_major":2,"version_minor":0}
+{"model_id":"6583b3bf366d4e2abef054d6c06120a9","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"5d375ef026614846a4a9079d4212aab5","version_major":2,"version_minor":0}
+{"model_id":"5d375ef026614846a4a9079d4212aab5","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"1c1068ad5976450a8460fb74aea3dd1c","version_major":2,"version_minor":0}
+{"model_id":"1c1068ad5976450a8460fb74aea3dd1c","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stderr">
@@ -791,7 +780,7 @@ Special tokens have been added in the vocabulary, make sure the associated word 
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>tok_ds <span class="op">=</span> ds.<span class="bu">map</span>(tok_func, batched<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"8551069b5c3544fa81ce2f9e751c9413","version_major":2,"version_minor":0}
+{"model_id":"8551069b5c3544fa81ce2f9e751c9413","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -844,52 +833,54 @@ Special tokens have been added in the vocabulary, make sure the associated word 
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>eval_df.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
 
-
   <div id="df-f7dd49a1-7732-4dde-ae68-09eaa9820990">
     <div class="colab-df-container">
       <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>id</th>
-      <th>anchor</th>
-      <th>target</th>
-      <th>context</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>count</th>
-      <td>36</td>
-      <td>36</td>
-      <td>36</td>
-      <td>36</td>
-    </tr>
-    <tr>
-      <th>unique</th>
-      <td>36</td>
-      <td>34</td>
-      <td>36</td>
-      <td>29</td>
-    </tr>
-    <tr>
-      <th>top</th>
-      <td>4112d61851461f60</td>
-      <td>el display</td>
-      <td>inorganic photoconductor drum</td>
-      <td>G02</td>
-    </tr>
-    <tr>
-      <th>freq</th>
-      <td>1</td>
-      <td>2</td>
-      <td>1</td>
-      <td>3</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">anchor</th>
+<th data-quarto-table-cell-role="th">target</th>
+<th data-quarto-table-cell-role="th">context</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>36</td>
+<td>36</td>
+<td>36</td>
+<td>36</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">unique</td>
+<td>36</td>
+<td>34</td>
+<td>36</td>
+<td>29</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">top</td>
+<td>4112d61851461f60</td>
+<td>el display</td>
+<td>inorganic photoconductor drum</td>
+<td>G02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">freq</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+</tr>
+</tbody>
 </table>
+
+
 </div>
       <button class="colab-df-convert" onclick="convertToInteractive('df-f7dd49a1-7732-4dde-ae68-09eaa9820990')" title="Convert this dataframe to an interactive table." style="display:none;">
         
@@ -991,7 +982,7 @@ Special tokens have been added in the vocabulary, make sure the associated word 
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>eval_ds <span class="op">=</span> Dataset.from_pandas(eval_df).<span class="bu">map</span>(tok_func, batched<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"9ae9031952424fe58b0c3763e16efaf4","version_major":2,"version_minor":0}
+{"model_id":"9ae9031952424fe58b0c3763e16efaf4","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -1043,87 +1034,12 @@ Using cuda_amp half precision backend</code></pre>
   Total train batch size (w. parallel, distributed &amp; accumulation) = 128
   Gradient Accumulation steps = 1
   Total optimization steps = 856
-  Number of trainable parameters = 141895681</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-
-
-    <div>
-      
-      <progress value="856" max="856" style="width:300px; height:20px; vertical-align: middle;"></progress>
-      [856/856 03:39, Epoch 4/4]
-    </div>
-    <table class="dataframe table table-sm table-striped">
-  <thead>
- <tr>
-      <th>Epoch</th>
-      <th>Training Loss</th>
-      <th>Validation Loss</th>
-      <th>Pearson</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>1</td>
-      <td>No log</td>
-      <td>0.023299</td>
-      <td>0.827306</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>No log</td>
-      <td>0.022970</td>
-      <td>0.831413</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>0.014000</td>
-      <td>0.022094</td>
-      <td>0.831611</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>0.014000</td>
-      <td>0.022278</td>
-      <td>0.831688</td>
-    </tr>
-  </tbody>
-</table><p>
-</p></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input, context, anchor, target, id. If input, context, anchor, target, id are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
+  Number of trainable parameters = 141895681
+The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input, context, anchor, target, id. If input, context, anchor, target, id are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
 ***** Running Evaluation *****
   Num examples = 9119
-  Batch size = 256</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-
-
-    <div>
-      
-      <progress value="215" max="856" style="width:300px; height:20px; vertical-align: middle;"></progress>
-      [215/856 00:52 &lt; 02:37, 4.08 it/s, Epoch 1/4]
-    </div>
-    <table class="dataframe table table-sm table-striped">
-  <thead>
- <tr>
-      <th>Epoch</th>
-      <th>Training Loss</th>
-      <th>Validation Loss</th>
-    </tr>
-  </thead>
-  <tbody>
-  </tbody>
-</table><p>
-    </p><div>
-      
-      <progress value="108" max="36" style="width:300px; height:20px; vertical-align: middle;"></progress>
-      [36/36 03:48]
-    </div>
-    
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input, context, anchor, target, id. If input, context, anchor, target, id are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
+  Batch size = 256
+The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input, context, anchor, target, id. If input, context, anchor, target, id are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
 ***** Running Evaluation *****
   Num examples = 9119
   Batch size = 256
@@ -1146,6 +1062,79 @@ Training completed. Do not forget to share your model on huggingface.co/models =
 
 </code></pre>
 </div>
+<div class="cell-output cell-output-display">
+
+    <div>
+      
+      <progress value="856" max="856" style="width:300px; height:20px; vertical-align: middle;"></progress>
+      [856/856 03:39, Epoch 4/4]
+    </div>
+    
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Epoch</th>
+<th data-quarto-table-cell-role="th">Training Loss</th>
+<th data-quarto-table-cell-role="th">Validation Loss</th>
+<th data-quarto-table-cell-role="th">Pearson</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>No log</td>
+<td>0.023299</td>
+<td>0.827306</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>No log</td>
+<td>0.022970</td>
+<td>0.831413</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>0.014000</td>
+<td>0.022094</td>
+<td>0.831611</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>0.014000</td>
+<td>0.022278</td>
+<td>0.831688</td>
+</tr>
+</tbody>
+</table>
+<p>
+</p></div>
+<div class="cell-output cell-output-display">
+
+    <div>
+      
+      <progress value="215" max="856" style="width:300px; height:20px; vertical-align: middle;"></progress>
+      [215/856 00:52 &lt; 02:37, 4.08 it/s, Epoch 1/4]
+    </div>
+    
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Epoch</th>
+<th data-quarto-table-cell-role="th">Training Loss</th>
+<th data-quarto-table-cell-role="th">Validation Loss</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<p>
+    </p><div>
+      
+      <progress value="108" max="36" style="width:300px; height:20px; vertical-align: middle;"></progress>
+      [36/36 03:48]
+    </div>
+    
+</div>
 </div>
 <p>Lots of warning messages from Transformers – we can ignore these.</p>
 <p>The key thing to look at is the “Pearson” value in table above. As we can see, it’s increasing, and is already above 0.8. It looks like we have a model that can predict with high accuracy for these patent text phrases.</p>
@@ -1154,8 +1143,8 @@ Training completed. Do not forget to share your model on huggingface.co/models =
 <h2 data-number="8" class="anchored" data-anchor-id="generate-predictions-for-us-patent-phrases"><span class="header-section-number">8</span> Generate Predictions for US Patent Phrases</h2>
 <p>Let’s get some predictions on the test set.</p>
 <div class="cell" data-outputid="90bdbf74-595c-4f9b-de5f-666406022fc3">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> trainer.predict(eval_ds).predictions.astype(<span class="bu">float</span>)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> trainer.predict(eval_ds).predictions.astype(<span class="bu">float</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>The following columns in the test set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input, context, anchor, target, id. If input, context, anchor, target, id are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
 ***** Running Prediction *****
@@ -1207,8 +1196,8 @@ Training completed. Do not forget to share your model on huggingface.co/models =
 <p>Looking at these predictions something is not quite right. The Pearson’s correlation coefficient should have a value (for our case) between 0 and 1, but some values of our predictions are less than zero and bigger than 1.</p>
 <p>This once again shows the value of remembering to actually look at your data. Let’s fix those out-of-bounds predictions:</p>
 <div class="cell" data-outputid="5a9651f1-9ce0-4de5-fed2-ef0fc0d9932f">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> np.clip(preds, <span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> np.clip(preds, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="33">
 <pre><code>array([[0.50146484],
        [0.60986328],
@@ -1306,9 +1295,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1373,6 +1376,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1411,12 +1500,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
-    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -1429,7 +1518,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

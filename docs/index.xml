@@ -9,8 +9,64 @@
 <link>http://livingdatalab.com/index.html</link>
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science &amp; AI Blog</description>
-<generator>quarto-1.2.335</generator>
-<lastBuildDate>Mon, 14 Aug 2023 23:00:00 GMT</lastBuildDate>
+<generator>quarto-1.3.450</generator>
+<lastBuildDate>Fri, 18 Aug 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Comparing Question and Answer LLM System Outputs</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-19-comparing-question-answer-llm-system-outputs.html</link>
+  <description><![CDATA[ The most frequent method for comparing two models is to run them both on the same dataset and compare the aggregate metrics. This method is valuable, but it may miss out on important information regarding the quality of the two system alternatives. In this instance, it may be useful to run direct pairwise comparisons on the responses and examine the resulting preference scores. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <category>llm-evaluation</category>
+  <guid>http://livingdatalab.com/posts/2023-08-19-comparing-question-answer-llm-system-outputs.html</guid>
+  <pubDate>Fri, 18 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/ai-eval4.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Evaluating Question and Answer Systems with Dynamic Data</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-18-evaluating-question-answer-llm-systems-with-dynamic-data.html</link>
+  <description><![CDATA[ In many real-world settings, the correct answer to a question may alter over time. For example, if you’re designing a Q&amp;A system on top of a database or that connects to an API, the underlying data may be updated regularly. In such instances, you should still measure the correctness of your system, but you should do so in a method that compensates for these changes. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <category>llm-evaluation</category>
+  <guid>http://livingdatalab.com/posts/2023-08-18-evaluating-question-answer-llm-systems-with-dynamic-data.html</guid>
+  <pubDate>Thu, 17 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/ai-eval3.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Measuring the Accuracy of an LLM based Question and Answering System</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-17-measuring-accuracy-of-a-question-answering-system.html</link>
+  <description><![CDATA[ Evaluating a question and response system can help you improve its system architecture as well as the prompt and model quality. We tend to improve what we can measure, therefore verifying for correctness is a key focus. One difficulty in gauging accuracy is that the responses are unstructured text. A Q&amp;A system can generate lengthy responses, rendering typical metrics like BLEU or ROUGE unreliable. In this case, employing a well-labeled dataset and llm-assisted assessors can help you rate the response quality of your system. This supplemented any human review and other measurements you may have already implemented. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <category>llm-evaluation</category>
+  <guid>http://livingdatalab.com/posts/2023-08-17-measuring-accuracy-of-a-question-answering-system.html</guid>
+  <pubDate>Wed, 16 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/ai-eval2.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Langsmith for LLM Application Evaluation &amp; Monitoring</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-16-langsmith-for-llm-application-evaluation.html</link>
+  <description><![CDATA[ LangChain simplifies the development of LLM apps and Agents. However, getting LLM applications into production can be tricky. To produce a high-quality result, you will most likely need to heavily customise and iterate on your prompts, chains, and other components. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <category>llm-evaluation</category>
+  <guid>http://livingdatalab.com/posts/2023-08-16-langsmith-for-llm-application-evaluation.html</guid>
+  <pubDate>Tue, 15 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/ai-eval1.png" medium="image" type="image/png"/>
+</item>
 <item>
   <title>Guarding Against Undesirable LLM Outputs with the Self-Critique Chain</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -246,62 +302,6 @@
   <category>activeloop</category>
   <guid>http://livingdatalab.com/posts/2023-07-31-popular-large-language-models-compared.html</guid>
   <pubDate>Sun, 30 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Using the Open Source GPT4All Large Language Model</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-30-using-open-source-gpt4all-llm.html</link>
-  <description><![CDATA[ The OpenAI GPT-family models that we have discussed in previous articles are without a doubt effective. However, access to the weights and architecture of these models is limited, and even if one does, it requires a large amount of resources to carry out any activity. It is important to note that, according to a number of benchmarks, the most recent CPU generation from Intel® Xeon® 4s can perform language models more effectively. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <guid>http://livingdatalab.com/posts/2023-07-30-using-open-source-gpt4all-llm.html</guid>
-  <pubDate>Sat, 29 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake3.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>A News Article Summariser with OpenAI and Langchain</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-29-news-article-summariser-with-openai-and-langchain.html</link>
-  <description><![CDATA[ It’s critical to stay current on news and information in the fast-paced world of today. However, reading through numerous news pieces might take time. Let’s create a News Articles Summarizer application utilising ChatGPT and LangChain to help you save time and receive a brief overview of the key points. We can scrape articles from the internet, extract their titles and text, and produce succinct summaries using this robust programme. We will walk you through the process of creating a summarizer in this lecture. We will apply the ideas we covered in past sessions, showing how they would be used in a practical situation. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <category>prompt-engineering</category>
-  <guid>http://livingdatalab.com/posts/2023-07-29-news-article-summariser-with-openai-and-langchain.html</guid>
-  <pubDate>Fri, 28 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Large Language Models v Chat Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-28-llms-v-chat-models.html</link>
-  <description><![CDATA[ Large Language Models have significantly advanced Natural Language Processing (NLP), allowing AI systems to comprehend and produce prose that is human-like. Based on the Transformers architecture, ChatGPT is a well-known language model that can comprehend lengthy texts and determine the relationships between words or concepts. It excels in predicting linguistic patterns and word associations. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-07-28-llms-v-chat-models.html</guid>
-  <pubDate>Thu, 27 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake1.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>The Activeloop Deep Lake Vector Store for Agents &amp; Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-27-activeloop-deeplake-vectorstore-llms-agents.html</link>
-  <description><![CDATA[ Activeloop Deep Lake provides storage for embeddings and their corresponding metadata in the context of LLM apps . It enables hybrid searches on these embeddings and their attributes for efficient data retrieval. It also integrates with LangChain &amp; Agents, facilitating the development and deployment of applications. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <guid>http://livingdatalab.com/posts/2023-07-27-activeloop-deeplake-vectorstore-llms-agents.html</guid>
-  <pubDate>Wed, 26 Jul 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png" medium="image" type="image/png"/>
 </item>
 </channel>

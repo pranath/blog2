@@ -1,4 +1,5 @@
-#quarto-margin-sidebar {
+#quarto-margin-sidebar,
+.quarto-post .thumbnail {
     display:none;
 }
 

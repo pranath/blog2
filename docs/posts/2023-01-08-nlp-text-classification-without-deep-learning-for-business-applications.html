@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,9 +20,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -49,43 +50,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -122,7 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -146,11 +118,11 @@ ga('send', {
 
 <link rel="stylesheet" href="../css/styles.css">
 <meta property="og:title" content="LivingDataLab - NLP and Text Classification Without Deep Learning for Business Applications">
-<meta property="og:description" content="Deep Learning and AI is powering some of the most recent amazing advances in text &amp; natural language processing (NLP) applications, such as GPT-3, Chat-GPT and Dall-E but these often require…">
+<meta property="og:description" content="Deep Learning and AI is powering some of the most recent amazing advances in text &amp; natural language processing (NLP) applications, such as GPT-3, Chat-GPT and Dall-E but these often require specialist resources such as deep learning. With Machine Learning (ML) its possible to create useful NLP applications for businesses without using AI and Deep Learning.">
 <meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/nlp-text-classification.png">
 <meta property="og:site-name" content="LivingDataLab">
 <meta name="twitter:title" content="LivingDataLab - NLP and Text Classification Without Deep Learning for Business Applications">
-<meta name="twitter:description" content="Deep Learning and AI is powering some of the most recent amazing advances in text &amp; natural language processing (NLP) applications, such as GPT-3, Chat-GPT and Dall-E but these often require…">
+<meta name="twitter:description" content="Deep Learning and AI is powering some of the most recent amazing advances in text &amp; natural language processing (NLP) applications, such as GPT-3, Chat-GPT and Dall-E but these often require specialist resources such as deep learning. With Machine Learning (ML) its possible to create useful NLP applications for businesses without using AI and Deep Learning.">
 <meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/nlp-text-classification.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -169,54 +141,58 @@ ga('send', {
     <span class="navbar-title">LivingDataLab</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html">
+    <a class="nav-link" href="../index.html" rel="" target="">
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects.html" aria-current="page">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
  <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html">
+    <a class="nav-link" href="../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">NLP and Text Classification Without Deep Learning for Business Applications</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">NLP and Text Classification Without Deep Learning for Business Applications</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -224,7 +200,7 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">NLP and Text Classification Without Deep Learning for Business Applications</h1>
+      <h1 class="title">NLP and Text Classification Without Deep Learning for Business Applications</h1>
                   <div>
         <div class="description">
           Deep Learning and AI is powering some of the most recent amazing advances in text &amp; natural language processing (NLP) applications, such as GPT-3, Chat-GPT and Dall-E but these often require specialist resources such as deep learning. With Machine Learning (ML) its possible to create useful NLP applications for businesses without using AI and Deep Learning.
@@ -260,50 +236,58 @@ ga('send', {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
   </div>
 </li>
       </ul>
@@ -311,6 +295,7 @@ ga('send', {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
 <!-- Begin Mailchimp Signup Form -->
@@ -351,25 +336,25 @@ ga('send', {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#business-applications-of-nlp" id="toc-business-applications-of-nlp" class="nav-link" data-scroll-target="#business-applications-of-nlp"><span class="toc-section-number">2</span>  Business Applications of NLP</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#business-applications-of-nlp" id="toc-business-applications-of-nlp" class="nav-link" data-scroll-target="#business-applications-of-nlp"><span class="header-section-number">2</span> Business Applications of NLP</a>
   <ul class="collapse">
-  <li><a href="#market-intelligence" id="toc-market-intelligence" class="nav-link" data-scroll-target="#market-intelligence"><span class="toc-section-number">2.1</span>  Market Intelligence</a></li>
-  <li><a href="#sentiment-analysis" id="toc-sentiment-analysis" class="nav-link" data-scroll-target="#sentiment-analysis"><span class="toc-section-number">2.2</span>  Sentiment Analysis</a></li>
-  <li><a href="#text-classification" id="toc-text-classification" class="nav-link" data-scroll-target="#text-classification"><span class="toc-section-number">2.3</span>  Text Classification</a></li>
-  <li><a href="#topic-modelling" id="toc-topic-modelling" class="nav-link" data-scroll-target="#topic-modelling"><span class="toc-section-number">2.4</span>  Topic Modelling</a></li>
-  <li><a href="#recruiting-and-hiring" id="toc-recruiting-and-hiring" class="nav-link" data-scroll-target="#recruiting-and-hiring"><span class="toc-section-number">2.5</span>  Recruiting And Hiring</a></li>
-  <li><a href="#text-summarization" id="toc-text-summarization" class="nav-link" data-scroll-target="#text-summarization"><span class="toc-section-number">2.6</span>  Text Summarization</a></li>
-  <li><a href="#survey-analysis" id="toc-survey-analysis" class="nav-link" data-scroll-target="#survey-analysis"><span class="toc-section-number">2.7</span>  Survey Analysis</a></li>
+  <li><a href="#market-intelligence" id="toc-market-intelligence" class="nav-link" data-scroll-target="#market-intelligence"><span class="header-section-number">2.1</span> Market Intelligence</a></li>
+  <li><a href="#sentiment-analysis" id="toc-sentiment-analysis" class="nav-link" data-scroll-target="#sentiment-analysis"><span class="header-section-number">2.2</span> Sentiment Analysis</a></li>
+  <li><a href="#text-classification" id="toc-text-classification" class="nav-link" data-scroll-target="#text-classification"><span class="header-section-number">2.3</span> Text Classification</a></li>
+  <li><a href="#topic-modelling" id="toc-topic-modelling" class="nav-link" data-scroll-target="#topic-modelling"><span class="header-section-number">2.4</span> Topic Modelling</a></li>
+  <li><a href="#recruiting-and-hiring" id="toc-recruiting-and-hiring" class="nav-link" data-scroll-target="#recruiting-and-hiring"><span class="header-section-number">2.5</span> Recruiting And Hiring</a></li>
+  <li><a href="#text-summarization" id="toc-text-summarization" class="nav-link" data-scroll-target="#text-summarization"><span class="header-section-number">2.6</span> Text Summarization</a></li>
+  <li><a href="#survey-analysis" id="toc-survey-analysis" class="nav-link" data-scroll-target="#survey-analysis"><span class="header-section-number">2.7</span> Survey Analysis</a></li>
   </ul></li>
-  <li><a href="#machine-learning-vs-deep-learning-for-nlp-and-business" id="toc-machine-learning-vs-deep-learning-for-nlp-and-business" class="nav-link" data-scroll-target="#machine-learning-vs-deep-learning-for-nlp-and-business"><span class="toc-section-number">3</span>  Machine Learning vs Deep Learning for NLP and Business</a></li>
-  <li><a href="#pycaret-and-nlp" id="toc-pycaret-and-nlp" class="nav-link" data-scroll-target="#pycaret-and-nlp"><span class="toc-section-number">4</span>  Pycaret and NLP</a></li>
-  <li><a href="#text-classification-without-deep-learning" id="toc-text-classification-without-deep-learning" class="nav-link" data-scroll-target="#text-classification-without-deep-learning"><span class="toc-section-number">5</span>  Text Classification Without Deep Learning</a>
+  <li><a href="#machine-learning-vs-deep-learning-for-nlp-and-business" id="toc-machine-learning-vs-deep-learning-for-nlp-and-business" class="nav-link" data-scroll-target="#machine-learning-vs-deep-learning-for-nlp-and-business"><span class="header-section-number">3</span> Machine Learning vs Deep Learning for NLP and Business</a></li>
+  <li><a href="#pycaret-and-nlp" id="toc-pycaret-and-nlp" class="nav-link" data-scroll-target="#pycaret-and-nlp"><span class="header-section-number">4</span> Pycaret and NLP</a></li>
+  <li><a href="#text-classification-without-deep-learning" id="toc-text-classification-without-deep-learning" class="nav-link" data-scroll-target="#text-classification-without-deep-learning"><span class="header-section-number">5</span> Text Classification Without Deep Learning</a>
   <ul class="collapse">
-  <li><a href="#topic-modelling---discovering-hidden-categories-in-kiva-loan-applications" id="toc-topic-modelling---discovering-hidden-categories-in-kiva-loan-applications" class="nav-link" data-scroll-target="#topic-modelling---discovering-hidden-categories-in-kiva-loan-applications"><span class="toc-section-number">5.1</span>  Topic modelling - Discovering hidden categories in Kiva loan applications</a></li>
-  <li><a href="#sentiment-analysis-classification---predict-if-amazon-product-reviews-are-positive-or-negative" id="toc-sentiment-analysis-classification---predict-if-amazon-product-reviews-are-positive-or-negative" class="nav-link" data-scroll-target="#sentiment-analysis-classification---predict-if-amazon-product-reviews-are-positive-or-negative"><span class="toc-section-number">5.2</span>  Sentiment Analysis &amp; Classification - Predict if Amazon product reviews are positive or negative</a></li>
+  <li><a href="#topic-modelling---discovering-hidden-categories-in-kiva-loan-applications" id="toc-topic-modelling---discovering-hidden-categories-in-kiva-loan-applications" class="nav-link" data-scroll-target="#topic-modelling---discovering-hidden-categories-in-kiva-loan-applications"><span class="header-section-number">5.1</span> Topic modelling - Discovering hidden categories in Kiva loan applications</a></li>
+  <li><a href="#sentiment-analysis-classification---predict-if-amazon-product-reviews-are-positive-or-negative" id="toc-sentiment-analysis-classification---predict-if-amazon-product-reviews-are-positive-or-negative" class="nav-link" data-scroll-target="#sentiment-analysis-classification---predict-if-amazon-product-reviews-are-positive-or-negative"><span class="header-section-number">5.2</span> Sentiment Analysis &amp; Classification - Predict if Amazon product reviews are positive or negative</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">6</span>  Conclusion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">6</span> Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -455,75 +440,76 @@ ga('send', {
 <div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-01-08T15:33:21.611024Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-01-08T15:33:21.610589Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-01-08T15:33:22.057337Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-01-08T15:33:22.056117Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2023-01-08T15:33:21.610989Z&quot;}" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>kiva <span class="op">=</span> get_data(<span class="st">'kiva'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>country</th>
-      <th>en</th>
-      <th>gender</th>
-      <th>loan_amount</th>
-      <th>nonpayment</th>
-      <th>sector</th>
-      <th>status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Dominican Republic</td>
-      <td>"Banco Esperanza" is a group of 10 women looking to receive a small loan. Each of them has taken out a very small loan already, so this would be their second. With this loan the group is going to try and expand their small businesses and start generating more income. &lt;P&gt;\n\nEduviges is the group representative and leader of the group. Eduviges has a lot on the line because she has 6 children that she has to take care of. She told me that those children are the reason she wants to be successful. She wants to be able to provide a different life for them and show them that they can be successful as well. &lt;P&gt;\n\nEduviges has a very small business selling shoes and Avon products. She plans to expand using this loan and dreams of success. The whole group is ready for this new challenge and a...</td>
-      <td>F</td>
-      <td>1225</td>
-      <td>partner</td>
-      <td>Retail</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Dominican Republic</td>
-      <td>"Caminemos Hacia Adelante" or "Walking Forward" is a group of ten entrepreneurs seeking their second loan from Esperanza International. The groups past loan has been successfully repaid and the group hopes to use additional loan funds for further business expansion. \n\nEstella is one of the coordinators for this group in Santiago. Estella sells undergarments to her community and neighboring communities.  Estella used her first loan, which has now been completely repaid, to buy additional products and Estela was able to increase the return on her business by adding inventory.  Estella wants to use her second loan to buy more undergarments to sell to her customers.  \n\nEstella lives with her mother and sister and dreams of improving the house they live in and plans to use her business ...</td>
-      <td>F</td>
-      <td>1975</td>
-      <td>lender</td>
-      <td>Clothing</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Dominican Republic</td>
-      <td>"Creciendo Por La Union" is a group of 10 people hoping to start their own businesses. This group is looking to receive loans to either start a small business or to try and increase their business. Everyone in this group is living in extreme poverty, and they see this as a chance to improve their lives and the lives of their families. \n\n"Dalina" is the group representative and was chosen because she is a very hardworking women. She is a young mother of two children, and she realized that she wanted a better life for her and her family. She is hoping to start a small business of selling clothes to people in her barrio. She hopes to someday have a thriving business and be able to provide for her family. On behalf of Dalina, the rest of the group, and Esperanza International: Thank you ...</td>
-      <td>F</td>
-      <td>2175</td>
-      <td>partner</td>
-      <td>Clothing</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Dominican Republic</td>
-      <td>"Cristo Vive" ("Christ lives" is a group of 10 women who are looking to receive their first loans. This is a very young group of women, and they all want to start changing their lives right away. Riquena is the group representative and leader of this group, and she is only 18 years old. She is also married, but has no children. She told me that once she has kids she wants to be able to provide them with a good life, and that is the main reason she is trying to start her own business. She plans on selling used clothes in her area, and hopes to one day have a big clothing store, and also design clothes. She is a very motivated person, and you can see it when you speak with her. She speaks Spanish and Creole fluently, and is studying English. This whole group is ready for this next step, ...</td>
-      <td>F</td>
-      <td>1425</td>
-      <td>partner</td>
-      <td>Clothing</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Dominican Republic</td>
-      <td>"Cristo Vive" is a large group of 35 people, 20 of which are hoping to take out a loan. For many of them this is their second loan, and a loan they hope to use to increase their business. The business range from clothing sales to salons. Miline is the chosen group representative due to her hard work and dedication. Miline is a hardworking mother of 5 very young children, the oldest being only 10 years old. She took her first loan and started a small business of selling chicken and other types of food. With this next loan she feels like she can increase her business greatly and start making money to support her family. Her dream is to have her own store someday, and be able to provide her family with comfortable life. On behalf of Miline, the group, and Esperanza International, thank yo...</td>
-      <td>F</td>
-      <td>4025</td>
-      <td>partner</td>
-      <td>Food</td>
-      <td>0</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">en</th>
+<th data-quarto-table-cell-role="th">gender</th>
+<th data-quarto-table-cell-role="th">loan_amount</th>
+<th data-quarto-table-cell-role="th">nonpayment</th>
+<th data-quarto-table-cell-role="th">sector</th>
+<th data-quarto-table-cell-role="th">status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Dominican Republic</td>
+<td>"Banco Esperanza" is a group of 10 women looking to receive a small loan. Each of them has taken out a very small loan already, so this would be their second. With this loan the group is going to try and expand their small businesses and start generating more income. &lt;P&gt;\n\nEduviges is the group representative and leader of the group. Eduviges has a lot on the line because she has 6 children that she has to take care of. She told me that those children are the reason she wants to be successful. She wants to be able to provide a different life for them and show them that they can be successful as well. &lt;P&gt;\n\nEduviges has a very small business selling shoes and Avon products. She plans to expand using this loan and dreams of success. The whole group is ready for this new challenge and a...</td>
+<td>F</td>
+<td>1225</td>
+<td>partner</td>
+<td>Retail</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Dominican Republic</td>
+<td>"Caminemos Hacia Adelante" or "Walking Forward" is a group of ten entrepreneurs seeking their second loan from Esperanza International. The groups past loan has been successfully repaid and the group hopes to use additional loan funds for further business expansion. \n\nEstella is one of the coordinators for this group in Santiago. Estella sells undergarments to her community and neighboring communities. Estella used her first loan, which has now been completely repaid, to buy additional products and Estela was able to increase the return on her business by adding inventory. Estella wants to use her second loan to buy more undergarments to sell to her customers. \n\nEstella lives with her mother and sister and dreams of improving the house they live in and plans to use her business ...</td>
+<td>F</td>
+<td>1975</td>
+<td>lender</td>
+<td>Clothing</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Dominican Republic</td>
+<td>"Creciendo Por La Union" is a group of 10 people hoping to start their own businesses. This group is looking to receive loans to either start a small business or to try and increase their business. Everyone in this group is living in extreme poverty, and they see this as a chance to improve their lives and the lives of their families. \n\n"Dalina" is the group representative and was chosen because she is a very hardworking women. She is a young mother of two children, and she realized that she wanted a better life for her and her family. She is hoping to start a small business of selling clothes to people in her barrio. She hopes to someday have a thriving business and be able to provide for her family. On behalf of Dalina, the rest of the group, and Esperanza International: Thank you ...</td>
+<td>F</td>
+<td>2175</td>
+<td>partner</td>
+<td>Clothing</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Dominican Republic</td>
+<td>"Cristo Vive" ("Christ lives" is a group of 10 women who are looking to receive their first loans. This is a very young group of women, and they all want to start changing their lives right away. Riquena is the group representative and leader of this group, and she is only 18 years old. She is also married, but has no children. She told me that once she has kids she wants to be able to provide them with a good life, and that is the main reason she is trying to start her own business. She plans on selling used clothes in her area, and hopes to one day have a big clothing store, and also design clothes. She is a very motivated person, and you can see it when you speak with her. She speaks Spanish and Creole fluently, and is studying English. This whole group is ready for this next step, ...</td>
+<td>F</td>
+<td>1425</td>
+<td>partner</td>
+<td>Clothing</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Dominican Republic</td>
+<td>"Cristo Vive" is a large group of 35 people, 20 of which are hoping to take out a loan. For many of them this is their second loan, and a loan they hope to use to increase their business. The business range from clothing sales to salons. Miline is the chosen group representative due to her hard work and dedication. Miline is a hardworking mother of 5 very young children, the oldest being only 10 years old. She took her first loan and started a small business of selling chicken and other types of food. With this next loan she feels like she can increase her business greatly and start making money to support her family. Her dream is to have her own store someday, and be able to provide her family with comfortable life. On behalf of Miline, the group, and Esperanza International, thank yo...</td>
+<td>F</td>
+<td>4025</td>
+<td>partner</td>
+<td>Food</td>
+<td>0</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -538,34 +524,34 @@ ga('send', {
 <div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-01-08T15:33:22.070091Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-01-08T15:33:22.069772Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-01-08T15:34:37.361427Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-01-08T15:34:37.360224Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2023-01-08T15:33:22.070063Z&quot;}" data-outputid="f751d97a-f74f-4fa6-dd65-c07ecb41ce45" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>time experiment1 <span class="op">=</span> setup(data<span class="op">=</span>kiva, target<span class="op">=</span><span class="st">'en'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
 <style type="text/css">
 </style>
-<table id="T_3bf27_">
-  <thead>
-    <tr>
-      <th class="col_heading level0 col0">Description</th>
-      <th class="col_heading level0 col1">Value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td id="T_3bf27_row0_col0" class="data row0 col0">session_id</td>
-      <td id="T_3bf27_row0_col1" class="data row0 col1">2214</td>
-    </tr>
-    <tr>
-      <td id="T_3bf27_row1_col0" class="data row1 col0">Documents</td>
-      <td id="T_3bf27_row1_col1" class="data row1 col1">6818</td>
-    </tr>
-    <tr>
-      <td id="T_3bf27_row2_col0" class="data row2 col0">Vocab Size</td>
-      <td id="T_3bf27_row2_col1" class="data row2 col1">12383</td>
-    </tr>
-    <tr>
-      <td id="T_3bf27_row3_col0" class="data row3 col0">Custom Stopwords</td>
-      <td id="T_3bf27_row3_col1" class="data row3 col1">False</td>
-    </tr>
-  </tbody>
+
+<table id="T_3bf27_" data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th class="col_heading level0 col0" data-quarto-table-cell-role="th">Description</th>
+<th class="col_heading level0 col1" data-quarto-table-cell-role="th">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_3bf27_row0_col0" class="data row0 col0">session_id</td>
+<td id="T_3bf27_row0_col1" class="data row0 col1">2214</td>
+</tr>
+<tr class="even">
+<td id="T_3bf27_row1_col0" class="data row1 col0">Documents</td>
+<td id="T_3bf27_row1_col1" class="data row1 col1">6818</td>
+</tr>
+<tr class="odd">
+<td id="T_3bf27_row2_col0" class="data row2 col0">Vocab Size</td>
+<td id="T_3bf27_row2_col1" class="data row2 col1">12383</td>
+</tr>
+<tr class="even">
+<td id="T_3bf27_row3_col0" class="data row3 col0">Custom Stopwords</td>
+<td id="T_3bf27_row3_col1" class="data row3 col1">False</td>
+</tr>
+</tbody>
 </table>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -585,111 +571,112 @@ Wall time: 1min 15s</code></pre>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>lda_results <span class="op">=</span> assign_model(lda_topic_model)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>lda_results.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="24">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>country</th>
-      <th>en</th>
-      <th>gender</th>
-      <th>loan_amount</th>
-      <th>nonpayment</th>
-      <th>sector</th>
-      <th>status</th>
-      <th>Topic_0</th>
-      <th>Topic_1</th>
-      <th>Topic_2</th>
-      <th>Topic_3</th>
-      <th>Dominant_Topic</th>
-      <th>Perc_Dominant_Topic</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Dominican Republic</td>
-      <td>group woman look receive small loan take small loan already second loan group go try expand small business start generate income group representative leader group eduvige lot line child tell child reason want successful want able provide different life show successful well eduvige small business selling shoe avon product plan expand use loan dream success whole group ready new challenge road better live behalf eduvige thank support</td>
-      <td>F</td>
-      <td>1225</td>
-      <td>partner</td>
-      <td>Retail</td>
-      <td>0</td>
-      <td>0.410590</td>
-      <td>0.044232</td>
-      <td>0.001707</td>
-      <td>0.543472</td>
-      <td>Topic 3</td>
-      <td>0.54</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Dominican Republic</td>
-      <td>caminemos walk forward group entrepreneur seek second loan esperanza_international group loan successfully_repaid group hope use additional loan fund business expansion coordinator group sell undergarment community neighboring community use first loan completely repay buy additional product estela able increase return business add inventory estella want use second loan buy undergarment sell customer live mother sister dream improve house live plan use business profit member art juice ice_cream fry food cake sale behalf esperanza group business entrepreneur like thank support</td>
-      <td>F</td>
-      <td>1975</td>
-      <td>lender</td>
-      <td>Clothing</td>
-      <td>0</td>
-      <td>0.608610</td>
-      <td>0.084845</td>
-      <td>0.001478</td>
-      <td>0.305067</td>
-      <td>Topic 0</td>
-      <td>0.61</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Dominican Republic</td>
-      <td>por la_union group people hope start business group look receive loan start small business try increase business group poverty see chance improve life live family representative choose hardworke woman young mother child realize want well life family hope start small business sell clothe people barrio hope someday thrive business able provide family behalf thank support</td>
-      <td>F</td>
-      <td>2175</td>
-      <td>partner</td>
-      <td>Clothing</td>
-      <td>0</td>
-      <td>0.486984</td>
-      <td>0.012169</td>
-      <td>0.002022</td>
-      <td>0.498825</td>
-      <td>Topic 3</td>
-      <td>0.50</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Dominican Republic</td>
-      <td>vive live group woman look receive first loan young group woman want start change life right away riquena group representative leader group year old also marry child tell kid want able provide good life main reason try start business plan sell use clothe area hope day big clothing store also design clothe motivated person see speak speak spanish creole fluently study english whole group ready next step excited_opportunity behalf thank support</td>
-      <td>F</td>
-      <td>1425</td>
-      <td>partner</td>
-      <td>Clothing</td>
-      <td>0</td>
-      <td>0.289351</td>
-      <td>0.071750</td>
-      <td>0.001620</td>
-      <td>0.637279</td>
-      <td>Topic 3</td>
-      <td>0.64</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Dominican Republic</td>
-      <td>cristo vive large group people hope take loan many second loan hope use increase business business range clothing sale salon miline choose group representative due hard work dedication miline hardworke mother young child old year old take first loan start small business sell chicken type food next loan feel increase business greatly start make money support family dream store someday able provide family comfortable life behalf miline thank support</td>
-      <td>F</td>
-      <td>4025</td>
-      <td>partner</td>
-      <td>Food</td>
-      <td>0</td>
-      <td>0.562529</td>
-      <td>0.032050</td>
-      <td>0.001672</td>
-      <td>0.403749</td>
-      <td>Topic 0</td>
-      <td>0.56</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">en</th>
+<th data-quarto-table-cell-role="th">gender</th>
+<th data-quarto-table-cell-role="th">loan_amount</th>
+<th data-quarto-table-cell-role="th">nonpayment</th>
+<th data-quarto-table-cell-role="th">sector</th>
+<th data-quarto-table-cell-role="th">status</th>
+<th data-quarto-table-cell-role="th">Topic_0</th>
+<th data-quarto-table-cell-role="th">Topic_1</th>
+<th data-quarto-table-cell-role="th">Topic_2</th>
+<th data-quarto-table-cell-role="th">Topic_3</th>
+<th data-quarto-table-cell-role="th">Dominant_Topic</th>
+<th data-quarto-table-cell-role="th">Perc_Dominant_Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Dominican Republic</td>
+<td>group woman look receive small loan take small loan already second loan group go try expand small business start generate income group representative leader group eduvige lot line child tell child reason want successful want able provide different life show successful well eduvige small business selling shoe avon product plan expand use loan dream success whole group ready new challenge road better live behalf eduvige thank support</td>
+<td>F</td>
+<td>1225</td>
+<td>partner</td>
+<td>Retail</td>
+<td>0</td>
+<td>0.410590</td>
+<td>0.044232</td>
+<td>0.001707</td>
+<td>0.543472</td>
+<td>Topic 3</td>
+<td>0.54</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Dominican Republic</td>
+<td>caminemos walk forward group entrepreneur seek second loan esperanza_international group loan successfully_repaid group hope use additional loan fund business expansion coordinator group sell undergarment community neighboring community use first loan completely repay buy additional product estela able increase return business add inventory estella want use second loan buy undergarment sell customer live mother sister dream improve house live plan use business profit member art juice ice_cream fry food cake sale behalf esperanza group business entrepreneur like thank support</td>
+<td>F</td>
+<td>1975</td>
+<td>lender</td>
+<td>Clothing</td>
+<td>0</td>
+<td>0.608610</td>
+<td>0.084845</td>
+<td>0.001478</td>
+<td>0.305067</td>
+<td>Topic 0</td>
+<td>0.61</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Dominican Republic</td>
+<td>por la_union group people hope start business group look receive loan start small business try increase business group poverty see chance improve life live family representative choose hardworke woman young mother child realize want well life family hope start small business sell clothe people barrio hope someday thrive business able provide family behalf thank support</td>
+<td>F</td>
+<td>2175</td>
+<td>partner</td>
+<td>Clothing</td>
+<td>0</td>
+<td>0.486984</td>
+<td>0.012169</td>
+<td>0.002022</td>
+<td>0.498825</td>
+<td>Topic 3</td>
+<td>0.50</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Dominican Republic</td>
+<td>vive live group woman look receive first loan young group woman want start change life right away riquena group representative leader group year old also marry child tell kid want able provide good life main reason try start business plan sell use clothe area hope day big clothing store also design clothe motivated person see speak speak spanish creole fluently study english whole group ready next step excited_opportunity behalf thank support</td>
+<td>F</td>
+<td>1425</td>
+<td>partner</td>
+<td>Clothing</td>
+<td>0</td>
+<td>0.289351</td>
+<td>0.071750</td>
+<td>0.001620</td>
+<td>0.637279</td>
+<td>Topic 3</td>
+<td>0.64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Dominican Republic</td>
+<td>cristo vive large group people hope take loan many second loan hope use increase business business range clothing sale salon miline choose group representative due hard work dedication miline hardworke mother young child old year old take first loan start small business sell chicken type food next loan feel increase business greatly start make money support family dream store someday able provide family comfortable life behalf miline thank support</td>
+<td>F</td>
+<td>4025</td>
+<td>partner</td>
+<td>Food</td>
+<td>0</td>
+<td>0.562529</td>
+<td>0.032050</td>
+<td>0.001672</td>
+<td>0.403749</td>
+<td>Topic 0</td>
+<td>0.56</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -770,45 +757,46 @@ Wall time: 1min 15s</code></pre>
 <div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-01-08T17:06:06.979447Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-01-08T17:06:06.978990Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-01-08T17:06:09.022516Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-01-08T17:06:09.021589Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2023-01-08T17:06:06.979403Z&quot;}" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>amazon_reviews <span class="op">=</span> get_data(<span class="st">'amazon'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>reviewText</th>
-      <th>Positive</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>This is a one of the best apps acording to a bunch of people and I agree it has bombs eggs pigs TNT king pigs and realustic stuff</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>This is a pretty good version of the game for being free. There are LOTS of different levels to play. My kids enjoy it a lot too.</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>this is a really cool game. there are a bunch of levels and you can find golden eggs. super fun.</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>This is a silly game and can be frustrating, but lots of fun and definitely recommend just as a fun time.</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>This is a terrific game on any pad. Hrs of fun.  My grandkids love it. Great entertainment when waiting in long lines</td>
-      <td>1</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">reviewText</th>
+<th data-quarto-table-cell-role="th">Positive</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>This is a one of the best apps acording to a bunch of people and I agree it has bombs eggs pigs TNT king pigs and realustic stuff</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>This is a pretty good version of the game for being free. There are LOTS of different levels to play. My kids enjoy it a lot too.</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>this is a really cool game. there are a bunch of levels and you can find golden eggs. super fun.</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>This is a silly game and can be frustrating, but lots of fun and definitely recommend just as a fun time.</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>This is a terrific game on any pad. Hrs of fun. My grandkids love it. Great entertainment when waiting in long lines</td>
+<td>1</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -832,34 +820,34 @@ Name: Positive, dtype: int64</code></pre>
 <div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-01-08T17:06:09.040940Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-01-08T17:06:09.040532Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-01-08T17:07:44.670621Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-01-08T17:07:44.669515Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2023-01-08T17:06:09.040906Z&quot;}" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>time experiment2 <span class="op">=</span> setup(data<span class="op">=</span>amazon_reviews, target<span class="op">=</span><span class="st">'reviewText'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
 <style type="text/css">
 </style>
-<table id="T_0c790_">
-  <thead>
-    <tr>
-      <th class="col_heading level0 col0">Description</th>
-      <th class="col_heading level0 col1">Value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td id="T_0c790_row0_col0" class="data row0 col0">session_id</td>
-      <td id="T_0c790_row0_col1" class="data row0 col1">497</td>
-    </tr>
-    <tr>
-      <td id="T_0c790_row1_col0" class="data row1 col0">Documents</td>
-      <td id="T_0c790_row1_col1" class="data row1 col1">20000</td>
-    </tr>
-    <tr>
-      <td id="T_0c790_row2_col0" class="data row2 col0">Vocab Size</td>
-      <td id="T_0c790_row2_col1" class="data row2 col1">12771</td>
-    </tr>
-    <tr>
-      <td id="T_0c790_row3_col0" class="data row3 col0">Custom Stopwords</td>
-      <td id="T_0c790_row3_col1" class="data row3 col1">False</td>
-    </tr>
-  </tbody>
+
+<table id="T_0c790_" data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th class="col_heading level0 col0" data-quarto-table-cell-role="th">Description</th>
+<th class="col_heading level0 col1" data-quarto-table-cell-role="th">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_0c790_row0_col0" class="data row0 col0">session_id</td>
+<td id="T_0c790_row0_col1" class="data row0 col1">497</td>
+</tr>
+<tr class="even">
+<td id="T_0c790_row1_col0" class="data row1 col0">Documents</td>
+<td id="T_0c790_row1_col1" class="data row1 col1">20000</td>
+</tr>
+<tr class="odd">
+<td id="T_0c790_row2_col0" class="data row2 col0">Vocab Size</td>
+<td id="T_0c790_row2_col1" class="data row2 col1">12771</td>
+</tr>
+<tr class="even">
+<td id="T_0c790_row3_col0" class="data row3 col0">Custom Stopwords</td>
+<td id="T_0c790_row3_col1" class="data row3 col1">False</td>
+</tr>
+</tbody>
 </table>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -876,81 +864,82 @@ Wall time: 1min 35s</code></pre>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>lda_results <span class="op">=</span> assign_model(lda_topic_model2)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>lda_results.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>reviewText</th>
-      <th>Positive</th>
-      <th>Topic_0</th>
-      <th>Topic_1</th>
-      <th>Topic_2</th>
-      <th>Topic_3</th>
-      <th>Dominant_Topic</th>
-      <th>Perc_Dominant_Topic</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>good app acorde bunch people agree bomb egg pig king pig realustic stuff</td>
-      <td>1</td>
-      <td>0.081603</td>
-      <td>0.309925</td>
-      <td>0.227132</td>
-      <td>0.381340</td>
-      <td>Topic 3</td>
-      <td>0.38</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>pretty good version game free lot different level play kid enjoy lot</td>
-      <td>1</td>
-      <td>0.070119</td>
-      <td>0.200039</td>
-      <td>0.249249</td>
-      <td>0.480594</td>
-      <td>Topic 3</td>
-      <td>0.48</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>really cool game bunch level find golden egg super fun</td>
-      <td>1</td>
-      <td>0.116654</td>
-      <td>0.263965</td>
-      <td>0.197222</td>
-      <td>0.422159</td>
-      <td>Topic 3</td>
-      <td>0.42</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>silly game frustrating lot fun definitely recommend fun time</td>
-      <td>1</td>
-      <td>0.077698</td>
-      <td>0.148072</td>
-      <td>0.309584</td>
-      <td>0.464646</td>
-      <td>Topic 3</td>
-      <td>0.46</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>terrific game pad fun grandkid love great entertainment wait long line</td>
-      <td>1</td>
-      <td>0.072539</td>
-      <td>0.138212</td>
-      <td>0.424701</td>
-      <td>0.364547</td>
-      <td>Topic 2</td>
-      <td>0.42</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">reviewText</th>
+<th data-quarto-table-cell-role="th">Positive</th>
+<th data-quarto-table-cell-role="th">Topic_0</th>
+<th data-quarto-table-cell-role="th">Topic_1</th>
+<th data-quarto-table-cell-role="th">Topic_2</th>
+<th data-quarto-table-cell-role="th">Topic_3</th>
+<th data-quarto-table-cell-role="th">Dominant_Topic</th>
+<th data-quarto-table-cell-role="th">Perc_Dominant_Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>good app acorde bunch people agree bomb egg pig king pig realustic stuff</td>
+<td>1</td>
+<td>0.081603</td>
+<td>0.309925</td>
+<td>0.227132</td>
+<td>0.381340</td>
+<td>Topic 3</td>
+<td>0.38</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>pretty good version game free lot different level play kid enjoy lot</td>
+<td>1</td>
+<td>0.070119</td>
+<td>0.200039</td>
+<td>0.249249</td>
+<td>0.480594</td>
+<td>Topic 3</td>
+<td>0.48</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>really cool game bunch level find golden egg super fun</td>
+<td>1</td>
+<td>0.116654</td>
+<td>0.263965</td>
+<td>0.197222</td>
+<td>0.422159</td>
+<td>Topic 3</td>
+<td>0.42</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>silly game frustrating lot fun definitely recommend fun time</td>
+<td>1</td>
+<td>0.077698</td>
+<td>0.148072</td>
+<td>0.309584</td>
+<td>0.464646</td>
+<td>Topic 3</td>
+<td>0.46</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>terrific game pad fun grandkid love great entertainment wait long line</td>
+<td>1</td>
+<td>0.072539</td>
+<td>0.138212</td>
+<td>0.424701</td>
+<td>0.364547</td>
+<td>Topic 2</td>
+<td>0.42</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -959,63 +948,64 @@ Wall time: 1min 35s</code></pre>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>lda_results.drop([<span class="st">'reviewText'</span>, <span class="st">'Dominant_Topic'</span>, <span class="st">'Perc_Dominant_Topic'</span>], axis<span class="op">=</span><span class="dv">1</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>lda_results.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Positive</th>
-      <th>Topic_0</th>
-      <th>Topic_1</th>
-      <th>Topic_2</th>
-      <th>Topic_3</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>0.081603</td>
-      <td>0.309925</td>
-      <td>0.227132</td>
-      <td>0.381340</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>0.070119</td>
-      <td>0.200039</td>
-      <td>0.249249</td>
-      <td>0.480594</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>0.116654</td>
-      <td>0.263965</td>
-      <td>0.197222</td>
-      <td>0.422159</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>0.077698</td>
-      <td>0.148072</td>
-      <td>0.309584</td>
-      <td>0.464646</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1</td>
-      <td>0.072539</td>
-      <td>0.138212</td>
-      <td>0.424701</td>
-      <td>0.364547</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Positive</th>
+<th data-quarto-table-cell-role="th">Topic_0</th>
+<th data-quarto-table-cell-role="th">Topic_1</th>
+<th data-quarto-table-cell-role="th">Topic_2</th>
+<th data-quarto-table-cell-role="th">Topic_3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>0.081603</td>
+<td>0.309925</td>
+<td>0.227132</td>
+<td>0.381340</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>0.070119</td>
+<td>0.200039</td>
+<td>0.249249</td>
+<td>0.480594</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1</td>
+<td>0.116654</td>
+<td>0.263965</td>
+<td>0.197222</td>
+<td>0.422159</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1</td>
+<td>0.077698</td>
+<td>0.148072</td>
+<td>0.309584</td>
+<td>0.464646</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1</td>
+<td>0.072539</td>
+<td>0.138212</td>
+<td>0.424701</td>
+<td>0.364547</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1027,107 +1017,107 @@ Wall time: 1min 35s</code></pre>
 <div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-01-08T17:27:31.377794Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-01-08T17:27:31.377437Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-01-08T17:27:31.656789Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-01-08T17:27:31.655560Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2023-01-08T17:27:31.377762Z&quot;}" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>time experiment3 <span class="op">=</span> setup(data<span class="op">=</span>train, target<span class="op">=</span><span class="st">'Positive'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
 <style type="text/css">
 #T_e05ea_row7_col1 {
   background-color: lightgreen;
 }
 </style>
-<table id="T_e05ea_">
-  <thead>
-    <tr>
-      <th class="blank level0">&nbsp;</th>
-      <th class="col_heading level0 col0">Description</th>
-      <th class="col_heading level0 col1">Value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th id="T_e05ea_level0_row0" class="row_heading level0 row0">0</th>
-      <td id="T_e05ea_row0_col0" class="data row0 col0">Session id</td>
-      <td id="T_e05ea_row0_col1" class="data row0 col1">227</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row1" class="row_heading level0 row1">1</th>
-      <td id="T_e05ea_row1_col0" class="data row1 col0">Target</td>
-      <td id="T_e05ea_row1_col1" class="data row1 col1">Positive</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row2" class="row_heading level0 row2">2</th>
-      <td id="T_e05ea_row2_col0" class="data row2 col0">Target type</td>
-      <td id="T_e05ea_row2_col1" class="data row2 col1">classification</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row3" class="row_heading level0 row3">3</th>
-      <td id="T_e05ea_row3_col0" class="data row3 col0">Data shape</td>
-      <td id="T_e05ea_row3_col1" class="data row3 col1">(19980, 5)</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row4" class="row_heading level0 row4">4</th>
-      <td id="T_e05ea_row4_col0" class="data row4 col0">Train data shape</td>
-      <td id="T_e05ea_row4_col1" class="data row4 col1">(13985, 5)</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row5" class="row_heading level0 row5">5</th>
-      <td id="T_e05ea_row5_col0" class="data row5 col0">Test data shape</td>
-      <td id="T_e05ea_row5_col1" class="data row5 col1">(5995, 5)</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row6" class="row_heading level0 row6">6</th>
-      <td id="T_e05ea_row6_col0" class="data row6 col0">Numeric features</td>
-      <td id="T_e05ea_row6_col1" class="data row6 col1">4</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row7" class="row_heading level0 row7">7</th>
-      <td id="T_e05ea_row7_col0" class="data row7 col0">Preprocess</td>
-      <td id="T_e05ea_row7_col1" class="data row7 col1">True</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row8" class="row_heading level0 row8">8</th>
-      <td id="T_e05ea_row8_col0" class="data row8 col0">Imputation type</td>
-      <td id="T_e05ea_row8_col1" class="data row8 col1">simple</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row9" class="row_heading level0 row9">9</th>
-      <td id="T_e05ea_row9_col0" class="data row9 col0">Numeric imputation</td>
-      <td id="T_e05ea_row9_col1" class="data row9 col1">mean</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row10" class="row_heading level0 row10">10</th>
-      <td id="T_e05ea_row10_col0" class="data row10 col0">Categorical imputation</td>
-      <td id="T_e05ea_row10_col1" class="data row10 col1">constant</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row11" class="row_heading level0 row11">11</th>
-      <td id="T_e05ea_row11_col0" class="data row11 col0">Fold Generator</td>
-      <td id="T_e05ea_row11_col1" class="data row11 col1">StratifiedKFold</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row12" class="row_heading level0 row12">12</th>
-      <td id="T_e05ea_row12_col0" class="data row12 col0">Fold Number</td>
-      <td id="T_e05ea_row12_col1" class="data row12 col1">10</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row13" class="row_heading level0 row13">13</th>
-      <td id="T_e05ea_row13_col0" class="data row13 col0">CPU Jobs</td>
-      <td id="T_e05ea_row13_col1" class="data row13 col1">-1</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row14" class="row_heading level0 row14">14</th>
-      <td id="T_e05ea_row14_col0" class="data row14 col0">Log Experiment</td>
-      <td id="T_e05ea_row14_col1" class="data row14 col1">False</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row15" class="row_heading level0 row15">15</th>
-      <td id="T_e05ea_row15_col0" class="data row15 col0">Experiment Name</td>
-      <td id="T_e05ea_row15_col1" class="data row15 col1">clf-default-name</td>
-    </tr>
-    <tr>
-      <th id="T_e05ea_level0_row16" class="row_heading level0 row16">16</th>
-      <td id="T_e05ea_row16_col0" class="data row16 col0">USI</td>
-      <td id="T_e05ea_row16_col1" class="data row16 col1">22b0</td>
-    </tr>
-  </tbody>
+
+<table id="T_e05ea_" data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="col_heading level0 col0" data-quarto-table-cell-role="th">Description</th>
+<th class="col_heading level0 col1" data-quarto-table-cell-role="th">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_e05ea_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">0</td>
+<td id="T_e05ea_row0_col0" class="data row0 col0">Session id</td>
+<td id="T_e05ea_row0_col1" class="data row0 col1">227</td>
+</tr>
+<tr class="even">
+<td id="T_e05ea_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">1</td>
+<td id="T_e05ea_row1_col0" class="data row1 col0">Target</td>
+<td id="T_e05ea_row1_col1" class="data row1 col1">Positive</td>
+</tr>
+<tr class="odd">
+<td id="T_e05ea_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">2</td>
+<td id="T_e05ea_row2_col0" class="data row2 col0">Target type</td>
+<td id="T_e05ea_row2_col1" class="data row2 col1">classification</td>
+</tr>
+<tr class="even">
+<td id="T_e05ea_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">3</td>
+<td id="T_e05ea_row3_col0" class="data row3 col0">Data shape</td>
+<td id="T_e05ea_row3_col1" class="data row3 col1">(19980, 5)</td>
+</tr>
+<tr class="odd">
+<td id="T_e05ea_level0_row4" class="row_heading level0 row4" data-quarto-table-cell-role="th">4</td>
+<td id="T_e05ea_row4_col0" class="data row4 col0">Train data shape</td>
+<td id="T_e05ea_row4_col1" class="data row4 col1">(13985, 5)</td>
+</tr>
+<tr class="even">
+<td id="T_e05ea_level0_row5" class="row_heading level0 row5" data-quarto-table-cell-role="th">5</td>
+<td id="T_e05ea_row5_col0" class="data row5 col0">Test data shape</td>
+<td id="T_e05ea_row5_col1" class="data row5 col1">(5995, 5)</td>
+</tr>
+<tr class="odd">
+<td id="T_e05ea_level0_row6" class="row_heading level0 row6" data-quarto-table-cell-role="th">6</td>
+<td id="T_e05ea_row6_col0" class="data row6 col0">Numeric features</td>
+<td id="T_e05ea_row6_col1" class="data row6 col1">4</td>
+</tr>
+<tr class="even">
+<td id="T_e05ea_level0_row7" class="row_heading level0 row7" data-quarto-table-cell-role="th">7</td>
+<td id="T_e05ea_row7_col0" class="data row7 col0">Preprocess</td>
+<td id="T_e05ea_row7_col1" class="data row7 col1">True</td>
+</tr>
+<tr class="odd">
+<td id="T_e05ea_level0_row8" class="row_heading level0 row8" data-quarto-table-cell-role="th">8</td>
+<td id="T_e05ea_row8_col0" class="data row8 col0">Imputation type</td>
+<td id="T_e05ea_row8_col1" class="data row8 col1">simple</td>
+</tr>
+<tr class="even">
+<td id="T_e05ea_level0_row9" class="row_heading level0 row9" data-quarto-table-cell-role="th">9</td>
+<td id="T_e05ea_row9_col0" class="data row9 col0">Numeric imputation</td>
+<td id="T_e05ea_row9_col1" class="data row9 col1">mean</td>
+</tr>
+<tr class="odd">
+<td id="T_e05ea_level0_row10" class="row_heading level0 row10" data-quarto-table-cell-role="th">10</td>
+<td id="T_e05ea_row10_col0" class="data row10 col0">Categorical imputation</td>
+<td id="T_e05ea_row10_col1" class="data row10 col1">constant</td>
+</tr>
+<tr class="even">
+<td id="T_e05ea_level0_row11" class="row_heading level0 row11" data-quarto-table-cell-role="th">11</td>
+<td id="T_e05ea_row11_col0" class="data row11 col0">Fold Generator</td>
+<td id="T_e05ea_row11_col1" class="data row11 col1">StratifiedKFold</td>
+</tr>
+<tr class="odd">
+<td id="T_e05ea_level0_row12" class="row_heading level0 row12" data-quarto-table-cell-role="th">12</td>
+<td id="T_e05ea_row12_col0" class="data row12 col0">Fold Number</td>
+<td id="T_e05ea_row12_col1" class="data row12 col1">10</td>
+</tr>
+<tr class="even">
+<td id="T_e05ea_level0_row13" class="row_heading level0 row13" data-quarto-table-cell-role="th">13</td>
+<td id="T_e05ea_row13_col0" class="data row13 col0">CPU Jobs</td>
+<td id="T_e05ea_row13_col1" class="data row13 col1">-1</td>
+</tr>
+<tr class="odd">
+<td id="T_e05ea_level0_row14" class="row_heading level0 row14" data-quarto-table-cell-role="th">14</td>
+<td id="T_e05ea_row14_col0" class="data row14 col0">Log Experiment</td>
+<td id="T_e05ea_row14_col1" class="data row14 col1">False</td>
+</tr>
+<tr class="even">
+<td id="T_e05ea_level0_row15" class="row_heading level0 row15" data-quarto-table-cell-role="th">15</td>
+<td id="T_e05ea_row15_col0" class="data row15 col0">Experiment Name</td>
+<td id="T_e05ea_row15_col1" class="data row15 col1">clf-default-name</td>
+</tr>
+<tr class="odd">
+<td id="T_e05ea_level0_row16" class="row_heading level0 row16" data-quarto-table-cell-role="th">16</td>
+<td id="T_e05ea_row16_col0" class="data row16 col0">USI</td>
+<td id="T_e05ea_row16_col1" class="data row16 col1">22b0</td>
+</tr>
+</tbody>
 </table>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -1140,7 +1130,6 @@ Wall time: 269 ms</code></pre>
 <div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-01-08T17:44:55.545898Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-01-08T17:44:55.545417Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-01-08T17:46:54.662918Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-01-08T17:46:54.661520Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2023-01-08T17:44:55.545850Z&quot;}" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>compare_models(exclude<span class="op">=</span><span class="st">'dummy'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
 <style type="text/css">
 #T_62f96_ th {
   text-align: left;
@@ -1162,203 +1151,204 @@ Wall time: 269 ms</code></pre>
   background-color: lightgrey;
 }
 </style>
-<table id="T_62f96_">
-  <thead>
-    <tr>
-      <th class="blank level0">&nbsp;</th>
-      <th class="col_heading level0 col0">Model</th>
-      <th class="col_heading level0 col1">Accuracy</th>
-      <th class="col_heading level0 col2">AUC</th>
-      <th class="col_heading level0 col3">Recall</th>
-      <th class="col_heading level0 col4">Prec.</th>
-      <th class="col_heading level0 col5">F1</th>
-      <th class="col_heading level0 col6">Kappa</th>
-      <th class="col_heading level0 col7">MCC</th>
-      <th class="col_heading level0 col8">TT (Sec)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th id="T_62f96_level0_row0" class="row_heading level0 row0">svm</th>
-      <td id="T_62f96_row0_col0" class="data row0 col0">SVM - Linear Kernel</td>
-      <td id="T_62f96_row0_col1" class="data row0 col1">0.7618</td>
-      <td id="T_62f96_row0_col2" class="data row0 col2">0.0000</td>
-      <td id="T_62f96_row0_col3" class="data row0 col3">1.0000</td>
-      <td id="T_62f96_row0_col4" class="data row0 col4">0.7618</td>
-      <td id="T_62f96_row0_col5" class="data row0 col5">0.8648</td>
-      <td id="T_62f96_row0_col6" class="data row0 col6">0.0000</td>
-      <td id="T_62f96_row0_col7" class="data row0 col7">0.0000</td>
-      <td id="T_62f96_row0_col8" class="data row0 col8">0.0220</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row1" class="row_heading level0 row1">lr</th>
-      <td id="T_62f96_row1_col0" class="data row1 col0">Logistic Regression</td>
-      <td id="T_62f96_row1_col1" class="data row1 col1">0.7617</td>
-      <td id="T_62f96_row1_col2" class="data row1 col2">0.6472</td>
-      <td id="T_62f96_row1_col3" class="data row1 col3">0.9981</td>
-      <td id="T_62f96_row1_col4" class="data row1 col4">0.7625</td>
-      <td id="T_62f96_row1_col5" class="data row1 col5">0.8645</td>
-      <td id="T_62f96_row1_col6" class="data row1 col6">0.0053</td>
-      <td id="T_62f96_row1_col7" class="data row1 col7">0.0294</td>
-      <td id="T_62f96_row1_col8" class="data row1 col8">0.0290</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row2" class="row_heading level0 row2">ridge</th>
-      <td id="T_62f96_row2_col0" class="data row2 col0">Ridge Classifier</td>
-      <td id="T_62f96_row2_col1" class="data row2 col1">0.7617</td>
-      <td id="T_62f96_row2_col2" class="data row2 col2">0.0000</td>
-      <td id="T_62f96_row2_col3" class="data row2 col3">0.9992</td>
-      <td id="T_62f96_row2_col4" class="data row2 col4">0.7620</td>
-      <td id="T_62f96_row2_col5" class="data row2 col5">0.8646</td>
-      <td id="T_62f96_row2_col6" class="data row2 col6">0.0019</td>
-      <td id="T_62f96_row2_col7" class="data row2 col7">0.0150</td>
-      <td id="T_62f96_row2_col8" class="data row2 col8">0.0160</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row3" class="row_heading level0 row3">lda</th>
-      <td id="T_62f96_row3_col0" class="data row3 col0">Linear Discriminant Analysis</td>
-      <td id="T_62f96_row3_col1" class="data row3 col1">0.7616</td>
-      <td id="T_62f96_row3_col2" class="data row3 col2">0.6474</td>
-      <td id="T_62f96_row3_col3" class="data row3 col3">0.9948</td>
-      <td id="T_62f96_row3_col4" class="data row3 col4">0.7637</td>
-      <td id="T_62f96_row3_col5" class="data row3 col5">0.8641</td>
-      <td id="T_62f96_row3_col6" class="data row3 col6">0.0156</td>
-      <td id="T_62f96_row3_col7" class="data row3 col7">0.0512</td>
-      <td id="T_62f96_row3_col8" class="data row3 col8">0.0210</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row4" class="row_heading level0 row4">gbc</th>
-      <td id="T_62f96_row4_col0" class="data row4 col0">Gradient Boosting Classifier</td>
-      <td id="T_62f96_row4_col1" class="data row4 col1">0.7610</td>
-      <td id="T_62f96_row4_col2" class="data row4 col2">0.6559</td>
-      <td id="T_62f96_row4_col3" class="data row4 col3">0.9965</td>
-      <td id="T_62f96_row4_col4" class="data row4 col4">0.7626</td>
-      <td id="T_62f96_row4_col5" class="data row4 col5">0.8640</td>
-      <td id="T_62f96_row4_col6" class="data row4 col6">0.0065</td>
-      <td id="T_62f96_row4_col7" class="data row4 col7">0.0282</td>
-      <td id="T_62f96_row4_col8" class="data row4 col8">0.8190</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row5" class="row_heading level0 row5">ada</th>
-      <td id="T_62f96_row5_col0" class="data row5 col0">Ada Boost Classifier</td>
-      <td id="T_62f96_row5_col1" class="data row5 col1">0.7602</td>
-      <td id="T_62f96_row5_col2" class="data row5 col2">0.6476</td>
-      <td id="T_62f96_row5_col3" class="data row5 col3">0.9937</td>
-      <td id="T_62f96_row5_col4" class="data row5 col4">0.7631</td>
-      <td id="T_62f96_row5_col5" class="data row5 col5">0.8633</td>
-      <td id="T_62f96_row5_col6" class="data row5 col6">0.0103</td>
-      <td id="T_62f96_row5_col7" class="data row5 col7">0.0318</td>
-      <td id="T_62f96_row5_col8" class="data row5 col8">0.2600</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row6" class="row_heading level0 row6">catboost</th>
-      <td id="T_62f96_row6_col0" class="data row6 col0">CatBoost Classifier</td>
-      <td id="T_62f96_row6_col1" class="data row6 col1">0.7600</td>
-      <td id="T_62f96_row6_col2" class="data row6 col2">0.6468</td>
-      <td id="T_62f96_row6_col3" class="data row6 col3">0.9868</td>
-      <td id="T_62f96_row6_col4" class="data row6 col4">0.7658</td>
-      <td id="T_62f96_row6_col5" class="data row6 col5">0.8624</td>
-      <td id="T_62f96_row6_col6" class="data row6 col6">0.0316</td>
-      <td id="T_62f96_row6_col7" class="data row6 col7">0.0690</td>
-      <td id="T_62f96_row6_col8" class="data row6 col8">6.6620</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row7" class="row_heading level0 row7">lightgbm</th>
-      <td id="T_62f96_row7_col0" class="data row7 col0">Light Gradient Boosting Machine</td>
-      <td id="T_62f96_row7_col1" class="data row7 col1">0.7583</td>
-      <td id="T_62f96_row7_col2" class="data row7 col2">0.6380</td>
-      <td id="T_62f96_row7_col3" class="data row7 col3">0.9829</td>
-      <td id="T_62f96_row7_col4" class="data row7 col4">0.7661</td>
-      <td id="T_62f96_row7_col5" class="data row7 col5">0.8610</td>
-      <td id="T_62f96_row7_col6" class="data row7 col6">0.0332</td>
-      <td id="T_62f96_row7_col7" class="data row7 col7">0.0675</td>
-      <td id="T_62f96_row7_col8" class="data row7 col8">0.1940</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row8" class="row_heading level0 row8">nb</th>
-      <td id="T_62f96_row8_col0" class="data row8 col0">Naive Bayes</td>
-      <td id="T_62f96_row8_col1" class="data row8 col1">0.7540</td>
-      <td id="T_62f96_row8_col2" class="data row8 col2">0.6470</td>
-      <td id="T_62f96_row8_col3" class="data row8 col3">0.9608</td>
-      <td id="T_62f96_row8_col4" class="data row8 col4">0.7720</td>
-      <td id="T_62f96_row8_col5" class="data row8 col5">0.8561</td>
-      <td id="T_62f96_row8_col6" class="data row8 col6">0.0727</td>
-      <td id="T_62f96_row8_col7" class="data row8 col7">0.1019</td>
-      <td id="T_62f96_row8_col8" class="data row8 col8">0.0250</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row9" class="row_heading level0 row9">xgboost</th>
-      <td id="T_62f96_row9_col0" class="data row9 col0">Extreme Gradient Boosting</td>
-      <td id="T_62f96_row9_col1" class="data row9 col1">0.7495</td>
-      <td id="T_62f96_row9_col2" class="data row9 col2">0.6231</td>
-      <td id="T_62f96_row9_col3" class="data row9 col3">0.9590</td>
-      <td id="T_62f96_row9_col4" class="data row9 col4">0.7692</td>
-      <td id="T_62f96_row9_col5" class="data row9 col5">0.8537</td>
-      <td id="T_62f96_row9_col6" class="data row9 col6">0.0528</td>
-      <td id="T_62f96_row9_col7" class="data row9 col7">0.0750</td>
-      <td id="T_62f96_row9_col8" class="data row9 col8">0.8160</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row10" class="row_heading level0 row10">qda</th>
-      <td id="T_62f96_row10_col0" class="data row10 col0">Quadratic Discriminant Analysis</td>
-      <td id="T_62f96_row10_col1" class="data row10 col1">0.7439</td>
-      <td id="T_62f96_row10_col2" class="data row10 col2">0.6441</td>
-      <td id="T_62f96_row10_col3" class="data row10 col3">0.9504</td>
-      <td id="T_62f96_row10_col4" class="data row10 col4">0.7712</td>
-      <td id="T_62f96_row10_col5" class="data row10 col5">0.8465</td>
-      <td id="T_62f96_row10_col6" class="data row10 col6">0.0333</td>
-      <td id="T_62f96_row10_col7" class="data row10 col7">0.0493</td>
-      <td id="T_62f96_row10_col8" class="data row10 col8">0.0190</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row11" class="row_heading level0 row11">rf</th>
-      <td id="T_62f96_row11_col0" class="data row11 col0">Random Forest Classifier</td>
-      <td id="T_62f96_row11_col1" class="data row11 col1">0.7233</td>
-      <td id="T_62f96_row11_col2" class="data row11 col2">0.5970</td>
-      <td id="T_62f96_row11_col3" class="data row11 col3">0.8956</td>
-      <td id="T_62f96_row11_col4" class="data row11 col4">0.7758</td>
-      <td id="T_62f96_row11_col5" class="data row11 col5">0.8314</td>
-      <td id="T_62f96_row11_col6" class="data row11 col6">0.0819</td>
-      <td id="T_62f96_row11_col7" class="data row11 col7">0.0892</td>
-      <td id="T_62f96_row11_col8" class="data row11 col8">1.3430</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row12" class="row_heading level0 row12">knn</th>
-      <td id="T_62f96_row12_col0" class="data row12 col0">K Neighbors Classifier</td>
-      <td id="T_62f96_row12_col1" class="data row12 col1">0.7171</td>
-      <td id="T_62f96_row12_col2" class="data row12 col2">0.5745</td>
-      <td id="T_62f96_row12_col3" class="data row12 col3">0.8887</td>
-      <td id="T_62f96_row12_col4" class="data row12 col4">0.7737</td>
-      <td id="T_62f96_row12_col5" class="data row12 col5">0.8272</td>
-      <td id="T_62f96_row12_col6" class="data row12 col6">0.0683</td>
-      <td id="T_62f96_row12_col7" class="data row12 col7">0.0737</td>
-      <td id="T_62f96_row12_col8" class="data row12 col8">0.0930</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row13" class="row_heading level0 row13">et</th>
-      <td id="T_62f96_row13_col0" class="data row13 col0">Extra Trees Classifier</td>
-      <td id="T_62f96_row13_col1" class="data row13 col1">0.7058</td>
-      <td id="T_62f96_row13_col2" class="data row13 col2">0.5801</td>
-      <td id="T_62f96_row13_col3" class="data row13 col3">0.8628</td>
-      <td id="T_62f96_row13_col4" class="data row13 col4">0.7760</td>
-      <td id="T_62f96_row13_col5" class="data row13 col5">0.8171</td>
-      <td id="T_62f96_row13_col6" class="data row13 col6">0.0756</td>
-      <td id="T_62f96_row13_col7" class="data row13 col7">0.0786</td>
-      <td id="T_62f96_row13_col8" class="data row13 col8">0.6430</td>
-    </tr>
-    <tr>
-      <th id="T_62f96_level0_row14" class="row_heading level0 row14">dt</th>
-      <td id="T_62f96_row14_col0" class="data row14 col0">Decision Tree Classifier</td>
-      <td id="T_62f96_row14_col1" class="data row14 col1">0.6556</td>
-      <td id="T_62f96_row14_col2" class="data row14 col2">0.5333</td>
-      <td id="T_62f96_row14_col3" class="data row14 col3">0.7667</td>
-      <td id="T_62f96_row14_col4" class="data row14 col4">0.7780</td>
-      <td id="T_62f96_row14_col5" class="data row14 col5">0.7723</td>
-      <td id="T_62f96_row14_col6" class="data row14 col6">0.0657</td>
-      <td id="T_62f96_row14_col7" class="data row14 col7">0.0658</td>
-      <td id="T_62f96_row14_col8" class="data row14 col8">0.0740</td>
-    </tr>
-  </tbody>
+
+<table id="T_62f96_" data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="col_heading level0 col0" data-quarto-table-cell-role="th">Model</th>
+<th class="col_heading level0 col1" data-quarto-table-cell-role="th">Accuracy</th>
+<th class="col_heading level0 col2" data-quarto-table-cell-role="th">AUC</th>
+<th class="col_heading level0 col3" data-quarto-table-cell-role="th">Recall</th>
+<th class="col_heading level0 col4" data-quarto-table-cell-role="th">Prec.</th>
+<th class="col_heading level0 col5" data-quarto-table-cell-role="th">F1</th>
+<th class="col_heading level0 col6" data-quarto-table-cell-role="th">Kappa</th>
+<th class="col_heading level0 col7" data-quarto-table-cell-role="th">MCC</th>
+<th class="col_heading level0 col8" data-quarto-table-cell-role="th">TT (Sec)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_62f96_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">svm</td>
+<td id="T_62f96_row0_col0" class="data row0 col0">SVM - Linear Kernel</td>
+<td id="T_62f96_row0_col1" class="data row0 col1">0.7618</td>
+<td id="T_62f96_row0_col2" class="data row0 col2">0.0000</td>
+<td id="T_62f96_row0_col3" class="data row0 col3">1.0000</td>
+<td id="T_62f96_row0_col4" class="data row0 col4">0.7618</td>
+<td id="T_62f96_row0_col5" class="data row0 col5">0.8648</td>
+<td id="T_62f96_row0_col6" class="data row0 col6">0.0000</td>
+<td id="T_62f96_row0_col7" class="data row0 col7">0.0000</td>
+<td id="T_62f96_row0_col8" class="data row0 col8">0.0220</td>
+</tr>
+<tr class="even">
+<td id="T_62f96_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">lr</td>
+<td id="T_62f96_row1_col0" class="data row1 col0">Logistic Regression</td>
+<td id="T_62f96_row1_col1" class="data row1 col1">0.7617</td>
+<td id="T_62f96_row1_col2" class="data row1 col2">0.6472</td>
+<td id="T_62f96_row1_col3" class="data row1 col3">0.9981</td>
+<td id="T_62f96_row1_col4" class="data row1 col4">0.7625</td>
+<td id="T_62f96_row1_col5" class="data row1 col5">0.8645</td>
+<td id="T_62f96_row1_col6" class="data row1 col6">0.0053</td>
+<td id="T_62f96_row1_col7" class="data row1 col7">0.0294</td>
+<td id="T_62f96_row1_col8" class="data row1 col8">0.0290</td>
+</tr>
+<tr class="odd">
+<td id="T_62f96_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">ridge</td>
+<td id="T_62f96_row2_col0" class="data row2 col0">Ridge Classifier</td>
+<td id="T_62f96_row2_col1" class="data row2 col1">0.7617</td>
+<td id="T_62f96_row2_col2" class="data row2 col2">0.0000</td>
+<td id="T_62f96_row2_col3" class="data row2 col3">0.9992</td>
+<td id="T_62f96_row2_col4" class="data row2 col4">0.7620</td>
+<td id="T_62f96_row2_col5" class="data row2 col5">0.8646</td>
+<td id="T_62f96_row2_col6" class="data row2 col6">0.0019</td>
+<td id="T_62f96_row2_col7" class="data row2 col7">0.0150</td>
+<td id="T_62f96_row2_col8" class="data row2 col8">0.0160</td>
+</tr>
+<tr class="even">
+<td id="T_62f96_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">lda</td>
+<td id="T_62f96_row3_col0" class="data row3 col0">Linear Discriminant Analysis</td>
+<td id="T_62f96_row3_col1" class="data row3 col1">0.7616</td>
+<td id="T_62f96_row3_col2" class="data row3 col2">0.6474</td>
+<td id="T_62f96_row3_col3" class="data row3 col3">0.9948</td>
+<td id="T_62f96_row3_col4" class="data row3 col4">0.7637</td>
+<td id="T_62f96_row3_col5" class="data row3 col5">0.8641</td>
+<td id="T_62f96_row3_col6" class="data row3 col6">0.0156</td>
+<td id="T_62f96_row3_col7" class="data row3 col7">0.0512</td>
+<td id="T_62f96_row3_col8" class="data row3 col8">0.0210</td>
+</tr>
+<tr class="odd">
+<td id="T_62f96_level0_row4" class="row_heading level0 row4" data-quarto-table-cell-role="th">gbc</td>
+<td id="T_62f96_row4_col0" class="data row4 col0">Gradient Boosting Classifier</td>
+<td id="T_62f96_row4_col1" class="data row4 col1">0.7610</td>
+<td id="T_62f96_row4_col2" class="data row4 col2">0.6559</td>
+<td id="T_62f96_row4_col3" class="data row4 col3">0.9965</td>
+<td id="T_62f96_row4_col4" class="data row4 col4">0.7626</td>
+<td id="T_62f96_row4_col5" class="data row4 col5">0.8640</td>
+<td id="T_62f96_row4_col6" class="data row4 col6">0.0065</td>
+<td id="T_62f96_row4_col7" class="data row4 col7">0.0282</td>
+<td id="T_62f96_row4_col8" class="data row4 col8">0.8190</td>
+</tr>
+<tr class="even">
+<td id="T_62f96_level0_row5" class="row_heading level0 row5" data-quarto-table-cell-role="th">ada</td>
+<td id="T_62f96_row5_col0" class="data row5 col0">Ada Boost Classifier</td>
+<td id="T_62f96_row5_col1" class="data row5 col1">0.7602</td>
+<td id="T_62f96_row5_col2" class="data row5 col2">0.6476</td>
+<td id="T_62f96_row5_col3" class="data row5 col3">0.9937</td>
+<td id="T_62f96_row5_col4" class="data row5 col4">0.7631</td>
+<td id="T_62f96_row5_col5" class="data row5 col5">0.8633</td>
+<td id="T_62f96_row5_col6" class="data row5 col6">0.0103</td>
+<td id="T_62f96_row5_col7" class="data row5 col7">0.0318</td>
+<td id="T_62f96_row5_col8" class="data row5 col8">0.2600</td>
+</tr>
+<tr class="odd">
+<td id="T_62f96_level0_row6" class="row_heading level0 row6" data-quarto-table-cell-role="th">catboost</td>
+<td id="T_62f96_row6_col0" class="data row6 col0">CatBoost Classifier</td>
+<td id="T_62f96_row6_col1" class="data row6 col1">0.7600</td>
+<td id="T_62f96_row6_col2" class="data row6 col2">0.6468</td>
+<td id="T_62f96_row6_col3" class="data row6 col3">0.9868</td>
+<td id="T_62f96_row6_col4" class="data row6 col4">0.7658</td>
+<td id="T_62f96_row6_col5" class="data row6 col5">0.8624</td>
+<td id="T_62f96_row6_col6" class="data row6 col6">0.0316</td>
+<td id="T_62f96_row6_col7" class="data row6 col7">0.0690</td>
+<td id="T_62f96_row6_col8" class="data row6 col8">6.6620</td>
+</tr>
+<tr class="even">
+<td id="T_62f96_level0_row7" class="row_heading level0 row7" data-quarto-table-cell-role="th">lightgbm</td>
+<td id="T_62f96_row7_col0" class="data row7 col0">Light Gradient Boosting Machine</td>
+<td id="T_62f96_row7_col1" class="data row7 col1">0.7583</td>
+<td id="T_62f96_row7_col2" class="data row7 col2">0.6380</td>
+<td id="T_62f96_row7_col3" class="data row7 col3">0.9829</td>
+<td id="T_62f96_row7_col4" class="data row7 col4">0.7661</td>
+<td id="T_62f96_row7_col5" class="data row7 col5">0.8610</td>
+<td id="T_62f96_row7_col6" class="data row7 col6">0.0332</td>
+<td id="T_62f96_row7_col7" class="data row7 col7">0.0675</td>
+<td id="T_62f96_row7_col8" class="data row7 col8">0.1940</td>
+</tr>
+<tr class="odd">
+<td id="T_62f96_level0_row8" class="row_heading level0 row8" data-quarto-table-cell-role="th">nb</td>
+<td id="T_62f96_row8_col0" class="data row8 col0">Naive Bayes</td>
+<td id="T_62f96_row8_col1" class="data row8 col1">0.7540</td>
+<td id="T_62f96_row8_col2" class="data row8 col2">0.6470</td>
+<td id="T_62f96_row8_col3" class="data row8 col3">0.9608</td>
+<td id="T_62f96_row8_col4" class="data row8 col4">0.7720</td>
+<td id="T_62f96_row8_col5" class="data row8 col5">0.8561</td>
+<td id="T_62f96_row8_col6" class="data row8 col6">0.0727</td>
+<td id="T_62f96_row8_col7" class="data row8 col7">0.1019</td>
+<td id="T_62f96_row8_col8" class="data row8 col8">0.0250</td>
+</tr>
+<tr class="even">
+<td id="T_62f96_level0_row9" class="row_heading level0 row9" data-quarto-table-cell-role="th">xgboost</td>
+<td id="T_62f96_row9_col0" class="data row9 col0">Extreme Gradient Boosting</td>
+<td id="T_62f96_row9_col1" class="data row9 col1">0.7495</td>
+<td id="T_62f96_row9_col2" class="data row9 col2">0.6231</td>
+<td id="T_62f96_row9_col3" class="data row9 col3">0.9590</td>
+<td id="T_62f96_row9_col4" class="data row9 col4">0.7692</td>
+<td id="T_62f96_row9_col5" class="data row9 col5">0.8537</td>
+<td id="T_62f96_row9_col6" class="data row9 col6">0.0528</td>
+<td id="T_62f96_row9_col7" class="data row9 col7">0.0750</td>
+<td id="T_62f96_row9_col8" class="data row9 col8">0.8160</td>
+</tr>
+<tr class="odd">
+<td id="T_62f96_level0_row10" class="row_heading level0 row10" data-quarto-table-cell-role="th">qda</td>
+<td id="T_62f96_row10_col0" class="data row10 col0">Quadratic Discriminant Analysis</td>
+<td id="T_62f96_row10_col1" class="data row10 col1">0.7439</td>
+<td id="T_62f96_row10_col2" class="data row10 col2">0.6441</td>
+<td id="T_62f96_row10_col3" class="data row10 col3">0.9504</td>
+<td id="T_62f96_row10_col4" class="data row10 col4">0.7712</td>
+<td id="T_62f96_row10_col5" class="data row10 col5">0.8465</td>
+<td id="T_62f96_row10_col6" class="data row10 col6">0.0333</td>
+<td id="T_62f96_row10_col7" class="data row10 col7">0.0493</td>
+<td id="T_62f96_row10_col8" class="data row10 col8">0.0190</td>
+</tr>
+<tr class="even">
+<td id="T_62f96_level0_row11" class="row_heading level0 row11" data-quarto-table-cell-role="th">rf</td>
+<td id="T_62f96_row11_col0" class="data row11 col0">Random Forest Classifier</td>
+<td id="T_62f96_row11_col1" class="data row11 col1">0.7233</td>
+<td id="T_62f96_row11_col2" class="data row11 col2">0.5970</td>
+<td id="T_62f96_row11_col3" class="data row11 col3">0.8956</td>
+<td id="T_62f96_row11_col4" class="data row11 col4">0.7758</td>
+<td id="T_62f96_row11_col5" class="data row11 col5">0.8314</td>
+<td id="T_62f96_row11_col6" class="data row11 col6">0.0819</td>
+<td id="T_62f96_row11_col7" class="data row11 col7">0.0892</td>
+<td id="T_62f96_row11_col8" class="data row11 col8">1.3430</td>
+</tr>
+<tr class="odd">
+<td id="T_62f96_level0_row12" class="row_heading level0 row12" data-quarto-table-cell-role="th">knn</td>
+<td id="T_62f96_row12_col0" class="data row12 col0">K Neighbors Classifier</td>
+<td id="T_62f96_row12_col1" class="data row12 col1">0.7171</td>
+<td id="T_62f96_row12_col2" class="data row12 col2">0.5745</td>
+<td id="T_62f96_row12_col3" class="data row12 col3">0.8887</td>
+<td id="T_62f96_row12_col4" class="data row12 col4">0.7737</td>
+<td id="T_62f96_row12_col5" class="data row12 col5">0.8272</td>
+<td id="T_62f96_row12_col6" class="data row12 col6">0.0683</td>
+<td id="T_62f96_row12_col7" class="data row12 col7">0.0737</td>
+<td id="T_62f96_row12_col8" class="data row12 col8">0.0930</td>
+</tr>
+<tr class="even">
+<td id="T_62f96_level0_row13" class="row_heading level0 row13" data-quarto-table-cell-role="th">et</td>
+<td id="T_62f96_row13_col0" class="data row13 col0">Extra Trees Classifier</td>
+<td id="T_62f96_row13_col1" class="data row13 col1">0.7058</td>
+<td id="T_62f96_row13_col2" class="data row13 col2">0.5801</td>
+<td id="T_62f96_row13_col3" class="data row13 col3">0.8628</td>
+<td id="T_62f96_row13_col4" class="data row13 col4">0.7760</td>
+<td id="T_62f96_row13_col5" class="data row13 col5">0.8171</td>
+<td id="T_62f96_row13_col6" class="data row13 col6">0.0756</td>
+<td id="T_62f96_row13_col7" class="data row13 col7">0.0786</td>
+<td id="T_62f96_row13_col8" class="data row13 col8">0.6430</td>
+</tr>
+<tr class="odd">
+<td id="T_62f96_level0_row14" class="row_heading level0 row14" data-quarto-table-cell-role="th">dt</td>
+<td id="T_62f96_row14_col0" class="data row14 col0">Decision Tree Classifier</td>
+<td id="T_62f96_row14_col1" class="data row14 col1">0.6556</td>
+<td id="T_62f96_row14_col2" class="data row14 col2">0.5333</td>
+<td id="T_62f96_row14_col3" class="data row14 col3">0.7667</td>
+<td id="T_62f96_row14_col4" class="data row14 col4">0.7780</td>
+<td id="T_62f96_row14_col5" class="data row14 col5">0.7723</td>
+<td id="T_62f96_row14_col6" class="data row14 col6">0.0657</td>
+<td id="T_62f96_row14_col7" class="data row14 col7">0.0658</td>
+<td id="T_62f96_row14_col8" class="data row14 col8">0.0740</td>
+</tr>
+</tbody>
 </table>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="31">
@@ -1379,75 +1369,76 @@ Wall time: 269 ms</code></pre>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>new_predictions <span class="op">=</span> new_predictions[[<span class="st">'reviewText'</span>, <span class="st">'Topic_0'</span>, <span class="st">'Topic_0'</span>, <span class="st">'Topic_0'</span>, <span class="st">'Topic_0'</span>, <span class="st">'Positive'</span>, <span class="st">'Label'</span>]]</span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>new_predictions.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="33">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>reviewText</th>
-      <th>Topic_0</th>
-      <th>Topic_0</th>
-      <th>Topic_0</th>
-      <th>Topic_0</th>
-      <th>Positive</th>
-      <th>Label</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>60</th>
-      <td>who doesn't like angrybirds?but the paid version is better as it doesn't have all those annoying adds. blocking your shots!</td>
-      <td>0.085445</td>
-      <td>0.085445</td>
-      <td>0.085445</td>
-      <td>0.085445</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>159</th>
-      <td>Free and fun, what could be better?  The birds are angry, it's everything I expected, and anyway, those pigs had it coming!</td>
-      <td>0.079090</td>
-      <td>0.079090</td>
-      <td>0.079090</td>
-      <td>0.079090</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1294</th>
-      <td>I downloaded this to my tablet, as my phone is out of space. Very easy to read the latest tweets that way</td>
-      <td>0.118320</td>
-      <td>0.118320</td>
-      <td>0.118320</td>
-      <td>0.118320</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4352</th>
-      <td>I love this App and also use Out Of Milk via the website. It makes creating my lists and sharing it with others, quick and easy! It also keeps track of my cost as I add to is, making budgeting a breeze.</td>
-      <td>0.081643</td>
-      <td>0.081643</td>
-      <td>0.081643</td>
-      <td>0.081643</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>7016</th>
-      <td>its actualy saying wat I'm going through. its very fun and creative. I will be sure to use it everyday. no complaints. good job guys. :)</td>
-      <td>0.104748</td>
-      <td>0.104748</td>
-      <td>0.104748</td>
-      <td>0.104748</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">reviewText</th>
+<th data-quarto-table-cell-role="th">Topic_0</th>
+<th data-quarto-table-cell-role="th">Topic_0</th>
+<th data-quarto-table-cell-role="th">Topic_0</th>
+<th data-quarto-table-cell-role="th">Topic_0</th>
+<th data-quarto-table-cell-role="th">Positive</th>
+<th data-quarto-table-cell-role="th">Label</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">60</td>
+<td>who doesn't like angrybirds?but the paid version is better as it doesn't have all those annoying adds. blocking your shots!</td>
+<td>0.085445</td>
+<td>0.085445</td>
+<td>0.085445</td>
+<td>0.085445</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">159</td>
+<td>Free and fun, what could be better? The birds are angry, it's everything I expected, and anyway, those pigs had it coming!</td>
+<td>0.079090</td>
+<td>0.079090</td>
+<td>0.079090</td>
+<td>0.079090</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1294</td>
+<td>I downloaded this to my tablet, as my phone is out of space. Very easy to read the latest tweets that way</td>
+<td>0.118320</td>
+<td>0.118320</td>
+<td>0.118320</td>
+<td>0.118320</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4352</td>
+<td>I love this App and also use Out Of Milk via the website. It makes creating my lists and sharing it with others, quick and easy! It also keeps track of my cost as I add to is, making budgeting a breeze.</td>
+<td>0.081643</td>
+<td>0.081643</td>
+<td>0.081643</td>
+<td>0.081643</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7016</td>
+<td>its actualy saying wat I'm going through. its very fun and creative. I will be sure to use it everyday. no complaints. good job guys. :)</td>
+<td>0.104748</td>
+<td>0.104748</td>
+<td>0.104748</td>
+<td>0.104748</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1513,9 +1504,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1580,6 +1585,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1618,12 +1709,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
-    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -1636,7 +1727,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

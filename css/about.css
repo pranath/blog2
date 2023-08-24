@@ -1,4 +1,5 @@
-#quarto-margin-sidebar {
+#quarto-margin-sidebar,
+#quarto-sidebar-glass {
   display: none !important;
 }
 .page-layout-article main #mc_embed_signup form {

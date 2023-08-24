@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-08-17">
+<meta name="description" content="Evaluating a question and response system can help you improve its system design as well as the prompt and model quality. We tend to improve what we can measure, therefore verifying for correctness is a key focus. In this post, we will utilise LangSmith to test the accuracy of a Q&amp;A system against an example dataset.">
+
+<title>LivingDataLab - Measuring the Accuracy of an LLM based Question and Answering System</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Measuring the Accuracy of an LLM based Question and Answering System">
+<meta property="og:description" content="Evaluating a question and response system can help you improve its system design as well as the prompt and model quality. We tend to improve what we can measure, therefore verifying for correctness is a key focus. In this post, we will utilise LangSmith to test the accuracy of a Q&amp;A system against an example dataset.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/ai-eval2.png">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Measuring the Accuracy of an LLM based Question and Answering System">
+<meta name="twitter:description" content="Evaluating a question and response system can help you improve its system design as well as the prompt and model quality. We tend to improve what we can measure, therefore verifying for correctness is a key focus. In this post, we will utilise LangSmith to test the accuracy of a Q&amp;A system against an example dataset.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/ai-eval2.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Measuring the Accuracy of an LLM based Question and Answering System</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Measuring the Accuracy of an LLM based Question and Answering System</h1>
+                  <div>
+        <div class="description">
+          Evaluating a question and response system can help you improve its system design as well as the prompt and model quality. We tend to improve what we can measure, therefore verifying for correctness is a key focus. In this post, we will utilise LangSmith to test the accuracy of a Q&amp;A system against an example dataset.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">openai</div>
+                <div class="quarto-category">llm-evaluation</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 17, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites"><span class="header-section-number">2</span> Prerequisites</a></li>
+  <li><a href="#create-a-dataset" id="toc-create-a-dataset" class="nav-link" data-scroll-target="#create-a-dataset"><span class="header-section-number">3</span> Create a Dataset</a></li>
+  <li><a href="#define-rag-qa-system" id="toc-define-rag-qa-system" class="nav-link" data-scroll-target="#define-rag-qa-system"><span class="header-section-number">4</span> Define RAG Q&amp;A System</a></li>
+  <li><a href="#evaluate-the-chain" id="toc-evaluate-the-chain" class="nav-link" data-scroll-target="#evaluate-the-chain"><span class="header-section-number">5</span> Evaluate the Chain</a></li>
+  <li><a href="#iterate" id="toc-iterate" class="nav-link" data-scroll-target="#iterate"><span class="header-section-number">6</span> Iterate</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">7</span> Conclusion</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">8</span> Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Evaluating a question and response system can help you improve its system architecture as well as the prompt and model quality. We tend to improve what we can measure, therefore verifying for correctness is a key focus. One difficulty in gauging accuracy is that the responses are unstructured text. A Q&amp;A system can generate lengthy responses, rendering typical metrics like BLEU or ROUGE unreliable. In this case, employing a well-labeled dataset and llm-assisted assessors can help you rate the response quality of your system. This supplemented any human review and other measurements you may have already implemented.</p>
+<p>In an <a href="2023-08-16-langsmith-for-llm-application-evaluation.html">earlier article</a> we introduced Langsmith and how it can help with LLM-based application evaluation.</p>
+<p>In this post, we will utilise LangSmith to validate a Q&amp;A system against an example dataset. The main steps are as follows:</p>
+<ol type="1">
+<li>Create a dataset of questions and answers.</li>
+<li>Define your question and answering system.</li>
+<li>Run evaluation using LangSmith.</li>
+<li>Iterate to improve the system.</li>
+</ol>
+<p>The test run will be saved in a project along with all its feedback and links to every evaluator run.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith7.png" width="800"></p>
+<blockquote class="blockquote">
+<p><strong>Note 1:</strong> This walkthrough tests the end-to-end behavior of the system. Separately evaluating each component of system is still important! Many components, such as the retrievers, can be tested separately using standard retrieval metrics to complement this full integration test.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p><strong>Note 2:</strong> If your knowledge base is changing, make sure your answers are still correct! You can avoid this through some combination of independent testing of chain components, freezing the knowledge source used during testing, and regularly updating your dataset.</p>
+</blockquote>
+</section>
+<section id="prerequisites" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="prerequisites"><span class="header-section-number">2</span> Prerequisites</h2>
+<p>This tutorial uses OpenAI for the model, ChromaDB to store documents, and LangChain to compose the chain. To make sure the tracing and evals are set up for <a href="https://smith.langchain.com">LangSmith</a>, please configure your API Key appropriately.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %env LANGCHAIN_API_KEY=&lt;YOUR_API_KEY&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Install the required packages. <code>lxml</code> and <code>html2text</code> are used by the document loader.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %pip install -U "langchain[openai]" &gt; /dev/null</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># %pip install chromadb &gt; /dev/null</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># %pip install lxml &gt; /dev/null</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># %pip install html2text &gt; /dev/null</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %env OPENAI_API_KEY=&lt;YOUR-API-KEY&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-a-dataset" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="create-a-dataset"><span class="header-section-number">3</span> Create a Dataset</h2>
+<p>In our case, we will compare a Q&amp;A system to the LangSmith documentation. To calculate aggregate accuracy, we’ll need to compile a list of example question-answer paris. To demonstrate the procedure, we’ve hard-coded several examples below. In general, you’ll need a lot more pairs (&gt;100) to get relevant results. Drawing from actual inquiries can help to create a more accurate portrayal of the domain.</p>
+<p>Below, we have hard-coded several question-answer pairs to assess and created each example row using the client’s ‘create_example’ method.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We have some hard-coded examples here.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>examples <span class="op">=</span> [</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"What is LangChain?"</span>, <span class="st">"LangChain is an open-source framework for building applications using large language models. It is also the name of the company building LangSmith."</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"How might I query for all runs in a project?"</span>, <span class="st">"client.list_runs(project_name='my-project-name'), or in TypeScript, client.ListRuns({projectName: 'my-project-anme'})"</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"What's a langsmith dataset?"</span>, <span class="st">"A LangSmith dataset is a collection of examples. Each example contains inputs and optional expected outputs or references for that data point."</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"How do I use a traceable decorator?"</span>, <span class="st">"""The traceable decorator is available in the langsmith python SDK. To use, configure your environment with your API key,</span><span class="ch">\</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">import the required function, decorate your function, and then call the function. Below is an example:</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">```python</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="st">from langsmith.run_helpers import traceable</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="st">@traceable(run_type="chain") # or "llm", etc.</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="st">def my_function(input_param):</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="st">    # Function logic goes here</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="st">    return output</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="st">result = my_function(input_param)</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="st">```"""</span>),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Can I trace my Llama V2 llm?"</span>, <span class="st">"So long as you are using one of LangChain's LLM implementations, all your calls can be traced"</span>),</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Why do I have to set environment variables?"</span>, <span class="st">"Environment variables can tell your LangChain application to perform tracing and contain the information necessary to authenticate to LangSmith."</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>     <span class="st">" While there are other ways to connect, environment variables tend to be the simplest way to configure your application."</span>),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"How do I move my project between organizations?"</span>, <span class="st">"LangSmith doesn't directly support moving projects between organizations."</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langsmith <span class="im">import</span> Client</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> Client()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dataset_name <span class="op">=</span> <span class="st">"Retrieval QA Questions"</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> client.create_dataset(dataset_name<span class="op">=</span>dataset_name)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> q, a <span class="kw">in</span> examples:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    client.create_example(inputs<span class="op">=</span>{<span class="st">"question"</span>: q}, outputs<span class="op">=</span>{<span class="st">"answer"</span>: a}, dataset_id<span class="op">=</span>dataset.<span class="bu">id</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="define-rag-qa-system" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="define-rag-qa-system"><span class="header-section-number">4</span> Define RAG Q&amp;A System</h2>
+<p>Our Q&amp;A system employs a straightforward retriever and an LLM response generator. To further simplify, the chain will consist of:</p>
+<ol type="1">
+<li>A <a href="https://api.python.langchain.com/en/latest/vectorstores/langchain.vectorstores.base.VectorStoreRetriever.html#langchain.vectorstores.base.VectorStoreRetriever">VectorStoreRetriever</a> to retrieve documents. This uses:
+<ul>
+<li>An embedding model to vectorize documents and user queries for retrieval. In this case, the <a href="https://api.python.langchain.com/en/latest/embeddings/langchain.embeddings.openai.OpenAIEmbeddings.html">OpenAIEmbeddings</a> model.</li>
+<li>A vectorstore, in this case we will use <a href="https://api.python.langchain.com/en/latest/vectorstores/langchain.vectorstores.chroma.Chroma.html#langchain.vectorstores.chroma.Chroma">Chroma</a></li>
+</ul></li>
+<li>A response generator. This uses:
+<ul>
+<li>A <a href="https://api.python.langchain.com/en/latest/prompts/langchain.prompts.chat.ChatPromptTemplate.html#langchain.prompts.chat.ChatPromptTemplate">ChatPromptTemplate</a> to combine the query and documents.</li>
+<li>An LLM, in this case, the 16k token context window version of <code>gpt-3.5-turbo</code> via <a href="https://api.python.langchain.com/en/latest/chat_models/langchain.chat_models.openai.ChatOpenAI.html#langchain.chat_models.openai.ChatOpenAI">ChatOpenAI</a>.</li>
+</ul></li>
+</ol>
+<p>We will combine them using LangChain’s <a href="https://python.langchain.com/docs/guides/expression_language/cookbook">expression syntax</a>.</p>
+<p>First, load the documents to populate the vectorstore:</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.document_loaders <span class="im">import</span> RecursiveUrlLoader</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.document_transformers <span class="im">import</span> Html2TextTransformer</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.text_splitter <span class="im">import</span> TokenTextSplitter</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.embeddings <span class="im">import</span> OpenAIEmbeddings</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.vectorstores <span class="im">import</span> Chroma</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>api_loader <span class="op">=</span> RecursiveUrlLoader(<span class="st">"https://docs.smith.langchain.com"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>text_splitter <span class="op">=</span> TokenTextSplitter(</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    model_name<span class="op">=</span><span class="st">"gpt-3.5-turbo"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    chunk_size<span class="op">=</span><span class="dv">2000</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    chunk_overlap<span class="op">=</span><span class="dv">200</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>doc_transformer <span class="op">=</span> Html2TextTransformer()</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>raw_documents <span class="op">=</span> api_loader.load()</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>transformed <span class="op">=</span> doc_transformer.transform_documents(raw_documents)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>documents <span class="op">=</span> text_splitter.split_documents(transformed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/bs4/builder/__init__.py:545: XMLParsedAsHTMLWarning: It looks like you're parsing an XML document using an HTML parser. If this really is an HTML document (maybe it's XHTML?), you can ignore or filter this warning. If it's XML, you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the lxml package installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+  warnings.warn(</code></pre>
+</div>
+</div>
+<p>With the documents prepared, create the vectorstore retriever. This is what will be used to provide context when generating a response.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>embeddings <span class="op">=</span> OpenAIEmbeddings()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>vectorstore <span class="op">=</span> Chroma.from_documents(documents, embeddings)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>retriever <span class="op">=</span> vectorstore.as_retriever(search_kwargs<span class="op">=</span>{<span class="st">"k"</span>: <span class="dv">4</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next up, we’ll define the response generator. This responds to the user by injecting the retrieved documents and the user query into a prompt template.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.prompts <span class="im">import</span> ChatPromptTemplate</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.schema.output_parser <span class="im">import</span> StrOutputParser</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> ChatPromptTemplate.from_messages(</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"system"</span>, <span class="st">"You are a helpful documentation Q&amp;A assistant, trained to answer"</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">" questions from LangSmith's documentation."</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">" LangChain is a framework for building applications using large language models."</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"</span><span class="ch">\n</span><span class="st">The current time is </span><span class="sc">{time}</span><span class="st">.</span><span class="ch">\n\n</span><span class="st">Relevant documents will be retrieved in the following messages."</span>),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"system"</span>, <span class="st">"</span><span class="sc">{context}</span><span class="st">"</span>),</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"human"</span>,<span class="st">"</span><span class="sc">{question}</span><span class="st">"</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    ).partial(time<span class="op">=</span><span class="bu">str</span>(datetime.now()))</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ChatOpenAI(model<span class="op">=</span><span class="st">"gpt-3.5-turbo-16k"</span>, temperature<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>response_generator <span class="op">=</span> (</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    prompt </span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> model </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> StrOutputParser()</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Finally, assemble the full chain!</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The full chain looks like the following</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> operator <span class="im">import</span> itemgetter</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> (</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The runnable map here routes the original inputs to a context and a question dictionary to pass to the response generator</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"context"</span>: itemgetter(<span class="st">"question"</span>) <span class="op">|</span> retriever <span class="op">|</span> (<span class="kw">lambda</span> docs: <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join([doc.page_content <span class="cf">for</span> doc <span class="kw">in</span> docs])),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"question"</span>: itemgetter(<span class="st">"question"</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> response_generator</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-tags="[]" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> tok <span class="kw">in</span> chain.stream({<span class="st">"question"</span>: <span class="st">"How do I log user feedback to a run?"</span>}):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(tok, end<span class="op">=</span><span class="st">""</span>, flush<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>To log user feedback to a run, you can use the LangSmith client or the REST API. Here's an example of how to log user feedback using the LangSmith client in Python:
+
+```python
+from langsmith import Client
+
+client = Client()
+feedback = client.create_feedback(
+    "&lt;run_id&gt;",
+    "&lt;feedback_key&gt;",
+    score=True,
+    comment="This is a positive feedback from the user."
+)
+```
+
+In this example, you need to replace `&lt;run_id&gt;` with the ID of the run you want to log feedback for, and `&lt;feedback_key&gt;` with a key that represents the type of feedback you want to log (e.g., "positive", "negative", "accuracy", etc.). You can also provide additional information such as a score, comment, and other optional fields.
+
+Make sure you have the necessary environment variables set up for the LangSmith client to authenticate with the LangSmith API.
+
+If you prefer to use the REST API directly, you can make a POST request to the `/feedback` endpoint with the necessary parameters.
+
+Remember that logging user feedback is an important step in improving your LLM application and ensuring a high-quality user experience.</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluate-the-chain" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="evaluate-the-chain"><span class="header-section-number">5</span> Evaluate the Chain</h2>
+<p>We will use the off-the-shelf QA evaluator to measure the correctness of the retrieval Q&amp;A responses</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.smith <span class="im">import</span> RunEvalConfig</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>eval_config <span class="op">=</span> RunEvalConfig(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    evaluators<span class="op">=</span>[<span class="st">"qa"</span>],</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If you want to configure the eval LLM:</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># eval_llm=ChatAnthropic(model="claude-2", temperature=0)</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Run the evaluation. This makes predictions over the dataset and then uses the “QA” evaluator to check the correctness on each data point.</p>
+<div class="cell" data-scrolled="true" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> <span class="cf">await</span> client.arun_on_dataset(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span>dataset_name,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    llm_or_chain_factory<span class="op">=</span><span class="kw">lambda</span>: chain,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    evaluation<span class="op">=</span>eval_config,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>View the evaluation results for project '6ed4213fc4c54b3fbcfdd9cba14e87f0-RunnableSequence' at:
+https://smith.langchain.com/projects/p/da05d8be-995f-4ee7-8d1b-ce8943bb085e?eval=true</code></pre>
+</div>
+</div>
+<p>You can visit to the produced “test run” project to examine the chain’s outputs, evaluator feedback, and connections to the evaluation traces as the test run progresses.</p>
+<p>You can filter the results depending on feedback metrics from the test project page. For example, in the filters section, click on “Correctness==0” to show the instances designated as inaccurate.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith8.png" width="800"></p>
+<p>After you’ve filtered the results, you can view the traces and triage where the chain failed by clicking on the individual runs. You may see for yourself by clicking on the image below. By selecting the “Feedback” option, you may view the evaluation results for this run.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith9.png" width="800"></p>
+<p>To view the trace of the evaluator run, click the link underlined in red above. Because LLM-assisted evaluations are flawed, analysing their traces allows you to evaluate the feedback decisions and choose when and how to modify the prompt to your individual use case.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith10.png" width="800"></p>
+<p>This trace was marked as “incorrect”. It looks like the chain is making up information, or “hallucinating.” If you click on the <code>ChatOpenAI</code> run in your own test project, you can open it in the playground to experiment with changes that may address this error.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith11.png" width="800"></p>
+<p>Let’s try tweaking the prompt to better instruct the model. We’ll add an additional system message to remind the model to only respond based on the retrieved documents. Click “Add Message” and paste in the following text:</p>
+<blockquote class="blockquote">
+<p>Respond as best as you can. If no documents are retrieved or if you do not see an answer in the retrieved documents, admit you do not know or that you don’t see it being supported at the moment.</p>
+</blockquote>
+<p>Click “Submit” to view the results streamed to the message in the right column. If you haven’t already added your OpenAI key, you can do so using the “Secrets &amp; API Keys” button.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith12.png" width="800"></p>
+<p>That seems to have the desired effect for this data point, but we want to be careful that we’re not overfitting to a single example. We’ll want to re-evaluate to confirm.</p>
+</section>
+<section id="iterate" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="iterate"><span class="header-section-number">6</span> Iterate</h2>
+<p>The chain performed well, and in the previous part, we were able to use the playground to generate a potential solution to the problem. Let’s re-run the evaluation with the updated prompt to see how it does overall. We’ve duplicated the chain code below and added an additional system message to the chat prompt template:</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> ChatPromptTemplate.from_messages(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"system"</span>, <span class="st">"You are a helpful documentation Q&amp;A assistant, trained to answer"</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">" questions from LangSmith's documentation."</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"</span><span class="ch">\n</span><span class="st">The current time is </span><span class="sc">{time}</span><span class="st">.</span><span class="ch">\n\n</span><span class="st">Relevant documents will be retrieved in the following messages."</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"system"</span>, <span class="st">"</span><span class="sc">{context}</span><span class="st">"</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"human"</span>,<span class="st">"</span><span class="sc">{question}</span><span class="st">"</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Add the new system message here:</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"system"</span>, <span class="st">"Respond as best as you can. If no documents are retrieved or if you do not see an answer in the retrieved documents,"</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>             <span class="st">" admit you do not know or that you don't see it being supported at the moment."</span>),</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    ).partial(time<span class="op">=</span><span class="kw">lambda</span>: <span class="bu">str</span>(datetime.now()))</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ChatOpenAI(model<span class="op">=</span><span class="st">"gpt-3.5-turbo-16k"</span>, temperature<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>response_generator_2 <span class="op">=</span> (</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    prompt </span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> model </span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> StrOutputParser()</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>chain_2 <span class="op">=</span> (</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"context"</span>: itemgetter(<span class="st">"question"</span>) <span class="op">|</span> retriever <span class="op">|</span> (<span class="kw">lambda</span> docs: <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join([doc.page_content <span class="cf">for</span> doc <span class="kw">in</span> docs])),</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">"question"</span>: itemgetter(<span class="st">"question"</span>)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> response_generator_2</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Rerun the evaluation and check out the results as they become available.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> <span class="cf">await</span> client.arun_on_dataset(</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span>dataset_name,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    llm_or_chain_factory<span class="op">=</span><span class="kw">lambda</span>: chain_2,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    evaluation<span class="op">=</span>eval_config,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>View the evaluation results for project 'e42329ecc0c3492282fe02bead607ce9-RunnableSequence' at:
+https://smith.langchain.com/projects/p/e42be46d-a0e3-40f6-ac58-59bcb70c3e6a?eval=true</code></pre>
+</div>
+</div>
+<p>We can now begin comparing findings. To see the aggregate feedback metrics for each test run, go to the “Retrieval QA Questions” dataset page. Click the datasets &amp; testing icon on the left bar to view your datasets.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith13.png" width="800"></p>
+<p>It appears that the new chain is now passing all of the cases. Remember that this illustrative dataset is too tiny to provide a thorough picture of the chain’s performance. We may add more examples to the dataset as we continue to prototype this chain.</p>
+<p>You can view specific forecasts on each row in addition to the aggregate feedback metrics. To view each row in the dataset, select the “Examples” tab. When you click on a specific example, it will display the results of both test runs for that data point. You may rapidly compare forecasts across chain versions using the linked runs table to get an idea of the types of outputs you might expect. You can re-view the full traces by clicking on each connected run.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith14.png" width="800"></p>
+</section>
+<section id="conclusion" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">7</span> Conclusion</h2>
+<p>You’ve just completed a fast assessment of the accuracy of your Q&amp;A system. You used LangSmith in this post to uncover problems in a RAG pipeline and make immediate changes to improve the chain’s performance. You’ve also learnt about evaluator feedback and how to use it into your LLM app development process. This is an excellent place to start when it comes to enhancing the consistency of your LLM applications.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">8</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://github.com/langchain-ai/langsmith-cookbook/">Langsmith Cookbook Repo</a> and acknowledge the use of some images and other materials from this project in writing this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>

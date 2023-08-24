@@ -1,0 +1,14 @@
+- Build more langchain apps:
+- find best model for now
+-  all chats with history, named entity recognition, whatsapp chat, slack chatbot, autonomous agent
+
+whatsapp
+https://python.langchain.com/en/latest/modules/indexes/document_loaders/examples/whatsapp_chat.html
+https://searchwith.ai/blog/create-your-own-chatgpt-ai-assistant-on-whatsapp/
+
+twitter
+https://github.com/Yongtae723/chat-your-data
+https://python.langchain.com/en/latest/modules/indexes/document_loaders/examples/twitter.html
+https://github.com/curiousily/CryptoGPT-Crypto-Twitter-Sentiment-Analysis-with-ChatGPT-and-LangChain
+https://docs.tweepy.org/en/stable/client.html#follows
+https://www.geeksforgeeks.org/python-api-followers-in-tweepy/

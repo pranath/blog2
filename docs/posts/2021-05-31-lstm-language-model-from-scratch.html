@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,9 +20,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -49,43 +50,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -122,7 +93,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -146,11 +118,11 @@ ga('send', {
 
 <link rel="stylesheet" href="../css/styles.css">
 <meta property="og:title" content="LivingDataLab - Building an LSTM Language Model from scratch">
-<meta property="og:description" content="In this article we will look at how we build an LSTM language model from scratch that is able to predict the next word in a sequence of words.">
+<meta property="og:description" content="In this article we will look at how we build an LSTM language model from scratch that is able to predict the next word in a sequence of words. This covers all the details of how to build the AWD-LSTM architecture.">
 <meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/LSTM.png">
 <meta property="og:site-name" content="LivingDataLab">
 <meta name="twitter:title" content="LivingDataLab - Building an LSTM Language Model from scratch">
-<meta name="twitter:description" content="In this article we will look at how we build an LSTM language model from scratch that is able to predict the next word in a sequence of words.">
+<meta name="twitter:description" content="In this article we will look at how we build an LSTM language model from scratch that is able to predict the next word in a sequence of words. This covers all the details of how to build the AWD-LSTM architecture.">
 <meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/LSTM.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -169,54 +141,58 @@ ga('send', {
     <span class="navbar-title">LivingDataLab</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html">
+    <a class="nav-link" href="../index.html" rel="" target="">
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../projects.html" aria-current="page">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
  <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html">
+    <a class="nav-link" href="../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/"><i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/LivingDataLab"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pranath"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../index.xml"><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Building an LSTM Language Model from scratch</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Building an LSTM Language Model from scratch</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -224,7 +200,7 @@ ga('send', {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">Building an LSTM Language Model from scratch</h1>
+      <h1 class="title">Building an LSTM Language Model from scratch</h1>
                   <div>
         <div class="description">
           In this article we will look at how we build an LSTM language model from scratch that is able to predict the next word in a sequence of words. This covers all the details of how to build the AWD-LSTM architecture.
@@ -260,50 +236,58 @@ ga('send', {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects.html" class="sidebar-item-text sidebar-link">Projects Overview</a>
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Projects</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">Document Chat</a>
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">Document Summarisation</a>
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">Web Page Chat</a>
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">Web Page Summarisation</a>
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">YouTube Chat</a>
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">YouTube Summarisation</a>
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
   </div>
 </li>
       </ul>
@@ -311,6 +295,7 @@ ga('send', {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
 <!-- Begin Mailchimp Signup Form -->
@@ -351,19 +336,19 @@ ga('send', {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="toc-section-number">2</span>  Dataset</a></li>
-  <li><a href="#language-model-1---linear-neural-network" id="toc-language-model-1---linear-neural-network" class="nav-link" data-scroll-target="#language-model-1---linear-neural-network"><span class="toc-section-number">3</span>  Language Model 1 - Linear Neural Network</a></li>
-  <li><a href="#language-model-2---recurrent-neural-network" id="toc-language-model-2---recurrent-neural-network" class="nav-link" data-scroll-target="#language-model-2---recurrent-neural-network"><span class="toc-section-number">4</span>  Language Model 2 - Recurrent Neural Network</a></li>
-  <li><a href="#language-model-3---a-better-rnn" id="toc-language-model-3---a-better-rnn" class="nav-link" data-scroll-target="#language-model-3---a-better-rnn"><span class="toc-section-number">5</span>  Language Model 3 - A better RNN</a></li>
-  <li><a href="#language-model-4---creating-more-signal" id="toc-language-model-4---creating-more-signal" class="nav-link" data-scroll-target="#language-model-4---creating-more-signal"><span class="toc-section-number">6</span>  Language Model 4 - Creating more signal</a></li>
-  <li><a href="#language-model-5---multi-layer-rnn" id="toc-language-model-5---multi-layer-rnn" class="nav-link" data-scroll-target="#language-model-5---multi-layer-rnn"><span class="toc-section-number">7</span>  Language Model 5 - Multi-layer RNN</a></li>
-  <li><a href="#language-model-6---lstms" id="toc-language-model-6---lstms" class="nav-link" data-scroll-target="#language-model-6---lstms"><span class="toc-section-number">8</span>  Language Model 6 - LSTM’s</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="header-section-number">2</span> Dataset</a></li>
+  <li><a href="#language-model-1---linear-neural-network" id="toc-language-model-1---linear-neural-network" class="nav-link" data-scroll-target="#language-model-1---linear-neural-network"><span class="header-section-number">3</span> Language Model 1 - Linear Neural Network</a></li>
+  <li><a href="#language-model-2---recurrent-neural-network" id="toc-language-model-2---recurrent-neural-network" class="nav-link" data-scroll-target="#language-model-2---recurrent-neural-network"><span class="header-section-number">4</span> Language Model 2 - Recurrent Neural Network</a></li>
+  <li><a href="#language-model-3---a-better-rnn" id="toc-language-model-3---a-better-rnn" class="nav-link" data-scroll-target="#language-model-3---a-better-rnn"><span class="header-section-number">5</span> Language Model 3 - A better RNN</a></li>
+  <li><a href="#language-model-4---creating-more-signal" id="toc-language-model-4---creating-more-signal" class="nav-link" data-scroll-target="#language-model-4---creating-more-signal"><span class="header-section-number">6</span> Language Model 4 - Creating more signal</a></li>
+  <li><a href="#language-model-5---multi-layer-rnn" id="toc-language-model-5---multi-layer-rnn" class="nav-link" data-scroll-target="#language-model-5---multi-layer-rnn"><span class="header-section-number">7</span> Language Model 5 - Multi-layer RNN</a></li>
+  <li><a href="#language-model-6---lstms" id="toc-language-model-6---lstms" class="nav-link" data-scroll-target="#language-model-6---lstms"><span class="header-section-number">8</span> Language Model 6 - LSTM’s</a>
   <ul class="collapse">
-  <li><a href="#the-4-gates-of-an-lstm" id="toc-the-4-gates-of-an-lstm" class="nav-link" data-scroll-target="#the-4-gates-of-an-lstm"><span class="toc-section-number">8.1</span>  The 4 Gates of an LSTM</a></li>
+  <li><a href="#the-4-gates-of-an-lstm" id="toc-the-4-gates-of-an-lstm" class="nav-link" data-scroll-target="#the-4-gates-of-an-lstm"><span class="header-section-number">8.1</span> The 4 Gates of an LSTM</a></li>
   </ul></li>
-  <li><a href="#language-model-7---weight-tied-regularized-lstms" id="toc-language-model-7---weight-tied-regularized-lstms" class="nav-link" data-scroll-target="#language-model-7---weight-tied-regularized-lstms"><span class="toc-section-number">9</span>  Language Model 7 - Weight-Tied Regularized LSTM’s</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">10</span>  Conclusion</a></li>
+  <li><a href="#language-model-7---weight-tied-regularized-lstms" id="toc-language-model-7---weight-tied-regularized-lstms" class="nav-link" data-scroll-target="#language-model-7---weight-tied-regularized-lstms"><span class="header-section-number">9</span> Language Model 7 - Weight-Tied Regularized LSTM’s</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">10</span> Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -485,47 +470,46 @@ ga('send', {
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                metrics<span class="op">=</span>accuracy)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">4</span>, <span class="fl">1e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>accuracy</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>1.824297</td>
-      <td>1.970941</td>
-      <td>0.467554</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>1.386973</td>
-      <td>1.823242</td>
-      <td>0.467554</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>1.417556</td>
-      <td>1.654497</td>
-      <td>0.494414</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1.376440</td>
-      <td>1.650849</td>
-      <td>0.494414</td>
-      <td>00:01</td>
-    </tr>
-  </tbody>
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>1.824297</td>
+<td>1.970941</td>
+<td>0.467554</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.386973</td>
+<td>1.823242</td>
+<td>0.467554</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.417556</td>
+<td>1.654497</td>
+<td>0.494414</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.376440</td>
+<td>1.650849</td>
+<td>0.494414</td>
+<td>00:01</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -564,47 +548,46 @@ ga('send', {
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                metrics<span class="op">=</span>accuracy)</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">4</span>, <span class="fl">1e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>accuracy</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>1.816274</td>
-      <td>1.964143</td>
-      <td>0.460185</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>1.423805</td>
-      <td>1.739964</td>
-      <td>0.473259</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>1.430327</td>
-      <td>1.685172</td>
-      <td>0.485382</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1.388390</td>
-      <td>1.657033</td>
-      <td>0.470406</td>
-      <td>00:01</td>
-    </tr>
-  </tbody>
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>1.816274</td>
+<td>1.964143</td>
+<td>0.460185</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.423805</td>
+<td>1.739964</td>
+<td>0.473259</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.430327</td>
+<td>1.685172</td>
+<td>0.485382</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.388390</td>
+<td>1.657033</td>
+<td>0.470406</td>
+<td>00:01</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -666,89 +649,88 @@ ga('send', {
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                metrics<span class="op">=</span>accuracy, cbs<span class="op">=</span>ModelResetter)</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">10</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>accuracy</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>1.708583</td>
-      <td>1.873094</td>
-      <td>0.401202</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>1.264271</td>
-      <td>1.781330</td>
-      <td>0.433173</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>1.087642</td>
-      <td>1.535732</td>
-      <td>0.521875</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1.007973</td>
-      <td>1.578549</td>
-      <td>0.542308</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>0.945740</td>
-      <td>1.660635</td>
-      <td>0.569231</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>0.902835</td>
-      <td>1.605541</td>
-      <td>0.551923</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>0.878297</td>
-      <td>1.527385</td>
-      <td>0.579087</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>0.814197</td>
-      <td>1.451913</td>
-      <td>0.606250</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>8</td>
-      <td>0.783523</td>
-      <td>1.509463</td>
-      <td>0.604087</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>9</td>
-      <td>0.763500</td>
-      <td>1.511033</td>
-      <td>0.608413</td>
-      <td>00:01</td>
-    </tr>
-  </tbody>
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>1.708583</td>
+<td>1.873094</td>
+<td>0.401202</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.264271</td>
+<td>1.781330</td>
+<td>0.433173</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.087642</td>
+<td>1.535732</td>
+<td>0.521875</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.007973</td>
+<td>1.578549</td>
+<td>0.542308</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.945740</td>
+<td>1.660635</td>
+<td>0.569231</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>0.902835</td>
+<td>1.605541</td>
+<td>0.551923</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0.878297</td>
+<td>1.527385</td>
+<td>0.579087</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.814197</td>
+<td>1.451913</td>
+<td>0.606250</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.783523</td>
+<td>1.509463</td>
+<td>0.604087</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.763500</td>
+<td>1.511033</td>
+<td>0.608413</td>
+<td>00:01</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -808,124 +790,123 @@ ga('send', {
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>                metrics<span class="op">=</span>accuracy, cbs<span class="op">=</span>ModelResetter)</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">15</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>accuracy</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>3.226453</td>
-      <td>3.039626</td>
-      <td>0.200033</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2.295425</td>
-      <td>1.925965</td>
-      <td>0.439697</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>1.743091</td>
-      <td>1.818798</td>
-      <td>0.423258</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1.471100</td>
-      <td>1.779967</td>
-      <td>0.467285</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>1.267640</td>
-      <td>1.823129</td>
-      <td>0.504883</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>1.100705</td>
-      <td>1.991244</td>
-      <td>0.500814</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>0.960767</td>
-      <td>2.086404</td>
-      <td>0.545085</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>0.857365</td>
-      <td>2.240561</td>
-      <td>0.556803</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>8</td>
-      <td>0.776844</td>
-      <td>2.004017</td>
-      <td>0.568766</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>9</td>
-      <td>0.711604</td>
-      <td>1.991193</td>
-      <td>0.588949</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>10</td>
-      <td>0.659614</td>
-      <td>2.064157</td>
-      <td>0.585775</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>11</td>
-      <td>0.619464</td>
-      <td>2.033359</td>
-      <td>0.606283</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>12</td>
-      <td>0.587681</td>
-      <td>2.100323</td>
-      <td>0.614176</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>13</td>
-      <td>0.565472</td>
-      <td>2.145048</td>
-      <td>0.603760</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>14</td>
-      <td>0.553879</td>
-      <td>2.149167</td>
-      <td>0.605550</td>
-      <td>00:00</td>
-    </tr>
-  </tbody>
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>3.226453</td>
+<td>3.039626</td>
+<td>0.200033</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2.295425</td>
+<td>1.925965</td>
+<td>0.439697</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.743091</td>
+<td>1.818798</td>
+<td>0.423258</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.471100</td>
+<td>1.779967</td>
+<td>0.467285</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>1.267640</td>
+<td>1.823129</td>
+<td>0.504883</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>1.100705</td>
+<td>1.991244</td>
+<td>0.500814</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0.960767</td>
+<td>2.086404</td>
+<td>0.545085</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.857365</td>
+<td>2.240561</td>
+<td>0.556803</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.776844</td>
+<td>2.004017</td>
+<td>0.568766</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.711604</td>
+<td>1.991193</td>
+<td>0.588949</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>0.659614</td>
+<td>2.064157</td>
+<td>0.585775</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>0.619464</td>
+<td>2.033359</td>
+<td>0.606283</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>0.587681</td>
+<td>2.100323</td>
+<td>0.614176</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>0.565472</td>
+<td>2.145048</td>
+<td>0.603760</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td>0.553879</td>
+<td>2.149167</td>
+<td>0.605550</td>
+<td>00:00</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -956,124 +937,123 @@ ga('send', {
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>                metrics<span class="op">=</span>accuracy, cbs<span class="op">=</span>ModelResetter)</span>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">15</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>accuracy</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>3.008033</td>
-      <td>2.559917</td>
-      <td>0.449707</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2.113339</td>
-      <td>1.726179</td>
-      <td>0.471273</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>1.688941</td>
-      <td>1.823044</td>
-      <td>0.389648</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1.466082</td>
-      <td>1.699160</td>
-      <td>0.462646</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>1.319908</td>
-      <td>1.701673</td>
-      <td>0.516764</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>1.177464</td>
-      <td>1.837683</td>
-      <td>0.543050</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>1.041084</td>
-      <td>2.043768</td>
-      <td>0.554688</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>0.923601</td>
-      <td>2.067982</td>
-      <td>0.549886</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>8</td>
-      <td>0.819859</td>
-      <td>2.061354</td>
-      <td>0.562988</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>9</td>
-      <td>0.735049</td>
-      <td>2.076721</td>
-      <td>0.568685</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>10</td>
-      <td>0.664878</td>
-      <td>2.080706</td>
-      <td>0.570231</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>11</td>
-      <td>0.614425</td>
-      <td>2.117641</td>
-      <td>0.586263</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>12</td>
-      <td>0.577034</td>
-      <td>2.142265</td>
-      <td>0.588053</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>13</td>
-      <td>0.554870</td>
-      <td>2.124338</td>
-      <td>0.591227</td>
-      <td>00:00</td>
-    </tr>
-    <tr>
-      <td>14</td>
-      <td>0.543019</td>
-      <td>2.121613</td>
-      <td>0.590658</td>
-      <td>00:00</td>
-    </tr>
-  </tbody>
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>3.008033</td>
+<td>2.559917</td>
+<td>0.449707</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2.113339</td>
+<td>1.726179</td>
+<td>0.471273</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.688941</td>
+<td>1.823044</td>
+<td>0.389648</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.466082</td>
+<td>1.699160</td>
+<td>0.462646</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>1.319908</td>
+<td>1.701673</td>
+<td>0.516764</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>1.177464</td>
+<td>1.837683</td>
+<td>0.543050</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>1.041084</td>
+<td>2.043768</td>
+<td>0.554688</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.923601</td>
+<td>2.067982</td>
+<td>0.549886</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.819859</td>
+<td>2.061354</td>
+<td>0.562988</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.735049</td>
+<td>2.076721</td>
+<td>0.568685</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>0.664878</td>
+<td>2.080706</td>
+<td>0.570231</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>0.614425</td>
+<td>2.117641</td>
+<td>0.586263</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>0.577034</td>
+<td>2.142265</td>
+<td>0.588053</td>
+<td>00:00</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>0.554870</td>
+<td>2.124338</td>
+<td>0.591227</td>
+<td>00:00</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td>0.543019</td>
+<td>2.121613</td>
+<td>0.590658</td>
+<td>00:00</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -1190,124 +1170,123 @@ ga('send', {
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                metrics<span class="op">=</span>accuracy, cbs<span class="op">=</span>ModelResetter)</span>
 <span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">15</span>, <span class="fl">1e-2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>accuracy</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>3.007779</td>
-      <td>2.770814</td>
-      <td>0.284017</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2.204949</td>
-      <td>1.782870</td>
-      <td>0.425944</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>1.606196</td>
-      <td>1.831585</td>
-      <td>0.462402</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1.296969</td>
-      <td>1.999463</td>
-      <td>0.479411</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>1.080299</td>
-      <td>1.889699</td>
-      <td>0.553141</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>0.828938</td>
-      <td>1.813550</td>
-      <td>0.593262</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>0.623377</td>
-      <td>1.710710</td>
-      <td>0.662516</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>0.479048</td>
-      <td>1.723749</td>
-      <td>0.687663</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>8</td>
-      <td>0.350940</td>
-      <td>1.458227</td>
-      <td>0.718913</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>9</td>
-      <td>0.260764</td>
-      <td>1.484386</td>
-      <td>0.732096</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>10</td>
-      <td>0.201649</td>
-      <td>1.384711</td>
-      <td>0.752523</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>11</td>
-      <td>0.158970</td>
-      <td>1.384149</td>
-      <td>0.753011</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>12</td>
-      <td>0.132954</td>
-      <td>1.377875</td>
-      <td>0.750244</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>13</td>
-      <td>0.117867</td>
-      <td>1.367185</td>
-      <td>0.756104</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>14</td>
-      <td>0.109761</td>
-      <td>1.366078</td>
-      <td>0.756104</td>
-      <td>00:01</td>
-    </tr>
-  </tbody>
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>3.007779</td>
+<td>2.770814</td>
+<td>0.284017</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2.204949</td>
+<td>1.782870</td>
+<td>0.425944</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.606196</td>
+<td>1.831585</td>
+<td>0.462402</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.296969</td>
+<td>1.999463</td>
+<td>0.479411</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>1.080299</td>
+<td>1.889699</td>
+<td>0.553141</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>0.828938</td>
+<td>1.813550</td>
+<td>0.593262</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0.623377</td>
+<td>1.710710</td>
+<td>0.662516</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.479048</td>
+<td>1.723749</td>
+<td>0.687663</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.350940</td>
+<td>1.458227</td>
+<td>0.718913</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.260764</td>
+<td>1.484386</td>
+<td>0.732096</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>0.201649</td>
+<td>1.384711</td>
+<td>0.752523</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>0.158970</td>
+<td>1.384149</td>
+<td>0.753011</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>0.132954</td>
+<td>1.377875</td>
+<td>0.750244</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>0.117867</td>
+<td>1.367185</td>
+<td>0.756104</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td>0.109761</td>
+<td>1.366078</td>
+<td>0.756104</td>
+<td>00:01</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -1358,124 +1337,123 @@ ga('send', {
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model and add extra regularization with weight decay</span></span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">15</span>, <span class="fl">1e-2</span>, wd<span class="op">=</span><span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>accuracy</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>2.513700</td>
-      <td>1.898873</td>
-      <td>0.498942</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>1.559825</td>
-      <td>1.421029</td>
-      <td>0.651937</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>0.810041</td>
-      <td>1.324630</td>
-      <td>0.703695</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>0.406249</td>
-      <td>0.870849</td>
-      <td>0.801514</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>0.211201</td>
-      <td>1.012451</td>
-      <td>0.776774</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>0.117430</td>
-      <td>0.748297</td>
-      <td>0.827474</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>0.072397</td>
-      <td>0.652809</td>
-      <td>0.843587</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>0.050372</td>
-      <td>0.740491</td>
-      <td>0.826172</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>8</td>
-      <td>0.037560</td>
-      <td>0.796995</td>
-      <td>0.831462</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>9</td>
-      <td>0.028582</td>
-      <td>0.669326</td>
-      <td>0.850830</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>10</td>
-      <td>0.022323</td>
-      <td>0.614551</td>
-      <td>0.855632</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>11</td>
-      <td>0.018281</td>
-      <td>0.670560</td>
-      <td>0.858317</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>12</td>
-      <td>0.014915</td>
-      <td>0.645430</td>
-      <td>0.856771</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>13</td>
-      <td>0.012732</td>
-      <td>0.656426</td>
-      <td>0.855387</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>14</td>
-      <td>0.011765</td>
-      <td>0.683027</td>
-      <td>0.853271</td>
-      <td>00:01</td>
-    </tr>
-  </tbody>
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>2.513700</td>
+<td>1.898873</td>
+<td>0.498942</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.559825</td>
+<td>1.421029</td>
+<td>0.651937</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>0.810041</td>
+<td>1.324630</td>
+<td>0.703695</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>0.406249</td>
+<td>0.870849</td>
+<td>0.801514</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.211201</td>
+<td>1.012451</td>
+<td>0.776774</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>0.117430</td>
+<td>0.748297</td>
+<td>0.827474</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0.072397</td>
+<td>0.652809</td>
+<td>0.843587</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.050372</td>
+<td>0.740491</td>
+<td>0.826172</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.037560</td>
+<td>0.796995</td>
+<td>0.831462</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.028582</td>
+<td>0.669326</td>
+<td>0.850830</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>0.022323</td>
+<td>0.614551</td>
+<td>0.855632</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>0.018281</td>
+<td>0.670560</td>
+<td>0.858317</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>0.014915</td>
+<td>0.645430</td>
+<td>0.856771</td>
+<td>00:01</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>0.012732</td>
+<td>0.656426</td>
+<td>0.855387</td>
+<td>00:01</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td>0.011765</td>
+<td>0.683027</td>
+<td>0.853271</td>
+<td>00:01</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -1537,9 +1515,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1604,6 +1596,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1642,12 +1720,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp(/http:\/\/livingdatalab\.com/);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
-    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -1660,7 +1738,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 
