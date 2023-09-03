@@ -10,7 +10,21 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science &amp; AI Blog</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Fri, 18 Aug 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 19 Aug 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Using LLMs and Langchain to Ask Questions about SQL Databases</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-08-20-using-llms-langchain-to-ask-questions-about-sql-databases.html</link>
+  <description><![CDATA[ SQL databases are frequently used to hold enterprise data. Natural language interaction with SQL databases is made feasible by LLMs such as OpenAI’s ChatGPT and GPT Models. LangChain provides SQL Chains and Agents for building and running SQL queries based on natural language prompts. These SQL Chains and Agents are compatible with any SQL dialect supported by SQLAlchemy (e.g., MySQL, PostgreSQL, Oracle SQL, Databricks, SQLite). ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <category>llm-evaluation</category>
+  <guid>http://livingdatalab.com/posts/2023-08-20-using-llms-langchain-to-ask-questions-about-sql-databases.html</guid>
+  <pubDate>Sat, 19 Aug 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/ai-db1.png" medium="image" type="image/png"/>
+</item>
 <item>
   <title>Comparing Question and Answer LLM System Outputs</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -290,19 +304,6 @@
   <guid>http://livingdatalab.com/posts/2023-08-01-prompt-engineering-tips-and-tricks.html</guid>
   <pubDate>Mon, 31 Jul 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake1.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Popular Large Language Models Compared</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-07-31-popular-large-language-models-compared.html</link>
-  <description><![CDATA[ We will examine the integration of various LLM models in LangChain in this article. We will look at and contrast the aspects of the platforms that enable these LLM types. Some of the most well-liked pre-trained models that are publicly accessible are already supported by LangChain. We have previously covered a number of alternatives in earlier posts, including ChatGPT, GPT-4, GPT-3, and GPT4ALL. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <guid>http://livingdatalab.com/posts/2023-07-31-popular-large-language-models-compared.html</guid>
-  <pubDate>Sun, 30 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png" medium="image" type="image/png"/>
 </item>
 </channel>
 </rss>

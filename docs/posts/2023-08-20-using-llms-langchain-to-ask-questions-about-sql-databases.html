@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-08-20">
+<meta name="description" content="Some of the most valuable information to make LLMs useful is in structured data such as atabases. In this article we show how we can use langchain to help LLMs answer questions based on information stored in an SQL database.">
+
+<title>LivingDataLab - Using LLMs and Langchain to Ask Questions about SQL Databases</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Using LLMs and Langchain to Ask Questions about SQL Databases">
+<meta property="og:description" content="Some of the most valuable information to make LLMs useful is in structured data such as atabases. In this article we show how we can use langchain to help LLMs answer questions based on information stored in an SQL database.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/ai-db1.png">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Using LLMs and Langchain to Ask Questions about SQL Databases">
+<meta name="twitter:description" content="Some of the most valuable information to make LLMs useful is in structured data such as atabases. In this article we show how we can use langchain to help LLMs answer questions based on information stored in an SQL database.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/ai-db1.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Using LLMs and Langchain to Ask Questions about SQL Databases</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Using LLMs and Langchain to Ask Questions about SQL Databases</h1>
+                  <div>
+        <div class="description">
+          Some of the most valuable information to make LLMs useful is in structured data such as atabases. In this article we show how we can use langchain to help LLMs answer questions based on information stored in an SQL database.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">openai</div>
+                <div class="quarto-category">llm-evaluation</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 20, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview"><span class="header-section-number">2</span> Overview</a></li>
+  <li><a href="#import-libs-setup" id="toc-import-libs-setup" class="nav-link" data-scroll-target="#import-libs-setup"><span class="header-section-number">3</span> Import Libs &amp; Setup</a></li>
+  <li><a href="#case-1-text-to-sql-query" id="toc-case-1-text-to-sql-query" class="nav-link" data-scroll-target="#case-1-text-to-sql-query"><span class="header-section-number">4</span> Case 1: Text-to-SQL query</a>
+  <ul class="collapse">
+  <li><a href="#go-deeper" id="toc-go-deeper" class="nav-link" data-scroll-target="#go-deeper"><span class="header-section-number">4.1</span> Go deeper</a></li>
+  </ul></li>
+  <li><a href="#case-2-text-to-sql-query-and-execution" id="toc-case-2-text-to-sql-query-and-execution" class="nav-link" data-scroll-target="#case-2-text-to-sql-query-and-execution"><span class="header-section-number">5</span> Case 2: Text-to-SQL query and execution</a>
+  <ul class="collapse">
+  <li><a href="#go-deeper-1" id="toc-go-deeper-1" class="nav-link" data-scroll-target="#go-deeper-1"><span class="header-section-number">5.1</span> Go deeper</a></li>
+  </ul></li>
+  <li><a href="#case-3-sql-agents" id="toc-case-3-sql-agents" class="nav-link" data-scroll-target="#case-3-sql-agents"><span class="header-section-number">6</span> Case 3: SQL agents</a>
+  <ul class="collapse">
+  <li><a href="#agent-task-example-1---running-queries" id="toc-agent-task-example-1---running-queries" class="nav-link" data-scroll-target="#agent-task-example-1---running-queries"><span class="header-section-number">6.1</span> Agent task example #1 - Running queries</a></li>
+  <li><a href="#agent-task-example-2---describing-a-table" id="toc-agent-task-example-2---describing-a-table" class="nav-link" data-scroll-target="#agent-task-example-2---describing-a-table"><span class="header-section-number">6.2</span> Agent task example #2 - Describing a Table</a></li>
+  <li><a href="#go-deeper-2" id="toc-go-deeper-2" class="nav-link" data-scroll-target="#go-deeper-2"><span class="header-section-number">6.3</span> Go deeper</a></li>
+  </ul></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">7</span> Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>SQL databases are frequently used to hold enterprise data. Natural language interaction with SQL databases is made feasible by LLMs such as OpenAI’s ChatGPT and GPT Models. LangChain provides SQL Chains and Agents for building and running SQL queries based on natural language prompts. These SQL Chains and Agents are compatible with any SQL dialect supported by SQLAlchemy (e.g., MySQL, PostgreSQL, Oracle SQL, Databricks, SQLite).</p>
+<p>They enable use cases like:</p>
+<ul>
+<li>Creating queries that will be executed in response to natural language questions</li>
+<li>Developing chatbots that can answer queries based on database data</li>
+<li>Developing custom dashboards based on information that a user want to analyse</li>
+</ul>
+<p>In this article we will see different ways we can use langchain and LLM’s to ask questions about data in an SQL database.</p>
+</section>
+<section id="overview" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="overview"><span class="header-section-number">2</span> Overview</h2>
+<p>LangChain provides tools to interact with SQL Databases:</p>
+<ol type="1">
+<li><code>Build SQL queries</code> based on natural language user questions</li>
+<li><code>Query a SQL database</code> using chains for query creation and execution</li>
+<li><code>Interact with a SQL database</code> using agents for robust and flexible querying</li>
+</ol>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langchain-sql-usecase.png" width="800"></p>
+</section>
+<section id="import-libs-setup" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="import-libs-setup"><span class="header-section-number">3</span> Import Libs &amp; Setup</h2>
+<p>First, get required packages and set environment variables:</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>OPENAI_API_KEY <span class="op">=</span> os.getenv(<span class="st">"OPENAI_API_KEY"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For our project we are also going to use Langsmith for logging runs and visulising runs, <a href="https://livingdatalab.com/posts/2023-08-16-langsmith-for-llm-application-evaluation.html">I wrote an article introducing Langsmith previously</a>. Let’s set up and configure Langsmith.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> uuid <span class="im">import</span> uuid4</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>unique_id <span class="op">=</span> uuid4().<span class="bu">hex</span>[<span class="dv">0</span>:<span class="dv">8</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"LANGCHAIN_TRACING_V2"</span>] <span class="op">=</span> <span class="st">"true"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"LANGCHAIN_PROJECT"</span>] <span class="op">=</span> <span class="ss">f"Langchain SQL Demo - </span><span class="sc">{</span>unique_id<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"LANGCHAIN_ENDPOINT"</span>] <span class="op">=</span> <span class="st">"https://api.smith.langchain.com"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"LANGCHAIN_API_KEY"</span>] <span class="op">=</span> os.getenv(<span class="st">"LANGCHAIN_API_KEY"</span>)  <span class="co"># Update to your API key</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Used by the agent in this post</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"OPENAI_API_KEY"</span>] <span class="op">=</span> os.getenv(<span class="st">"OPENAI_API_KEY"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will also use an SQLite connection with the Chinook database. The Chinook database is an sample data database that represents a digital media store, including tables for artists, albums, media tracks, invoices and customers.</p>
+<p>There are 11 tables in the chinook sample database.</p>
+<ul>
+<li><strong>employees</strong> table stores employees data such as employee id, last name, first name, etc. It also has a field named ReportsTo to specify who reports to whom.</li>
+<li><strong>customers</strong> table stores customers data.</li>
+<li><strong>invoices &amp; invoice_items tables</strong> these two tables store invoice data. The invoices table stores invoice header data and the invoice_items table stores the invoice line items data.</li>
+<li><strong>artists</strong> table stores artists data. It is a simple table that contains only the artist id and name.</li>
+<li><strong>albums</strong> table stores data about a list of tracks. Each album belongs to one artist. However, one artist may have multiple albums.</li>
+<li><strong>media_types</strong> table stores media types such as MPEG audio and AAC audio files.</li>
+<li><strong>genres</strong> table stores music types such as rock, jazz, metal, etc.</li>
+<li><strong>tracks</strong> table stores the data of songs. Each track belongs to one album.</li>
+<li><strong>playlists &amp; playlist_track tables</strong> playlists table store data about playlists. Each playlist contains a list of tracks. Each track may belong to multiple playlists. The relationship between the playlists table and tracks table is many-to-many. The playlist_track table is used to reflect this relationship.</li>
+</ul>
+<p><img src="https://github.com/pranath/blog/raw/master/images/sqlite-chinook.jpg" width="800"></p>
+<p>Follow <a href="https://database.guide/2-sample-databases-sqlite/">installation steps</a> to create <code>Chinook.db</code> in the same directory as this notebook:</p>
+<ul>
+<li>Save <a href="https://raw.githubusercontent.com/lerocha/chinook-database/master/ChinookDatabase/DataSources/Chinook_Sqlite.sql">this file</a> to the directory as <code>Chinook_Sqlite.sql</code></li>
+<li>Run <code>sqlite3 Chinook.db</code></li>
+<li>Run <code>.read Chinook_Sqlite.sql</code></li>
+<li>Test <code>SELECT * FROM Artist LIMIT 10;</code></li>
+</ul>
+<p>Now, <code>Chinhook.db</code> is in our directory.</p>
+<p>Let’s create a <code>SQLDatabaseChain</code> to create and execute SQL queries.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.utilities <span class="im">import</span> SQLDatabase</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.llms <span class="im">import</span> OpenAI</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_experimental.sql <span class="im">import</span> SQLDatabaseChain</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(<span class="st">"sqlite:///Chinook.db"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(temperature<span class="op">=</span><span class="dv">0</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>db_chain <span class="op">=</span> SQLDatabaseChain.from_llm(llm, db, verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="b457eac6-2aa8-4269-dfe4-61afcf1b1e9e" data-scrolled="true" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>db_chain.run(<span class="st">"How many customers are there?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+&gt; Entering new SQLDatabaseChain chain...
+How many customers are there?
+SQLQuery:SELECT COUNT(*) FROM Customer;
+SQLResult: [(59,)]
+Answer:There are 59 customers.
+&gt; Finished chain.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>'There are 59 customers.'</code></pre>
+</div>
+</div>
+<p>Note that this both creates and executes the query. In the following sections, we will cover the 3 different use cases mentioned in the overview.</p>
+</section>
+<section id="case-1-text-to-sql-query" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="case-1-text-to-sql-query"><span class="header-section-number">4</span> Case 1: Text-to-SQL query</h2>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chains <span class="im">import</span> create_sql_query_chain</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s create the chain that will build the SQL Query:</p>
+<div class="cell" data-outputid="c6279e54-bc3e-43ff-9f42-161543cc4b5b" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> create_sql_query_chain(ChatOpenAI(temperature<span class="op">=</span><span class="dv">0</span>), db)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> chain.invoke({<span class="st">"question"</span>:<span class="st">"How many customers are there"</span>})</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SELECT COUNT(*) FROM Customer</code></pre>
+</div>
+</div>
+<p>After building the SQL query based on a user question, we can execute the query:</p>
+<div class="cell" data-outputid="c99ae4d7-111a-4b95-aa86-0c5e604ed6bf" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>db.run(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>'[(59,)]'</code></pre>
+</div>
+</div>
+<p>As we can see, the SQL Query Builder chain <strong>only created</strong> the query, and we handled the <strong>query execution separately</strong>.</p>
+<section id="go-deeper" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="go-deeper"><span class="header-section-number">4.1</span> Go deeper</h3>
+<p><strong>Looking under the hood</strong></p>
+<p>We can look at the LangSmith trace to unpack this:</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith-sql1.png" width="800"></p>
+<p>This is the full text of the prompt created from that query:</p>
+<pre><code>You are a SQLite expert. Given an input question, first create a syntactically correct SQLite query to run, then look at the results of the query and return the answer to the input question.
+Unless the user specifies in the question a specific number of examples to obtain, query for at most 5 results using the LIMIT clause as per SQLite. You can order the results to return the most informative data in the database.
+Never query for all columns from a table. You must query only the columns that are needed to answer the question. Wrap each column name in double quotes (") to denote them as delimited identifiers.
+Pay attention to use only the column names you can see in the tables below. Be careful to not query for columns that do not exist. Also, pay attention to which column is in which table.
+Pay attention to use date('now') function to get the current date, if the question involves "today".
+
+Use the following format:
+
+Question: Question here
+SQLQuery: SQL Query to run
+SQLResult: Result of the SQLQuery
+Answer: Final answer here
+
+Only use the following tables:
+
+CREATE TABLE "Album" (
+    "AlbumId" INTEGER NOT NULL, 
+    "Title" NVARCHAR(160) NOT NULL, 
+    "ArtistId" INTEGER NOT NULL, 
+    PRIMARY KEY ("AlbumId"), 
+    FOREIGN KEY("ArtistId") REFERENCES "Artist" ("ArtistId")
+)
+
+/*
+3 rows from Album table:
+AlbumId Title   ArtistId
+1   For Those About To Rock We Salute You   1
+2   Balls to the Wall   2
+3   Restless and Wild   2
+*/
+
+
+CREATE TABLE "Artist" (
+    "ArtistId" INTEGER NOT NULL, 
+    "Name" NVARCHAR(120), 
+    PRIMARY KEY ("ArtistId")
+)
+
+/*
+3 rows from Artist table:
+ArtistId    Name
+1   AC/DC
+2   Accept
+3   Aerosmith
+*/
+
+
+CREATE TABLE "Customer" (
+    "CustomerId" INTEGER NOT NULL, 
+    "FirstName" NVARCHAR(40) NOT NULL, 
+    "LastName" NVARCHAR(20) NOT NULL, 
+    "Company" NVARCHAR(80), 
+    "Address" NVARCHAR(70), 
+    "City" NVARCHAR(40), 
+    "State" NVARCHAR(40), 
+    "Country" NVARCHAR(40), 
+    "PostalCode" NVARCHAR(10), 
+    "Phone" NVARCHAR(24), 
+    "Fax" NVARCHAR(24), 
+    "Email" NVARCHAR(60) NOT NULL, 
+    "SupportRepId" INTEGER, 
+    PRIMARY KEY ("CustomerId"), 
+    FOREIGN KEY("SupportRepId") REFERENCES "Employee" ("EmployeeId")
+)
+
+/*
+3 rows from Customer table:
+CustomerId  FirstName   LastName    Company Address City    State   Country PostalCode  Phone   Fax Email   SupportRepId
+1   Luís    Gonçalves   Embraer - Empresa Brasileira de Aeronáutica S.A.    Av. Brigadeiro Faria Lima, 2170 São José dos Campos SP  Brazil  12227-000   +55 (12) 3923-5555  +55 (12) 3923-5566  luisg@embraer.com.br    3
+2   Leonie  Köhler  None    Theodor-Heuss-Straße 34 Stuttgart   None    Germany 70174   +49 0711 2842222    None    leonekohler@surfeu.de   5
+3   François    Tremblay    None    1498 rue Bélanger   Montréal    QC  Canada  H2G 1A7 +1 (514) 721-4711   None    ftremblay@gmail.com 3
+*/
+
+
+CREATE TABLE "Employee" (
+    "EmployeeId" INTEGER NOT NULL, 
+    "LastName" NVARCHAR(20) NOT NULL, 
+    "FirstName" NVARCHAR(20) NOT NULL, 
+    "Title" NVARCHAR(30), 
+    "ReportsTo" INTEGER, 
+    "BirthDate" DATETIME, 
+    "HireDate" DATETIME, 
+    "Address" NVARCHAR(70), 
+    "City" NVARCHAR(40), 
+    "State" NVARCHAR(40), 
+    "Country" NVARCHAR(40), 
+    "PostalCode" NVARCHAR(10), 
+    "Phone" NVARCHAR(24), 
+    "Fax" NVARCHAR(24), 
+    "Email" NVARCHAR(60), 
+    PRIMARY KEY ("EmployeeId"), 
+    FOREIGN KEY("ReportsTo") REFERENCES "Employee" ("EmployeeId")
+)
+
+/*
+3 rows from Employee table:
+EmployeeId  LastName    FirstName   Title   ReportsTo   BirthDate   HireDate    Address City    State   Country PostalCode  Phone   Fax Email
+1   Adams   Andrew  General Manager None    1962-02-18 00:00:00 2002-08-14 00:00:00 11120 Jasper Ave NW Edmonton    AB  Canada  T5K 2N1 +1 (780) 428-9482   +1 (780) 428-3457   andrew@chinookcorp.com
+2   Edwards Nancy   Sales Manager   1   1958-12-08 00:00:00 2002-05-01 00:00:00 825 8 Ave SW    Calgary AB  Canada  T2P 2T3 +1 (403) 262-3443   +1 (403) 262-3322   nancy@chinookcorp.com
+3   Peacock Jane    Sales Support Agent 2   1973-08-29 00:00:00 2002-04-01 00:00:00 1111 6 Ave SW   Calgary AB  Canada  T2P 5M5 +1 (403) 262-3443   +1 (403) 262-6712   jane@chinookcorp.com
+*/
+
+
+CREATE TABLE "Genre" (
+    "GenreId" INTEGER NOT NULL, 
+    "Name" NVARCHAR(120), 
+    PRIMARY KEY ("GenreId")
+)
+
+/*
+3 rows from Genre table:
+GenreId Name
+1   Rock
+2   Jazz
+3   Metal
+*/
+
+
+CREATE TABLE "Invoice" (
+    "InvoiceId" INTEGER NOT NULL, 
+    "CustomerId" INTEGER NOT NULL, 
+    "InvoiceDate" DATETIME NOT NULL, 
+    "BillingAddress" NVARCHAR(70), 
+    "BillingCity" NVARCHAR(40), 
+    "BillingState" NVARCHAR(40), 
+    "BillingCountry" NVARCHAR(40), 
+    "BillingPostalCode" NVARCHAR(10), 
+    "Total" NUMERIC(10, 2) NOT NULL, 
+    PRIMARY KEY ("InvoiceId"), 
+    FOREIGN KEY("CustomerId") REFERENCES "Customer" ("CustomerId")
+)
+
+/*
+3 rows from Invoice table:
+InvoiceId   CustomerId  InvoiceDate BillingAddress  BillingCity BillingState    BillingCountry  BillingPostalCode   Total
+1   2   2009-01-01 00:00:00 Theodor-Heuss-Straße 34 Stuttgart   None    Germany 70174   1.98
+2   4   2009-01-02 00:00:00 Ullevålsveien 14    Oslo    None    Norway  0171    3.96
+3   8   2009-01-03 00:00:00 Grétrystraat 63 Brussels    None    Belgium 1000    5.94
+*/
+
+
+CREATE TABLE "InvoiceLine" (
+    "InvoiceLineId" INTEGER NOT NULL, 
+    "InvoiceId" INTEGER NOT NULL, 
+    "TrackId" INTEGER NOT NULL, 
+    "UnitPrice" NUMERIC(10, 2) NOT NULL, 
+    "Quantity" INTEGER NOT NULL, 
+    PRIMARY KEY ("InvoiceLineId"), 
+    FOREIGN KEY("TrackId") REFERENCES "Track" ("TrackId"), 
+    FOREIGN KEY("InvoiceId") REFERENCES "Invoice" ("InvoiceId")
+)
+
+/*
+3 rows from InvoiceLine table:
+InvoiceLineId   InvoiceId   TrackId UnitPrice   Quantity
+1   1   2   0.99    1
+2   1   4   0.99    1
+3   2   6   0.99    1
+*/
+
+
+CREATE TABLE "MediaType" (
+    "MediaTypeId" INTEGER NOT NULL, 
+    "Name" NVARCHAR(120), 
+    PRIMARY KEY ("MediaTypeId")
+)
+
+/*
+3 rows from MediaType table:
+MediaTypeId Name
+1   MPEG audio file
+2   Protected AAC audio file
+3   Protected MPEG-4 video file
+*/
+
+
+CREATE TABLE "Playlist" (
+    "PlaylistId" INTEGER NOT NULL, 
+    "Name" NVARCHAR(120), 
+    PRIMARY KEY ("PlaylistId")
+)
+
+/*
+3 rows from Playlist table:
+PlaylistId  Name
+1   Music
+2   Movies
+3   TV Shows
+*/
+
+
+CREATE TABLE "PlaylistTrack" (
+    "PlaylistId" INTEGER NOT NULL, 
+    "TrackId" INTEGER NOT NULL, 
+    PRIMARY KEY ("PlaylistId", "TrackId"), 
+    FOREIGN KEY("TrackId") REFERENCES "Track" ("TrackId"), 
+    FOREIGN KEY("PlaylistId") REFERENCES "Playlist" ("PlaylistId")
+)
+
+/*
+3 rows from PlaylistTrack table:
+PlaylistId  TrackId
+1   3402
+1   3389
+1   3390
+*/
+
+
+CREATE TABLE "Track" (
+    "TrackId" INTEGER NOT NULL, 
+    "Name" NVARCHAR(200) NOT NULL, 
+    "AlbumId" INTEGER, 
+    "MediaTypeId" INTEGER NOT NULL, 
+    "GenreId" INTEGER, 
+    "Composer" NVARCHAR(220), 
+    "Milliseconds" INTEGER NOT NULL, 
+    "Bytes" INTEGER, 
+    "UnitPrice" NUMERIC(10, 2) NOT NULL, 
+    PRIMARY KEY ("TrackId"), 
+    FOREIGN KEY("MediaTypeId") REFERENCES "MediaType" ("MediaTypeId"), 
+    FOREIGN KEY("GenreId") REFERENCES "Genre" ("GenreId"), 
+    FOREIGN KEY("AlbumId") REFERENCES "Album" ("AlbumId")
+)
+
+/*
+3 rows from Track table:
+TrackId Name    AlbumId MediaTypeId GenreId Composer    Milliseconds    Bytes   UnitPrice
+1   For Those About To Rock (We Salute You) 1   1   1   Angus Young, Malcolm Young, Brian Johnson   343719  11170334    0.99
+2   Balls to the Wall   2   2   1   None    342562  5510424 0.99
+3   Fast As a Shark 3   2   1   F. Baltes, S. Kaufman, U. Dirkscneider &amp; W. Hoffman 230619  3990994 0.99
+*/
+
+Question: How many customers are there
+SQLQuery: </code></pre>
+<p><a href="https://arxiv.org/pdf/2204.00498.pdf">Some papers</a> have reported good performance when prompting with:</p>
+<ul>
+<li>A <code>CREATE TABLE</code> description for each table, which include column names, their types, etc</li>
+<li>Followed by three example rows in a <code>SELECT</code> statement</li>
+</ul>
+<p><code>create_sql_query_chain</code> adopts this the best practice (see more in this <a href="https://blog.langchain.dev/llms-and-sql/">blog</a>).</p>
+<p><strong>Improvements</strong></p>
+<p>The query builder can be improved in a variety of ways, including (but not limited to):</p>
+<ul>
+<li>Tailoring the database description to your particular use case</li>
+<li>Using a vector database to provide dynamic examples that are relevant to the individual user question - Hardcoding a few instances of questions and their related SQL query in the prompt</li>
+</ul>
+<p>All of these examples involve changing the prompt for the chain. For example, we could include the following instances in our prompt:</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.prompts <span class="im">import</span> PromptTemplate</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>TEMPLATE <span class="op">=</span> <span class="st">"""Given an input question, first create a syntactically correct </span><span class="sc">{dialect}</span><span class="st"> query to run, then look at the results of the query and return the answer.</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">Use the following format:</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">Question: "Question here"</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">SQLQuery: "SQL Query to run"</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">SQLResult: "Result of the SQLQuery"</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">Answer: "Final answer here"</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="st">Only use the following tables:</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="sc">{table_info}</span><span class="st">.</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="st">Some examples of SQL queries that corrsespond to questions are:</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="sc">{few_shot_examples}</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="st">Question: </span><span class="sc">{input}</span><span class="st">"""</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>CUSTOM_PROMPT <span class="op">=</span> PromptTemplate(</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    input_variables<span class="op">=</span>[<span class="st">"input"</span>, <span class="st">"few_shot_examples"</span>, <span class="st">"table_info"</span>, <span class="st">"dialect"</span>], template<span class="op">=</span>TEMPLATE</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="case-2-text-to-sql-query-and-execution" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="case-2-text-to-sql-query-and-execution"><span class="header-section-number">5</span> Case 2: Text-to-SQL query and execution</h2>
+<p>We can use <code>SQLDatabaseChain</code> from <code>langchain_experimental</code> to create and run SQL queries.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.llms <span class="im">import</span> OpenAI</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_experimental.sql <span class="im">import</span> SQLDatabaseChain</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(temperature<span class="op">=</span><span class="dv">0</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>db_chain <span class="op">=</span> SQLDatabaseChain.from_llm(llm, db, verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="51f6bf33-5af9-4f88-9ca1-fb64540d8b43" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>db_chain.run(<span class="st">"How many customers are there?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+&gt; Entering new SQLDatabaseChain chain...
+How many customers are there?
+SQLQuery:SELECT COUNT(*) FROM Customer;
+SQLResult: [(59,)]
+Answer:There are 59 customers.
+&gt; Finished chain.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>'There are 59 customers.'</code></pre>
+</div>
+</div>
+<p>As we can see, we get the same result as the previous case.</p>
+<p>Here, the chain <strong>also handles the query execution</strong> and provides a final answer based on the user question and the query result.</p>
+<p><strong>Be careful</strong> while using this approach as it is susceptible to <code>SQL Injection</code>:</p>
+<ul>
+<li>The chain is executing queries that are created by an LLM, and weren’t validated</li>
+<li>e.g.&nbsp;records may be created, modified or deleted unintentionally_</li>
+</ul>
+<p>This is why we see the <code>SQLDatabaseChain</code> is inside <code>langchain_experimental</code>.</p>
+<section id="go-deeper-1" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="go-deeper-1"><span class="header-section-number">5.1</span> Go deeper</h3>
+<p><strong>Looking under the hood</strong></p>
+<p>We can use the <a href="https://smith.langchain.com/public/7f202a0c-1e35-42d6-a84a-6c2a58f697ef/r">LangSmith trace</a> to see what is happening under the hood:</p>
+<ul>
+<li>As discussed above, first we create the query:</li>
+</ul>
+<pre><code>text: ' SELECT COUNT(*) FROM "Customer";'</code></pre>
+<ul>
+<li>Then, it executes the query and passes the results to an LLM for synthesis.</li>
+</ul>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith-sql2.png" width="800"></p>
+<p><strong>Improvements</strong></p>
+<p>The performance of the <code>SQLDatabaseChain</code> can be enhanced in several ways:</p>
+<ul>
+<li><a href="#adding-sample-rows">Adding sample rows</a></li>
+<li><a href="../docs/integrations/tools/sqlite#custom-table-info">Specifying custom table information</a></li>
+<li><a href="../docs/integrations/tools/sqlite#use-query-checker">Using Query Checker</a> self-correct invalid SQL using parameter <code>use_query_checker=True</code></li>
+<li><a href="../docs/integrations/tools/sqlite#customize-prompt">Customizing the LLM Prompt</a> include specific instructions or relevant information, using parameter <code>prompt=CUSTOM_PROMPT</code></li>
+<li><a href="../docs/integrations/tools/sqlite#return-intermediate-steps">Get intermediate steps</a> access the SQL statement as well as the final result using parameter <code>return_intermediate_steps=True</code></li>
+<li><a href="../docs/integrations/tools/sqlite#choosing-how-to-limit-the-number-of-rows-returned">Limit the number of rows</a> a query will return using parameter <code>top_k=5</code></li>
+</ul>
+<p>You might find <a href="../docs/integrations/tools/sqlite#sqldatabasesequentialchain">SQLDatabaseSequentialChain</a> useful for cases in which the number of tables in the database is large.</p>
+<p>This <code>Sequential Chain</code> handles the process of:</p>
+<ol type="1">
+<li>Determining which tables to use based on the user question</li>
+<li>Calling the normal SQL database chain using only relevant tables</li>
+</ol>
+<p><strong>Adding Sample Rows</strong></p>
+<p>Providing sample data can help the LLM construct correct queries when the data format is not obvious.</p>
+<p>For example, we can tell LLM that artists are saved with their full names by providing two rows from the Track table.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sqlite:///Chinook.db"</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    include_tables<span class="op">=</span>[<span class="st">'Track'</span>], <span class="co"># we include only one table to save tokens in the prompt :)</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    sample_rows_in_table_info<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The sample rows are added to the prompt after each corresponding table’s column information.</p>
+<p>We can use <code>db.table_info</code> and check which sample rows are included:</p>
+<div class="cell" data-outputid="ae34abbf-bb00-49dc-8817-9da8537f853a" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(db.table_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+CREATE TABLE "Track" (
+    "TrackId" INTEGER NOT NULL, 
+    "Name" NVARCHAR(200) NOT NULL, 
+    "AlbumId" INTEGER, 
+    "MediaTypeId" INTEGER NOT NULL, 
+    "GenreId" INTEGER, 
+    "Composer" NVARCHAR(220), 
+    "Milliseconds" INTEGER NOT NULL, 
+    "Bytes" INTEGER, 
+    "UnitPrice" NUMERIC(10, 2) NOT NULL, 
+    PRIMARY KEY ("TrackId"), 
+    FOREIGN KEY("MediaTypeId") REFERENCES "MediaType" ("MediaTypeId"), 
+    FOREIGN KEY("GenreId") REFERENCES "Genre" ("GenreId"), 
+    FOREIGN KEY("AlbumId") REFERENCES "Album" ("AlbumId")
+)
+
+/*
+2 rows from Track table:
+TrackId Name    AlbumId MediaTypeId GenreId Composer    Milliseconds    Bytes   UnitPrice
+1   For Those About To Rock (We Salute You) 1   1   1   Angus Young, Malcolm Young, Brian Johnson   343719  11170334    0.99
+2   Balls to the Wall   2   2   1   None    342562  5510424 0.99
+*/</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="case-3-sql-agents" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="case-3-sql-agents"><span class="header-section-number">6</span> Case 3: SQL agents</h2>
+<p>LangChain has a SQL Agent that is more flexible than the ‘SQLDatabaseChain’ in communicating with SQL Databases.</p>
+<p>The following are the primary benefits of utilising the SQL Agent:</p>
+<ul>
+<li>It can answer questions based on the schema as well as the content of the databases (for example, describing a specific table).</li>
+<li>It can recover from problems by running a created query, capturing the traceback, and correctly rebuilding it.</li>
+</ul>
+<p>In <a href="https://medium.com/dataherald/how-to-connect-llm-to-sql-database-with-langchain-sqlagent-48635fddaa74#:~:text=LangChain%20SQLAgent%20is%20a%20powerful,calls%20for%20answering%20user%20questions.">this article</a> the author desribed reasons why you might want to consider using an agent for SQL queries rather than just a chain:</p>
+<blockquote class="blockquote">
+<p><em>‘…Let us first understand what is an agent and why it might be preferred over a simple SQLChain. An agent is a component that has access to a suite of tools, including a Large Language Model (LLM). Its distinguishing characteristic lies in its ability to make informed decisions based on user input, utilizing the appropriate tools until it achieves a satisfactory answer. For example in the context of text-to-SQL, the LangChain SQLAgent will not give up if there is an error in executing the generated SQL. Instead, it will attempt to recover by interpreting the error in a subsequent LLM call and rectify the issue. Therefore, in theory, SQLAgent should outperform SQLChain in productivity and accuracy’</em></p>
+</blockquote>
+<p>And this is what that author found from their experiments:</p>
+<blockquote class="blockquote">
+<p><em>‘…During our tests, we ran multiple questions on both SQLChain and SQLAgent using GPT-3.5 and compared their respective results. Our findings revealed that SQLAgent outperformed SQLChain by answering a greater number of questions…For accuracy, however, our findings also indicate a higher incidence of incorrect responses from SQLAgent. Besides the general shortcomings of using LLM to query database, we hypothesize that SQLAgent will occasionally make its best attempt to answer a question even when concrete results cannot be obtained from the SQL query.’</em></p>
+</blockquote>
+<p>The ‘create_sql_agent’ method is used to initialise the agent.</p>
+<p>This agent includes the ‘SQLDatabaseToolkit,’ which includes tools for:</p>
+<ul>
+<li>Create and run queries</li>
+<li>Verify query syntax</li>
+<li>Get table descriptions</li>
+<li>… and much more</li>
+</ul>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_sql_agent</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_toolkits <span class="im">import</span> SQLDatabaseToolkit</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># from langchain.agents import AgentExecutor</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_types <span class="im">import</span> AgentType</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(<span class="st">"sqlite:///Chinook.db"</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(temperature<span class="op">=</span><span class="dv">0</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>agent_executor <span class="op">=</span> create_sql_agent(</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    llm<span class="op">=</span>OpenAI(temperature<span class="op">=</span><span class="dv">0</span>),</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    toolkit<span class="op">=</span>SQLDatabaseToolkit(db<span class="op">=</span>db, llm<span class="op">=</span>OpenAI(temperature<span class="op">=</span><span class="dv">0</span>)),</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    agent_type<span class="op">=</span>AgentType.ZERO_SHOT_REACT_DESCRIPTION,</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="agent-task-example-1---running-queries" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="agent-task-example-1---running-queries"><span class="header-section-number">6.1</span> Agent task example #1 - Running queries</h3>
+<div class="cell" data-outputid="c98e1428-eac3-4e58-986a-a292057c6e33" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>agent_executor.run(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"List the total sales per country. Which country's customers spent the most?"</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+&gt; Entering new AgentExecutor chain...
+Action: sql_db_list_tables
+Action Input: 
+Observation: Album, Artist, Customer, Employee, Genre, Invoice, InvoiceLine, MediaType, Playlist, PlaylistTrack, Track
+Thought: I should query the schema of the Invoice and Customer tables.
+Action: sql_db_schema
+Action Input: Invoice, Customer
+Observation: 
+CREATE TABLE "Customer" (
+    "CustomerId" INTEGER NOT NULL, 
+    "FirstName" NVARCHAR(40) NOT NULL, 
+    "LastName" NVARCHAR(20) NOT NULL, 
+    "Company" NVARCHAR(80), 
+    "Address" NVARCHAR(70), 
+    "City" NVARCHAR(40), 
+    "State" NVARCHAR(40), 
+    "Country" NVARCHAR(40), 
+    "PostalCode" NVARCHAR(10), 
+    "Phone" NVARCHAR(24), 
+    "Fax" NVARCHAR(24), 
+    "Email" NVARCHAR(60) NOT NULL, 
+    "SupportRepId" INTEGER, 
+    PRIMARY KEY ("CustomerId"), 
+    FOREIGN KEY("SupportRepId") REFERENCES "Employee" ("EmployeeId")
+)
+
+/*
+3 rows from Customer table:
+CustomerId  FirstName   LastName    Company Address City    State   Country PostalCode  Phone   Fax Email   SupportRepId
+1   Luís    Gonçalves   Embraer - Empresa Brasileira de Aeronáutica S.A.    Av. Brigadeiro Faria Lima, 2170 São José dos Campos SP  Brazil  12227-000   +55 (12) 3923-5555  +55 (12) 3923-5566  luisg@embraer.com.br    3
+2   Leonie  Köhler  None    Theodor-Heuss-Straße 34 Stuttgart   None    Germany 70174   +49 0711 2842222    None    leonekohler@surfeu.de   5
+3   François    Tremblay    None    1498 rue Bélanger   Montréal    QC  Canada  H2G 1A7 +1 (514) 721-4711   None    ftremblay@gmail.com 3
+*/
+
+
+CREATE TABLE "Invoice" (
+    "InvoiceId" INTEGER NOT NULL, 
+    "CustomerId" INTEGER NOT NULL, 
+    "InvoiceDate" DATETIME NOT NULL, 
+    "BillingAddress" NVARCHAR(70), 
+    "BillingCity" NVARCHAR(40), 
+    "BillingState" NVARCHAR(40), 
+    "BillingCountry" NVARCHAR(40), 
+    "BillingPostalCode" NVARCHAR(10), 
+    "Total" NUMERIC(10, 2) NOT NULL, 
+    PRIMARY KEY ("InvoiceId"), 
+    FOREIGN KEY("CustomerId") REFERENCES "Customer" ("CustomerId")
+)
+
+/*
+3 rows from Invoice table:
+InvoiceId   CustomerId  InvoiceDate BillingAddress  BillingCity BillingState    BillingCountry  BillingPostalCode   Total
+1   2   2009-01-01 00:00:00 Theodor-Heuss-Straße 34 Stuttgart   None    Germany 70174   1.98
+2   4   2009-01-02 00:00:00 Ullevålsveien 14    Oslo    None    Norway  0171    3.96
+3   8   2009-01-03 00:00:00 Grétrystraat 63 Brussels    None    Belgium 1000    5.94
+*/
+Thought: I should query the total sales per country.
+Action: sql_db_query
+Action Input: SELECT Country, SUM(Total) AS TotalSales FROM Invoice INNER JOIN Customer ON Invoice.CustomerId = Customer.CustomerId GROUP BY Country ORDER BY TotalSales DESC LIMIT 10
+Observation: [('USA', 523.0600000000003), ('Canada', 303.9599999999999), ('France', 195.09999999999994), ('Brazil', 190.09999999999997), ('Germany', 156.48), ('United Kingdom', 112.85999999999999), ('Czech Republic', 90.24000000000001), ('Portugal', 77.23999999999998), ('India', 75.25999999999999), ('Chile', 46.62)]
+Thought: I now know the final answer
+Final Answer: The country with the highest total sales is the USA, with a total of $523.06.
+
+&gt; Finished chain.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>'The country with the highest total sales is the USA, with a total of $523.06.'</code></pre>
+</div>
+</div>
+<p>Looking at the LangSmith trace, we can see:</p>
+<ul>
+<li>The agent is using a ReAct style prompt</li>
+<li>First, it will look at the tables: <code>Action: sql_db_list_tables</code> using tool <code>sql_db_list_tables</code></li>
+<li>Given the tables as an observation, it <code>thinks</code> and then determinates the next <code>action</code>:</li>
+</ul>
+<pre><code>Observation: Album, Artist, Customer, Employee, Genre, Invoice, InvoiceLine, MediaType, Playlist, PlaylistTrack, Track
+Thought: I should query the schema of the Invoice and Customer tables.
+Action: sql_db_schema
+Action Input: Invoice, Customer</code></pre>
+<ul>
+<li>It then formulates the query using the schema from tool <code>sql_db_schema</code></li>
+</ul>
+<pre><code>Thought: I should query the total sales per country.
+Action: sql_db_query
+Action Input: SELECT Country, SUM(Total) AS TotalSales FROM Invoice INNER JOIN Customer ON Invoice.CustomerId = Customer.CustomerId GROUP BY Country ORDER BY TotalSales DESC LIMIT 10</code></pre>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith-sql3.png" width="800"></p>
+<ul>
+<li>It finally executes the generated query using tool <code>sql_db_query</code></li>
+</ul>
+<p><img src="https://github.com/pranath/blog/raw/master/images/langsmith-sql4.png" width="800"></p>
+</section>
+<section id="agent-task-example-2---describing-a-table" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="agent-task-example-2---describing-a-table"><span class="header-section-number">6.2</span> Agent task example #2 - Describing a Table</h3>
+<div class="cell" data-outputid="445b8b45-1ee6-4aee-b549-88e19c4c82eb" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>agent_executor.run(<span class="st">"Describe the playlisttrack table"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+&gt; Entering new AgentExecutor chain...
+Action: sql_db_list_tables
+Action Input: 
+Observation: Album, Artist, Customer, Employee, Genre, Invoice, InvoiceLine, MediaType, Playlist, PlaylistTrack, Track
+Thought: The PlaylistTrack table is the most relevant to the question.
+Action: sql_db_schema
+Action Input: PlaylistTrack
+Observation: 
+CREATE TABLE "PlaylistTrack" (
+    "PlaylistId" INTEGER NOT NULL, 
+    "TrackId" INTEGER NOT NULL, 
+    PRIMARY KEY ("PlaylistId", "TrackId"), 
+    FOREIGN KEY("TrackId") REFERENCES "Track" ("TrackId"), 
+    FOREIGN KEY("PlaylistId") REFERENCES "Playlist" ("PlaylistId")
+)
+
+/*
+3 rows from PlaylistTrack table:
+PlaylistId  TrackId
+1   3402
+1   3389
+1   3390
+*/
+Thought: I now know the final answer
+Final Answer: The PlaylistTrack table contains two columns, PlaylistId and TrackId, which are both integers and form a primary key. It also has two foreign keys, one to the Track table and one to the Playlist table.
+
+&gt; Finished chain.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>'The PlaylistTrack table contains two columns, PlaylistId and TrackId, which are both integers and form a primary key. It also has two foreign keys, one to the Track table and one to the Playlist table.'</code></pre>
+</div>
+</div>
+</section>
+<section id="go-deeper-2" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="go-deeper-2"><span class="header-section-number">6.3</span> Go deeper</h3>
+<p>To learn more about the SQL Agent and how it works we refer to the <a href="../docs/integrations/toolkits/sql_database">SQL Agent Toolkit</a> documentation.</p>
+<p>You can also check Agents for other document types: - <a href="../docs/integrations/toolkits/pandas.html">Pandas Agent</a> - <a href="../docs/integrations/toolkits/csv.html">CSV Agent</a></p>
+</section>
+</section>
+<section id="acknowledgements" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://docs.smith.langchain.com/">Langsmith Documentation</a> and acknowledge the use of some images and other materials from the documentation in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab Data Science &amp; AI Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>

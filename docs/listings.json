@@ -13,6 +13,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-08-20-using-llms-langchain-to-ask-questions-about-sql-databases.html",
       "/posts/2023-08-19-comparing-question-answer-llm-system-outputs.html",
       "/posts/2023-08-18-evaluating-question-answer-llm-systems-with-dynamic-data.html",
       "/posts/2023-08-17-measuring-accuracy-of-a-question-answering-system.html",
