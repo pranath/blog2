@@ -351,9 +351,14 @@ ga('send', {
   <ul class="collapse">
   <li><a href="#agent-task-example-1---running-queries" id="toc-agent-task-example-1---running-queries" class="nav-link" data-scroll-target="#agent-task-example-1---running-queries"><span class="header-section-number">6.1</span> Agent task example #1 - Running queries</a></li>
   <li><a href="#agent-task-example-2---describing-a-table" id="toc-agent-task-example-2---describing-a-table" class="nav-link" data-scroll-target="#agent-task-example-2---describing-a-table"><span class="header-section-number">6.2</span> Agent task example #2 - Describing a Table</a></li>
-  <li><a href="#go-deeper-2" id="toc-go-deeper-2" class="nav-link" data-scroll-target="#go-deeper-2"><span class="header-section-number">6.3</span> Go deeper</a></li>
   </ul></li>
-  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">7</span> Acknowledgements</a></li>
+  <li><a href="#extending-the-sql-toolkit-with-domain-specific-knowledge-tools" id="toc-extending-the-sql-toolkit-with-domain-specific-knowledge-tools" class="nav-link" data-scroll-target="#extending-the-sql-toolkit-with-domain-specific-knowledge-tools"><span class="header-section-number">7</span> Extending the SQL Toolkit with Domain Specific Knowledge Tools</a>
+  <ul class="collapse">
+  <li><a href="#including-dynamic-few-shot-examples" id="toc-including-dynamic-few-shot-examples" class="nav-link" data-scroll-target="#including-dynamic-few-shot-examples"><span class="header-section-number">7.1</span> Including dynamic few-shot examples</a></li>
+  <li><a href="#identifying-and-fixing-proper-noun-misspellings" id="toc-identifying-and-fixing-proper-noun-misspellings" class="nav-link" data-scroll-target="#identifying-and-fixing-proper-noun-misspellings"><span class="header-section-number">7.2</span> Identifying and fixing proper noun misspellings</a></li>
+  </ul></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">8</span> Further Reading</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">9</span> Acknowledgements</a></li>
   </ul>
 </nav>
     </div>
@@ -387,7 +392,7 @@ ga('send', {
 <section id="import-libs-setup" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="import-libs-setup"><span class="header-section-number">3</span> Import Libs &amp; Setup</h2>
 <p>First, get required packages and set environment variables:</p>
-<div class="cell" data-execution_count="3">
+<div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -395,7 +400,7 @@ ga('send', {
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>OPENAI_API_KEY <span class="op">=</span> os.getenv(<span class="st">"OPENAI_API_KEY"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>For our project we are also going to use Langsmith for logging runs and visulising runs, <a href="https://livingdatalab.com/posts/2023-08-16-langsmith-for-llm-application-evaluation.html">I wrote an article introducing Langsmith previously</a>. Let’s set up and configure Langsmith.</p>
-<div class="cell" data-execution_count="8">
+<div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> uuid <span class="im">import</span> uuid4</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>unique_id <span class="op">=</span> uuid4().<span class="bu">hex</span>[<span class="dv">0</span>:<span class="dv">8</span>]</span>
@@ -430,17 +435,21 @@ ga('send', {
 </ul>
 <p>Now, <code>Chinhook.db</code> is in our directory.</p>
 <p>Let’s create a <code>SQLDatabaseChain</code> to create and execute SQL queries.</p>
-<div class="cell" data-execution_count="9">
+<div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.utilities <span class="im">import</span> SQLDatabase</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.llms <span class="im">import</span> OpenAI</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_experimental.sql <span class="im">import</span> SQLDatabaseChain</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(<span class="st">"sqlite:///Chinook.db"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(<span class="st">"sqlite:///docs/Chinook.db"</span>)</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(temperature<span class="op">=</span><span class="dv">0</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>db_chain <span class="op">=</span> SQLDatabaseChain.from_llm(llm, db, verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/pranathfernando/opt/anaconda3/lib/python3.9/site-packages/deeplake/util/check_latest_version.py:32: UserWarning: A newer version of deeplake (3.6.24) is available. It's recommended that you update to the latest version using `pip install -U deeplake`.
+  warnings.warn(</code></pre>
 </div>
-<div class="cell" data-outputid="b457eac6-2aa8-4269-dfe4-61afcf1b1e9e" data-scrolled="true" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>db_chain.run(<span class="st">"How many customers are there?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="b457eac6-2aa8-4269-dfe4-61afcf1b1e9e" data-scrolled="true" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>db_chain.run(<span class="st">"How many customers are there?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 
@@ -451,7 +460,11 @@ SQLResult: [(59,)]
 Answer:There are 59 customers.
 &gt; Finished chain.</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="10">
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/pranathfernando/opt/anaconda3/lib/python3.9/site-packages/langchain/utilities/sql_database.py:357: SAWarning: Dialect sqlite+pysqlite does *not* support Decimal objects natively, and SQLAlchemy must convert from floating point - rounding errors and other issues may occur. Please consider storing Decimal numbers as strings or integers on this platform for lossless storage.
+  sample_rows_result = connection.execute(command)  # type: ignore</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>'There are 59 customers.'</code></pre>
 </div>
 </div>
@@ -459,23 +472,23 @@ Answer:There are 59 customers.
 </section>
 <section id="case-1-text-to-sql-query" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="case-1-text-to-sql-query"><span class="header-section-number">4</span> Case 1: Text-to-SQL query</h2>
-<div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chains <span class="im">import</span> create_sql_query_chain</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chains <span class="im">import</span> create_sql_query_chain</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s create the chain that will build the SQL Query:</p>
-<div class="cell" data-outputid="c6279e54-bc3e-43ff-9f42-161543cc4b5b" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> create_sql_query_chain(ChatOpenAI(temperature<span class="op">=</span><span class="dv">0</span>), db)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> chain.invoke({<span class="st">"question"</span>:<span class="st">"How many customers are there"</span>})</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-outputid="c6279e54-bc3e-43ff-9f42-161543cc4b5b" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> create_sql_query_chain(ChatOpenAI(temperature<span class="op">=</span><span class="dv">0</span>), db)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> chain.invoke({<span class="st">"question"</span>:<span class="st">"How many customers are there"</span>})</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>SELECT COUNT(*) FROM Customer</code></pre>
 </div>
 </div>
 <p>After building the SQL query based on a user question, we can execute the query:</p>
-<div class="cell" data-outputid="c99ae4d7-111a-4b95-aa86-0c5e604ed6bf" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>db.run(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
+<div class="cell" data-outputid="c99ae4d7-111a-4b95-aa86-0c5e604ed6bf" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>db.run(response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>'[(59,)]'</code></pre>
 </div>
 </div>
@@ -733,45 +746,45 @@ SQLQuery: </code></pre>
 <li>Using a vector database to provide dynamic examples that are relevant to the individual user question - Hardcoding a few instances of questions and their related SQL query in the prompt</li>
 </ul>
 <p>All of these examples involve changing the prompt for the chain. For example, we could include the following instances in our prompt:</p>
-<div class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.prompts <span class="im">import</span> PromptTemplate</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>TEMPLATE <span class="op">=</span> <span class="st">"""Given an input question, first create a syntactically correct </span><span class="sc">{dialect}</span><span class="st"> query to run, then look at the results of the query and return the answer.</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">Use the following format:</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">Question: "Question here"</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">SQLQuery: "SQL Query to run"</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">SQLResult: "Result of the SQLQuery"</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">Answer: "Final answer here"</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="st">Only use the following tables:</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="sc">{table_info}</span><span class="st">.</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="st">Some examples of SQL queries that corrsespond to questions are:</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="sc">{few_shot_examples}</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="st">Question: </span><span class="sc">{input}</span><span class="st">"""</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>CUSTOM_PROMPT <span class="op">=</span> PromptTemplate(</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    input_variables<span class="op">=</span>[<span class="st">"input"</span>, <span class="st">"few_shot_examples"</span>, <span class="st">"table_info"</span>, <span class="st">"dialect"</span>], template<span class="op">=</span>TEMPLATE</span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.prompts <span class="im">import</span> PromptTemplate</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>TEMPLATE <span class="op">=</span> <span class="st">"""Given an input question, first create a syntactically correct </span><span class="sc">{dialect}</span><span class="st"> query to run, then look at the results of the query and return the answer.</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="st">Use the following format:</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="st">Question: "Question here"</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="st">SQLQuery: "SQL Query to run"</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="st">SQLResult: "Result of the SQLQuery"</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="st">Answer: "Final answer here"</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="st">Only use the following tables:</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="sc">{table_info}</span><span class="st">.</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="st">Some examples of SQL queries that corrsespond to questions are:</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="sc">{few_shot_examples}</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="st">Question: </span><span class="sc">{input}</span><span class="st">"""</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>CUSTOM_PROMPT <span class="op">=</span> PromptTemplate(</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    input_variables<span class="op">=</span>[<span class="st">"input"</span>, <span class="st">"few_shot_examples"</span>, <span class="st">"table_info"</span>, <span class="st">"dialect"</span>], template<span class="op">=</span>TEMPLATE</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="case-2-text-to-sql-query-and-execution" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="case-2-text-to-sql-query-and-execution"><span class="header-section-number">5</span> Case 2: Text-to-SQL query and execution</h2>
 <p>We can use <code>SQLDatabaseChain</code> from <code>langchain_experimental</code> to create and run SQL queries.</p>
-<div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.llms <span class="im">import</span> OpenAI</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_experimental.sql <span class="im">import</span> SQLDatabaseChain</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(temperature<span class="op">=</span><span class="dv">0</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>db_chain <span class="op">=</span> SQLDatabaseChain.from_llm(llm, db, verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.llms <span class="im">import</span> OpenAI</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_experimental.sql <span class="im">import</span> SQLDatabaseChain</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(temperature<span class="op">=</span><span class="dv">0</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>db_chain <span class="op">=</span> SQLDatabaseChain.from_llm(llm, db, verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-outputid="51f6bf33-5af9-4f88-9ca1-fb64540d8b43" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>db_chain.run(<span class="st">"How many customers are there?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-outputid="51f6bf33-5af9-4f88-9ca1-fb64540d8b43" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>db_chain.run(<span class="st">"How many customers are there?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 
@@ -782,7 +795,7 @@ SQLResult: [(59,)]
 Answer:There are 59 customers.
 &gt; Finished chain.</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="16">
+<div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>'There are 59 customers.'</code></pre>
 </div>
 </div>
@@ -825,16 +838,16 @@ Answer:There are 59 customers.
 <p><strong>Adding Sample Rows</strong></p>
 <p>Providing sample data can help the LLM construct correct queries when the data format is not obvious.</p>
 <p>For example, we can tell LLM that artists are saved with their full names by providing two rows from the Track table.</p>
-<div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sqlite:///Chinook.db"</span>,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    include_tables<span class="op">=</span>[<span class="st">'Track'</span>], <span class="co"># we include only one table to save tokens in the prompt :)</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    sample_rows_in_table_info<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sqlite:///docs/Chinook.db"</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    include_tables<span class="op">=</span>[<span class="st">'Track'</span>], <span class="co"># we include only one table to save tokens in the prompt :)</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    sample_rows_in_table_info<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The sample rows are added to the prompt after each corresponding table’s column information.</p>
 <p>We can use <code>db.table_info</code> and check which sample rows are included:</p>
-<div class="cell" data-outputid="ae34abbf-bb00-49dc-8817-9da8537f853a" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(db.table_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-outputid="ae34abbf-bb00-49dc-8817-9da8537f853a" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(db.table_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 CREATE TABLE "Track" (
@@ -887,28 +900,28 @@ TrackId Name    AlbumId MediaTypeId GenreId Composer    Milliseconds    Bytes   
 <li>Get table descriptions</li>
 <li>… and much more</li>
 </ul>
-<div class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_sql_agent</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_toolkits <span class="im">import</span> SQLDatabaseToolkit</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># from langchain.agents import AgentExecutor</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_types <span class="im">import</span> AgentType</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(<span class="st">"sqlite:///Chinook.db"</span>)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(temperature<span class="op">=</span><span class="dv">0</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>agent_executor <span class="op">=</span> create_sql_agent(</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    llm<span class="op">=</span>OpenAI(temperature<span class="op">=</span><span class="dv">0</span>),</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    toolkit<span class="op">=</span>SQLDatabaseToolkit(db<span class="op">=</span>db, llm<span class="op">=</span>OpenAI(temperature<span class="op">=</span><span class="dv">0</span>)),</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    agent_type<span class="op">=</span>AgentType.ZERO_SHOT_REACT_DESCRIPTION,</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_sql_agent</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_toolkits <span class="im">import</span> SQLDatabaseToolkit</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># from langchain.agents import AgentExecutor</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_types <span class="im">import</span> AgentType</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(<span class="st">"sqlite:///docs/Chinook.db"</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> OpenAI(temperature<span class="op">=</span><span class="dv">0</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>agent_executor <span class="op">=</span> create_sql_agent(</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    llm<span class="op">=</span>OpenAI(temperature<span class="op">=</span><span class="dv">0</span>),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    toolkit<span class="op">=</span>SQLDatabaseToolkit(db<span class="op">=</span>db, llm<span class="op">=</span>OpenAI(temperature<span class="op">=</span><span class="dv">0</span>)),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    agent_type<span class="op">=</span>AgentType.ZERO_SHOT_REACT_DESCRIPTION,</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="agent-task-example-1---running-queries" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="agent-task-example-1---running-queries"><span class="header-section-number">6.1</span> Agent task example #1 - Running queries</h3>
-<div class="cell" data-outputid="c98e1428-eac3-4e58-986a-a292057c6e33" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>agent_executor.run(</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"List the total sales per country. Which country's customers spent the most?"</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-outputid="c98e1428-eac3-4e58-986a-a292057c6e33" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>agent_executor.run(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"List the total sales per country. Which country's customers spent the most?"</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 
@@ -977,7 +990,7 @@ Final Answer: The country with the highest total sales is the USA, with a total 
 
 &gt; Finished chain.</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="20">
+<div class="cell-output cell-output-display" data-execution_count="15">
 <pre><code>'The country with the highest total sales is the USA, with a total of $523.06.'</code></pre>
 </div>
 </div>
@@ -1005,8 +1018,8 @@ Action Input: SELECT Country, SUM(Total) AS TotalSales FROM Invoice INNER JOIN C
 </section>
 <section id="agent-task-example-2---describing-a-table" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="agent-task-example-2---describing-a-table"><span class="header-section-number">6.2</span> Agent task example #2 - Describing a Table</h3>
-<div class="cell" data-outputid="445b8b45-1ee6-4aee-b549-88e19c4c82eb" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>agent_executor.run(<span class="st">"Describe the playlisttrack table"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-outputid="445b8b45-1ee6-4aee-b549-88e19c4c82eb" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>agent_executor.run(<span class="st">"Describe the playlisttrack table"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 
@@ -1014,7 +1027,7 @@ Action Input: SELECT Country, SUM(Total) AS TotalSales FROM Invoice INNER JOIN C
 Action: sql_db_list_tables
 Action Input: 
 Observation: Album, Artist, Customer, Employee, Genre, Invoice, InvoiceLine, MediaType, Playlist, PlaylistTrack, Track
-Thought: The PlaylistTrack table is the most relevant to the question.
+Thought: I should query the schema of the PlaylistTrack table
 Action: sql_db_schema
 Action Input: PlaylistTrack
 Observation: 
@@ -1038,19 +1051,260 @@ Final Answer: The PlaylistTrack table contains two columns, PlaylistId and Track
 
 &gt; Finished chain.</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div class="cell-output cell-output-display" data-execution_count="16">
 <pre><code>'The PlaylistTrack table contains two columns, PlaylistId and TrackId, which are both integers and form a primary key. It also has two foreign keys, one to the Track table and one to the Playlist table.'</code></pre>
 </div>
 </div>
 </section>
-<section id="go-deeper-2" class="level3" data-number="6.3">
-<h3 data-number="6.3" class="anchored" data-anchor-id="go-deeper-2"><span class="header-section-number">6.3</span> Go deeper</h3>
-<p>To learn more about the SQL Agent and how it works we refer to the <a href="../docs/integrations/toolkits/sql_database">SQL Agent Toolkit</a> documentation.</p>
+</section>
+<section id="extending-the-sql-toolkit-with-domain-specific-knowledge-tools" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="extending-the-sql-toolkit-with-domain-specific-knowledge-tools"><span class="header-section-number">7</span> Extending the SQL Toolkit with Domain Specific Knowledge Tools</h2>
+<p>In a recent <a href="https://blog.langchain.dev/incorporating-domain-specific-knowledge-in-sql-llm-solutions/">Langchain blog article on 5/9/23</a> they highlighted how you can use few shot examples to bring in domain specific knowlege as an alternative approach.</p>
+<p>Although the Langchain SQL Toolkit includes all of the tools needed to begin working on a database, several additional tools may be beneficial for increasing the agent’s capabilities. This is especially important when attempting to integrate domain-specific information in the solution to increase overall performance.</p>
+<p>Here are a few examples:</p>
+<ul>
+<li>Including dynamic demonstrations of a few shots</li>
+<li>Identifying misspellings of proper nouns for use as column filters</li>
+</ul>
+<p>We can develop distinct tools to address these unique use cases and include them as an addition to the regular SQL Toolkit. Let’s look at how to incorporate these two bespoke tools.</p>
+<section id="including-dynamic-few-shot-examples" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="including-dynamic-few-shot-examples"><span class="header-section-number">7.1</span> Including dynamic few-shot examples</h3>
+<p>To integrate dynamic few-shot examples, we require a custom Retriever Tool that searches the vector database for examples that are semantically related to the user’s query.</p>
+<p>Let’s begin by making a dictionary out of several examples:</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>few_shots <span class="op">=</span> {<span class="st">'List all artists.'</span>: <span class="st">'SELECT * FROM artists;'</span>,</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Find all albums for the artist 'AC/DC'."</span>: <span class="st">"SELECT * FROM albums WHERE ArtistId = (SELECT ArtistId FROM artists WHERE Name = 'AC/DC');"</span>,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"List all tracks in the 'Rock' genre."</span>: <span class="st">"SELECT * FROM tracks WHERE GenreId = (SELECT GenreId FROM genres WHERE Name = 'Rock');"</span>,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">'Find the total duration of all tracks.'</span>: <span class="st">'SELECT SUM(Milliseconds) FROM tracks;'</span>,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">'List all customers from Canada.'</span>: <span class="st">"SELECT * FROM customers WHERE Country = 'Canada';"</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">'How many tracks are there in the album with ID 5?'</span>: <span class="st">'SELECT COUNT(*) FROM tracks WHERE AlbumId = 5;'</span>,</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>              <span class="st">'Find the total number of invoices.'</span>: <span class="st">'SELECT COUNT(*) FROM invoices;'</span>,</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>              <span class="st">'List all tracks that are longer than 5 minutes.'</span>: <span class="st">'SELECT * FROM tracks WHERE Milliseconds &gt; 300000;'</span>,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>              <span class="st">'Who are the top 5 customers by total purchase?'</span>: <span class="st">'SELECT CustomerId, SUM(Total) AS TotalPurchase FROM invoices GROUP BY CustomerId ORDER BY TotalPurchase DESC LIMIT 5;'</span>,</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>              <span class="st">'Which albums are from the year 2000?'</span>: <span class="st">"SELECT * FROM albums WHERE strftime('%Y', ReleaseDate) = '2000';"</span>,</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>              <span class="st">'How many employees are there'</span>: <span class="st">'SELECT COUNT(*) FROM "employee"'</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>             }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then create a retriever using the list of questions, assigning the target SQL query as metadata:</p>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.embeddings.openai <span class="im">import</span> OpenAIEmbeddings</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.vectorstores <span class="im">import</span> FAISS</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.schema <span class="im">import</span> Document</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>embeddings <span class="op">=</span> OpenAIEmbeddings()</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>few_shot_docs <span class="op">=</span> [Document(page_content<span class="op">=</span>question, metadata<span class="op">=</span>{<span class="st">'sql_query'</span>: few_shots[question]}) <span class="cf">for</span> question <span class="kw">in</span> few_shots.keys()]</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>vector_db <span class="op">=</span> FAISS.from_documents(few_shot_docs, embeddings)</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>retriever <span class="op">=</span> vector_db.as_retriever()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can create our own custom tool and append it as a new tool in the create_sql_agent function:</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_toolkits <span class="im">import</span> create_retriever_tool</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>tool_description <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="st">This tool will help you understand similar examples to adapt them to the user question.</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="st">Input to this tool should be the user question.</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>retriever_tool <span class="op">=</span> create_retriever_tool(</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>        retriever,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">'sql_get_similar_examples'</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>        description<span class="op">=</span>tool_description</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>custom_tool_list <span class="op">=</span> [retriever_tool]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can now create the agent by modifying the normal SQL Agent suffix to reflect our use case. Although including it in the tool description is the simplest method to manage this, it is frequently insufficient, and we must express it in the agent prompt using the suffix argument in the constructor.</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_sql_agent, AgentType</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_toolkits <span class="im">import</span> SQLDatabaseToolkit</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.utilities <span class="im">import</span> SQLDatabase</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> SQLDatabase.from_uri(<span class="st">"sqlite:///docs/Chinook.db"</span>)</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> ChatOpenAI(model_name<span class="op">=</span><span class="st">'gpt-4'</span>,temperature<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>toolkit <span class="op">=</span> SQLDatabaseToolkit(db<span class="op">=</span>db, llm<span class="op">=</span>llm)</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>custom_suffix <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="st">I should first get the similar examples I know.</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="st">If the examples are enough to construct the query, I can build it.</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="st">Otherwise, I can then look at the tables in the database to see what I can query.</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="st">Then I should query the schema of the most relevant tables</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>agent <span class="op">=</span> create_sql_agent(llm<span class="op">=</span>llm,</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>                         toolkit<span class="op">=</span>toolkit,</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>                         verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>                         agent_type<span class="op">=</span>AgentType.OPENAI_FUNCTIONS,</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>                         extra_tools<span class="op">=</span>custom_tool_list,</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>                         suffix<span class="op">=</span>custom_suffix</span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>                        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>agent.run(<span class="st">"How many employees do we have?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+&gt; Entering new AgentExecutor chain...
+
+Invoking: `sql_get_similar_examples` with `How many employees do we have?`
+
+
+[Document(page_content='How many employees are there', metadata={'sql_query': 'SELECT COUNT(*) FROM "employee"'}), Document(page_content='Find the total number of invoices.', metadata={'sql_query': 'SELECT COUNT(*) FROM invoices;'}), Document(page_content='Who are the top 5 customers by total purchase?', metadata={'sql_query': 'SELECT CustomerId, SUM(Total) AS TotalPurchase FROM invoices GROUP BY CustomerId ORDER BY TotalPurchase DESC LIMIT 5;'}), Document(page_content='List all customers from Canada.', metadata={'sql_query': "SELECT * FROM customers WHERE Country = 'Canada';"})]
+Invoking: `sql_db_query_checker` with `SELECT COUNT(*) FROM employee`
+responded: {content}
+
+SELECT COUNT(*) FROM employee
+Invoking: `sql_db_query` with `SELECT COUNT(*) FROM employee`
+
+
+[(8,)]We have 8 employees.
+
+&gt; Finished chain.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>'We have 8 employees.'</code></pre>
+</div>
+</div>
+</section>
+<section id="identifying-and-fixing-proper-noun-misspellings" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="identifying-and-fixing-proper-noun-misspellings"><span class="header-section-number">7.2</span> Identifying and fixing proper noun misspellings</h3>
+<p>To accurately filter data from columns that contain proper nouns such as addresses, song titles, or artists, we must first double-check the spelling.</p>
+<p>We may accomplish this by establishing a vector store with all of the various proper nouns in the database. The agent can then query that vector storage each time a proper noun is included in a question to find the right spelling for that word. Before constructing the target query, the agent can ensure that it understands which entity the user is referring to.</p>
+<p>Let’s take a similar technique to the few shots, but without the metadata: embedding the proper nouns and then querying to find the one that is most similar to the misspelt user question.</p>
+<p>First we need the unique values for each entity we want, for which we define a function that parses the result into a list of elements:</p>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_query_save_results(db, query):</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> db.run(query)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> [el <span class="cf">for</span> sub <span class="kw">in</span> ast.literal_eval(res) <span class="cf">for</span> el <span class="kw">in</span> sub <span class="cf">if</span> el]</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> [re.sub(<span class="vs">r'\b\d+\b'</span>, <span class="st">''</span>, string).strip() <span class="cf">for</span> string <span class="kw">in</span> res]</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>artists <span class="op">=</span> run_query_save_results(db, <span class="st">"SELECT Name FROM Artist"</span>)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>albums <span class="op">=</span> run_query_save_results(db, <span class="st">"SELECT Title FROM Album"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can proceed with creating the custom retreiver tool and the final agent:</p>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_toolkits <span class="im">import</span> create_retriever_tool</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.embeddings.openai <span class="im">import</span> OpenAIEmbeddings</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.vectorstores <span class="im">import</span> FAISS</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>texts <span class="op">=</span> (artists <span class="op">+</span> albums)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>embeddings <span class="op">=</span> OpenAIEmbeddings()</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>vector_db <span class="op">=</span> FAISS.from_texts(texts, embeddings)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>retriever <span class="op">=</span> vector_db.as_retriever()</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>retriever_tool <span class="op">=</span> create_retriever_tool(</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>        retriever,</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">'name_search'</span>,</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>        description<span class="op">=</span><span class="st">'use to learn how a piece of data is actually written, can be from names, surnames addresses etc'</span></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>custom_tool_list <span class="op">=</span> [retriever_tool]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_sql_agent, AgentType</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.agent_toolkits <span class="im">import</span> SQLDatabaseToolkit</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.utilities <span class="im">import</span> SQLDatabase</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co"># db = SQLDatabase.from_uri("sqlite:///Chinook.db")</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> ChatOpenAI(model_name<span class="op">=</span><span class="st">'gpt-4'</span>, temperature<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>toolkit <span class="op">=</span> SQLDatabaseToolkit(db<span class="op">=</span>db, llm<span class="op">=</span>llm)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>custom_suffix <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="st">If a user asks for me to filter based on proper nouns, I should first check the spelling using the name_search tool.</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="st">Otherwise, I can then look at the tables in the database to see what I can query.</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="st">Then I should query the schema of the most relevant tables</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>agent <span class="op">=</span> create_sql_agent(llm<span class="op">=</span>llm,</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>                         toolkit<span class="op">=</span>toolkit,</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>                         verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>                         agent_type<span class="op">=</span>AgentType.OPENAI_FUNCTIONS,</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>                         extra_tools<span class="op">=</span>custom_tool_list,</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>                         suffix<span class="op">=</span>custom_suffix</span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>                        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>agent.run(<span class="st">"How many albums does alis in pains have?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+&gt; Entering new AgentExecutor chain...
+
+Invoking: `name_search` with `alis in pains`
+
+
+[Document(page_content='House of Pain', metadata={}), Document(page_content='Alice In Chains', metadata={}), Document(page_content='Aisha Duo', metadata={}), Document(page_content='House Of Pain', metadata={})]
+Invoking: `sql_db_list_tables` with ``
+responded: {content}
+
+Album, Artist, Customer, Employee, Genre, Invoice, InvoiceLine, MediaType, Playlist, PlaylistTrack, Track
+Invoking: `sql_db_schema` with `Album, Artist`
+responded: {content}
+
+
+CREATE TABLE "Album" (
+    "AlbumId" INTEGER NOT NULL, 
+    "Title" NVARCHAR(160) NOT NULL, 
+    "ArtistId" INTEGER NOT NULL, 
+    PRIMARY KEY ("AlbumId"), 
+    FOREIGN KEY("ArtistId") REFERENCES "Artist" ("ArtistId")
+)
+
+/*
+3 rows from Album table:
+AlbumId Title   ArtistId
+1   For Those About To Rock We Salute You   1
+2   Balls to the Wall   2
+3   Restless and Wild   2
+*/
+
+
+CREATE TABLE "Artist" (
+    "ArtistId" INTEGER NOT NULL, 
+    "Name" NVARCHAR(120), 
+    PRIMARY KEY ("ArtistId")
+)
+
+/*
+3 rows from Artist table:
+ArtistId    Name
+1   AC/DC
+2   Accept
+3   Aerosmith
+*/
+Invoking: `sql_db_query_checker` with `SELECT COUNT(*) FROM Album WHERE ArtistId = (SELECT ArtistId FROM Artist WHERE Name = 'Alice In Chains')`
+responded: {content}
+
+SELECT COUNT(*) FROM Album WHERE ArtistId = (SELECT ArtistId FROM Artist WHERE Name = 'Alice In Chains')
+Invoking: `sql_db_query` with `SELECT COUNT(*) FROM Album WHERE ArtistId = (SELECT ArtistId FROM Artist WHERE Name = 'Alice In Chains')`
+
+
+[(1,)]Alice In Chains has 1 album in the database.
+
+&gt; Finished chain.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>'Alice In Chains has 1 album in the database.'</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="further-reading" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">8</span> Further Reading</h2>
+<p>To learn more about the SQL Agent and how it works please refer to the <a href="../docs/integrations/toolkits/sql_database">SQL Agent Toolkit</a> and <a href="https://python.langchain.com/docs/use_cases/qa_structured/sql">LangChain Uses cases - SQL</a> documentation.</p>
 <p>You can also check Agents for other document types: - <a href="../docs/integrations/toolkits/pandas.html">Pandas Agent</a> - <a href="../docs/integrations/toolkits/csv.html">CSV Agent</a></p>
 </section>
-</section>
-<section id="acknowledgements" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">7</span> Acknowledgements</h2>
+<section id="acknowledgements" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">9</span> Acknowledgements</h2>
 <p>I’d like to express my thanks to the wonderful <a href="https://docs.smith.langchain.com/">Langsmith Documentation</a> and acknowledge the use of some images and other materials from the documentation in this article.</p>
 
 

@@ -31,3 +31,13 @@ body a.external:after {
     background-image: none !important;
     display: none !important;
 }
+header#title-block-header,
+header .quarto-secondary-nav {
+    display:none;
+}
+
+@media (min-width: 992px) {
+    header#title-block-header {
+        display:block;
+    }
+}
