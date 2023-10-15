@@ -31,11 +31,12 @@ body a.external:after {
     background-image: none !important;
     display: none !important;
 }
-header#title-block-header,
 header .quarto-secondary-nav {
     display:none;
 }
-
+.quarto-title-banner {
+    padding-bottom: 2.5em !important;;
+}
 @media (min-width: 992px) {
     header#title-block-header {
         display: grid;
