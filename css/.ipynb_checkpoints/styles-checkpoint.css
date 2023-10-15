@@ -38,6 +38,6 @@ header .quarto-secondary-nav {
 
 @media (min-width: 992px) {
     header#title-block-header {
-        display:block;
+        display: grid;
     }
 }

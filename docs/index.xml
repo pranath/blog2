@@ -10,7 +10,17 @@
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>LivingDataLab Data Science &amp; AI Blog</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Sat, 19 Aug 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 14 Oct 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>AI and the Meta-Crisis - How AI is likely to play a major role in the multiple threats humanity faces and their possible solutions</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-10-15-ai-the-metacrisis-how-ai-will-play-a-major-roleiin-multiple-existential-threats-and-solutions.html</link>
+  <description><![CDATA[ In an era marked by burgeoning technological capabilities, humanity finds itself on the precipice of self-induced existential calamities. The concern doesn’t merely lie in the manifest risks, but also in the inadvertent augmentation of certain risks while trying to mitigate others. This article aims to introduce concepts that help us understand these called the Meta-crisis and Third Attractor, and describe how AI plays an essential role of both of these. ]]></description>
+  <category>ideas</category>
+  <guid>http://livingdatalab.com/posts/2023-10-15-ai-the-metacrisis-how-ai-will-play-a-major-roleiin-multiple-existential-threats-and-solutions.html</guid>
+  <pubDate>Sat, 14 Oct 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/ai-metacrisis.png" medium="image" type="image/png"/>
+</item>
 <item>
   <title>Using LLMs and Langchain to Ask Questions about SQL Databases</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -289,21 +299,6 @@
   <guid>http://livingdatalab.com/posts/2023-08-02-using-prompt-templates-for-llms.html</guid>
   <pubDate>Tue, 01 Aug 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Prompt Engineering Tips and Tricks for Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-08-01-prompt-engineering-tips-and-tricks.html</link>
-  <description><![CDATA[ In the relatively young field of prompt engineering, prompts are created and improved in order to make efficient use of language models for a variety of applications and research areas. It is necessary for many NLP tasks and aids in a better understanding of the strengths and weaknesses of LLMs. To assist you better comprehend the subtleties of prompt engineering, we will use real-world examples to contrast good and terrible prompts. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <category>prompt-engineering</category>
-  <guid>http://livingdatalab.com/posts/2023-08-01-prompt-engineering-tips-and-tricks.html</guid>
-  <pubDate>Mon, 31 Jul 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake1.png" medium="image" type="image/png"/>
 </item>
 </channel>
 </rss>
