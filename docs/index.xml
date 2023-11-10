@@ -8,9 +8,82 @@
 <title>LivingDataLab</title>
 <link>http://livingdatalab.com/index.html</link>
 <atom:link href="http://livingdatalab.com/index.xml" rel="self" type="application/rss+xml"/>
-<description>LivingDataLab Data Science &amp; AI Blog</description>
+<description>LivingDataLab AI Technical Blog</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Sat, 14 Oct 2023 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 08 Nov 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Langchain and OpenAI Functions - Conversational agents</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-11-08-langchain-openai-functional_conversational-agents.html</link>
+  <description><![CDATA[ In this post we aim to explore the advanced concept of conversational agents. Building upon our previous articles, we delve into creating a conversational future using Large Language Models (LLMs), blending tool usage with chat memory, akin to the workings of OpenAI’s ChatGPT. This article serves as a comprehensive guide to understanding and implementing these agents. ]]></description>
+  <category>natural-language-processing</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <category>agents</category>
+  <guid>http://livingdatalab.com/posts/2023-11-08-langchain-openai-functional_conversational-agents.html</guid>
+  <pubDate>Wed, 08 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Langchain and OpenAI Functions - Tools and Routing</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-11-07-langchain-openai-functions-tools-routing-apis.html</link>
+  <description><![CDATA[ This article will delve into the mechanics of OpenAI’s functions, how to use it to select the appropriate tools for an LLM, and how to execute them efficiently. This can give you the knowledge to create your own tools tailored to specific tasks and to utilize them effectively within the OpenAI framework and Langchain to create powerful LLM based applications. ]]></description>
+  <category>natural-language-processing</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-11-07-langchain-openai-functions-tools-routing-apis.html</guid>
+  <pubDate>Tue, 07 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain1.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Enhancing Data Structuring through Tagging and Extraction with OpenAI and LangChain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-11-06-tagging-and-extraction-with-openai-and-langchain.html</link>
+  <description><![CDATA[ Structured data extraction is increasingly becoming an essential tool for developers who wish to harness the power of Large Language Model capabilities. This blog post aims to provide a comprehensive understanding of how developers can use OpenAI functions for tagging and extraction, two primary use cases central to transforming unstructured text into structured, actionable data. ]]></description>
+  <category>natural-language-processing</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-11-06-tagging-and-extraction-with-openai-and-langchain.html</guid>
+  <pubDate>Mon, 06 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain3.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>OpenAI Function Calling In LangChain</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-11-05-openai-function-calling-with-langchain.html</link>
+  <description><![CDATA[ In our ongoing exploration of artificial intelligence tools, this article synthesizes insights from our previous articles, focusing on the integration of OpenAI functions with Langchain’s expression language. We will also delve into the utility of PyDantic, a Python library that simplifies the construction of OpenAI functions. ]]></description>
+  <category>natural-language-processing</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-11-05-openai-function-calling-with-langchain.html</guid>
+  <pubDate>Sun, 05 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain2.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>An Introduction to LangChain Expression Language (LCEL)</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-11-04-an-introduction-to-langchain-expression-language.html</link>
+  <description><![CDATA[ In the evolving world of large language models and AI, the need for more streamlined and efficient methods of chaining components and agents together has led to the development of LangChain, and more recently the LangChain Expression Language (LCEL). This new syntax simplifies the construction and management of these llm chains, enhancing transparency and usability, enabling the building of LLM application prototypes quicker and faster. ]]></description>
+  <category>natural-language-processing</category>
+  <category>deep-learning</category>
+  <category>langchain</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-11-04-an-introduction-to-langchain-expression-language.html</guid>
+  <pubDate>Sat, 04 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain1.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Unlocking Function Calls with OpenAI - A Step-by-Step Guide to Augmenting OpenAI Language Models</title>
+  <dc:creator>Pranath Fernando</dc:creator>
+  <link>http://livingdatalab.com/posts/2023-11-03-openai-function-calling-a-step-by-step-guide.html</link>
+  <description><![CDATA[ OpenAI’s API comes with a range of powerful features, one of which is the ability to call functions. This capability, introduced a few months back, opens up a realm of possibilities, making interactions with the language model more dynamic and informative - allowing the model to access external knowledge and functionality. ]]></description>
+  <category>natural-language-processing</category>
+  <category>openai</category>
+  <guid>http://livingdatalab.com/posts/2023-11-03-openai-function-calling-a-step-by-step-guide.html</guid>
+  <pubDate>Fri, 03 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://github.com/pranath/blog/raw/master/images/ai-db1.png" medium="image" type="image/png"/>
+</item>
 <item>
   <title>AI and the Meta-Crisis - How AI is likely to play a major role in the multiple threats humanity faces and their possible solutions</title>
   <dc:creator>Pranath Fernando</dc:creator>
@@ -27,7 +100,7 @@
   <link>http://livingdatalab.com/posts/2023-08-20-using-llms-langchain-to-ask-questions-about-sql-databases.html</link>
   <description><![CDATA[ SQL databases are frequently used to hold enterprise data. Natural language interaction with SQL databases is made feasible by LLMs such as OpenAI’s ChatGPT and GPT Models. LangChain provides SQL Chains and Agents for building and running SQL queries based on natural language prompts. These SQL Chains and Agents are compatible with any SQL dialect supported by SQLAlchemy (e.g., MySQL, PostgreSQL, Oracle SQL, Databricks, SQLite). ]]></description>
   <category>natural-language-processing</category>
-  <category>deep-learning</category>
+  <category>agents</category>
   <category>langchain</category>
   <category>openai</category>
   <category>llm-evaluation</category>
@@ -208,97 +281,6 @@
   <guid>http://livingdatalab.com/posts/2023-08-08-streamlined-data-ingestion-for-llms.html</guid>
   <pubDate>Mon, 07 Aug 2023 23:00:00 GMT</pubDate>
   <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Exploring The Role of LangChain’s Indexes and Retrievers</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-08-07-langchain-indexes-and-retreievers.html</link>
-  <description><![CDATA[ In LangChain, retrievers and indexes are essential for organising documents and obtaining relevant data for LLMs. With an emphasis on the function of indexes and retrievers, we will examine some of the benefits and drawbacks of employing document-based LLMs (i.e., LLMs that incorporate pertinent documents inside their prompts). ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <category>retrievers</category>
-  <guid>http://livingdatalab.com/posts/2023-08-07-langchain-indexes-and-retreievers.html</guid>
-  <pubDate>Sun, 06 Aug 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake3.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Creating Knowledge Graphs from Textual Data and LLM’s</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-08-06-creating-knowledge-graphs-from-text-data-with-llms.html</link>
-  <description><![CDATA[ Understanding the connections between various types of information is essential in today’s data-driven environment. Unstructured text may now be transformed into a structured network of items and their relationships using knowledge graphs, which have evolved as a potent tool for visualising and exploring these connections. We will walk you through a straightforward method for converting textual data into a knowledge graph, making complex content more approachable and understandable. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <category>prompt-engineering</category>
-  <category>network-analysis</category>
-  <guid>http://livingdatalab.com/posts/2023-08-06-creating-knowledge-graphs-from-text-data-with-llms.html</guid>
-  <pubDate>Sat, 05 Aug 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>An Improved News Articles Summarizer</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-08-05-an-improved-news-articles-summariser.html</link>
-  <description><![CDATA[ This article aims to improve our earlier News Article Summarizer implementation. Our goal is to improve our tool’s ability to extract the most important information from lengthy news items and display it in an easy-to-read, bulleted list format. With this improvement, consumers will be able to quickly and clearly understand the essential ideas of an article, saving time and improving the reading experience. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <category>prompt-engineering</category>
-  <guid>http://livingdatalab.com/posts/2023-08-05-an-improved-news-articles-summariser.html</guid>
-  <pubDate>Fri, 04 Aug 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake1.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Managing Large Language Model Outputs with Parsers</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-08-04-managing-llm-outputs-with-parsers.html</link>
-  <description><![CDATA[ In a production setting, a predictable data structure is always desired even when language models can only produce textual outputs. Imagine, for instance, that you are developing a thesaurus application and want to provide a list of potential synonyms depending on the context. The LLMs are strong enough to produce a lot of proposals quickly. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <category>prompt-engineering</category>
-  <guid>http://livingdatalab.com/posts/2023-08-04-managing-llm-outputs-with-parsers.html</guid>
-  <pubDate>Thu, 03 Aug 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake4.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Getting the Best of Few Shot Prompts and Example Selectors for LLMs</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-08-03-getting-the-best-of-few-shot-prompts-and-example-selectors.html</link>
-  <description><![CDATA[ In this article, we’ll examine how example selectors and few-shot prompts might improve LangChain’s language model performance. There are several ways to implement Few-shot prompting and Example selection in LangChain. To help you get the most of your language model, we’ll go through three different strategies and weigh their benefits and drawbacks. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <category>prompt-engineering</category>
-  <guid>http://livingdatalab.com/posts/2023-08-03-getting-the-best-of-few-shot-prompts-and-example-selectors.html</guid>
-  <pubDate>Wed, 02 Aug 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake3.png" medium="image" type="image/png"/>
-</item>
-<item>
-  <title>Using Prompt Templates with Large Language Models</title>
-  <dc:creator>Pranath Fernando</dc:creator>
-  <link>http://livingdatalab.com/posts/2023-08-02-using-prompt-templates-for-llms.html</link>
-  <description><![CDATA[ We can do a variety of jobs thanks to large language models. These models work on the simple premise that they take a text input sequence and produce a text output sequence. The prompt or input text is the most important element in this process. ]]></description>
-  <category>natural-language-processing</category>
-  <category>deep-learning</category>
-  <category>langchain</category>
-  <category>activeloop</category>
-  <category>openai</category>
-  <category>prompt-engineering</category>
-  <guid>http://livingdatalab.com/posts/2023-08-02-using-prompt-templates-for-llms.html</guid>
-  <pubDate>Tue, 01 Aug 2023 23:00:00 GMT</pubDate>
-  <media:content url="https://github.com/pranath/blog/raw/master/images/langchain-deeplake2.png" medium="image" type="image/png"/>
 </item>
 </channel>
 </rss>

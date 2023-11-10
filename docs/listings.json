@@ -13,6 +13,12 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-11-08-langchain-openai-functional_conversational-agents.html",
+      "/posts/2023-11-07-langchain-openai-functions-tools-routing-apis.html",
+      "/posts/2023-11-06-tagging-and-extraction-with-openai-and-langchain.html",
+      "/posts/2023-11-05-openai-function-calling-with-langchain.html",
+      "/posts/2023-11-04-an-introduction-to-langchain-expression-language.html",
+      "/posts/2023-11-03-openai-function-calling-a-step-by-step-guide.html",
       "/posts/2023-10-15-ai-the-metacrisis-how-ai-will-play-a-major-roleiin-multiple-existential-threats-and-solutions.html",
       "/posts/2023-08-20-using-llms-langchain-to-ask-questions-about-sql-databases.html",
       "/posts/2023-08-19-comparing-question-answer-llm-system-outputs.html",

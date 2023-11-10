@@ -19,6 +19,6 @@ about:
 
 ---
 
-Livingdatalab is the professional blog of Pranath Fernando, a Data Scientist with a special interest in Artifical Intelligence (AI), NLP, Large Language Models (LLM's) and its applications.
+Livingdatalab is the professional blog of Pranath Fernando, an AI Consultant, AI Strategist & Data Scientist with a special interest in NLP, Large Language Models (LLM's) and its applications.
 
 I can be contacted via Linkedin or Twitter using the links below.

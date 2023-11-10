@@ -4,14 +4,14 @@ project:
 
 website:
   title: "LivingDataLab"
-  description: 'LivingDataLab Data Science & AI Blog'
+  description: 'LivingDataLab AI Technical Blog'
   site-url: 'http://livingdatalab.com'
   twitter-card: true
   open-graph: true
   favicon: "images/favicon.ico"
   google-analytics: "UA-91568149-1"
   margin-header: subscribe.html
-  page-footer: "LivingDataLab Data Science & AI Blog" 
+  page-footer: "LivingDataLab AI Technical Blog" 
   body-footer: subscribe.html
   navbar:
     logo: "images/logo.png"

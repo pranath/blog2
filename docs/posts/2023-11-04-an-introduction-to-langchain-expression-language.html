@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-11-04">
+<meta name="description" content="Here we introduce is a new syntax LangChain Expression Language (LCEL) that makes it much easier and more transparent to construct and work with different LLM chains and agents for LLM based applications">
+
+<title>LivingDataLab - An Introduction to LangChain Expression Language (LCEL)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - An Introduction to LangChain Expression Language (LCEL)">
+<meta property="og:description" content="Here we introduce is a new syntax LangChain Expression Language (LCEL) that makes it much easier and more transparent to construct and work with different LLM chains and agents for LLM based applications">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/langchain1.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - An Introduction to LangChain Expression Language (LCEL)">
+<meta name="twitter:description" content="Here we introduce is a new syntax LangChain Expression Language (LCEL) that makes it much easier and more transparent to construct and work with different LLM chains and agents for LLM based applications">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/langchain1.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">An Introduction to LangChain Expression Language (LCEL)</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">An Introduction to LangChain Expression Language (LCEL)</h1>
+                  <div>
+        <div class="description">
+          Here we introduce is a new syntax LangChain Expression Language (LCEL) that makes it much easier and more transparent to construct and work with different LLM chains and agents for LLM based applications
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">deep-learning</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">openai</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 4, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#understanding-lcel-a-new-protocol-for-chaining-langchain-components" id="toc-understanding-lcel-a-new-protocol-for-chaining-langchain-components" class="nav-link" data-scroll-target="#understanding-lcel-a-new-protocol-for-chaining-langchain-components"><span class="header-section-number">2</span> Understanding LCEL: A New Protocol for Chaining LangChain Components</a>
+  <ul class="collapse">
+  <li><a href="#the-interface-of-runables-in-lcel" id="toc-the-interface-of-runables-in-lcel" class="nav-link" data-scroll-target="#the-interface-of-runables-in-lcel"><span class="header-section-number">2.1</span> The Interface of Runables in LCEL</a></li>
+  <li><a href="#common-properties-and-methods" id="toc-common-properties-and-methods" class="nav-link" data-scroll-target="#common-properties-and-methods"><span class="header-section-number">2.2</span> Common Properties and Methods</a></li>
+  </ul></li>
+  <li><a href="#the-advantages-of-utilizing-lcel" id="toc-the-advantages-of-utilizing-lcel" class="nav-link" data-scroll-target="#the-advantages-of-utilizing-lcel"><span class="header-section-number">3</span> The Advantages of Utilizing LCEL</a>
+  <ul class="collapse">
+  <li><a href="#fallbacks-parallelism-and-logging" id="toc-fallbacks-parallelism-and-logging" class="nav-link" data-scroll-target="#fallbacks-parallelism-and-logging"><span class="header-section-number">3.1</span> Fallbacks, Parallelism, and Logging</a></li>
+  </ul></li>
+  <li><a href="#practical-application-of-lcel" id="toc-practical-application-of-lcel" class="nav-link" data-scroll-target="#practical-application-of-lcel"><span class="header-section-number">4</span> Practical Application of LCEL</a></li>
+  <li><a href="#simple-chain" id="toc-simple-chain" class="nav-link" data-scroll-target="#simple-chain"><span class="header-section-number">5</span> Simple Chain</a>
+  <ul class="collapse">
+  <li><a href="#setting-up-and-executing-chains" id="toc-setting-up-and-executing-chains" class="nav-link" data-scroll-target="#setting-up-and-executing-chains"><span class="header-section-number">5.1</span> Setting Up and Executing Chains</a></li>
+  </ul></li>
+  <li><a href="#more-complex-chain" id="toc-more-complex-chain" class="nav-link" data-scroll-target="#more-complex-chain"><span class="header-section-number">6</span> More complex chain</a>
+  <ul class="collapse">
+  <li><a href="#advanced-chaining-techniques" id="toc-advanced-chaining-techniques" class="nav-link" data-scroll-target="#advanced-chaining-techniques"><span class="header-section-number">6.1</span> Advanced Chaining Techniques</a></li>
+  </ul></li>
+  <li><a href="#implementing-fallbacks-and-parallelism" id="toc-implementing-fallbacks-and-parallelism" class="nav-link" data-scroll-target="#implementing-fallbacks-and-parallelism"><span class="header-section-number">7</span> Implementing Fallbacks and Parallelism</a>
+  <ul class="collapse">
+  <li><a href="#debugging-and-modifying-chains" id="toc-debugging-and-modifying-chains" class="nav-link" data-scroll-target="#debugging-and-modifying-chains"><span class="header-section-number">7.1</span> Debugging and Modifying Chains</a></li>
+  </ul></li>
+  <li><a href="#interface" id="toc-interface" class="nav-link" data-scroll-target="#interface"><span class="header-section-number">8</span> Interface</a></li>
+  <li><a href="#conclusion-the-future-of-chaining-with-lcel" id="toc-conclusion-the-future-of-chaining-with-lcel" class="nav-link" data-scroll-target="#conclusion-the-future-of-chaining-with-lcel"><span class="header-section-number">9</span> Conclusion: The Future of Chaining with LCEL</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">10</span> Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>In the evolving world of large language models and AI, the need for more streamlined and efficient methods of chaining components and agents together has led to the development of LangChain, and more recently the LangChain Expression Language (LCEL). This new syntax simplifies the construction and management of these llm chains, enhancing transparency and usability, enabling the building of LLM application prototypes quicker and faster.</p>
+</section>
+<section id="understanding-lcel-a-new-protocol-for-chaining-langchain-components" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="understanding-lcel-a-new-protocol-for-chaining-langchain-components"><span class="header-section-number">2</span> Understanding LCEL: A New Protocol for Chaining LangChain Components</h2>
+<p>LCEL presents a new approach to composing various components of LangChain. It has a protocol that specifies a set of permissible input and output types, along with a suite of standard methods. These methods are designed to be universally applicable across all runables, allowing for uniform invocation. Moreover, LCEL facilitates the dynamic adjustment of parameters during runtime and the incorporation of additional options, such as fallback mechanisms.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/lcel-1.png" width="800"></p>
+<p>A large part of LangChain’s power derives from combining chains of diverse components. LCEL, a runable protocol that defines these things, is a new way of doing this. It begins by defining an acceptable set of input types and a corresponding allowed set of output types. There are then a number of standard methods, which we will go over in detail, but these are standard ways that all runables use, so you can refer to them all in the same way.</p>
+<section id="the-interface-of-runables-in-lcel" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="the-interface-of-runables-in-lcel"><span class="header-section-number">2.1</span> The Interface of Runables in LCEL</h3>
+<p>Every runable under LCEL is expected to adhere to a common interface, consisting of methods like ‘invoke’ for single inputs, ‘stream’ for streaming responses, and ‘batch’ for listed inputs. To cater to different operational needs, each of these synchronous methods is paired with an asynchronous counterpart, ensuring flexibility across various use cases.</p>
+</section>
+<section id="common-properties-and-methods" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="common-properties-and-methods"><span class="header-section-number">2.2</span> Common Properties and Methods</h3>
+<p>Runables share common properties, including input and output schemas that define the types they handle. This standardization is crucial for consistency and interoperability among different components within LangChain.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/lcel-2.png" width="800"></p>
+</section>
+</section>
+<section id="the-advantages-of-utilizing-lcel" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-advantages-of-utilizing-lcel"><span class="header-section-number">3</span> The Advantages of Utilizing LCEL</h2>
+<p>LCEL offers several benefits to developers and users alike. It comes equipped with asynchronous operations, streaming, and batch processing capabilities, making the transition from development to production seamless. Its design inherently supports parallel processing, vital for time-intensive language model (LLM) calls. Built-in logging capabilities provide visibility into the complex sequences of steps within chains and agents, essential for robust application development.</p>
+<p><img src="https://github.com/pranath/blog/raw/master/images/lcel-3.png" width="800"></p>
+<section id="fallbacks-parallelism-and-logging" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="fallbacks-parallelism-and-logging"><span class="header-section-number">3.1</span> Fallbacks, Parallelism, and Logging</h3>
+<p>The ability to attach fallbacks to both individual LLMs and entire chains ensures reliability in unpredictable scenarios. Parallel execution of LLM calls via LCEL maximizes efficiency. As chains and agents grow in complexity, the integrated logging system within LCEL offers a critical tool for monitoring and debugging.</p>
+</section>
+</section>
+<section id="practical-application-of-lcel" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="practical-application-of-lcel"><span class="header-section-number">4</span> Practical Application of LCEL</h2>
+<p>When it comes to practical usage, setting up an LCEL environment involves importing various components such as prompt templates, language models, and output parsers. These elements are then seamlessly chained together using LCEL’s syntax, with the ability to pass additional arguments and modify prompts on the fly.</p>
+<p>Let’s first import our libraries.</p>
+<div class="cell" data-tags="[]" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> openai</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv, find_dotenv</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> load_dotenv(find_dotenv()) <span class="co"># read local .env file</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>openai.api_key <span class="op">=</span> os.environ[<span class="st">'OPENAI_API_KEY'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!pip install pydantic==1.10.8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.prompts <span class="im">import</span> ChatPromptTemplate</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.schema.output_parser <span class="im">import</span> StrOutputParser</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/pranathfernando/opt/anaconda3/lib/python3.9/site-packages/deeplake/util/check_latest_version.py:32: UserWarning: A newer version of deeplake (3.8.4) is available. It's recommended that you update to the latest version using `pip install -U deeplake`.
+  warnings.warn(</code></pre>
+</div>
+</div>
+</section>
+<section id="simple-chain" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="simple-chain"><span class="header-section-number">5</span> Simple Chain</h2>
+<section id="setting-up-and-executing-chains" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="setting-up-and-executing-chains"><span class="header-section-number">5.1</span> Setting Up and Executing Chains</h3>
+<p>A simple chain might link a prompt template to a language model and then to an output parser. The integration process is straightforward, connecting components with specified types and utilizing the ‘invoke’ method for invocation, with inputs tailored to the prompt template’s requirements. And we’ll make one in which we ask the language model to give us a brief joke. The language model that will be used will then be initialised. Finally, we’ll design the output parser that we’ll use.</p>
+<p>All that remains is to connect them with the types and apps in order to form a chain. And we can now use the invoke method to call this chain. And the inputs here will be the prompt template’s inputs.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> ChatPromptTemplate.from_template(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tell me a short joke about </span><span class="sc">{topic}</span><span class="st">"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ChatOpenAI()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>output_parser <span class="op">=</span> StrOutputParser()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> prompt <span class="op">|</span> model <span class="op">|</span> output_parser</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>chain.invoke({<span class="st">"topic"</span>: <span class="st">"bears"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>"Why don't bears wear shoes? \n\nBecause they have bear feet!"</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="more-complex-chain" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="more-complex-chain"><span class="header-section-number">6</span> More complex chain</h2>
+<section id="advanced-chaining-techniques" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="advanced-chaining-techniques"><span class="header-section-number">6.1</span> Advanced Chaining Techniques</h3>
+<p>Beyond basic chains, LCEL also supports more complex operations like retrieval-augmented generation. This involves setting up retrievers, creating prompts that incorporate context and user questions, and then constructing chains that process these elements in a streamlined fashion.</p>
+<p>In a previous post <a href="../posts/2023-07-25-chat-with-your-data-using-memory-and-langchain.html">we discussed retrieval augmented generation (RAG)</a>. So we’ll use LCEL to mimic that process.</p>
+<p>First, we must configure our retrievers. We’ll start by making a very simple vector storage. This will be accomplished by initialising it with two types. We’ll then pass in the embedding model, open an embedding, and use vector store to generate a retriever. This includes retrievers.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.embeddings <span class="im">import</span> OpenAIEmbeddings</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.vectorstores <span class="im">import</span> DocArrayInMemorySearch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>vectorstore <span class="op">=</span> DocArrayInMemorySearch.from_texts(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"pranath worked at kensho"</span>, <span class="st">"bears like to eat honey"</span>],</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    embedding<span class="op">=</span>OpenAIEmbeddings()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>retriever <span class="op">=</span> vectorstore.as_retriever()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>So we call it with “where did Pranath work?” And we get a list of documents back, with the first one visible. If we ask it something different, such as what do bears like to eat, we can see that the first answer is that bears like to eat honey. So this is a simplistic example because there are just two documents, but the main point is that you can do this on a bigger number of documents and it will return the most relevant document, which we will then utilise in our retriever order of creation pipeline.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>retriever.get_relevant_documents(<span class="st">"where did pranath work?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>[Document(page_content='pranath worked at kensho', metadata={}),
+ Document(page_content='bears like to eat honey', metadata={})]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>retriever.get_relevant_documents(<span class="st">"what do bears like to eat"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>[Document(page_content='bears like to eat honey', metadata={}),
+ Document(page_content='pranath worked at kensho', metadata={})]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>template <span class="op">=</span> <span class="st">"""Answer the question based only on the following context:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="sc">{context}</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="st">Question: </span><span class="sc">{question}</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> ChatPromptTemplate.from_template(template)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To build this pipeline, we’ll start with a prompt that basically asks the language model to answer the question based only on the subsequent context, and has two variables here, as context and question, so we’ll be packing in two. We’ll be packing in the question, which will be the user query, and then we’ll be packing in the context, which will be the documents that we recover from the retriever.</p>
+<p>So, how do we plan on constructing this chain? The user question should be the first and only implicit chain. From there, we want to retrieve relevant context, which we will then pass into the prompt, which we will then pass into a model, which we will then give into the other person and transform the chat message into a string. So the first thing we’ll do is build something that takes a single question and converts it into a dictionary comprising two elements: context and question. To accomplish so, we’ll utilise a runnable map, which we can import like this.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.schema.runnable <span class="im">import</span> RunnableMap</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This runnable map will contain two elements: the first is context, and the context will call the retriever. We may create a lambda function that calls the retriever and accepts the query argument as a parameter. We also want to pass the original question parameter forward, which we can do with another simple lambda function. From here, we want to feed that into the prompt, then into the model, and finally into the output parser.</p>
+<p>So we can just put all of those together in a pipe, call it our chain, and we have a new runnable. And now we bring it up again with the inquiry, “Where did Pranath work?”</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> RunnableMap({</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"context"</span>: <span class="kw">lambda</span> x: retriever.get_relevant_documents(x[<span class="st">"question"</span>]),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"question"</span>: <span class="kw">lambda</span> x: x[<span class="st">"question"</span>]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>}) <span class="op">|</span> prompt <span class="op">|</span> model <span class="op">|</span> output_parser</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>chain.invoke({<span class="st">"question"</span>: <span class="st">"where did pranath work?"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>'Pranath worked at Kensho.'</code></pre>
+</div>
+</div>
+<p>We’d like to take a closer look at what’s going on in the scene. We can simply look at this runnable map. So let’s make a list of variables, hoping, but, and then if we run this on the same thing, we can see that we receive back context, which is a listed document, and then the question, so there’s both pieces there.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> RunnableMap({</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"context"</span>: <span class="kw">lambda</span> x: retriever.get_relevant_documents(x[<span class="st">"question"</span>]),</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"question"</span>: <span class="kw">lambda</span> x: x[<span class="st">"question"</span>]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>inputs.invoke({<span class="st">"question"</span>: <span class="st">"where did pranath work?"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>{'context': [Document(page_content='pranath worked at kensho', metadata={}),
+  Document(page_content='bears like to eat honey', metadata={})],
+ 'question': 'where did pranath work?'}</code></pre>
+</div>
+</div>
+<p>This is then sent into the prompt; we’ve just finished constructing a prompt value, so we’ll just send it into the model, which will return the chat message, pass the output person, and lastly return the string. Another thing we can do with runnables is tie useful functions to them.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>functions <span class="op">=</span> [</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>      <span class="st">"name"</span>: <span class="st">"weather_search"</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">"description"</span>: <span class="st">"Search for weather given an airport code"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">"parameters"</span>: {</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"type"</span>: <span class="st">"object"</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"properties"</span>: {</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>          <span class="st">"airport_code"</span>: {</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"type"</span>: <span class="st">"string"</span>,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"description"</span>: <span class="st">"The airport code to get the weather for"</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>          },</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"required"</span>: [<span class="st">"airport_code"</span>]</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> ChatPromptTemplate.from_messages(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"human"</span>, <span class="st">"</span><span class="sc">{input}</span><span class="st">"</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ChatOpenAI(temperature<span class="op">=</span><span class="dv">0</span>).bind(functions<span class="op">=</span>functions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>runnable <span class="op">=</span> prompt <span class="op">|</span> model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>runnable.invoke({<span class="st">"input"</span>: <span class="st">"what is the weather in sf"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>AIMessage(content='', additional_kwargs={'function_call': {'name': 'weather_search', 'arguments': '{\n  "airport_code": "SFO"\n}'}}, example=False)</code></pre>
+</div>
+</div>
+<p>So, given this collection of functions, we wish to invoke the language model using those functions. Normally, this would seem like a prompt followed by a model. But what about the functions? So, to insert the functions, we can perform <strong>bind</strong>, then functions = functions, and what this does under the hood is that when the model is called, it will send any parameters and bind along with the invitation. So, if we construct a runnable by executing prompt and then typing model, when we call the runnable, an input that should use the function, such as what is the weather, is passed.</p>
+<p>We can see that what we get back is a method with this extra parsing argument and the function call that we expect to return. So lets include another function, sport search. It will look for news about recent sporting events and will enter a team name. We now have two distinct functions here. We may simply update the model by adding additional functions.</p>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>functions <span class="op">=</span> [</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>      <span class="st">"name"</span>: <span class="st">"weather_search"</span>,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">"description"</span>: <span class="st">"Search for weather given an airport code"</span>,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">"parameters"</span>: {</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"type"</span>: <span class="st">"object"</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"properties"</span>: {</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>          <span class="st">"airport_code"</span>: {</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"type"</span>: <span class="st">"string"</span>,</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"description"</span>: <span class="st">"The airport code to get the weather for"</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>          },</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"required"</span>: [<span class="st">"airport_code"</span>]</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">"name"</span>: <span class="st">"sports_search"</span>,</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">"description"</span>: <span class="st">"Search for news of recent sport events"</span>,</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>      <span class="st">"parameters"</span>: {</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"type"</span>: <span class="st">"object"</span>,</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"properties"</span>: {</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>          <span class="st">"team_name"</span>: {</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"type"</span>: <span class="st">"string"</span>,</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>            <span class="st">"description"</span>: <span class="st">"The sports team to search for"</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>          },</span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">"required"</span>: [<span class="st">"team_name"</span>]</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>  ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> model.bind(functions<span class="op">=</span>functions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>runnable <span class="op">=</span> prompt <span class="op">|</span> model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>runnable.invoke({<span class="st">"input"</span>: <span class="st">"how did the patriots do yesterday?"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<pre><code>AIMessage(content='', additional_kwargs={'function_call': {'name': 'sports_search', 'arguments': '{\n  "team_name": "patriots"\n}'}}, example=False)</code></pre>
+</div>
+</div>
+<p>We can see that it is now aware of the sport search.</p>
+</section>
+</section>
+<section id="implementing-fallbacks-and-parallelism" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="implementing-fallbacks-and-parallelism"><span class="header-section-number">7</span> Implementing Fallbacks and Parallelism</h2>
+<p>LCEL’s power is further demonstrated in its ability to handle fallbacks for entire sequences and facilitate parallel executions. For instance, creating a retriever-augmented generation pipeline involves various steps, from fetching relevant documents to parsing the final output, all of which can be configured to run in parallel, enhancing performance.</p>
+<section id="debugging-and-modifying-chains" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="debugging-and-modifying-chains"><span class="header-section-number">7.1</span> Debugging and Modifying Chains</h3>
+<p>Debugging is made easier with LCEL, as developers can inspect each step of the chain and the transformations it undergoes. Additionally, chains can be dynamically altered with new functions or parameters, showcasing the flexibility of the LCEL system.</p>
+<p>So, when we’re attempting to get a language model to generate JSON, let’s take a look at that. We’ll utilise an older version of a language model from OpenAI that isn’t quite as good - to create a circumstance that will fail. To accomplish this, we will import an OpenAI language model. This is distinct from chat models. Chat models are newer forms of models, although they’re generally quite good at things like JSON output. Older models, on the other hand, aren’t. Now we’ll make a simple model and a simple chain.</p>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.llms <span class="im">import</span> OpenAI</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>simple_model <span class="op">=</span> OpenAI(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    temperature<span class="op">=</span><span class="dv">0</span>, </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    max_tokens<span class="op">=</span><span class="dv">1000</span>, </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"text-davinci-001"</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>simple_chain <span class="op">=</span> simple_model <span class="op">|</span> json.loads</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this simple model, we’ll set the temperature to zero to get some determinism. This is an extremely early version of an OpenAI model. Our chain will simply call this language model and then pipe the output into json.loads. This will fail if the outcome of the language model is not correct. We’ll ask it to write three poems in a JSON blob, with each containing a JSON blob with a title, author, and opening line. This is a difficult problem, and we want it to respond with a valid JSON.</p>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>challenge <span class="op">=</span> <span class="st">"write three poems in a json blob, where each poem is a json blob of a title, author, and first line"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>simple_model.invoke(challenge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>'\n\n["The Waste Land","T.S. Eliot","April is the cruelest month, breeding lilacs out of the dead land"]\n\n["The Raven","Edgar Allan Poe","Once upon a midnight dreary, while I pondered, weak and weary"]\n\n["Ode to a Nightingale","John Keats","Thou still unravish\'d bride of quietness, Thou foster-child of silence and slow time"]'</code></pre>
+</div>
+</div>
+<p>And so if we run the simple model on this, we can see that it responds with some structure format, and it’s kind of close. But if we take this and try to decode it with JSON, we can see that we get a JSON decode error.</p>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>simple_chain.invoke(challenge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>JSONDecodeError: Extra data: line 5 column 1 (char 103)</code></pre>
+</div>
+</div>
+<p>The latest OpenAI models are quite good at producing JSON. So we’ll make a model called ChatOpenAI, and then we’ll make a chain by piping that model with an output person, who will basically take the chat message from the model and convert it to a string, and then we’ll pipe that string into json.loads. We can see that this model successfully outputs validation when we apply the same challenge to it.</p>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ChatOpenAI(temperature<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> model <span class="op">|</span> StrOutputParser() <span class="op">|</span> json.loads</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>chain.invoke(challenge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>{'poem1': {'title': 'Whispers of the Wind',
+  'author': 'Emily Rivers',
+  'first_line': 'Softly it comes, the whisper of the wind'},
+ 'poem2': {'title': 'Silent Serenade',
+  'author': 'Jacob Moore',
+  'first_line': 'In the stillness of night, a silent serenade'},
+ 'poem3': {'title': 'Dancing Shadows',
+  'author': 'Sophia Anderson',
+  'first_line': 'Shadows dance upon the moonlit floor'}}</code></pre>
+</div>
+</div>
+<p>We can see that when we call this chain on the challenge, it answers in the correct format. So it tried on the simple chain, failed, then went back to the good chain that sees in ChatOpenAI and succeeded, and that’s what we’re getting from this final chain.</p>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>final_chain <span class="op">=</span> simple_chain.with_fallbacks([chain])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>final_chain.invoke(challenge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<pre><code>{'poem1': {'title': 'Whispers of the Wind',
+  'author': 'Emily Rivers',
+  'first_line': 'Softly it comes, the whisper of the wind'},
+ 'poem2': {'title': 'Silent Serenade',
+  'author': 'Jacob Moore',
+  'first_line': 'In the stillness of night, a silent serenade'},
+ 'poem3': {'title': 'Dancing Shadows',
+  'author': 'Sophia Anderson',
+  'first_line': 'Shadows dance upon the moonlit floor'}}</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="interface" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="interface"><span class="header-section-number">8</span> Interface</h2>
+<p>Finally, lets consider the interface of these runnables. Let’s go back to the previous chain and tell ourselves a joke. Let’s have a look at some of the interface’s different elements now. The one we were using from the start is invoke. This is a straightforward approach that relies on a single variable. There’s also that, which will call it based on a set of inputs. So we call chain.batch after passing in two different inputs, one with bears and one with frogs.</p>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> ChatPromptTemplate.from_template(</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Tell me a short joke about </span><span class="sc">{topic}</span><span class="st">"</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ChatOpenAI()</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>output_parser <span class="op">=</span> StrOutputParser()</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> prompt <span class="op">|</span> model <span class="op">|</span> output_parser</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>chain.invoke({<span class="st">"topic"</span>: <span class="st">"bears"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>"Why don't bears wear shoes? \n\nBecause they have bear feet!"</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>chain.batch([{<span class="st">"topic"</span>: <span class="st">"bears"</span>}, {<span class="st">"topic"</span>: <span class="st">"frogs"</span>}])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<pre><code>["Why don't bears wear shoes? \n\nBecause they have bear feet!",
+ 'Why did the frog take the bus to work?\n\nBecause his car got toad away!']</code></pre>
+</div>
+</div>
+<p>And, under the hood, this is actually executing them in parallel to the greatest extent possible. We can also receive responses in real time. So chain.stream will return an iterable, and we can loop through it to print out the various elements. So, if we run this now, we can see the reaction to that streaming to the user.</p>
+<div class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> chain.stream({<span class="st">"topic"</span>: <span class="st">"bears"</span>}):</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Why
+ don
+'t
+ bears
+ wear
+ shoes
+?
+
+
+Because
+ they
+ already
+ have
+ bear
+ feet
+!
+</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> <span class="cf">await</span> chain.ainvoke({<span class="st">"topic"</span>: <span class="st">"bears"</span>})</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>response</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="38">
+<pre><code>'Why don\'t bears use cell phones? \n\nBecause they can\'t find the "paws" button!'</code></pre>
+</div>
+</div>
+</section>
+<section id="conclusion-the-future-of-chaining-with-lcel" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="conclusion-the-future-of-chaining-with-lcel"><span class="header-section-number">9</span> Conclusion: The Future of Chaining with LCEL</h2>
+<p>LangChain Expression Language represents a significant advancement in the realm of language model chaining, offering a robust, flexible, and efficient framework. Its ability to handle asynchronous operations, fallbacks, parallel processing, and detailed logging paves the way for sophisticated LLM applications. With LCEL, developers are equipped to build, modify, and debug complex chains, ushering in a new era of AI-driven solutions.</p>
+<p>Find out more about LCEL in <a href="https://blog.langchain.dev/langchain-expression-language/">this article</a> and this <a href="https://python.langchain.com/docs/expression_language/">documentation</a>.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">10</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/short-courses/functions-tools-agents-langchain/">Functions, Tools and Agents with LangChain</a> by DeepLearning.ai - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab AI Technical Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>

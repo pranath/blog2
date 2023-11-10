@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Pranath Fernando">
+<meta name="dcterms.date" content="2023-11-07">
+<meta name="description" content="This article will delve into the mechanics of OpenAI’s functions, how to use it to select the appropriate tools for an LLM, and how to execute them efficiently. This can give you the knowledge to create your own tools tailored to specific tasks and to utilize them effectively within the OpenAI framework and Langchain to create powerful LLM based applications.">
+
+<title>LivingDataLab - Langchain and OpenAI Functions - Tools and Routing</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-91568149-1', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../css/styles.css">
+<meta property="og:title" content="LivingDataLab - Langchain and OpenAI Functions - Tools and Routing">
+<meta property="og:description" content="This article will delve into the mechanics of OpenAI’s functions, how to use it to select the appropriate tools for an LLM, and how to execute them efficiently. This can give you the knowledge to create your own tools tailored to specific tasks and to utilize them effectively within the OpenAI framework and Langchain to create powerful LLM based applications.">
+<meta property="og:image" content="https://github.com/pranath/blog/raw/master/images/langchain1.jpg">
+<meta property="og:site-name" content="LivingDataLab">
+<meta name="twitter:title" content="LivingDataLab - Langchain and OpenAI Functions - Tools and Routing">
+<meta name="twitter:description" content="This article will delve into the mechanics of OpenAI’s functions, how to use it to select the appropriate tools for an LLM, and how to execute them efficiently. This can give you the knowledge to create your own tools tailored to specific tasks and to utilize them effectively within the OpenAI framework and Langchain to create powerful LLM based applications.">
+<meta name="twitter:image" content="https://github.com/pranath/blog/raw/master/images/langchain1.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">LivingDataLab</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../projects.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/pranath-fernando/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/LivingDataLab" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/pranath" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../index.xml" rel="" target=""><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Langchain and OpenAI Functions - Tools and Routing</li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Langchain and OpenAI Functions - Tools and Routing</h1>
+                  <div>
+        <div class="description">
+          This article will delve into the mechanics of OpenAI’s functions, how to use it to select the appropriate tools for an LLM, and how to execute them efficiently. This can give you the knowledge to create your own tools tailored to specific tasks and to utilize them effectively within the OpenAI framework and Langchain to create powerful LLM based applications.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">natural-language-processing</div>
+                <div class="quarto-category">langchain</div>
+                <div class="quarto-category">openai</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Pranath Fernando </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 7, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Projects Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Projects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/doc-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Document Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/web-page-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Web Page Summarisation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-chat.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Chat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../projects/youtube-summarisation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">YouTube Summarisation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<!-- Begin Mailchimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+       We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#understanding-langchain-openai-tools-functions" id="toc-understanding-langchain-openai-tools-functions" class="nav-link" data-scroll-target="#understanding-langchain-openai-tools-functions"><span class="header-section-number">2</span> Understanding Langchain &amp; OpenAI Tools &amp; Functions</a></li>
+  <li><a href="#defining-input-schemas" id="toc-defining-input-schemas" class="nav-link" data-scroll-target="#defining-input-schemas"><span class="header-section-number">3</span> Defining Input Schemas</a>
+  <ul class="collapse">
+  <li><a href="#building-functional-tools" id="toc-building-functional-tools" class="nav-link" data-scroll-target="#building-functional-tools"><span class="header-section-number">3.1</span> Building Functional Tools</a></li>
+  </ul></li>
+  <li><a href="#advanced-tool-usage-the-wikipedia-example" id="toc-advanced-tool-usage-the-wikipedia-example" class="nav-link" data-scroll-target="#advanced-tool-usage-the-wikipedia-example"><span class="header-section-number">4</span> Advanced Tool Usage: The Wikipedia Example</a></li>
+  <li><a href="#integrating-openai-functions-with-apis" id="toc-integrating-openai-functions-with-apis" class="nav-link" data-scroll-target="#integrating-openai-functions-with-apis"><span class="header-section-number">5</span> Integrating OpenAI Functions with APIs</a></li>
+  <li><a href="#intelligent-function-selection-and-execution" id="toc-intelligent-function-selection-and-execution" class="nav-link" data-scroll-target="#intelligent-function-selection-and-execution"><span class="header-section-number">6</span> Intelligent Function Selection and Execution</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">7</span> Conclusion</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">8</span> Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>This article will delve into the mechanics of OpenAI’s functions, how to use it to select the appropriate tools for an LLM, and how to execute them efficiently. This can give you the knowledge to create your own tools tailored to specific tasks and to utilize them effectively within the OpenAI framework and Langchain to create powerful LLM based applications.</p>
+</section>
+<section id="understanding-langchain-openai-tools-functions" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="understanding-langchain-openai-tools-functions"><span class="header-section-number">2</span> Understanding Langchain &amp; OpenAI Tools &amp; Functions</h2>
+<p>When we consider having an OpenAI function, there are two parts to it. The first is to let a language model pick which function to employ and what its input should be. The next step is to use those inputs to call that function. Langchain combines those two ideas into a tool, which is really a schema definition for the function that we can then convert into the OpenAI functions type, and a callable, which allows us to actually call that model.</p>
+<p>Many of these tools are incorporated into the package search tools, mask tools, and SQL tools in Langchain, but we’ll focus on constructing our own tools in this piece. One thing that has been discovered is that when constructing your own chain and agents, a lot of it is dependent on really creating your own tools because what you’re attempting to do is probably pretty specific to your own work. So we’ll go over how to simply design our own tools, and then we’ll go over how to use a layer form to select which tools to use, and then call those tools.</p>
+<p>We’ll begin with the standard setup, followed by the import of the tool decorator in Langchain. So we can use this decorator on top of the function, and then when we define the function, we’ll go over how to use the code. So we may use this tool decorator on top of the function that we define. This automatically transforms the function into a Langchain tool that we can use and analyse. So this search engine now has a name, a description, and arguments.</p>
+<p>As a result, all of these will be used to create the open definition action. We may further improve on this by creating a more explicit input schema structure. This is particularly significant since, once again, the language model uses the description of the input to determine what the input should be. As a result, having a very explicit specification for the input becomes critical.</p>
+<div class="cell" data-tags="[]" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> openai</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv, find_dotenv</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> load_dotenv(find_dotenv()) <span class="co"># read local .env file</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>openai.api_key <span class="op">=</span> os.environ[<span class="st">'OPENAI_API_KEY'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="55">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!pip install langchain==0.0.319 openapi-pydantic==0.3.2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> tool</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> search(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Search for weather online"""</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"42f"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>search.name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>'search'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>search.description</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>'search(query: str) -&gt; str - Search for weather online'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>search.args</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>{'query': {'title': 'Query', 'type': 'string'}}</code></pre>
+</div>
+</div>
+<p>We can accomplish this by first creating an Pydantic model, and then when we define the function, we can include our schema, which will search for input. So the search input class is the one that is generated here. It has the same structure as the function, therefore it has a query parameter that corresponds to the query parameter there.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pydantic <span class="im">import</span> BaseModel, Field</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SearchInput(BaseModel):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    query: <span class="bu">str</span> <span class="op">=</span> Field(description<span class="op">=</span><span class="st">"Thing to search for"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span>(args_schema<span class="op">=</span>SearchInput)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> search(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Search for the weather online."""</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"42f"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>search.args</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>{'query': {'title': 'Query',
+  'description': 'Thing to search for',
+  'type': 'string'}}</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>search.run(<span class="st">"sf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>'42f'</code></pre>
+</div>
+</div>
+<p>The primary distinction here is that we’ve added a description for that query option. This is a method of providing description and other information, therefore we want to put it in the field, to the tool’s args_schema. So, if we run this, and then do a search, we can see that we get the description of what we entered. So, if we do this and pass in a string, it is evaluated. And this isn’t actually doing anything beneath the hood, but we’ll see how you can use it later. The first practical tool we’ll build is one that returns the current temperature given a latitude and longitude.</p>
+</section>
+<section id="defining-input-schemas" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="defining-input-schemas"><span class="header-section-number">3</span> Defining Input Schemas</h2>
+<p>So, first and foremost, we’ll create the input schema. So, latitude and longitude, and then the description. This function will then be defined. We’ll use this tool decorator. We’ll pass in args_schema equals open meteo input, and open meteo is the API we’ll be using behind the scenes. We’re dialling cdi.metio.com. We’re referring to the forecast endpoint. So now we have a forecast. And we’re receiving one forecast day ahead of schedule. We’re passing in the longitude and latitude and either passing them into the function or saying that we want the temperature back. We then make this call with the request library, parsing out the response as we proceed.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pydantic <span class="im">import</span> BaseModel, Field</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the input schema</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> OpenMeteoInput(BaseModel):</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    latitude: <span class="bu">float</span> <span class="op">=</span> Field(..., description<span class="op">=</span><span class="st">"Latitude of the location to fetch weather data for"</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    longitude: <span class="bu">float</span> <span class="op">=</span> Field(..., description<span class="op">=</span><span class="st">"Longitude of the location to fetch weather data for"</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span>(args_schema<span class="op">=</span>OpenMeteoInput)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_current_temperature(latitude: <span class="bu">float</span>, longitude: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Fetch current temperature for given coordinates."""</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    BASE_URL <span class="op">=</span> <span class="st">"https://api.open-meteo.com/v1/forecast"</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Parameters for the request</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> {</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">'latitude'</span>: latitude,</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">'longitude'</span>: longitude,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">'hourly'</span>: <span class="st">'temperature_2m'</span>,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">'forecast_days'</span>: <span class="dv">1</span>,</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Make the request</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(BASE_URL, params<span class="op">=</span>params)</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>        results <span class="op">=</span> response.json()</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="ss">f"API Request failed with status code: </span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>    current_utc_time <span class="op">=</span> datetime.datetime.utcnow()</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>    time_list <span class="op">=</span> [datetime.datetime.fromisoformat(time_str.replace(<span class="st">'Z'</span>, <span class="st">'+00:00'</span>)) <span class="cf">for</span> time_str <span class="kw">in</span> results[<span class="st">'hourly'</span>][<span class="st">'time'</span>]]</span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>    temperature_list <span class="op">=</span> results[<span class="st">'hourly'</span>][<span class="st">'temperature_2m'</span>]</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>    closest_time_index <span class="op">=</span> <span class="bu">min</span>(<span class="bu">range</span>(<span class="bu">len</span>(time_list)), key<span class="op">=</span><span class="kw">lambda</span> i: <span class="bu">abs</span>(time_list[i] <span class="op">-</span> current_utc_time))</span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>    current_temperature <span class="op">=</span> temperature_list[closest_time_index]</span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f'The current temperature is </span><span class="sc">{</span>current_temperature<span class="sc">}</span><span class="ss">°C'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="building-functional-tools" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="building-functional-tools"><span class="header-section-number">3.1</span> Building Functional Tools</h3>
+<p>Then, the next day, we obtain the forecast and locate the spot in the forecast that is closest to the current time. Once we’ve done that and got that temperature, we’ll respond with the current temperature in degrees Celsius. We call it current temperature if we look at the name of the description for this. So, given the description, we can see that it contains both the signature and the doc string. Looking at the args, we can see that it has the longitude and latitude. This tool can also be converted into the exact opening error function definition.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>get_current_temperature.name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>'get_current_temperature'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>get_current_temperature.description</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>'get_current_temperature(latitude: float, longitude: float) -&gt; dict - Fetch current temperature for given coordinates.'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>get_current_temperature.args</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>{'latitude': {'title': 'Latitude',
+  'description': 'Latitude of the location to fetch weather data for',
+  'type': 'number'},
+ 'longitude': {'title': 'Longitude',
+  'description': 'Longitude of the location to fetch weather data for',
+  'type': 'number'}}</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.tools.render <span class="im">import</span> format_tool_to_openai_function</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>format_tool_to_openai_function(get_current_temperature)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>{'name': 'get_current_temperature',
+ 'description': 'get_current_temperature(latitude: float, longitude: float) -&gt; dict - Fetch current temperature for given coordinates.',
+ 'parameters': {'title': 'OpenMeteoInput',
+  'type': 'object',
+  'properties': {'latitude': {'title': 'Latitude',
+    'description': 'Latitude of the location to fetch weather data for',
+    'type': 'number'},
+   'longitude': {'title': 'Longitude',
+    'description': 'Longitude of the location to fetch weather data for',
+    'type': 'number'}},
+  'required': ['latitude', 'longitude']}}</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>get_current_temperature({<span class="st">"latitude"</span>: <span class="dv">13</span>, <span class="st">"longitude"</span>: <span class="dv">14</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>'The current temperature is 35.8°C'</code></pre>
+</div>
+</div>
+<p>So, when we do this on a particular tool, we get a JSON blob that combines all of these parts and now has the name, description, and parameter that includes the longitude and latitude values. This is also the format that the opening error function wants. And, once again, we have the latitude and longitude from this tool. This is now a genuine request to open media, with an immediate answer.</p>
+</section>
+</section>
+<section id="advanced-tool-usage-the-wikipedia-example" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="advanced-tool-usage-the-wikipedia-example"><span class="header-section-number">4</span> Advanced Tool Usage: The Wikipedia Example</h2>
+<p>The second tool we’ll use is the Wikipedia tool. So it will use doc search to access the Wikipedia library and return a list of pages. It will iterate over the first three items on that list. And it will obtain further information about that page. So it’ll call Wikipedia.page with the page title we got back, and it’ll get this Wikipedia element. What we are not going to do is create a list of summaries. So we’ll put page and page title, then summary, then finally summary the page.</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> wikipedia</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> search_wikipedia(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Run Wikipedia search and get page summaries."""</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    page_titles <span class="op">=</span> wikipedia.search(query)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    summaries <span class="op">=</span> []</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> page_title <span class="kw">in</span> page_titles[: <span class="dv">3</span>]:</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>            wiki_page <span class="op">=</span>  wikipedia.page(title<span class="op">=</span>page_title, auto_suggest<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>            summaries.append(<span class="ss">f"Page: </span><span class="sc">{</span>page_title<span class="sc">}</span><span class="ch">\n</span><span class="ss">Summary: </span><span class="sc">{</span>wiki_page<span class="sc">.</span>summary<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> (</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.wiki_client.exceptions.PageError,</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.wiki_client.exceptions.DisambiguationError,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>        ):</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">pass</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> summaries:</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"No good Wikipedia Search Result was found"</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"</span><span class="ch">\n\n</span><span class="st">"</span>.join(summaries)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>search_wikipedia.name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>'search_wikipedia'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>search_wikipedia.description</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>'search_wikipedia(query: str) -&gt; str - Run Wikipedia search and get page summaries.'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>format_tool_to_openai_function(search_wikipedia)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>{'name': 'search_wikipedia',
+ 'description': 'search_wikipedia(query: str) -&gt; str - Run Wikipedia search and get page summaries.',
+ 'parameters': {'title': 'search_wikipediaSchemaSchema',
+  'type': 'object',
+  'properties': {'query': {'title': 'Query', 'type': 'string'}},
+  'required': ['query']}}</code></pre>
+</div>
+</div>
+<p>And we’re going to make that list, and then we’ll answer with just a list of those summaries. So, if we look at this tool, we can look at the name and the description. This is transformed to the function definition, which we can then use to provide a query. So let’s look up a langchain and see what Wikipedia knows about it; it returns a slew of them. The langchain page is the first thing that returns. So it has the page as well as the summary.</p>
+<div class="cell" data-scrolled="true" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>search_wikipedia({<span class="st">"query"</span>: <span class="st">"langchain"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>'Page: LangChain\nSummary: LangChain is a framework designed to simplify the creation of applications using large language models (LLMs). As a language model integration framework, LangChain\'s use-cases largely overlap with those of language models in general, including document analysis and summarization, chatbots, and code analysis.\n\nPage: Prompt engineering\nSummary: Prompt engineering is the process of structuring text that can be interpreted and understood by a generative AI model. A prompt is natural language text describing the task that an AI should perform.A prompt for a text-to-text model can be a query such as "what is Fermat\'s little theorem?", a command such as "write a poem about leaves falling", a short statement of feedback (for example, "too verbose", "too formal", "rephrase again", "omit this word") or a longer statement including context, instructions, and input data. Prompt engineering may involve phrasing a query, specifying a style, providing relevant context or assigning a role to the AI such as "Act as a native French speaker". A prompt may include a few examples for a model to learn from, such as "maison -&gt; house, chat -&gt; cat, chien -&gt; dog", an approach called few-shot learning.When communicating with a text-to-image or a text-to-audio model, a typical prompt is a description of a desired output such as "a high-quality photo of an astronaut riding a horse" or "Lo-fi slow BPM electro chill with organic samples". Prompting a text-to-image model may involve adding, removing, emphasizing and re-ordering words to achieve a desired subject, style, layout, lighting, and aesthetic.\n\n\n\nPage: Sentence embedding\nSummary: In natural language processing, a sentence embedding refers to a numeric representation of a sentence in the form of a vector of real numbers which encodes meaningful semantic information.State of the art embeddings are based on the learned hidden layer representation of dedicated sentence transformer models. BERT pioneered an approach involving the use of a dedicated [CLS] token prepended to the beginning of each sentence inputted into the model; the final hidden state vector of this token encodes information about the sentence and can be fine-tuned for use in sentence classification tasks. In practice however, BERT\'s sentence embedding with the [CLS] token achieves poor performance, often worse than simply averaging non-contextual word embeddings. SBERT later achieved superior sentence embedding performance by fine tuning BERT\'s [CLS] token embeddings through the usage of a siamese neural network architecture on the SNLI dataset. \nOther approaches are loosely based on the idea of distributional semantics applied to sentences. Skip-Thought trains an encoder-decoder structure for the task of neighboring sentences predictions. Though this has been shown to achieve worse performance than approaches such as InferSent or SBERT. \nAn alternative direction is to aggregate word embeddings, such as those returned by Word2vec, into sentence embeddings. The most straightforward approach is to simply compute the average of word vectors, known as continuous bag-of-words (CBOW). However, more elaborate solutions based on word vector quantization have also been proposed. One such approach is the vector of locally aggregated word embeddings (VLAWE), which demonstrated performance improvements in downstream text classification tasks.\n\n'</code></pre>
+</div>
+</div>
+<p>Looking down, we can notice that the following page of those results is about quick engineering in general. The third page that appears is regarding patent embedding. As a result, it provides three distinct results to this enormous list text block.</p>
+</section>
+<section id="integrating-openai-functions-with-apis" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="integrating-openai-functions-with-apis"><span class="header-section-number">5</span> Integrating OpenAI Functions with APIs</h2>
+<p>So far, we’ve generated functions in our article and then open AI function definitions for those functions. Functions with which we want to engage are frequently exposed behind the API. In addition, APIs frequently have a defined specification for its inputs and outputs known as an open API specification. So what we’re going to demonstrate now is how to take one of these open API steps and convert it into a list of open AI function calls. Again, this is quite handy because much functionality is hidden behind API.</p>
+<p>As a result, having a general straightforward way to communicate with those APIs has proven to be really beneficial. So we’ll bring in two items. To begin, we will import a function named open API spec and open AI function.</p>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chains.openai_functions.openapi <span class="im">import</span> openapi_spec_to_openai_fn</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.utilities.openapi <span class="im">import</span> OpenAPISpec</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And then there’s this open API spec class. Then, in the first place, we’ll load the open API spec. Take a look at this sample open API specification. The pet specification comes first, followed by a get endpoint. We can then see that there is a post endpoint with the same path, which results in the creation of a pet. Finally, we can see that there is another endpoint that accepts a pet ID and then returns information on that individual pet.</p>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="st">  "openapi": "3.0.0",</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="st">  "info": {</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="st">    "version": "1.0.0",</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="st">    "title": "Swagger Petstore",</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="st">    "license": {</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="st">      "name": "MIT"</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="st">  },</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="st">  "servers": [</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="st">      "url": "http://petstore.swagger.io/v1"</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="st">  ],</span></span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a><span class="st">  "paths": {</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a><span class="st">    "/pets": {</span></span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a><span class="st">      "get": {</span></span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a><span class="st">        "summary": "List all pets",</span></span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a><span class="st">        "operationId": "listPets",</span></span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a><span class="st">        "tags": [</span></span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a><span class="st">          "pets"</span></span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a><span class="st">        ],</span></span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a><span class="st">        "parameters": [</span></span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a><span class="st">          {</span></span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a><span class="st">            "name": "limit",</span></span>
+<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a><span class="st">            "in": "query",</span></span>
+<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a><span class="st">            "description": "How many items to return at one time (max 100)",</span></span>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a><span class="st">            "required": false,</span></span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a><span class="st">            "schema": {</span></span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a><span class="st">              "type": "integer",</span></span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a><span class="st">              "maximum": 100,</span></span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a><span class="st">              "format": "int32"</span></span>
+<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a><span class="st">            }</span></span>
+<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a><span class="st">          }</span></span>
+<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a><span class="st">        ],</span></span>
+<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a><span class="st">        "responses": {</span></span>
+<span id="cb39-38"><a href="#cb39-38" aria-hidden="true" tabindex="-1"></a><span class="st">          "200": {</span></span>
+<span id="cb39-39"><a href="#cb39-39" aria-hidden="true" tabindex="-1"></a><span class="st">            "description": "A paged array of pets",</span></span>
+<span id="cb39-40"><a href="#cb39-40" aria-hidden="true" tabindex="-1"></a><span class="st">            "headers": {</span></span>
+<span id="cb39-41"><a href="#cb39-41" aria-hidden="true" tabindex="-1"></a><span class="st">              "x-next": {</span></span>
+<span id="cb39-42"><a href="#cb39-42" aria-hidden="true" tabindex="-1"></a><span class="st">                "description": "A link to the next page of responses",</span></span>
+<span id="cb39-43"><a href="#cb39-43" aria-hidden="true" tabindex="-1"></a><span class="st">                "schema": {</span></span>
+<span id="cb39-44"><a href="#cb39-44" aria-hidden="true" tabindex="-1"></a><span class="st">                  "type": "string"</span></span>
+<span id="cb39-45"><a href="#cb39-45" aria-hidden="true" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb39-46"><a href="#cb39-46" aria-hidden="true" tabindex="-1"></a><span class="st">              }</span></span>
+<span id="cb39-47"><a href="#cb39-47" aria-hidden="true" tabindex="-1"></a><span class="st">            },</span></span>
+<span id="cb39-48"><a href="#cb39-48" aria-hidden="true" tabindex="-1"></a><span class="st">            "content": {</span></span>
+<span id="cb39-49"><a href="#cb39-49" aria-hidden="true" tabindex="-1"></a><span class="st">              "application/json": {</span></span>
+<span id="cb39-50"><a href="#cb39-50" aria-hidden="true" tabindex="-1"></a><span class="st">                "schema": {</span></span>
+<span id="cb39-51"><a href="#cb39-51" aria-hidden="true" tabindex="-1"></a><span class="st">                  "$ref": "#/components/schemas/Pets"</span></span>
+<span id="cb39-52"><a href="#cb39-52" aria-hidden="true" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb39-53"><a href="#cb39-53" aria-hidden="true" tabindex="-1"></a><span class="st">              }</span></span>
+<span id="cb39-54"><a href="#cb39-54" aria-hidden="true" tabindex="-1"></a><span class="st">            }</span></span>
+<span id="cb39-55"><a href="#cb39-55" aria-hidden="true" tabindex="-1"></a><span class="st">          },</span></span>
+<span id="cb39-56"><a href="#cb39-56" aria-hidden="true" tabindex="-1"></a><span class="st">          "default": {</span></span>
+<span id="cb39-57"><a href="#cb39-57" aria-hidden="true" tabindex="-1"></a><span class="st">            "description": "unexpected error",</span></span>
+<span id="cb39-58"><a href="#cb39-58" aria-hidden="true" tabindex="-1"></a><span class="st">            "content": {</span></span>
+<span id="cb39-59"><a href="#cb39-59" aria-hidden="true" tabindex="-1"></a><span class="st">              "application/json": {</span></span>
+<span id="cb39-60"><a href="#cb39-60" aria-hidden="true" tabindex="-1"></a><span class="st">                "schema": {</span></span>
+<span id="cb39-61"><a href="#cb39-61" aria-hidden="true" tabindex="-1"></a><span class="st">                  "$ref": "#/components/schemas/Error"</span></span>
+<span id="cb39-62"><a href="#cb39-62" aria-hidden="true" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb39-63"><a href="#cb39-63" aria-hidden="true" tabindex="-1"></a><span class="st">              }</span></span>
+<span id="cb39-64"><a href="#cb39-64" aria-hidden="true" tabindex="-1"></a><span class="st">            }</span></span>
+<span id="cb39-65"><a href="#cb39-65" aria-hidden="true" tabindex="-1"></a><span class="st">          }</span></span>
+<span id="cb39-66"><a href="#cb39-66" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb39-67"><a href="#cb39-67" aria-hidden="true" tabindex="-1"></a><span class="st">      },</span></span>
+<span id="cb39-68"><a href="#cb39-68" aria-hidden="true" tabindex="-1"></a><span class="st">      "post": {</span></span>
+<span id="cb39-69"><a href="#cb39-69" aria-hidden="true" tabindex="-1"></a><span class="st">        "summary": "Create a pet",</span></span>
+<span id="cb39-70"><a href="#cb39-70" aria-hidden="true" tabindex="-1"></a><span class="st">        "operationId": "createPets",</span></span>
+<span id="cb39-71"><a href="#cb39-71" aria-hidden="true" tabindex="-1"></a><span class="st">        "tags": [</span></span>
+<span id="cb39-72"><a href="#cb39-72" aria-hidden="true" tabindex="-1"></a><span class="st">          "pets"</span></span>
+<span id="cb39-73"><a href="#cb39-73" aria-hidden="true" tabindex="-1"></a><span class="st">        ],</span></span>
+<span id="cb39-74"><a href="#cb39-74" aria-hidden="true" tabindex="-1"></a><span class="st">        "responses": {</span></span>
+<span id="cb39-75"><a href="#cb39-75" aria-hidden="true" tabindex="-1"></a><span class="st">          "201": {</span></span>
+<span id="cb39-76"><a href="#cb39-76" aria-hidden="true" tabindex="-1"></a><span class="st">            "description": "Null response"</span></span>
+<span id="cb39-77"><a href="#cb39-77" aria-hidden="true" tabindex="-1"></a><span class="st">          },</span></span>
+<span id="cb39-78"><a href="#cb39-78" aria-hidden="true" tabindex="-1"></a><span class="st">          "default": {</span></span>
+<span id="cb39-79"><a href="#cb39-79" aria-hidden="true" tabindex="-1"></a><span class="st">            "description": "unexpected error",</span></span>
+<span id="cb39-80"><a href="#cb39-80" aria-hidden="true" tabindex="-1"></a><span class="st">            "content": {</span></span>
+<span id="cb39-81"><a href="#cb39-81" aria-hidden="true" tabindex="-1"></a><span class="st">              "application/json": {</span></span>
+<span id="cb39-82"><a href="#cb39-82" aria-hidden="true" tabindex="-1"></a><span class="st">                "schema": {</span></span>
+<span id="cb39-83"><a href="#cb39-83" aria-hidden="true" tabindex="-1"></a><span class="st">                  "$ref": "#/components/schemas/Error"</span></span>
+<span id="cb39-84"><a href="#cb39-84" aria-hidden="true" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb39-85"><a href="#cb39-85" aria-hidden="true" tabindex="-1"></a><span class="st">              }</span></span>
+<span id="cb39-86"><a href="#cb39-86" aria-hidden="true" tabindex="-1"></a><span class="st">            }</span></span>
+<span id="cb39-87"><a href="#cb39-87" aria-hidden="true" tabindex="-1"></a><span class="st">          }</span></span>
+<span id="cb39-88"><a href="#cb39-88" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb39-89"><a href="#cb39-89" aria-hidden="true" tabindex="-1"></a><span class="st">      }</span></span>
+<span id="cb39-90"><a href="#cb39-90" aria-hidden="true" tabindex="-1"></a><span class="st">    },</span></span>
+<span id="cb39-91"><a href="#cb39-91" aria-hidden="true" tabindex="-1"></a><span class="st">    "/pets/</span><span class="sc">{petId}</span><span class="st">": {</span></span>
+<span id="cb39-92"><a href="#cb39-92" aria-hidden="true" tabindex="-1"></a><span class="st">      "get": {</span></span>
+<span id="cb39-93"><a href="#cb39-93" aria-hidden="true" tabindex="-1"></a><span class="st">        "summary": "Info for a specific pet",</span></span>
+<span id="cb39-94"><a href="#cb39-94" aria-hidden="true" tabindex="-1"></a><span class="st">        "operationId": "showPetById",</span></span>
+<span id="cb39-95"><a href="#cb39-95" aria-hidden="true" tabindex="-1"></a><span class="st">        "tags": [</span></span>
+<span id="cb39-96"><a href="#cb39-96" aria-hidden="true" tabindex="-1"></a><span class="st">          "pets"</span></span>
+<span id="cb39-97"><a href="#cb39-97" aria-hidden="true" tabindex="-1"></a><span class="st">        ],</span></span>
+<span id="cb39-98"><a href="#cb39-98" aria-hidden="true" tabindex="-1"></a><span class="st">        "parameters": [</span></span>
+<span id="cb39-99"><a href="#cb39-99" aria-hidden="true" tabindex="-1"></a><span class="st">          {</span></span>
+<span id="cb39-100"><a href="#cb39-100" aria-hidden="true" tabindex="-1"></a><span class="st">            "name": "petId",</span></span>
+<span id="cb39-101"><a href="#cb39-101" aria-hidden="true" tabindex="-1"></a><span class="st">            "in": "path",</span></span>
+<span id="cb39-102"><a href="#cb39-102" aria-hidden="true" tabindex="-1"></a><span class="st">            "required": true,</span></span>
+<span id="cb39-103"><a href="#cb39-103" aria-hidden="true" tabindex="-1"></a><span class="st">            "description": "The id of the pet to retrieve",</span></span>
+<span id="cb39-104"><a href="#cb39-104" aria-hidden="true" tabindex="-1"></a><span class="st">            "schema": {</span></span>
+<span id="cb39-105"><a href="#cb39-105" aria-hidden="true" tabindex="-1"></a><span class="st">              "type": "string"</span></span>
+<span id="cb39-106"><a href="#cb39-106" aria-hidden="true" tabindex="-1"></a><span class="st">            }</span></span>
+<span id="cb39-107"><a href="#cb39-107" aria-hidden="true" tabindex="-1"></a><span class="st">          }</span></span>
+<span id="cb39-108"><a href="#cb39-108" aria-hidden="true" tabindex="-1"></a><span class="st">        ],</span></span>
+<span id="cb39-109"><a href="#cb39-109" aria-hidden="true" tabindex="-1"></a><span class="st">        "responses": {</span></span>
+<span id="cb39-110"><a href="#cb39-110" aria-hidden="true" tabindex="-1"></a><span class="st">          "200": {</span></span>
+<span id="cb39-111"><a href="#cb39-111" aria-hidden="true" tabindex="-1"></a><span class="st">            "description": "Expected response to a valid request",</span></span>
+<span id="cb39-112"><a href="#cb39-112" aria-hidden="true" tabindex="-1"></a><span class="st">            "content": {</span></span>
+<span id="cb39-113"><a href="#cb39-113" aria-hidden="true" tabindex="-1"></a><span class="st">              "application/json": {</span></span>
+<span id="cb39-114"><a href="#cb39-114" aria-hidden="true" tabindex="-1"></a><span class="st">                "schema": {</span></span>
+<span id="cb39-115"><a href="#cb39-115" aria-hidden="true" tabindex="-1"></a><span class="st">                  "$ref": "#/components/schemas/Pet"</span></span>
+<span id="cb39-116"><a href="#cb39-116" aria-hidden="true" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb39-117"><a href="#cb39-117" aria-hidden="true" tabindex="-1"></a><span class="st">              }</span></span>
+<span id="cb39-118"><a href="#cb39-118" aria-hidden="true" tabindex="-1"></a><span class="st">            }</span></span>
+<span id="cb39-119"><a href="#cb39-119" aria-hidden="true" tabindex="-1"></a><span class="st">          },</span></span>
+<span id="cb39-120"><a href="#cb39-120" aria-hidden="true" tabindex="-1"></a><span class="st">          "default": {</span></span>
+<span id="cb39-121"><a href="#cb39-121" aria-hidden="true" tabindex="-1"></a><span class="st">            "description": "unexpected error",</span></span>
+<span id="cb39-122"><a href="#cb39-122" aria-hidden="true" tabindex="-1"></a><span class="st">            "content": {</span></span>
+<span id="cb39-123"><a href="#cb39-123" aria-hidden="true" tabindex="-1"></a><span class="st">              "application/json": {</span></span>
+<span id="cb39-124"><a href="#cb39-124" aria-hidden="true" tabindex="-1"></a><span class="st">                "schema": {</span></span>
+<span id="cb39-125"><a href="#cb39-125" aria-hidden="true" tabindex="-1"></a><span class="st">                  "$ref": "#/components/schemas/Error"</span></span>
+<span id="cb39-126"><a href="#cb39-126" aria-hidden="true" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb39-127"><a href="#cb39-127" aria-hidden="true" tabindex="-1"></a><span class="st">              }</span></span>
+<span id="cb39-128"><a href="#cb39-128" aria-hidden="true" tabindex="-1"></a><span class="st">            }</span></span>
+<span id="cb39-129"><a href="#cb39-129" aria-hidden="true" tabindex="-1"></a><span class="st">          }</span></span>
+<span id="cb39-130"><a href="#cb39-130" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb39-131"><a href="#cb39-131" aria-hidden="true" tabindex="-1"></a><span class="st">      }</span></span>
+<span id="cb39-132"><a href="#cb39-132" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb39-133"><a href="#cb39-133" aria-hidden="true" tabindex="-1"></a><span class="st">  },</span></span>
+<span id="cb39-134"><a href="#cb39-134" aria-hidden="true" tabindex="-1"></a><span class="st">  "components": {</span></span>
+<span id="cb39-135"><a href="#cb39-135" aria-hidden="true" tabindex="-1"></a><span class="st">    "schemas": {</span></span>
+<span id="cb39-136"><a href="#cb39-136" aria-hidden="true" tabindex="-1"></a><span class="st">      "Pet": {</span></span>
+<span id="cb39-137"><a href="#cb39-137" aria-hidden="true" tabindex="-1"></a><span class="st">        "type": "object",</span></span>
+<span id="cb39-138"><a href="#cb39-138" aria-hidden="true" tabindex="-1"></a><span class="st">        "required": [</span></span>
+<span id="cb39-139"><a href="#cb39-139" aria-hidden="true" tabindex="-1"></a><span class="st">          "id",</span></span>
+<span id="cb39-140"><a href="#cb39-140" aria-hidden="true" tabindex="-1"></a><span class="st">          "name"</span></span>
+<span id="cb39-141"><a href="#cb39-141" aria-hidden="true" tabindex="-1"></a><span class="st">        ],</span></span>
+<span id="cb39-142"><a href="#cb39-142" aria-hidden="true" tabindex="-1"></a><span class="st">        "properties": {</span></span>
+<span id="cb39-143"><a href="#cb39-143" aria-hidden="true" tabindex="-1"></a><span class="st">          "id": {</span></span>
+<span id="cb39-144"><a href="#cb39-144" aria-hidden="true" tabindex="-1"></a><span class="st">            "type": "integer",</span></span>
+<span id="cb39-145"><a href="#cb39-145" aria-hidden="true" tabindex="-1"></a><span class="st">            "format": "int64"</span></span>
+<span id="cb39-146"><a href="#cb39-146" aria-hidden="true" tabindex="-1"></a><span class="st">          },</span></span>
+<span id="cb39-147"><a href="#cb39-147" aria-hidden="true" tabindex="-1"></a><span class="st">          "name": {</span></span>
+<span id="cb39-148"><a href="#cb39-148" aria-hidden="true" tabindex="-1"></a><span class="st">            "type": "string"</span></span>
+<span id="cb39-149"><a href="#cb39-149" aria-hidden="true" tabindex="-1"></a><span class="st">          },</span></span>
+<span id="cb39-150"><a href="#cb39-150" aria-hidden="true" tabindex="-1"></a><span class="st">          "tag": {</span></span>
+<span id="cb39-151"><a href="#cb39-151" aria-hidden="true" tabindex="-1"></a><span class="st">            "type": "string"</span></span>
+<span id="cb39-152"><a href="#cb39-152" aria-hidden="true" tabindex="-1"></a><span class="st">          }</span></span>
+<span id="cb39-153"><a href="#cb39-153" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb39-154"><a href="#cb39-154" aria-hidden="true" tabindex="-1"></a><span class="st">      },</span></span>
+<span id="cb39-155"><a href="#cb39-155" aria-hidden="true" tabindex="-1"></a><span class="st">      "Pets": {</span></span>
+<span id="cb39-156"><a href="#cb39-156" aria-hidden="true" tabindex="-1"></a><span class="st">        "type": "array",</span></span>
+<span id="cb39-157"><a href="#cb39-157" aria-hidden="true" tabindex="-1"></a><span class="st">        "maxItems": 100,</span></span>
+<span id="cb39-158"><a href="#cb39-158" aria-hidden="true" tabindex="-1"></a><span class="st">        "items": {</span></span>
+<span id="cb39-159"><a href="#cb39-159" aria-hidden="true" tabindex="-1"></a><span class="st">          "$ref": "#/components/schemas/Pet"</span></span>
+<span id="cb39-160"><a href="#cb39-160" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb39-161"><a href="#cb39-161" aria-hidden="true" tabindex="-1"></a><span class="st">      },</span></span>
+<span id="cb39-162"><a href="#cb39-162" aria-hidden="true" tabindex="-1"></a><span class="st">      "Error": {</span></span>
+<span id="cb39-163"><a href="#cb39-163" aria-hidden="true" tabindex="-1"></a><span class="st">        "type": "object",</span></span>
+<span id="cb39-164"><a href="#cb39-164" aria-hidden="true" tabindex="-1"></a><span class="st">        "required": [</span></span>
+<span id="cb39-165"><a href="#cb39-165" aria-hidden="true" tabindex="-1"></a><span class="st">          "code",</span></span>
+<span id="cb39-166"><a href="#cb39-166" aria-hidden="true" tabindex="-1"></a><span class="st">          "message"</span></span>
+<span id="cb39-167"><a href="#cb39-167" aria-hidden="true" tabindex="-1"></a><span class="st">        ],</span></span>
+<span id="cb39-168"><a href="#cb39-168" aria-hidden="true" tabindex="-1"></a><span class="st">        "properties": {</span></span>
+<span id="cb39-169"><a href="#cb39-169" aria-hidden="true" tabindex="-1"></a><span class="st">          "code": {</span></span>
+<span id="cb39-170"><a href="#cb39-170" aria-hidden="true" tabindex="-1"></a><span class="st">            "type": "integer",</span></span>
+<span id="cb39-171"><a href="#cb39-171" aria-hidden="true" tabindex="-1"></a><span class="st">            "format": "int32"</span></span>
+<span id="cb39-172"><a href="#cb39-172" aria-hidden="true" tabindex="-1"></a><span class="st">          },</span></span>
+<span id="cb39-173"><a href="#cb39-173" aria-hidden="true" tabindex="-1"></a><span class="st">          "message": {</span></span>
+<span id="cb39-174"><a href="#cb39-174" aria-hidden="true" tabindex="-1"></a><span class="st">            "type": "string"</span></span>
+<span id="cb39-175"><a href="#cb39-175" aria-hidden="true" tabindex="-1"></a><span class="st">          }</span></span>
+<span id="cb39-176"><a href="#cb39-176" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb39-177"><a href="#cb39-177" aria-hidden="true" tabindex="-1"></a><span class="st">      }</span></span>
+<span id="cb39-178"><a href="#cb39-178" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb39-179"><a href="#cb39-179" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb39-180"><a href="#cb39-180" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb39-181"><a href="#cb39-181" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’ll load the open API spec onto this pet and then incorporate that step into the open API stage. First, we’ll get the function definition back, the open AI function definition that we may utilise. Second, we’ll get a collection of callables that we may use to invoke those functions. Because it’s a made-up step, the callables won’t be genuine, but if this was a true function in the spec, they’d work.</p>
+<p>As can be seen, we have three functions. We have the list pets function first, then the create pets method, and finally the show pet by ID function.</p>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>spec <span class="op">=</span> OpenAPISpec.from_text(text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Attempting to load an OpenAPI 3.0.0 spec.  This may result in degraded performance. Convert your OpenAPI spec to 3.1.* spec for better support.</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>pet_openai_functions, pet_callables <span class="op">=</span> openapi_spec_to_openai_fn(spec)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>pet_openai_functions</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>[{'name': 'listPets',
+  'description': 'List all pets',
+  'parameters': {'type': 'object',
+   'properties': {'params': {'type': 'object',
+     'properties': {'limit': {'type': 'integer',
+       'maximum': 100.0,
+       'schema_format': 'int32',
+       'description': 'How many items to return at one time (max 100)'}},
+     'required': []}}}},
+ {'name': 'createPets',
+  'description': 'Create a pet',
+  'parameters': {'type': 'object', 'properties': {}}},
+ {'name': 'showPetById',
+  'description': 'Info for a specific pet',
+  'parameters': {'type': 'object',
+   'properties': {'path_params': {'type': 'object',
+     'properties': {'petId': {'type': 'string',
+       'description': 'The id of the pet to retrieve'}},
+     'required': ['petId']}}}}]</code></pre>
+</div>
+</div>
+</section>
+<section id="intelligent-function-selection-and-execution" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="intelligent-function-selection-and-execution"><span class="header-section-number">6</span> Intelligent Function Selection and Execution</h2>
+<p>We’ll now demonstrate how to use a language model to decide which of these functions to invoke. So we’re going to import an OpenAI model and then generate a simplified version of it. And we’ll use temperature equals zero once more because we want to choose amongst functions in a predictable manner. Then we’ll look for it in the function arguments.</p>
+<p>We’ll use the open AI model to determine which function to execute, and then we’ll do the invocation. This results in something called <strong>routing</strong>, in which we use the language model to identify which path to take as well as the inputs to that path. First, we’ll compile a list of open AI functions that we’ll employ. So we’ll call format tools and open AI functions on our two tools, starting with wikipedia and getting the current temperature. Then we’ll build a model, set the temperature to zero, and bind to those functions.</p>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.chat_models <span class="im">import</span> ChatOpenAI</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ChatOpenAI(temperature<span class="op">=</span><span class="dv">0</span>).bind(functions<span class="op">=</span>pet_openai_functions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s give that model a few sentences. So, let’s base it on what’s in our step right now. It appears to use the get current temperature tool with parameters as well as the current latitude and longitude. If we look at what is langchain, we can see that it uses the wikipedia search tool with the query langchain. Before proceeding to the model call, we’ll take the next step and add a prompt.</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>model.invoke(<span class="st">"what are three pets names"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>AIMessage(content='', additional_kwargs={'function_call': {'name': 'listPets', 'arguments': '{\n  "params": {\n    "limit": 3\n  }\n}'}})</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>model.invoke(<span class="st">"tell me about pet with id 42"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>AIMessage(content='', additional_kwargs={'function_call': {'name': 'showPetById', 'arguments': '{\n  "path_params": {\n    "petId": "42"\n  }\n}'}})</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>functions <span class="op">=</span> [</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>    format_tool_to_openai_function(f) <span class="cf">for</span> f <span class="kw">in</span> [</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>        search_wikipedia, get_current_temperature</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ChatOpenAI(temperature<span class="op">=</span><span class="dv">0</span>).bind(functions<span class="op">=</span>functions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>model.invoke(<span class="st">"what is the weather in sf right now"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<pre><code>AIMessage(content='', additional_kwargs={'function_call': {'name': 'get_current_temperature', 'arguments': '{\n  "latitude": 37.7749,\n  "longitude": -122.4194\n}'}})</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>model.invoke(<span class="st">"what is langchain"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>AIMessage(content='', additional_kwargs={'function_call': {'name': 'search_wikipedia', 'arguments': '{\n  "query": "langchain"\n}'}})</code></pre>
+</div>
+</div>
+<p>So we’re going to make a very simple adjustment in which this prompt and its model are very simple, just a system message that says you’re a helpful assistant.</p>
+<p>But we’re showing this because if you need to customise the prompt to be more relevant to the type of path you’re attempting to solve, this will show you how to do so. And now, when we apply the adjustment to the same inputs, we observe that we receive the same result. This is good and beneficial, but there is still a minor issue because we have this AI message with null content, an additional inquiry with self-dictionary content, function calls with self-dictionary content, and so on.</p>
+<div class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.prompts <span class="im">import</span> ChatPromptTemplate</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"You are helpful but sassy assistant"</span>),</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"</span><span class="sc">{input}</span><span class="st">"</span>),</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> prompt <span class="op">|</span> model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>chain.invoke({<span class="st">"input"</span>: <span class="st">"what is the weather in sf right now"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="37">
+<pre><code>AIMessage(content='', additional_kwargs={'function_call': {'name': 'get_current_temperature', 'arguments': '{\n  "latitude": 37.7749,\n  "longitude": -122.4194\n}'}})</code></pre>
+</div>
+</div>
+<p>So what we’re going to do is transform this into a bit more readable output. Consider the various outcomes of this answer as well. The two key ones are when it decides to call a tool and when it decides not to call a tool. When it doesn’t decide to call a tool, the major thing we’re looking at is the worth of content. When it does decide to call a tool, the important item we’re interested in is both the tool that it calls and the input to that tool.</p>
+<p>It would be ideal if the input to that tool was not just a string of this JSON block, but rather parsed out into a dictionary, like we saw in the <a href="../posts/2023-11-06-tagging-and-extraction-with-openai-and-langchain.html">tagging and extractions article</a>. This is possible with a new output parser. This will take the output and parse it into a format containing that information. First, determine whether it is simply a function call or a response. Second, if it is a function call, what function should be called, and what is the input? We’ll make a chain by combining the above prompt with the model and then exit the parser.</p>
+<div class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents.output_parsers <span class="im">import</span> OpenAIFunctionsAgentOutputParser</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> prompt <span class="op">|</span> model <span class="op">|</span> OpenAIFunctionsAgentOutputParser()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The chain will then be invoked on the same input as previously. Let’s see what the end result looks like.</p>
+<p>So, based on the type of effect, it is an agent activity.</p>
+<p>And this is due to the fact that it will be calling one of these tools.</p>
+<div class="cell" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> chain.invoke({<span class="st">"input"</span>: <span class="st">"what is the weather in sf right now"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="41">
+<pre><code>langchain.schema.agent.AgentActionMessageLog</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>result.tool</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="42">
+<pre><code>'get_current_temperature'</code></pre>
+</div>
+</div>
+<p>So, if we call result.tool, we can now see if we succeeded in determining what that tool is. And we have this chunk of inputs that we want to send to the tool if we use result.tool.input.</p>
+<p>We can then do things like send the tool input into the function itself. So we can feed this into the system and obtain the reaction to the current temperature in the cell.</p>
+<p>What happens when the tool is called? What if they’re the same kind?</p>
+<div class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>result.tool_input</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="43">
+<pre><code>{'latitude': 37.7749, 'longitude': -122.4194}</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="44">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>get_current_temperature(result.tool_input)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="44">
+<pre><code>'The current temperature is 8.3°C'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> chain.invoke({<span class="st">"input"</span>: <span class="st">"hi!"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="46">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="46">
+<pre><code>langchain.schema.agent.AgentFinish</code></pre>
+</div>
+</div>
+<p>Looking at this and the type of result, we can see that we receive it in agent finish.</p>
+<p>So we’ll have a look at result.returnValue, which is available on all agent finish types. So far, we’ve seen how, depending on the input, it might be an agent action or an agent finish.</p>
+<p>What exactly is happening inside? What’s going on is fairly straightforward. If a function is called, we consider it an agent activity. If no function is called and the response is merely a standard response, we describe it as an agent finish.</p>
+<div class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>result.return_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="47">
+<pre><code>{'output': 'Hello! How can I assist you today?'}</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="48">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.schema.agent <span class="im">import</span> AgentFinish</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> route(result):</span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(result, AgentFinish):</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result.return_values[<span class="st">'output'</span>]</span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>        tools <span class="op">=</span> {</span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"search_wikipedia"</span>: search_wikipedia, </span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"get_current_temperature"</span>: get_current_temperature,</span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> tools[result.tool].run(result.tool_input)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’ve seen how we can use a language to determine what actions to do or whether to take any actions at all, and how this can be represented as an agent finish or an agent action.</p>
+<p>The final step will be to carry out the right action. To accomplish this, we will define a route function. This route function will act on the language model’s output and do the necessary steps.</p>
+<p>So we’ll check to see whether it’s an agent finish, and if it is, we’ll simply return the values and output. If it’s not an agent finish, therefore if it’s an agent action, we’ll look up the appropriate tool for you and then run that tool with the tool input as stated.</p>
+<p>Let’s make a new chain that is identical to the previous one, except that we are now including the final step of this route function.</p>
+<div class="cell" data-execution_count="49">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>chain <span class="op">=</span> prompt <span class="op">|</span> model <span class="op">|</span> OpenAIFunctionsAgentOutputParser() <span class="op">|</span> route</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’ll put together the prompt. This will be used as a model. We’ll translate that output into an agent finish or an agent action and then pass it through this route method.</p>
+<p>Let’s use the weather as an example of what we’re asking. So, how is the weather and temperature today?</p>
+<div class="cell" data-execution_count="50">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> chain.invoke({<span class="st">"input"</span>: <span class="st">"What is the weather in san francisco right now?"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="51">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="51">
+<pre><code>'The current temperature is 8.3°C'</code></pre>
+</div>
+</div>
+<p>Let’s try it on an input where we want it to call Wikipedia, so we’ll execute it with langchain and inspect the result before passing it.</p>
+<p>We get this enormous block back, which is what we got when we first looked up what langchain is on Wikipedia.</p>
+<div class="cell" data-execution_count="52">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> chain.invoke({<span class="st">"input"</span>: <span class="st">"What is langchain?"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-scrolled="true" data-execution_count="53">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="53">
+<pre><code>'Page: LangChain\nSummary: LangChain is a framework designed to simplify the creation of applications using large language models (LLMs). As a language model integration framework, LangChain\'s use-cases largely overlap with those of language models in general, including document analysis and summarization, chatbots, and code analysis.\n\nPage: Prompt engineering\nSummary: Prompt engineering is the process of structuring text that can be interpreted and understood by a generative AI model. A prompt is natural language text describing the task that an AI should perform.A prompt for a text-to-text model can be a query such as "what is Fermat\'s little theorem?", a command such as "write a poem about leaves falling", a short statement of feedback (for example, "too verbose", "too formal", "rephrase again", "omit this word") or a longer statement including context, instructions, and input data. Prompt engineering may involve phrasing a query, specifying a style, providing relevant context or assigning a role to the AI such as "Act as a native French speaker". A prompt may include a few examples for a model to learn from, such as "maison -&gt; house, chat -&gt; cat, chien -&gt; dog", an approach called few-shot learning.When communicating with a text-to-image or a text-to-audio model, a typical prompt is a description of a desired output such as "a high-quality photo of an astronaut riding a horse" or "Lo-fi slow BPM electro chill with organic samples". Prompting a text-to-image model may involve adding, removing, emphasizing and re-ordering words to achieve a desired subject, style, layout, lighting, and aesthetic.\n\n\n\nPage: Sentence embedding\nSummary: In natural language processing, a sentence embedding refers to a numeric representation of a sentence in the form of a vector of real numbers which encodes meaningful semantic information.State of the art embeddings are based on the learned hidden layer representation of dedicated sentence transformer models. BERT pioneered an approach involving the use of a dedicated [CLS] token prepended to the beginning of each sentence inputted into the model; the final hidden state vector of this token encodes information about the sentence and can be fine-tuned for use in sentence classification tasks. In practice however, BERT\'s sentence embedding with the [CLS] token achieves poor performance, often worse than simply averaging non-contextual word embeddings. SBERT later achieved superior sentence embedding performance by fine tuning BERT\'s [CLS] token embeddings through the usage of a siamese neural network architecture on the SNLI dataset. \nOther approaches are loosely based on the idea of distributional semantics applied to sentences. Skip-Thought trains an encoder-decoder structure for the task of neighboring sentences predictions. Though this has been shown to achieve worse performance than approaches such as InferSent or SBERT. \nAn alternative direction is to aggregate word embeddings, such as those returned by Word2vec, into sentence embeddings. The most straightforward approach is to simply compute the average of word vectors, known as continuous bag-of-words (CBOW). However, more elaborate solutions based on word vector quantization have also been proposed. One such approach is the vector of locally aggregated word embeddings (VLAWE), which demonstrated performance improvements in downstream text classification tasks.\n\n'</code></pre>
+</div>
+</div>
+<p>And then finally, let’s try it out on something really simple.</p>
+<div class="cell" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>chain.invoke({<span class="st">"input"</span>: <span class="st">"hi!"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="54">
+<pre><code>'Hello! How can I assist you today?'</code></pre>
+</div>
+</div>
+</section>
+<section id="conclusion" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">7</span> Conclusion</h2>
+<p>In this post, we’ve outlined the intricacies of OpenAI’s advanced tool usage, from the langchain concept to the practical creation of tools and their integration with APIs. We’ve also shown how the OpenAI model can act as a smart selector and executor of functions, culminating in a comprehensive system capable of routing and performing actions.</p>
+</section>
+<section id="acknowledgements" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="acknowledgements"><span class="header-section-number">8</span> Acknowledgements</h2>
+<p>I’d like to express my thanks to the wonderful <a href="https://www.deeplearning.ai/short-courses/functions-tools-agents-langchain/">Functions, Tools and Agents with LangChain</a> by DeepLearning.ai - which i completed, and acknowledge the use of some images and other materials from the course in this article.</p>
+
+
+</section>
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-071822.css" rel="stylesheet" type="text/css"><div id="mc_embed_signup">
+    <form action="https://livingdatalab.us8.list-manage.com/subscribe/post?u=e2d57b0d6e43b4f6bff927a55&amp;id=a30bdff125&amp;f_id=009d05e0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+        <div id="mc_embed_signup_scroll">
+        <h2 class="anchored">Subscribe</h2>
+<div class="mc-field-group">
+    <label for="mce-EMAIL">Email Address
+</label>
+    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" required="">
+    <span id="mce-EMAIL-HELPERTEXT" class="helper_text"></span>
+</div>
+    <div id="mce-responses" class="clear foot">
+        <div class="response" id="mce-error-response" style="display:none"></div>
+        <div class="response" id="mce-success-response" style="display:none"></div>
+    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e2d57b0d6e43b4f6bff927a55_a30bdff125" tabindex="-1" value=""></div>
+        <div class="optionalParent">
+            <div class="clear foot">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+            </div>
+        </div>
+    </div>
+</form>
+</div><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("http:\/\/livingdatalab\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">LivingDataLab AI Technical Blog</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>
