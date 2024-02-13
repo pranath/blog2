@@ -16,22 +16,19 @@ website:
   navbar:
     logo: "images/logo.png"
     right:
+      - icon: substack
+        text: Newsletter
+        href: https://thefuturai.substack.com/
       - text: "Blog"
         file: index.qmd
       - text: "Projects"
         file: projects.qmd
       - text: "About"
         file: about.qmd
-      - icon: medium
-        text: Medium
-        href: https://medium.com/@pranathfernando
       - icon: linkedin
         href: https://www.linkedin.com/in/pranath-fernando/
       - icon: twitter
         href: https://twitter.com/LivingDataLab
-      - icon: facebook
-        text: Facebook
-        href: https://www.facebook.com/profile.php?id=61553930042412
       - icon: github
         href: https://github.com/pranath
       - icon: rss

@@ -7,18 +7,15 @@ format:
 about:
   template: jolla
   links:
-    - icon: medium
-      text: Medium
-      href: https://medium.com/@pranathfernando
+    - icon: substack
+      text: Newsletter
+      href: https://thefuturai.substack.com/
     - icon: twitter
       text: Twitter
       href: https://twitter.com/LivingDataLab
     - icon: linkedin
       text: LinkedIn
       href: https://www.linkedin.com/in/pranath-fernando/
-    - icon: facebook
-      text: Facebook
-      href: https://www.facebook.com/profile.php?id=61553930042412
     - icon: github
       text: Github
       href: https://github.com/pranath
@@ -27,6 +24,4 @@ about:
 
 Livingdatalab is the AI Technical Blog of Pranath Fernando, an AI Consultant, AI Strategist & Data Scientist with a special interest in NLP, Large Language Models (LLM's) and its applications.
 
-I also write on [Medium](https://medium.com/@pranathfernando) about Artificial Intelligence and its impact on people, society and businesses.
-
-I can be contacted via Medium, LinkedIn Twitter or Facebook using the links below.
+I also publish a newsletter [The FuturAI](https://medium.com/@pranathfernando) about Artificial Intelligence and its impact on people, society and businesses.
